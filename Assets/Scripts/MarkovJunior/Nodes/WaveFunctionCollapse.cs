@@ -116,7 +116,7 @@ namespace MarkovJunior
                 }
                 else n++;
 
-                if (n >= 0 || ip.gif) UpdateState();
+                if (n >= 0 || ip.animated) UpdateState();
                 return true;
             }
         }

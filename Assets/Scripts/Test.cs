@@ -2,12 +2,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Entities.Graphics;
@@ -25,10 +25,21 @@ namespace MarkovBlocks
         private static readonly Bounds cubeBounds = new Bounds(new(0.5F, 0.5F, 0.5F), new(1F, 1F, 1F));
         private static readonly RenderBounds renderBounds = new RenderBounds { Value = cubeBounds.ToAABB() };
 
-        [SerializeField] public Material? cubeMaterial;
-        private Mesh[] cubeMeshes = new Mesh[1];
+        [SerializeField] public string modelName = "Apartemazements";
+        [SerializeField] public int modelLength = 1;
+        [SerializeField] public int modelWidth  = 1;
+        [SerializeField] public int modelHeight = 1;
+        [SerializeField] public int modelAmount = 2;
+        [SerializeField] public int modelSteps = 1000;
+        [SerializeField] public string? modelSeed = string.Empty;
 
-        [SerializeField] public TMP_InputField? modelInput;
+        [SerializeField] public TMP_Text? playbackSpeedText, generationText;
+        [SerializeField] public Slider? playbackSpeedSlider;
+
+        [SerializeField] public Material? cubeMaterial;
+
+        private float playbackSpeed = 1F;
+        private Mesh[] cubeMeshes = new Mesh[1];
 
         private void GenerateCubeMeshes()
         {
@@ -85,12 +96,6 @@ namespace MarkovBlocks
 
         private IEnumerator RunTest()
         {
-            #region Init Start =====================================================================
-            // Generate cube meshes
-            GenerateCubeMeshes();
-            var cubeCount = 0;
-            #endregion Init End =======================================================================
-        
             var sw = System.Diagnostics.Stopwatch.StartNew();
             var folder = System.IO.Directory.CreateDirectory("output");
             foreach (var file in folder.GetFiles()) file.Delete();
@@ -98,113 +103,84 @@ namespace MarkovBlocks
             Dictionary<char, int> palette = XDocument.Load(PathHelper.GetExtraDataFile("palette.xml")).Root.Elements("color")
                     .ToDictionary(x => x.Get<char>("symbol"), x => (255 << 24) + Convert.ToInt32(x.Get<string>("value"), 16));
 
-            if (modelInput == null)
-            {
-                Debug.LogError("Model input field is not assigned");
-                yield break;
-            }
-
-            XElement? xmodel = null;
-
-            try
-            {
-                xmodel = XElement.Load(new StringReader(modelInput.text), LoadOptions.None);
-                
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"Failed to parse model input: {e}");
-                yield break;
-            }
-            
-            string name = xmodel.Get<string>("name");
-            int linearSize = xmodel.Get("size", -1);
-            int dimension = xmodel.Get("d", 2);
-            int MX = xmodel.Get("length", linearSize);
-            int MY = xmodel.Get("width", linearSize);
-            int MZ = xmodel.Get("height", dimension == 2 ? 1 : linearSize);
-
             System.Random rand = new();
 
-            Debug.Log($"{name} > ");
-            string filename = PathHelper.GetExtraDataFile($"models/{name}.xml");
+            Debug.Log($"{modelName} > ");
+            string filename = PathHelper.GetExtraDataFile($"models/{modelName}.xml");
 
             XDocument modeldoc;
             try { modeldoc = XDocument.Load(filename, LoadOptions.SetLineInfo); }
             catch (Exception)
             {
-                Debug.Log($"ERROR: couldn't open xml file {filename}");
+                Debug.Log($"ERROR: Couldn't open xml file {filename}");
                 yield break;
             }
 
-            Interpreter interpreter = Interpreter.Load(modeldoc.Root, MX, MY, MZ);
+            Interpreter interpreter = Interpreter.Load(modeldoc.Root, modelLength, modelWidth, modelHeight);
             if (interpreter == null)
             {
-                Debug.Log("ERROR");
+                Debug.Log("ERROR: Failed to creating model interpreter");
                 yield break;
             }
 
-            int amount = xmodel.Get("amount", 2);
-            int pixelsize = xmodel.Get("pixelsize", 4);
-            string? seedString = xmodel.Get<string?>("seeds", null);
-            int[]? seeds = seedString?.Split(' ').Select(s => int.Parse(s)).ToArray();
-            bool gif = xmodel.Get("gif", false);
-            bool iso = xmodel.Get("iso", false);
-            int steps = xmodel.Get("steps", gif ? 1000 : 50000);
-            int gui = xmodel.Get("gui", 0);
-            if (gif) amount = 1;
-
+            if (modelSeed != null && modelSeed.Trim().Equals(string.Empty)) // Seed not specified
+                modelSeed = null;
+            
+            int[]? seeds = modelSeed?.Split(' ').Select(s => int.Parse(s)).ToArray();
+            
             Dictionary<char, int> customPalette = new(palette);
 
+            /* TODO: Implement
             foreach (var x in xmodel.Elements("color"))
                 customPalette[x.Get<char>("symbol")] = (255 << 24) + Convert.ToInt32(x.Get<string>("value"), 16);
+            */
 
-            var tick = 0.1F;
-            var wait = new WaitForSeconds(tick);
+            var resultPerLine = Mathf.RoundToInt(Mathf.Sqrt(modelAmount));
 
-            var resultPerLine = Mathf.RoundToInt(Mathf.Sqrt(amount));
             if (resultPerLine <= 0)
                 resultPerLine = 1;
 
-            for (int k = 0; k < amount; k++)
+            for (int k = 0; k < modelAmount; k++)
             {
                 int seed = seeds != null && k < seeds.Length ? seeds[k] : rand.Next();
                 int frameCount = 0;
 
-                foreach ((byte[] result, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, steps, gif))
+                int4[] instanceDataRaw = { };
+
+                foreach ((byte[] result, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, modelSteps, true))
                 {
                     int[] colors = legend.Select(ch => customPalette[ch]).ToArray();
+                    float tick = 1F / playbackSpeed;
+
+                    // Update generation text
+                    if (generationText != null)
+                    {
+                        generationText.text = $"Iteration: {k}\nFrame: {frameCount}\nTick: {(int)(tick * 1000)}ms";
+                    }
 
                     frameCount++;
 
                     int xCount = k % resultPerLine, zCount = k / resultPerLine;
                     int ox = xCount * (FX + 2), oz = zCount * (FY + 2);
 
-                    var instanceDataRaw = GetInstanceData(result, (byte)FX, (byte)FY, (byte)FZ, ox, 0, oz, FZ > 1, colors);
+                    instanceDataRaw = CubeDataBuilder.GetInstanceData(result,
+                            (byte)FX, (byte)FY, (byte)FZ, ox, 0, oz, FZ > 1, colors);
 
-                    VisualizeState(instanceDataRaw, cubeMeshes, ref cubeCount, tick);
+                    VisualizeState(instanceDataRaw, cubeMeshes, tick);
 
-                    yield return wait;
+                    yield return new WaitForSeconds(tick);
                 }
 
-                Debug.Log($"DONE Frame Count: {frameCount}");
-
-                yield return wait;
+                Debug.Log($"Generation complete. Frame Count: {frameCount}");
+                FinalizeState(instanceDataRaw, cubeMeshes);
             }
-            
 
-            #region Finalize Start =================================================================
-            //entityManager.DestroyEntity(prototype);
-
-            #endregion Finalize End ===================================================================
-
-            Debug.Log($"time = {sw.ElapsedMilliseconds}, totalCubeCount = {cubeCount}");
+            Debug.Log($"Time elapsed: {sw.ElapsedMilliseconds}ms");
         }
 
-        private void VisualizeState(int4[] instanceDataRaw, Mesh[] meshes, ref int cubeCount, float persistence)
+        private void VisualizeState(int4[] instanceDataRaw, Mesh[] meshes, float persistence)
         {
             var entityCount = instanceDataRaw.Length;
-            cubeCount += entityCount;
 
             var instanceData = new NativeArray<int4>(entityCount, Allocator.TempJob);
             instanceData.CopyFrom(instanceDataRaw);
@@ -232,7 +208,7 @@ namespace MarkovBlocks
                 renderMeshArray,
                 MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
             entityManager.AddComponentData(prototype, new URPMaterialPropertyBaseColor());
-            entityManager.AddComponentData(prototype, new MagicComponent { TimeLeft = persistence + 0.01F });
+            entityManager.AddComponentData(prototype, new MagicComponent());
             #endregion
 
             // Spawn most of the entities in a Burst job by cloning a pre-created prototype entity,
@@ -244,7 +220,7 @@ namespace MarkovBlocks
                 Prototype = prototype,
                 RenderBounds = renderBounds,
                 InstanceData = instanceData,
-                LifeTime = 1F
+                LifeTime = persistence
             };
 
             var spawnHandle = spawnJob.Schedule(entityCount, 128);
@@ -255,69 +231,87 @@ namespace MarkovBlocks
             ecbJob.Dispose();
 
             entityManager.DestroyEntity(prototype);
-            
         }
 
-        private static bool checkNotOpaque3d(byte block) => block == 0;
-
-        private int4[] GetInstanceData(byte[] state, byte FX, byte FY, byte FZ, int ox, int oy, int oz, bool is3d, int[] palette)
+        private void FinalizeState(int4[] instanceDataRaw, Mesh[] meshes)
         {
-            if (cubeMaterial == null)
+            var entityCount = instanceDataRaw.Length;
+
+            var instanceData = new NativeArray<int4>(entityCount, Allocator.TempJob);
+            instanceData.CopyFrom(instanceDataRaw);
+
+            var world = World.DefaultGameObjectInjectionWorld;
+            var entityManager = world.EntityManager;
+            EntityCommandBuffer ecbJob = new EntityCommandBuffer(Allocator.TempJob);
+            
+            #region Prepare entity prototype
+            var filterSettings = RenderFilterSettings.Default;
+
+            var renderMeshArray = new RenderMeshArray(new[] { cubeMaterial }, cubeMeshes);
+            var renderMeshDescription = new RenderMeshDescription
             {
-                Debug.LogWarning("Cube material not assigned!");
-                return new int4[] { };
-            }
+                FilterSettings = filterSettings,
+                LightProbeUsage = LightProbeUsage.Off,
+            };
 
-            List<int4> instanceData = new();
+            var prototype = entityManager.CreateEntity();
 
-            for (byte z = 0; z < FZ; z++) for (byte y = 0; y < FY; y++) for (byte x = 0; x < FX; x++)
+            RenderMeshUtility.AddComponents(
+                prototype,
+                entityManager,
+                renderMeshDescription,
+                renderMeshArray,
+                MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
+            entityManager.AddComponentData(prototype, new URPMaterialPropertyBaseColor());
+            // entityManager.AddComponentData(prototype, new MagicComponent());
+            #endregion
+
+            // Spawn most of the entities in a Burst job by cloning a pre-created prototype entity,
+            // which can be either a Prefab or an entity created at run time like in this sample.
+            // This is the fastest and most efficient way to create entities at run time.
+            var spawnJob = new SpawnJob
             {
-                byte v = state[x + y * FX + z * FX * FY];
-                
-                if (is3d) // 3d structure
-                {
-                    if (!checkNotOpaque3d(v)) // Not air, do face culling
-                    {
-                        var cull = 0; // All sides are hidden at start
+                Ecb = ecbJob.AsParallelWriter(),
+                Prototype = prototype,
+                RenderBounds = renderBounds,
+                InstanceData = instanceData,
+                LifeTime = -1F
+            };
 
-                        if (z == FZ - 1 || checkNotOpaque3d(state[x + y * FX + (z + 1) * FX * FY])) // Unity +Y (Up)    | Markov +Z
-                            cull |= (1 << 0);
-                        
-                        if (z ==      0 || checkNotOpaque3d(state[x + y * FX + (z - 1) * FX * FY])) // Unity -Y (Down)  | Markov -Z
-                            cull |= (1 << 1);
+            var spawnHandle = spawnJob.Schedule(entityCount, 128);
 
-                        if (x == FX - 1 || checkNotOpaque3d(state[(x + 1) + y * FX + z * FX * FY])) // Unity +X (South) | Markov +X
-                            cull |= (1 << 2);
-                        
-                        if (x ==      0 || checkNotOpaque3d(state[(x - 1) + y * FX + z * FX * FY])) // Unity -X (North) | Markov -X
-                            cull |= (1 << 3);
-                        
-                        if (y == FY - 1 || checkNotOpaque3d(state[x + (y + 1) * FX + z * FX * FY])) // Unity +Z (East)  | Markov +Y
-                            cull |= (1 << 4);
-                        
-                        if (y ==      0 || checkNotOpaque3d(state[x + (y - 1) * FX + z * FX * FY])) // Unity -Z (East)  | Markov +Y
-                            cull |= (1 << 5);
+            spawnHandle.Complete();
 
-                        if (cull != 0) // At least one side of this cube is visible
-                            instanceData.Add(new(x + ox, z + oy, y + oz, palette[v]));
-                        
-                    }
-                }
-                else // 2d structure, all blocks should be shown even those with value 0. In other words, there's no air block
-                {
-                    // No cube can be totally occluded in 2d mode
-                    instanceData.Add(new(x + ox, z + oy, y + oz, palette[v]));
-                }
-            }
+            ecbJob.Playback(entityManager);
+            ecbJob.Dispose();
 
-            return instanceData.ToArray();
+            entityManager.DestroyEntity(prototype);
         }
 
         void Start()
         {
+            // Generate cube meshes
+            GenerateCubeMeshes();
+
+            if (playbackSpeedSlider != null) // Initialize playback speed
+                UpdatePlaybackSpeed(playbackSpeedSlider.value);
+            else
+                Debug.LogWarning("Playback speed slider is not assigned!");
+
             // Start it up!
             StartCoroutine(RunTest());
 
+        }
+
+        public void UpdatePlaybackSpeed(float newValue)
+        {
+            if (playbackSpeedText != null) // Update playback speed
+            {
+                playbackSpeedText.text = $"{newValue:0.0}";
+                playbackSpeed = newValue;
+            }
+            else
+                Debug.LogWarning("Playback speed text is not assigned!");
         }
 
     }

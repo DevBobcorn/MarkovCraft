@@ -1,7 +1,6 @@
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Rendering;
 using Unity.Transforms;
 
 namespace MarkovBlocks
@@ -37,21 +36,22 @@ namespace MarkovBlocks
             {
                 magic.ValueRW.TimeLeft -= SystemAPI.Time.DeltaTime;
 
-                if (magic.ValueRO.TimeLeft <= 0F)
+                if (magic.ValueRO.TimeLeft <= -magic.ValueRO.LifeTime)
                 {
                     // Making a structural change would invalidate the query we are iterating through,
                     // so instead we record a command to destroy the entity later.
                     ecb.DestroyEntity(entity);
                 }
-                else if (magic.ValueRO.TimeLeft <= 0.5F)
+                else if (magic.ValueRO.LifeTime >= 0.15F && magic.ValueRO.TimeLeft < -0.01F)
                 {
                     // Fade out by reducing its scale
-                    var scale = magic.ValueRW.TimeLeft * 2F;
+                    var scale = 1F + (magic.ValueRO.TimeLeft / magic.ValueRO.LifeTime);
+                    var offset = (1F - scale) / 2F;
 
                     trs.ValueRW.Value = float4x4.TRS(
-                        trs.ValueRO.Position,
+                        magic.ValueRO.Position + new float3(offset),
                         quaternion.identity,
-                        new(scale, scale, scale)
+                        new float3(scale)
                     );
                 }
             }

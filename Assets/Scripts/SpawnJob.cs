@@ -44,7 +44,8 @@ namespace MarkovBlocks
             Ecb.SetComponent(index, e, MaterialMeshInfo.FromRenderMeshArrayIndices(0, meshIndex));
             Ecb.SetComponent(index, e, RenderBounds);
 
-            Ecb.SetComponent(index, e, new MagicComponent { TimeLeft = LifeTime });
+            if (LifeTime > 0F)
+                Ecb.SetComponent(index, e, new MagicComponent { TimeLeft = LifeTime, LifeTime = LifeTime, Position = data.xyz });
             
         }
 

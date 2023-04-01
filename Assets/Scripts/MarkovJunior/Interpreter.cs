@@ -21,7 +21,7 @@ namespace MarkovJunior
         public List<int> first;
         public int counter;
         
-        public bool gif;
+        public bool animated;
 
         Interpreter() { }
         public static Interpreter Load(XElement xelem, int MX, int MY, int MZ)
@@ -53,7 +53,7 @@ namespace MarkovJunior
             return ip;
         }
 
-        public IEnumerable<(byte[], char[], int, int, int)> Run(int seed, int steps, bool gif)
+        public IEnumerable<(byte[], char[], int, int, int)> Run(int seed, int steps, bool animated)
         {
             random = new System.Random(seed);
             grid = startgrid;
@@ -67,15 +67,12 @@ namespace MarkovJunior
             root.Reset();
             current = root;
 
-            this.gif = gif;
+            this.animated = animated;
             counter = 0;
             while (current != null && (steps <= 0 || counter < steps))
             {
-                if (gif)
-                {
-                    Debug.Log($"Frame [{counter}]");
+                if (animated)
                     yield return (grid.state, grid.characters, grid.MX, grid.MY, grid.MZ);
-                }
 
                 current.Go();
                 counter++;
