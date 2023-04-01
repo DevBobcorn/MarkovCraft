@@ -1108,7 +1108,7 @@ MonoBehaviour:
   m_MinValue: 1
   m_MaxValue: 10
   m_WholeNumbers: 0
-  m_Value: 3
+  m_Value: 5
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -1475,6 +1475,7 @@ MonoBehaviour:
   modelHeight: 8
   modelAmount: 2
   modelSteps: 1000
+  modelAnimated: 0
   modelSeed: 
   playbackSpeedText: {fileID: 544061883}
   generationText: {fileID: 599961054}
