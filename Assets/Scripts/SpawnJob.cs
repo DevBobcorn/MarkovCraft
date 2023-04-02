@@ -49,7 +49,7 @@ namespace MarkovBlocks
             
         }
 
-        public float4 ComputeColor(int rgb)
+        public static float4 ComputeColor(int rgb)
         {
             return new(((rgb & 0xFF0000) >> 16) / 255F, ((rgb & 0xFF00) >> 8) / 255F, (rgb & 0xFF) / 255F, 1F);
         }

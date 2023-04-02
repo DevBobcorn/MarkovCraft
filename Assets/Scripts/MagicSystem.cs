@@ -42,7 +42,7 @@ namespace MarkovBlocks
                     // so instead we record a command to destroy the entity later.
                     ecb.DestroyEntity(entity);
                 }
-                else if (magic.ValueRO.LifeTime >= 0.15F && magic.ValueRO.TimeLeft < -0.01F)
+                else if (magic.ValueRO.LifeTime >= 0.15F && magic.ValueRO.TimeLeft < -0.05F)
                 {
                     // Fade out by reducing its scale
                     var scale = 1F + (magic.ValueRO.TimeLeft / magic.ValueRO.LifeTime);

@@ -38,6 +38,7 @@ namespace MarkovBlocks
         [SerializeField] public Slider? playbackSpeedSlider;
 
         [SerializeField] public Material? cubeMaterial;
+        [SerializeField] public RawImage? graphImage;
 
         private float playbackSpeed = 1F;
         private Mesh[] blockMeshes = { };
@@ -96,7 +97,7 @@ namespace MarkovBlocks
 
                 int4[]? instanceDataRaw = null;
 
-                foreach ((byte[] result, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, modelSteps, true))
+                foreach ((byte[] result, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, modelSteps, modelAnimated))
                 {
                     int[] colors = legend.Select(ch => customPalette[ch]).ToArray();
                     float tick = 1F / playbackSpeed;
@@ -110,11 +111,37 @@ namespace MarkovBlocks
 
                     frameCount++;
 
-                    int xCount = k % resultPerLine, zCount = k / resultPerLine;
+                    int xCount = k / resultPerLine, zCount = k % resultPerLine;
                     int ox = xCount * (FX + 2), oz = zCount * (FY + 2);
 
                     instanceDataRaw = CubeDataBuilder.GetInstanceData(result,
-                            (byte)FX, (byte)FY, (byte)FZ, ox, 0, oz, FZ > 1, colors);
+                            FX, FY, FZ, ox, 0, oz, FZ > 1, colors);
+
+                    if (frameCount == 1 && graphImage != null)
+                    {
+                        int imageX = 200, imageY = 600;
+                        var image = new int[imageX * imageY];
+
+                        MarkovJunior.GUI.Draw(modelName, interpreter.root, null, image, imageX, imageY, customPalette);
+                        
+                        Texture2D texture = new(imageX, imageY);
+
+                        var color32s = new Color32[imageX * imageY];
+
+                        for (int y = 0; y < imageY; y++) for (int x = 0; x < imageX; x++)
+                        {
+                            int rgb = image[x + (imageY - 1 - y) * imageX];
+                            color32s[x + y * imageX] = new((byte)((rgb & 0xFF0000) >> 16), (byte)((rgb & 0xFF00) >> 8), (byte)(rgb & 0xFF), 255);
+                        }
+
+                        texture.SetPixels32(color32s);
+                        texture.Apply(false);
+
+                        //VisualizeState(CubeDataBuilder.GetInstanceData(image, imageX, imageY, 0, -5, 0), blockMeshes, 0F);
+                        graphImage.texture = texture;
+                        graphImage.SetNativeSize();
+
+                    }
 
                     yield return new WaitForSeconds(tick);
                 }
@@ -205,6 +232,27 @@ namespace MarkovBlocks
             // Start it up!
             StartCoroutine(RunTest());
 
+        }
+
+        public const int WINDOWED_APP_WIDTH = 1600, WINDOWED_APP_HEIGHT = 900;
+
+        void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.F11)) // Toggle full screen
+            {
+                if (Screen.fullScreen)
+                {
+                    Screen.SetResolution(WINDOWED_APP_WIDTH, WINDOWED_APP_HEIGHT, false);
+                    Screen.fullScreen = false;
+                }
+                else
+                {
+                    var maxRes = Screen.resolutions[Screen.resolutions.Length - 1];
+                    Screen.SetResolution(maxRes.width, maxRes.height, true);
+                    Screen.fullScreen = true;
+                }
+                
+            }
         }
 
         public void UpdatePlaybackSpeed(float newValue)
