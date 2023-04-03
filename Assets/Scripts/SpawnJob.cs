@@ -37,7 +37,7 @@ namespace MarkovBlocks
                         new(1F, 1F, 1F)
                     ) });
             
-            Ecb.SetComponent(index, e, new URPMaterialPropertyBaseColor() { Value = ComputeColor(data.w) });
+            Ecb.SetComponent(index, e, new InstanceBlockColor() { Value = ComputeColor(data.w) });
             
             byte meshIndex = 0;
 

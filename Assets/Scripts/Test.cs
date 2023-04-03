@@ -17,6 +17,7 @@ using Unity.Rendering;
 using TMPro;
 
 using MarkovJunior;
+using MarkovBlocks.Mapping;
 
 namespace MarkovBlocks
 {
@@ -25,27 +26,58 @@ namespace MarkovBlocks
         private static readonly Bounds cubeBounds = new Bounds(new(0.5F, 0.5F, 0.5F), new(1F, 1F, 1F));
         private static readonly RenderBounds renderBounds = new RenderBounds { Value = cubeBounds.ToAABB() };
 
-        [SerializeField] public string modelName = "Apartemazements";
-        [SerializeField] public int modelLength = 1;
-        [SerializeField] public int modelWidth  = 1;
-        [SerializeField] public int modelHeight = 1;
-        [SerializeField] public int modelAmount = 2;
-        [SerializeField] public int modelSteps = 1000;
-        [SerializeField] public bool modelAnimated = false;
-        [SerializeField] public string? modelSeed = string.Empty;
+        [SerializeField] MarkovJuniorModel? generationModel;
 
         [SerializeField] public TMP_Text? playbackSpeedText, generationText;
         [SerializeField] public Slider? playbackSpeedSlider;
 
-        [SerializeField] public Material? cubeMaterial;
+        [SerializeField] public Material? blockMaterial;
         [SerializeField] public RawImage? graphImage;
 
         private float playbackSpeed = 1F;
-        private Mesh[] blockMeshes = { };
+        private readonly List<Mesh> blockMeshes = new();
 
+        private readonly LoadStateInfo loadStateInfo = new();
 
-        private IEnumerator RunTest()
+        private IEnumerator RunTest(MarkovJuniorModel model, string dataVersion, string[] resourceOverrides)
         {
+            #region Load model data
+            var wait = new WaitForSecondsRealtime(0.1F);
+
+            loadStateInfo.loggingIn = true;
+
+            // First load all possible Block States...
+            var loadFlag = new DataLoadFlag();
+            StartCoroutine(BlockStatePalette.INSTANCE.PrepareData(dataVersion, loadFlag, loadStateInfo));
+
+            while (!loadFlag.Finished)
+                yield return wait;
+            
+            // Then load all Items...
+            // [Code removed]
+
+            // Create a new resource pack manager...
+            var packManager = new ResourcePackManager();
+
+            // Load resource packs...
+            packManager.ClearPacks();
+            // Collect packs
+            foreach (var packName in resourceOverrides)
+                packManager.AddPack(new(packName));
+            // Load valid packs...
+            loadFlag.Finished = false;
+            StartCoroutine(packManager.LoadPacks(this, loadFlag, loadStateInfo));
+
+            while (!loadFlag.Finished)
+                yield return null;
+            
+            loadStateInfo.loggingIn = false;
+
+            MaterialManager.EnsureInitialized();
+            blockMaterial = MaterialManager.GetAtlasMaterial(RenderType.SOLID);
+
+            #endregion
+            
             var sw = System.Diagnostics.Stopwatch.StartNew();
             var folder = System.IO.Directory.CreateDirectory("output");
             foreach (var file in folder.GetFiles()) file.Delete();
@@ -55,8 +87,8 @@ namespace MarkovBlocks
 
             System.Random rand = new();
 
-            Debug.Log($"{modelName} > ");
-            string filename = PathHelper.GetExtraDataFile($"models/{modelName}.xml");
+            Debug.Log($"{model.Name} > ");
+            string filename = PathHelper.GetExtraDataFile($"models/{model.Name}.xml");
 
             XDocument modeldoc;
             try { modeldoc = XDocument.Load(filename, LoadOptions.SetLineInfo); }
@@ -66,17 +98,19 @@ namespace MarkovBlocks
                 yield break;
             }
 
-            Interpreter interpreter = Interpreter.Load(modeldoc.Root, modelLength, modelWidth, modelHeight);
+            Interpreter interpreter = Interpreter.Load(modeldoc.Root, model.SizeX, model.SizeY, model.SizeZ);
             if (interpreter == null)
             {
                 Debug.Log("ERROR: Failed to creating model interpreter");
                 yield break;
             }
 
-            if (modelSeed != null && modelSeed.Trim().Equals(string.Empty)) // Seed not specified
-                modelSeed = null;
+            var modelSeeds = model.Seeds;
+
+            if (modelSeeds != null && modelSeeds.Trim().Equals(string.Empty)) // Seed not specified
+                modelSeeds = null;
             
-            int[]? seeds = modelSeed?.Split(' ').Select(s => int.Parse(s)).ToArray();
+            int[]? seeds = modelSeeds?.Split(' ').Select(s => int.Parse(s)).ToArray();
             
             Dictionary<char, int> customPalette = new(palette);
 
@@ -85,25 +119,39 @@ namespace MarkovBlocks
                 customPalette[x.Get<char>("symbol")] = (255 << 24) + Convert.ToInt32(x.Get<string>("value"), 16);
             */
 
-            var resultPerLine = Mathf.RoundToInt(Mathf.Sqrt(modelAmount));
+            var resultPerLine = Mathf.RoundToInt(Mathf.Sqrt(model.Amount));
 
             if (resultPerLine <= 0)
                 resultPerLine = 1;
+            
+            #region Generate meshes
+            // Generate block meshes
+            var buffers = new VertexBuffer[1];
+            
+            for (int i = 0;i < buffers.Length;i++)
+                buffers[i] = new VertexBuffer();
 
-            for (int k = 0; k < modelAmount; k++)
+            CubeGeometry.Build(ref buffers[0], AtlasManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
+
+            blockMeshes.AddRange(BlockMeshGenerator.GenerateMeshes(buffers));
+            #endregion
+            
+            var meshesArr = blockMeshes.ToArray();
+
+            for (int k = 0; k < model.Amount; k++)
             {
                 int seed = seeds != null && k < seeds.Length ? seeds[k] : rand.Next();
                 int frameCount = 0;
 
                 int4[]? instanceDataRaw = null;
 
-                foreach ((byte[] result, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, modelSteps, modelAnimated))
+                foreach ((byte[] result, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, model.Steps, model.Animated))
                 {
                     int[] colors = legend.Select(ch => customPalette[ch]).ToArray();
                     float tick = 1F / playbackSpeed;
 
                     if (instanceDataRaw != null)
-                        VisualizeState(instanceDataRaw, blockMeshes, tick);
+                        VisualizeState(instanceDataRaw, meshesArr, tick);
 
                     // Update generation text
                     if (generationText != null)
@@ -122,7 +170,7 @@ namespace MarkovBlocks
                         int imageX = 200, imageY = 600;
                         var image = new int[imageX * imageY];
 
-                        MarkovJunior.GUI.Draw(modelName, interpreter.root, null, image, imageX, imageY, customPalette);
+                        MarkovJunior.GUI.Draw(model.Name, interpreter.root, null, image, imageX, imageY, customPalette);
                         
                         Texture2D texture = new(imageX, imageY);
 
@@ -136,8 +184,7 @@ namespace MarkovBlocks
 
                         texture.SetPixels32(color32s);
                         texture.Apply(false);
-
-                        //VisualizeState(CubeDataBuilder.GetInstanceData(image, imageX, imageY, 0, -5, 0), blockMeshes, 0F);
+                        
                         graphImage.texture = texture;
                         graphImage.SetNativeSize();
 
@@ -147,7 +194,7 @@ namespace MarkovBlocks
                 }
 
                 if (instanceDataRaw != null)
-                    VisualizeState(instanceDataRaw, blockMeshes, 0F); // The final visualization is persistent
+                    VisualizeState(instanceDataRaw, meshesArr, 0F); // The final visualization is persistent
 
                 Debug.Log($"Generation complete. Frame Count: {frameCount}");
             }
@@ -170,7 +217,7 @@ namespace MarkovBlocks
             #region Prepare entity prototype
             var filterSettings = RenderFilterSettings.Default;
 
-            var renderMeshArray = new RenderMeshArray(new[] { cubeMaterial }, blockMeshes);
+            var renderMeshArray = new RenderMeshArray(new[] { blockMaterial }, meshes);
             var renderMeshDescription = new RenderMeshDescription
             {
                 FilterSettings = filterSettings,
@@ -186,10 +233,11 @@ namespace MarkovBlocks
                 renderMeshArray,
                 MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
             
-            entityManager.AddComponentData(prototype, new URPMaterialPropertyBaseColor());
+            entityManager.AddComponentData(prototype, new InstanceBlockColor());
 
             if (!persistent) // Add magic component to make it expire after some time
                 entityManager.AddComponentData(prototype, new MagicComponent());
+            
             #endregion
 
             // Spawn most of the entities in a Burst job by cloning a pre-created prototype entity,
@@ -216,21 +264,19 @@ namespace MarkovBlocks
 
         void Start()
         {
-            // Generate block meshes
-            var buffer = new VertexBuffer();
-            CubeGeometry.Build(ref buffer, 0, 0, 0, 0b111111, float3.zero);
-
-            var buffers = new VertexBuffer[] { buffer };
-
-            blockMeshes = BlockMeshGenerator.GenerateMeshes(buffers);
-
             if (playbackSpeedSlider != null) // Initialize playback speed
                 UpdatePlaybackSpeed(playbackSpeedSlider.value);
             else
                 Debug.LogWarning("Playback speed slider is not assigned!");
+            
+            if (generationModel == null)
+            {
+                Debug.LogWarning("Markov Junior model not assigned!");
+                return;
+            }
 
             // Start it up!
-            StartCoroutine(RunTest());
+            StartCoroutine(RunTest(generationModel, "1.16", new string[] { "default" }));
 
         }
 
@@ -253,6 +299,12 @@ namespace MarkovBlocks
                 }
                 
             }
+
+            if (loadStateInfo.loggingIn && generationText != null)
+            {
+                generationText.text = loadStateInfo.infoText;
+            }
+
         }
 
         public void UpdatePlaybackSpeed(float newValue)

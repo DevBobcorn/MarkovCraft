@@ -14,17 +14,19 @@ namespace MarkovBlocks
         {
             var meshDataArr = Mesh.AllocateWritableMeshData(buffers.Length);
 
-            var vertAttrs = new NativeArray<VertexAttributeDescriptor>(1, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            var vertAttrs = new NativeArray<VertexAttributeDescriptor>(3, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
             vertAttrs[0] = new(VertexAttribute.Position,  dimension: 3, stream: 0);
+            vertAttrs[1] = new(VertexAttribute.TexCoord0, dimension: 3, stream: 1);
+            vertAttrs[2] = new(VertexAttribute.Color,     dimension: 3, stream: 2);
 
             var resultMeshes = new Mesh[buffers.Length];
 
             for (int mi = 0;mi < buffers.Length;mi++)
             {
                 var meshData = meshDataArr[mi];
-                var buffer = buffers[mi];
+                var visualBuffer = buffers[mi];
 
-                int vertexCount = buffer.vert.Length;
+                int vertexCount = visualBuffer.vert.Length;
                 int triIdxCount = (vertexCount / 2) * 3;
                 
                 // Set mesh params
@@ -34,7 +36,13 @@ namespace MarkovBlocks
                 // Set vertex data
                 // Positions
                 var positions = meshData.GetVertexData<float3>(0);
-                positions.CopyFrom(buffer.vert);
+                positions.CopyFrom(visualBuffer.vert);
+                // Tex Coordinates
+                var texCoords = meshData.GetVertexData<float3>(1);
+                texCoords.CopyFrom(visualBuffer.txuv);
+                // Vertex colors
+                var vertColors = meshData.GetVertexData<float3>(2);
+                vertColors.CopyFrom(visualBuffer.tint);
 
                 // Set face data
                 var triIndices = meshData.GetIndexData<uint>();

@@ -7,9 +7,8 @@ namespace MarkovBlocks
     public static class CubeGeometry
     {
         private static readonly Vector4 FULL = new(0, 0, 1, 1);
-        private static readonly float3[] DUMMY = new float3[] { 0F, 0F, 0F, 0F };
 
-        public static void Build(ref VertexBuffer buffer, int x, int y, int z, int cullFlags, float3 vertColor)
+        public static void Build(ref VertexBuffer buffer, ResourceLocation tex, int x, int y, int z, int cullFlags, float3 vertColor)
         {
             // Unity                   Minecraft            Top Quad Vertices
             //  A +Z (East)             A +X (East)          v0---v1
@@ -33,7 +32,7 @@ namespace MarkovBlocks
             for (int fti = vertOffset;fti < newLength;fti++)
                 tints[fti] = vertColor;
 
-            float3[] fullUVs = DUMMY;
+            float3[] fullUVs = AtlasManager.GetUVs(tex, FULL, 0);
 
             if ((cullFlags & (1 << 0)) != 0) // Up
             {
