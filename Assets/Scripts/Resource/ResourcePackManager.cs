@@ -14,9 +14,6 @@ namespace MarkovBlocks
         // Identidier -> Block json model file path
         public readonly Dictionary<ResourceLocation, string> BlockModelFileTable = new();
 
-        // Identidier -> Item json model file path
-        public readonly Dictionary<ResourceLocation, string> ItemModelFileTable = new();
-
         // Identidier -> BlockState json model file path
         public readonly Dictionary<ResourceLocation, string> BlockStateFileTable = new();
 

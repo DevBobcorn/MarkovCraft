@@ -111,7 +111,7 @@ namespace MarkovBlocks
 
             // Collect referenced textures
             var modelFilePaths = packManager.BlockModelFileTable.Values.ToList();
-            modelFilePaths.AddRange(packManager.ItemModelFileTable.Values);
+            // [Code removed]
             
             foreach (var modelFile in modelFilePaths)
             {

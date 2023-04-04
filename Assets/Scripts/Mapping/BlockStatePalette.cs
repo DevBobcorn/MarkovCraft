@@ -40,12 +40,22 @@ namespace MarkovBlocks.Mapping
 
         public readonly Dictionary<ResourceLocation, RenderType> RenderTypeTable = new();
 
+        private readonly Dictionary<int, Func<World, Location, BlockState, float3>> blockColorRules = new();
+
+        public float3 GetBlockColor(int stateId, World world, Location loc, BlockState state)
+        {
+            if (blockColorRules.ContainsKey(stateId))
+                return blockColorRules[stateId].Invoke(world, loc, state);
+            return BlockGeometry.DEFAULT_COLOR;
+        } 
+
         public IEnumerator PrepareData(string dataVersion, DataLoadFlag flag, LoadStateInfo loadStateInfo)
         {
             // Clean up first...
             statesTable.Clear();
             blocksTable.Clear();
             stateListTable.Clear();
+            blockColorRules.Clear();
             RenderTypeTable.Clear();
 
             HashSet<int> knownStates = new HashSet<int>();
@@ -176,7 +186,77 @@ namespace MarkovBlocks.Mapping
             Debug.Log($"{statesTable.Count} block states loaded.");
 
             // Load block color rules...
-            // [Code removed]
+            loadStateInfo.infoText = $"Loading block color rules";
+            yield return null;
+
+            Json.JSONData colorRules = Json.ParseJson(File.ReadAllText(colorsPath, Encoding.UTF8));
+
+            if (colorRules.Properties.ContainsKey("dynamic"))
+            {
+                foreach (var dynamicRule in colorRules.Properties["dynamic"].Properties)
+                {
+                    var ruleName = dynamicRule.Key;
+
+                    Func<World, Location, BlockState, float3> ruleFunc = ruleName switch {
+                        "foliage"  => (world, loc, state) => world.GetFoliageColor(loc),
+                        "grass"    => (world, loc, state) => world.GetGrassColor(loc),
+                        "redstone" => (world, loc, state) => {
+                            if (state.Properties.ContainsKey("power"))
+                                return new(float.Parse(state.Properties["power"]) / 16F, 0F, 0F);
+                            return BlockGeometry.DEFAULT_COLOR;
+                        },
+
+                        _         => (world, loc, state) => float3.zero
+                    };
+
+                    foreach (var block in dynamicRule.Value.DataArray)
+                    {
+                        var blockId = ResourceLocation.fromString(block.StringValue);
+
+                        if (stateListTable.ContainsKey(blockId))
+                        {
+                            foreach (var stateId in stateListTable[blockId])
+                            {
+                                if (!blockColorRules.TryAdd(stateId, ruleFunc))
+                                    Debug.LogWarning($"Failed to apply dynamic color rules to {blockId} ({stateId})!");
+                            }
+                        }
+                        else
+                            Debug.LogWarning($"Applying dynamic color rules to undefined block {blockId}!");
+                        
+                        count++;
+                        if (count % yieldCount == 0)
+                            yield return null;
+                    }
+                }
+            }
+
+            if (colorRules.Properties.ContainsKey("fixed"))
+            {
+                foreach (var fixedRule in colorRules.Properties["fixed"].Properties)
+                {
+                    var blockId = ResourceLocation.fromString(fixedRule.Key);
+
+                    if (stateListTable.ContainsKey(blockId))
+                    {
+                        var fixedColor = VectorUtil.Json2Float3(fixedRule.Value) / 255F;
+                        Func<World, Location, BlockState, float3> ruleFunc = (world, loc, state) => fixedColor;
+
+                        foreach (var stateId in stateListTable[blockId])
+                        {
+                            if (!blockColorRules.TryAdd(stateId, ruleFunc))
+                                Debug.LogWarning($"Failed to apply fixed color rules to {blockId} ({stateId})!");
+                            count++;
+                            if (count % yieldCount == 0)
+                                yield return null;
+                        }
+                    }
+                    else
+                        Debug.LogWarning($"Applying fixed color rules to undefined block {blockId}!");
+                }
+            }
+
+            yield return null;
             
             // Load and apply block render types...
             loadStateInfo.infoText = $"Loading block render types";

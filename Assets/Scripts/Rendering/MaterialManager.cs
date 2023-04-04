@@ -58,7 +58,7 @@ namespace MarkovBlocks
             */
 
             // All
-            var solid = Resources.Load<Material>("Materials/Block");
+            var solid = Resources.Load<Material>("Materials/BlockSolid");
             solid.SetTexture("_BaseMap", AtlasManager.GetAtlasArray(RenderType.SOLID));
             blockMaterials.Add(RenderType.SOLID, solid);
             blockMaterials.Add(RenderType.CUTOUT, solid);

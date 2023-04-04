@@ -39,7 +39,7 @@ namespace MarkovBlocks
 
         private readonly LoadStateInfo loadStateInfo = new();
 
-        private IEnumerator RunTest(MarkovJuniorModel model, string dataVersion, string[] resourceOverrides)
+        private IEnumerator RunTest(MarkovJuniorModel model, string dataVersion, string[] packs)
         {
             #region Load model data
             var wait = new WaitForSecondsRealtime(0.1F);
@@ -62,7 +62,7 @@ namespace MarkovBlocks
             // Load resource packs...
             packManager.ClearPacks();
             // Collect packs
-            foreach (var packName in resourceOverrides)
+            foreach (var packName in packs)
                 packManager.AddPack(new(packName));
             // Load valid packs...
             loadFlag.Finished = false;
@@ -210,7 +210,7 @@ namespace MarkovBlocks
             var instanceData = new NativeArray<int4>(entityCount, Allocator.TempJob);
             instanceData.CopyFrom(instanceDataRaw);
 
-            var world = World.DefaultGameObjectInjectionWorld;
+            var world = Unity.Entities.World.DefaultGameObjectInjectionWorld;
             var entityManager = world.EntityManager;
             EntityCommandBuffer ecbJob = new EntityCommandBuffer(Allocator.TempJob);
             
@@ -276,7 +276,7 @@ namespace MarkovBlocks
             }
 
             // Start it up!
-            StartCoroutine(RunTest(generationModel, "1.16", new string[] { "default" }));
+            StartCoroutine(RunTest(generationModel, "1.16", new string[] { "vanilla-1.16.5", "default" }));
 
         }
 

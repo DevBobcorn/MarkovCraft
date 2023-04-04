@@ -134,32 +134,6 @@ namespace MarkovBlocks
                             }
                         }
 
-                        if (new DirectoryInfo($"{nameSpaceDir}/models/item").Exists)
-                        {
-                            foreach (var modelFile in modelsDir.GetFiles("item/*.json", SearchOption.AllDirectories)) // Allow sub folders...
-                            {
-                                string modelId = modelFile.FullName.Replace('\\', '/');
-                                modelId = modelId.Substring(modelDirLen); // e.g. 'item/acacia_boat.json'
-                                modelId = modelId.Substring(0, modelId.LastIndexOf('.')); // e.g. 'item/acacia_boat'
-                                ResourceLocation identifier = new ResourceLocation(nameSpace, modelId);
-
-                                if (!manager.ItemModelFileTable.ContainsKey(identifier))
-                                {
-                                    // This model is not provided by previous resource packs, so add it here...
-                                    manager.ItemModelFileTable.Add(identifier, modelFile.FullName.Replace('\\', '/'));
-                                }
-                                else // Overwrite it
-                                    manager.ItemModelFileTable[identifier] = modelFile.FullName.Replace('\\', '/');
-                                
-                                count++;
-                                if (count % 100 == 0)
-                                {
-                                    loadStateInfo.infoText =  $"Gathering item model {identifier}";
-                                    yield return null;
-                                }
-                            }
-                        }
-
                         // Load and store all blockstate files...
                         var blockstatesDir = new DirectoryInfo($"{nameSpaceDir}/blockstates/");
                         int blockstateDirLen = blockstatesDir.FullName.Length;
