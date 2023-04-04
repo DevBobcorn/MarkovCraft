@@ -1,0 +1,108 @@
+{
+  "minecraft:air": {
+    "states": [
+      {
+        "id": 0,
+        "default": true
+      }
+    ]
+  },
+  "minecraft:grass_block": {
+    "properties": {
+      "snowy": [
+        "true",
+        "false"
+      ]
+    },
+    "states": [
+      {
+        "properties": {
+          "snowy": "true"
+        },
+        "id": 1
+      },
+      {
+        "properties": {
+          "snowy": "false"
+        },
+        "id": 2,
+        "default": true
+      }
+    ]
+  },
+  "minecraft:dirt": {
+    "states": [
+      {
+        "id": 3,
+        "default": true
+      }
+    ]
+  },
+  "minecraft:grass": {
+    "states": [
+      {
+        "id": 4,
+        "default": true
+      }
+    ]
+  },
+  "minecraft:fern": {
+    "states": [
+      {
+        "id": 5,
+        "default": true
+      }
+    ]
+  },
+  "minecraft:white_shulker_box": {
+    "properties": {
+      "facing": [
+        "north",
+        "east",
+        "south",
+        "west",
+        "up",
+        "down"
+      ]
+    },
+    "states": [
+      {
+        "properties": {
+          "facing": "north"
+        },
+        "id": 9282
+      },
+      {
+        "properties": {
+          "facing": "east"
+        },
+        "id": 9283
+      },
+      {
+        "properties": {
+          "facing": "south"
+        },
+        "id": 9284
+      },
+      {
+        "properties": {
+          "facing": "west"
+        },
+        "id": 9285
+      },
+      {
+        "properties": {
+          "facing": "up"
+        },
+        "id": 9286,
+        "default": true
+      },
+      {
+        "properties": {
+          "facing": "down"
+        },
+        "id": 9287
+      }
+    ]
+  }
+}

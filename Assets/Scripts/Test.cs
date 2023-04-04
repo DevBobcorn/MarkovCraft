@@ -73,6 +73,12 @@ namespace MarkovBlocks
             
             loadStateInfo.loggingIn = false;
 
+            if (loadFlag.Failed)
+            {
+                Debug.LogWarning("Block data loading failed");
+                yield break;
+            }
+
             MaterialManager.EnsureInitialized();
             blockMaterial = MaterialManager.GetAtlasMaterial(RenderType.SOLID);
 
@@ -131,7 +137,14 @@ namespace MarkovBlocks
             for (int i = 0;i < buffers.Length;i++)
                 buffers[i] = new VertexBuffer();
 
-            CubeGeometry.Build(ref buffers[0], AtlasManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
+            //CubeGeometry.Build(ref buffers[0], AtlasManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
+            var dummyWorld = new MarkovBlocks.Mapping.World();
+
+            var statePalette = BlockStatePalette.INSTANCE;
+            var stateId = 9282;
+            
+            packManager.StateModelTable[stateId].Geometries[0].Build(ref buffers[0], float3.zero, 0b111111,
+                    statePalette.GetBlockColor(stateId, dummyWorld, Location.Zero, statePalette.FromId(stateId)));
 
             blockMeshes.AddRange(BlockMeshGenerator.GenerateMeshes(buffers));
             #endregion
@@ -276,7 +289,7 @@ namespace MarkovBlocks
             }
 
             // Start it up!
-            StartCoroutine(RunTest(generationModel, "1.16", new string[] { "vanilla-1.16.5", "default" }));
+            StartCoroutine(RunTest(generationModel, "markov", new string[] { "vanilla-1.16.5", "vanilla_fix", "default" }));
 
         }
 
