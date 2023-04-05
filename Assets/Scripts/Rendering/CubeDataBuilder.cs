@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using UnityEngine;
 using Unity.Mathematics;
 
 namespace MarkovBlocks
@@ -8,9 +9,10 @@ namespace MarkovBlocks
     {
         private static bool checkNotOpaque3d(byte block) => block == 0;
 
-        public static int4[] GetInstanceData(byte[] states, int FX, int FY, int FZ, int ox, int oy, int oz, bool is3d, int[] palette)
+        public static (int3[], int2[]) GetInstanceData(byte[] states, int FX, int FY, int FZ, int ox, int oy, int oz, bool is3d, int2[] palette)
         {
-            List<int4> instanceData = new();
+            List<int3> posData = new();
+            List<int2> meshData = new();
 
             for (int z = 0; z < FZ; z++) for (int y = 0; y < FY; y++) for (int x = 0; x < FX; x++)
             {
@@ -41,18 +43,22 @@ namespace MarkovBlocks
                             cull |= (1 << 5);
 
                         if (cull != 0) // At least one side of this cube is visible
-                            instanceData.Add(new(x + ox, z + oy, y + oz, palette[v]));
+                        {
+                            posData.Add(new(x + ox, z + oy, y + oz));
+                            meshData.Add(palette[v]);
+                        }
                         
                     }
                 }
                 else // 2d structure, all blocks should be shown even those with value 0. In other words, there's no air block
                 {
                     // No cube can be totally occluded in 2d mode
-                    instanceData.Add(new(x + ox, z + oy, y + oz, palette[v]));
+                    posData.Add(new(x + ox, z + oy, y + oz));
+                    meshData.Add(palette[v]);
                 }
             }
 
-            return instanceData.ToArray();
+            return (posData.ToArray(), meshData.ToArray());
         }
 
         public static int4[] GetInstanceData(int[] colors, int FX, int FY, int ox, int oy, int oz)

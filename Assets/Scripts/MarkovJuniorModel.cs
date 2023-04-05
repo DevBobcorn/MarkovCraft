@@ -1,8 +1,17 @@
 #nullable enable
+using System;
 using UnityEngine;
 
 namespace MarkovBlocks
 {
+    [Serializable]
+    public struct CustomCharRemap
+    {
+        public char Symbol;
+        public string RemapTarget;
+        public Color32 RemapColor;
+    }
+
     [CreateAssetMenu(fileName = "MarkovJuniorModel", menuName = "MarkovBlocks/MarkovJuniorModel")]
     public class MarkovJuniorModel : ScriptableObject
     {
@@ -14,7 +23,8 @@ namespace MarkovBlocks
         [SerializeField] public int Steps = 1000;
         [SerializeField] public bool Animated = true;
         [SerializeField] public string? Seeds = string.Empty;
-        [SerializeField] public string[] CustomColors = { };
+
+        [SerializeField] public CustomCharRemap[] CustomRemapping = { };
 
     }
 }

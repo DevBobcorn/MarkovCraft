@@ -18,7 +18,10 @@ namespace MarkovBlocks
         public RenderBounds RenderBounds;
 
         [ReadOnly]
-        public NativeArray<int4> InstanceData; // x, y, z, color
+        public NativeArray<int3> PositionData; // x, y, z
+
+        [ReadOnly]
+        public NativeArray<int2> MeshData; // mesh index, color
 
         [ReadOnly]
         public float LifeTime;
@@ -28,24 +31,22 @@ namespace MarkovBlocks
             var e = Ecb.Instantiate(index, Prototype);
 
             // Prototype has all correct components up front, can use SetComponent
-            var data = InstanceData[index];
+            var pos = PositionData[index];
+            var mesh = MeshData[index];
 
             Ecb.SetComponent(index, e, new LocalToWorld {
                     Value = float4x4.TRS(
-                        new(data.x, data.y, data.z),
+                        new(pos.x, pos.y, pos.z),
                         quaternion.identity,
                         new(1F, 1F, 1F)
                     ) });
             
-            Ecb.SetComponent(index, e, new InstanceBlockColor() { Value = ComputeColor(data.w) });
-            
-            byte meshIndex = 0;
-
-            Ecb.SetComponent(index, e, MaterialMeshInfo.FromRenderMeshArrayIndices(0, meshIndex));
+            Ecb.SetComponent(index, e, new InstanceBlockColor() { Value = ComputeColor(mesh.y) });
+            Ecb.SetComponent(index, e, MaterialMeshInfo.FromRenderMeshArrayIndices(0, mesh.x));
             Ecb.SetComponent(index, e, RenderBounds);
 
             if (LifeTime > 0F)
-                Ecb.SetComponent(index, e, new MagicComponent { TimeLeft = LifeTime, LifeTime = LifeTime, Position = data.xyz });
+                Ecb.SetComponent(index, e, new MagicComponent { TimeLeft = LifeTime, LifeTime = LifeTime, Position = pos });
             
         }
 

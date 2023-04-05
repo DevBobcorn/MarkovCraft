@@ -88,8 +88,9 @@ namespace MarkovBlocks
             var folder = System.IO.Directory.CreateDirectory("output");
             foreach (var file in folder.GetFiles()) file.Delete();
 
-            Dictionary<char, int> palette = XDocument.Load(PathHelper.GetExtraDataFile("palette.xml")).Root.Elements("color")
-                    .ToDictionary(x => x.Get<char>("symbol"), x => (255 << 24) + Convert.ToInt32(x.Get<string>("value"), 16));
+            // Mesh indices are set to #0 by default
+            Dictionary<char, int2> colorPalette = XDocument.Load(PathHelper.GetExtraDataFile("palette.xml")).Root.Elements("color")
+                    .ToDictionary(x => x.Get<char>("symbol"), x => new int2(0, (255 << 24) + Convert.ToInt32(x.Get<string>("value"), 16)));
 
             System.Random rand = new();
 
@@ -118,12 +119,43 @@ namespace MarkovBlocks
             
             int[]? seeds = modelSeeds?.Split(' ').Select(s => int.Parse(s)).ToArray();
             
-            Dictionary<char, int> customPalette = new(palette);
+            var fullPalette = new Dictionary<char, int2>(colorPalette);
 
-            /* TODO: Implement
-            foreach (var x in xmodel.Elements("color"))
-                customPalette[x.Get<char>("symbol")] = (255 << 24) + Convert.ToInt32(x.Get<string>("value"), 16);
-            */
+            int meshCount = 1; // #0 is preserved for default cube mesh
+            var meshTable = new Dictionary<int, int>(); // StateId => Mesh index
+
+            var statePalette = BlockStatePalette.INSTANCE;
+
+            foreach (var remap in model.CustomRemapping)
+            {
+                var color = remap.RemapColor;
+                int rgba = (color.a << 24) + (color.r << 16) + (color.g << 8) + color.b;
+
+                if (!string.IsNullOrEmpty(remap.RemapTarget))
+                {
+                    int remapStateId = BlockStateRemapper.GetStateIdFromString(remap.RemapTarget);
+                    
+                    if (remapStateId != BlockStateRemapper.INVALID_BLOCKSTATE)
+                    {
+                        var state = statePalette.StatesTable[remapStateId];
+
+                        Debug.Log($"Remapped '{remap.Symbol}' to [{remapStateId}] {state}");
+
+                        if (meshTable.TryAdd(remapStateId, meshCount))
+                        {
+                            Debug.Log($"Assigned mesh for [{remapStateId}] {state} to #{meshCount}");
+
+                            fullPalette[remap.Symbol] = new(meshCount++, rgba);
+                        }
+                        else // The mesh of this block state is already regestered, just use it
+                            fullPalette[remap.Symbol] = new(meshTable[remapStateId], rgba);
+                    }
+                    else // Default cube mesh with custom color
+                        fullPalette[remap.Symbol] = new(0, rgba);
+                }
+                else // Default cube mesh with custom color
+                    fullPalette[remap.Symbol] = new(0, rgba);
+            }
 
             var resultPerLine = Mathf.RoundToInt(Mathf.Sqrt(model.Amount));
 
@@ -132,19 +164,24 @@ namespace MarkovBlocks
             
             #region Generate meshes
             // Generate block meshes
-            var buffers = new VertexBuffer[1];
+            var buffers = new VertexBuffer[meshCount];
             
             for (int i = 0;i < buffers.Length;i++)
                 buffers[i] = new VertexBuffer();
 
-            //CubeGeometry.Build(ref buffers[0], AtlasManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
-            var dummyWorld = new MarkovBlocks.Mapping.World();
+            // #0 is default cube mesh
+            CubeGeometry.Build(ref buffers[0], AtlasManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
 
-            var statePalette = BlockStatePalette.INSTANCE;
-            var stateId = 9282;
+            var dummyWorld = new MarkovBlocks.Mapping.World();
             
-            packManager.StateModelTable[stateId].Geometries[0].Build(ref buffers[0], float3.zero, 0b111111,
-                    statePalette.GetBlockColor(stateId, dummyWorld, Location.Zero, statePalette.FromId(stateId)));
+            foreach (var pair in meshTable) // StateId => Mesh index
+            {
+                var stateId = pair.Key;
+
+                packManager.StateModelTable[stateId].Geometries[0].Build(ref buffers[pair.Value], float3.zero, 0b111111,
+                        statePalette.GetBlockColor(stateId, dummyWorld, Location.Zero, statePalette.FromId(stateId)));
+
+            }
 
             blockMeshes.AddRange(BlockMeshGenerator.GenerateMeshes(buffers));
             #endregion
@@ -156,15 +193,15 @@ namespace MarkovBlocks
                 int seed = seeds != null && k < seeds.Length ? seeds[k] : rand.Next();
                 int frameCount = 0;
 
-                int4[]? instanceDataRaw = null;
+                (int3[], int2[])? instanceDataRaw = null;
 
                 foreach ((byte[] result, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, model.Steps, model.Animated))
                 {
-                    int[] colors = legend.Select(ch => customPalette[ch]).ToArray();
+                    int2[] stepPalette = legend.Select(ch => fullPalette[ch]).ToArray();
                     float tick = 1F / playbackSpeed;
 
                     if (instanceDataRaw != null)
-                        VisualizeState(instanceDataRaw, meshesArr, tick);
+                        VisualizeState(instanceDataRaw.Value, meshesArr, tick);
 
                     // Update generation text
                     if (generationText != null)
@@ -176,38 +213,13 @@ namespace MarkovBlocks
                     int ox = xCount * (FX + 2), oz = zCount * (FY + 2);
 
                     instanceDataRaw = CubeDataBuilder.GetInstanceData(result,
-                            FX, FY, FZ, ox, 0, oz, FZ > 1, colors);
-
-                    if (frameCount == 1 && graphImage != null)
-                    {
-                        int imageX = 200, imageY = 600;
-                        var image = new int[imageX * imageY];
-
-                        MarkovJunior.GUI.Draw(model.Name, interpreter.root, null, image, imageX, imageY, customPalette);
-                        
-                        Texture2D texture = new(imageX, imageY);
-
-                        var color32s = new Color32[imageX * imageY];
-
-                        for (int y = 0; y < imageY; y++) for (int x = 0; x < imageX; x++)
-                        {
-                            int rgb = image[x + (imageY - 1 - y) * imageX];
-                            color32s[x + y * imageX] = new((byte)((rgb & 0xFF0000) >> 16), (byte)((rgb & 0xFF00) >> 8), (byte)(rgb & 0xFF), 255);
-                        }
-
-                        texture.SetPixels32(color32s);
-                        texture.Apply(false);
-                        
-                        graphImage.texture = texture;
-                        graphImage.SetNativeSize();
-
-                    }
+                            FX, FY, FZ, ox, 0, oz, FZ > 1, stepPalette);
 
                     yield return new WaitForSeconds(tick);
                 }
 
                 if (instanceDataRaw != null)
-                    VisualizeState(instanceDataRaw, meshesArr, 0F); // The final visualization is persistent
+                    VisualizeState(instanceDataRaw.Value, meshesArr, 0F); // The final visualization is persistent
 
                 Debug.Log($"Generation complete. Frame Count: {frameCount}");
             }
@@ -215,13 +227,15 @@ namespace MarkovBlocks
             Debug.Log($"Time elapsed: {sw.ElapsedMilliseconds}ms");
         }
 
-        private void VisualizeState(int4[] instanceDataRaw, Mesh[] meshes, float persistence)
+        private void VisualizeState((int3[], int2[]) instanceDataRaw, Mesh[] meshes, float persistence)
         {
             bool persistent = persistence <= 0F;
-            var entityCount = instanceDataRaw.Length;
+            var entityCount = instanceDataRaw.Item1.Length;
 
-            var instanceData = new NativeArray<int4>(entityCount, Allocator.TempJob);
-            instanceData.CopyFrom(instanceDataRaw);
+            var posData = new NativeArray<int3>(entityCount, Allocator.TempJob);
+            posData.CopyFrom(instanceDataRaw.Item1);
+            var meshData = new NativeArray<int2>(entityCount, Allocator.TempJob);
+            meshData.CopyFrom(instanceDataRaw.Item2);
 
             var world = Unity.Entities.World.DefaultGameObjectInjectionWorld;
             var entityManager = world.EntityManager;
@@ -261,7 +275,8 @@ namespace MarkovBlocks
                 Ecb = ecbJob.AsParallelWriter(),
                 Prototype = prototype,
                 RenderBounds = renderBounds,
-                InstanceData = instanceData,
+                PositionData = posData,
+                MeshData = meshData,
                 LifeTime = persistence
             };
 

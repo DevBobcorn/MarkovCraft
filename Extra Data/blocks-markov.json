@@ -54,6 +54,30 @@
       }
     ]
   },
+  "minecraft:acacia_planks": {
+    "states": [
+      {
+        "id": 19,
+        "default": true
+      }
+    ]
+  },
+  "minecraft:diamond_block": {
+    "states": [
+      {
+        "id": 3355,
+        "default": true
+      }
+    ]
+  },
+  "minecraft:quartz_block": {
+    "states": [
+      {
+        "id": 6742,
+        "default": true
+      }
+    ]
+  },
   "minecraft:white_shulker_box": {
     "properties": {
       "facing": [
