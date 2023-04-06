@@ -99,7 +99,7 @@ namespace MarkovBlocks
                                 count++;
                                 if (count % 100 == 0)
                                 {
-                                    loadStateInfo.infoText = $"Gathering texture {identifier}";
+                                    loadStateInfo.InfoText = $"Gathering texture {identifier}";
                                     yield return null;
                                 }
                             }
@@ -128,7 +128,7 @@ namespace MarkovBlocks
                                 count++;
                                 if (count % 100 == 0)
                                 {
-                                    loadStateInfo.infoText =  $"Gathering block model {identifier}";
+                                    loadStateInfo.InfoText =  $"Gathering block model {identifier}";
                                     yield return null;
                                 }
                             }
@@ -157,7 +157,7 @@ namespace MarkovBlocks
                                 count++;
                                 if (count % 100 == 0)
                                 {
-                                    loadStateInfo.infoText = $"Gathering block state model definition for {identifier}";
+                                    loadStateInfo.InfoText = $"Gathering block state model definition for {identifier}";
                                     yield return null;
                                 }
                             }

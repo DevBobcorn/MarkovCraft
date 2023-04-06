@@ -67,7 +67,7 @@ namespace MarkovBlocks.Mapping
 
             if (!File.Exists(statesPath) || !File.Exists(listsPath) || !File.Exists(colorsPath) || !File.Exists(renderTypePath))
             {
-                loadStateInfo.infoText = "Block data not complete!";
+                loadStateInfo.InfoText = "Block data not complete!";
                 flag.Finished = true;
                 flag.Failed = true;
                 yield break;
@@ -82,7 +82,7 @@ namespace MarkovBlocks.Mapping
             lists.Add("empty_blocks", new());
 
             Json.JSONData spLists = Json.ParseJson(File.ReadAllText(listsPath, Encoding.UTF8));
-            loadStateInfo.infoText = $"Reading special lists from {listsPath}";
+            loadStateInfo.InfoText = $"Reading special lists from {listsPath}";
 
             int count = 0, yieldCount = 200;
 
@@ -176,7 +176,7 @@ namespace MarkovBlocks.Mapping
                     count++;
                     if (count % 10 == 0)
                     {
-                        loadStateInfo.infoText = $"Loading states of block {item.Key}";
+                        loadStateInfo.InfoText = $"Loading states of block {item.Key}";
                         yield return null;
                     }
 
@@ -186,7 +186,7 @@ namespace MarkovBlocks.Mapping
             Debug.Log($"{statesTable.Count} block states loaded.");
 
             // Load block color rules...
-            loadStateInfo.infoText = $"Loading block color rules";
+            loadStateInfo.InfoText = $"Loading block color rules";
             yield return null;
 
             Json.JSONData colorRules = Json.ParseJson(File.ReadAllText(colorsPath, Encoding.UTF8));
@@ -259,7 +259,7 @@ namespace MarkovBlocks.Mapping
             yield return null;
             
             // Load and apply block render types...
-            loadStateInfo.infoText = $"Loading block render types";
+            loadStateInfo.InfoText = $"Loading block render types";
             yield return null;
 
             try
@@ -301,7 +301,7 @@ namespace MarkovBlocks.Mapping
             catch (IOException e)
             {
                 Debug.LogWarning($"Failed to load block render types: {e.Message}");
-                loadStateInfo.infoText = $"Failed to load block render types: {e.Message}";
+                loadStateInfo.InfoText = $"Failed to load block render types: {e.Message}";
                 flag.Failed = true;
             }
 

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Collections.Generic;
 
+using Unity.Mathematics;
+
 using MarkovBlocks;
 
 namespace MarkovJunior
@@ -56,14 +58,14 @@ namespace MarkovJunior
             ACTIVE = (255 << 24) + Convert.ToInt32(settings.Get("active", "ffffff"), 16);
         }
 
-        public static void Draw(string name, Branch root, Branch current, int[] bitmap, int WIDTH, int HEIGHT, Dictionary<char, int> palette)
+        public static void Draw(string name, Branch root, Branch current, int[] bitmap, int WIDTH, int HEIGHT, Dictionary<char, int2> palette)
         {
             void drawRectangle(int x, int y, int width, int height, int color)
             {
                 if (y + height > HEIGHT) return;
                 for (int dy = 0; dy < height; dy++) for (int dx = 0; dx < width; dx++) bitmap[x + dx + (y + dy) * WIDTH] = color;
             };
-            void drawSquare(int x, int y, int S, char c) => drawRectangle(x, y, S, S, palette[c]);
+            void drawSquare(int x, int y, int S, char c) => drawRectangle(x, y, S, S, palette[c].y);
             void drawShadedSquare(int x, int y, int S, int color)
             {
                 drawRectangle(x, y, S, S, color);
@@ -125,7 +127,7 @@ namespace MarkovJunior
                 for (int dz = 0; dz < MZ; dz++) for (int dy = 0; dy < MY; dy++) for (int dx = 0; dx < MX; dx++)
                         {
                             byte i = a[dx + dy * MX + dz * MX * MY];
-                            int color = i != 0xff ? palette[characters[i]] : (D3 ? INACTIVE : BACKGROUND);
+                            int color = i != 0xff ? palette[characters[i]].y : (D3 ? INACTIVE : BACKGROUND);
                             drawShadedSquare(x + dx * S + (MZ - dz - 1) * ZSHIFT, y + dy * S + (MZ - dz - 1) * ZSHIFT, S, color);
                         }
                 return MX * S + (MZ - 1) * ZSHIFT;

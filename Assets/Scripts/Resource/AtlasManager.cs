@@ -164,7 +164,7 @@ namespace MarkovBlocks
                 count++;
                 if (count % 20 == 0)
                 {
-                    loadStateInfo.infoText = $"Loading texture file {texId}";
+                    loadStateInfo.InfoText = $"Loading texture file {texId}";
                     yield return null;
                 }
             }
@@ -177,7 +177,7 @@ namespace MarkovBlocks
 
             do
             {
-                loadStateInfo.infoText = $"Stitching texture atlas #{curAtlasIndex}";
+                loadStateInfo.InfoText = $"Stitching texture atlas #{curAtlasIndex}";
                 
                 // First count all the textures to be stitched onto this atlas
                 int lastTexIndex = curTexIndex - 1, curVolume = 0; // lastTexIndex is inclusive
@@ -270,7 +270,7 @@ namespace MarkovBlocks
                 atlasArray0.SetPixels(atlases[index].GetPixels(), index, 0);
                 atlasArray1.SetPixels(atlases[index].GetPixels(), index, 0);
 
-                loadStateInfo.infoText = $"Creating atlas array element #{curAtlasIndex}";
+                loadStateInfo.InfoText = $"Creating atlas array element #{curAtlasIndex}";
                 yield return null;
             }
 

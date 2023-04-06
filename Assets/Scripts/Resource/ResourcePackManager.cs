@@ -95,7 +95,7 @@ namespace MarkovBlocks
                 }
             }
 
-            loadStateInfo.infoText = string.Empty;
+            loadStateInfo.InfoText = string.Empty;
 
             Debug.Log($"Resource packs loaded in {Time.realtimeSinceStartup - startTime} seconds.");
             Debug.Log($"Built {StateModelTable.Count} block state geometry lists.");
@@ -122,7 +122,7 @@ namespace MarkovBlocks
                     count++;
                     if (count % 10 == 0)
                     {
-                        loadStateInfo.infoText = $"Building model for block {blockId}";
+                        loadStateInfo.InfoText = $"Building model for block {blockId}";
                         yield return null;
                     }
                     

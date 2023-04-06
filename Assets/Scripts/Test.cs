@@ -6,14 +6,8 @@ using System.Linq;
 using System.Xml.Linq;
 
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
-using Unity.Collections;
-using Unity.Entities;
-using Unity.Entities.Graphics;
-using Unity.Jobs;
 using Unity.Mathematics;
-using Unity.Rendering;
 using TMPro;
 
 using MarkovJunior;
@@ -23,8 +17,7 @@ namespace MarkovBlocks
 {
     public class Test : MonoBehaviour
     {
-        private static readonly Bounds cubeBounds = new Bounds(new(0.5F, 0.5F, 0.5F), new(1F, 1F, 1F));
-        private static readonly RenderBounds renderBounds = new RenderBounds { Value = cubeBounds.ToAABB() };
+        public const int WINDOWED_APP_WIDTH = 1600, WINDOWED_APP_HEIGHT = 900;
 
         [SerializeField] MarkovJuniorModel? generationModel;
 
@@ -34,99 +27,121 @@ namespace MarkovBlocks
         [SerializeField] public Material? blockMaterial;
         [SerializeField] public RawImage? graphImage;
 
+        private MarkovJuniorModel? currentModel = null;
+        private Interpreter? interpreter = null;
+        private bool modelIsAvailable = false;
+
         private float playbackSpeed = 1F;
-        private readonly List<Mesh> blockMeshes = new();
 
-        private readonly LoadStateInfo loadStateInfo = new();
+        // Palettes and meshes
+        private readonly ResourcePackManager packManager = new();
+        private Mesh[] blockMeshes = { };
+        private int blockMeshCount = 0;
+        private readonly Dictionary<char, int2> fullPalette = new();
 
-        private IEnumerator RunTest(MarkovJuniorModel model, string dataVersion, string[] packs)
+        private readonly LoadStateInfo loadInfo = new();
+
+        private void RedrawProcedureGraph(Dictionary<char, int2> palette)
         {
-            #region Load model data
-            var wait = new WaitForSecondsRealtime(0.1F);
-
-            loadStateInfo.loggingIn = true;
-
-            // First load all possible Block States...
-            var loadFlag = new DataLoadFlag();
-            StartCoroutine(BlockStatePalette.INSTANCE.PrepareData(dataVersion, loadFlag, loadStateInfo));
-
-            while (!loadFlag.Finished)
-                yield return wait;
-            
-            // Then load all Items...
-            // [Code removed]
-
-            // Create a new resource pack manager...
-            var packManager = new ResourcePackManager();
-
-            // Load resource packs...
-            packManager.ClearPacks();
-            // Collect packs
-            foreach (var packName in packs)
-                packManager.AddPack(new(packName));
-            // Load valid packs...
-            loadFlag.Finished = false;
-            StartCoroutine(packManager.LoadPacks(this, loadFlag, loadStateInfo));
-
-            while (!loadFlag.Finished)
-                yield return null;
-            
-            loadStateInfo.loggingIn = false;
-
-            if (loadFlag.Failed)
+            if (currentModel != null && interpreter != null && graphImage != null)
             {
-                Debug.LogWarning("Block data loading failed");
-                yield break;
+                int imageX = 200, imageY = 600;
+                var image = new int[imageX * imageY];
+
+                MarkovJunior.GUI.Draw(currentModel.Name, interpreter.root, null, image, imageX, imageY, palette);
+                
+                Texture2D texture = new(imageX, imageY);
+
+                var color32s = new Color32[imageX * imageY];
+
+                for (int y = 0; y < imageY; y++) for (int x = 0; x < imageX; x++)
+                {
+                    int rgb = image[x + (imageY - 1 - y) * imageX];
+                    color32s[x + y * imageX] = new((byte)((rgb & 0xFF0000) >> 16), (byte)((rgb & 0xFF00) >> 8), (byte)(rgb & 0xFF), 255);
+                }
+
+                texture.SetPixels32(color32s);
+                texture.Apply(false);
+                
+                graphImage.texture = texture;
+                graphImage.SetNativeSize();
+
+            }
+            else
+                Debug.LogWarning("Failed to update procedure graph due to stuffs missing!");
+
+        }
+
+        private void GenerateBlockMeshes(Dictionary<int, int> stateId2Mesh) // StateId => Mesh index
+        {
+            var statePalette = BlockStatePalette.INSTANCE;
+            var buffers = new VertexBuffer[blockMeshCount];
+            
+            for (int i = 0;i < buffers.Length;i++)
+                buffers[i] = new VertexBuffer();
+
+            // #0 is default cube mesh
+            CubeGeometry.Build(ref buffers[0], AtlasManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
+
+            var dummyWorld = new MarkovBlocks.Mapping.World();
+            var modelTable = packManager.StateModelTable;
+            
+            foreach (var pair in stateId2Mesh) // StateId => Mesh index
+            {
+                var stateId = pair.Key;
+
+                if (modelTable.ContainsKey(stateId))
+                    modelTable[stateId].Geometries[0].Build(ref buffers[pair.Value], float3.zero, 0b111111,
+                            statePalette.GetBlockColor(stateId, dummyWorld, Location.Zero, statePalette.FromId(stateId)));
+                else
+                {
+                    Debug.LogWarning($"Model for block state #{stateId} ({statePalette.FromId(stateId)}) is not available. Using cube model instead.");
+                    CubeGeometry.Build(ref buffers[pair.Value], AtlasManager.HAKU, 0, 0, 0, 0b111111, new float3(1F, 1F, 1F));
+                }
             }
 
-            MaterialManager.EnsureInitialized();
-            blockMaterial = MaterialManager.GetAtlasMaterial(RenderType.SOLID);
+            // Set result to blockMeshes
+            blockMeshes = BlockMeshGenerator.GenerateMeshes(buffers);
+        }
 
-            #endregion
-            
-            var sw = System.Diagnostics.Stopwatch.StartNew();
-            var folder = System.IO.Directory.CreateDirectory("output");
-            foreach (var file in folder.GetFiles()) file.Delete();
+        public void SetGenerationModel(MarkovJuniorModel model)
+        {
+            // Assign new generation model
+            currentModel = model;
 
-            // Mesh indices are set to #0 by default
-            Dictionary<char, int2> colorPalette = XDocument.Load(PathHelper.GetExtraDataFile("palette.xml")).Root.Elements("color")
-                    .ToDictionary(x => x.Get<char>("symbol"), x => new int2(0, (255 << 24) + Convert.ToInt32(x.Get<string>("value"), 16)));
-
-            System.Random rand = new();
-
-            Debug.Log($"{model.Name} > ");
-            string filename = PathHelper.GetExtraDataFile($"models/{model.Name}.xml");
+            string fileName = PathHelper.GetExtraDataFile($"models/{model.Name}.xml");
+            Debug.Log($"{model.Name} > {fileName}");
 
             XDocument modeldoc;
-            try { modeldoc = XDocument.Load(filename, LoadOptions.SetLineInfo); }
+            try { modeldoc = XDocument.Load(fileName, LoadOptions.SetLineInfo); }
             catch (Exception)
             {
-                Debug.Log($"ERROR: Couldn't open xml file {filename}");
-                yield break;
+                Debug.LogWarning($"ERROR: Couldn't open xml file at {fileName}");
+                return;
             }
 
-            Interpreter interpreter = Interpreter.Load(modeldoc.Root, model.SizeX, model.SizeY, model.SizeZ);
+            interpreter = Interpreter.Load(modeldoc.Root, model.SizeX, model.SizeY, model.SizeZ);
+
             if (interpreter == null)
             {
-                Debug.Log("ERROR: Failed to creating model interpreter");
-                yield break;
+                Debug.LogWarning("ERROR: Failed to creating model interpreter");
+                return;
             }
 
-            var modelSeeds = model.Seeds;
-
-            if (modelSeeds != null && modelSeeds.Trim().Equals(string.Empty)) // Seed not specified
-                modelSeeds = null;
-            
-            int[]? seeds = modelSeeds?.Split(' ').Select(s => int.Parse(s)).ToArray();
-            
-            var fullPalette = new Dictionary<char, int2>(colorPalette);
-
-            int meshCount = 1; // #0 is preserved for default cube mesh
-            var meshTable = new Dictionary<int, int>(); // StateId => Mesh index
-
             var statePalette = BlockStatePalette.INSTANCE;
+            var stateId2Mesh = new Dictionary<int, int>(); // StateId => Mesh index
 
-            foreach (var remap in model.CustomRemapping)
+            fullPalette.Clear();
+
+            Dictionary<char, int> basePalette = XDocument.Load(PathHelper.GetExtraDataFile("palette.xml")).Root.Elements("color")
+                    .ToDictionary(x => x.Get<char>("symbol"), x => (255 << 24) + Convert.ToInt32(x.Get<string>("value"), 16));
+            
+            foreach (var item in basePalette) // Use mesh #0 by default (cube mesh)
+                fullPalette.Add(item.Key, new(0, item.Value));
+
+            blockMeshCount = 1; // #0 is preserved for default cube mesh
+
+            foreach (var remap in model.CustomRemapping) // Read and assign custom remapping
             {
                 var color = remap.RemapColor;
                 int rgba = (color.a << 24) + (color.r << 16) + (color.g << 8) + color.b;
@@ -141,14 +156,14 @@ namespace MarkovBlocks
 
                         Debug.Log($"Remapped '{remap.Symbol}' to [{remapStateId}] {state}");
 
-                        if (meshTable.TryAdd(remapStateId, meshCount))
+                        if (stateId2Mesh.TryAdd(remapStateId, blockMeshCount))
                         {
-                            Debug.Log($"Assigned mesh for [{remapStateId}] {state} to #{meshCount}");
+                            Debug.Log($"Assigned mesh for [{remapStateId}] {state} to #{blockMeshCount}");
 
-                            fullPalette[remap.Symbol] = new(meshCount++, rgba);
+                            fullPalette[remap.Symbol] = new(blockMeshCount++, rgba);
                         }
                         else // The mesh of this block state is already regestered, just use it
-                            fullPalette[remap.Symbol] = new(meshTable[remapStateId], rgba);
+                            fullPalette[remap.Symbol] = new(stateId2Mesh[remapStateId], rgba);
                     }
                     else // Default cube mesh with custom color
                         fullPalette[remap.Symbol] = new(0, rgba);
@@ -157,36 +172,81 @@ namespace MarkovBlocks
                     fullPalette[remap.Symbol] = new(0, rgba);
             }
 
+            // Update procedure graph
+            RedrawProcedureGraph(fullPalette);
+
+            // Generate block meshes
+            GenerateBlockMeshes(stateId2Mesh);
+        }
+
+        private IEnumerator LoadMCData(string dataVersion, string[] packs, Action? callback = null)
+        {
+            var wait = new WaitForSecondsRealtime(0.1F);
+
+            loadInfo.Loading = true;
+
+            // First load all possible Block States...
+            var loadFlag = new DataLoadFlag();
+            StartCoroutine(BlockStatePalette.INSTANCE.PrepareData(dataVersion, loadFlag, loadInfo));
+
+            while (!loadFlag.Finished)
+                yield return wait;
+            
+            // Then load all Items...
+            // [Code removed]
+
+            // Load resource packs...
+            packManager.ClearPacks();
+            // Collect packs
+            foreach (var packName in packs)
+                packManager.AddPack(new(packName));
+            // Load valid packs...
+            loadFlag.Finished = false;
+            StartCoroutine(packManager.LoadPacks(this, loadFlag, loadInfo));
+
+            while (!loadFlag.Finished)
+                yield return null;
+            
+            loadInfo.Loading = false;
+
+            if (loadFlag.Failed)
+            {
+                Debug.LogWarning("Block data loading failed");
+                yield break;
+            }
+
+            MaterialManager.EnsureInitialized();
+            blockMaterial = MaterialManager.GetAtlasMaterial(RenderType.SOLID);
+
+            if (callback is not null)
+                callback.Invoke();
+        }
+
+        private IEnumerator RunTest()
+        {
+            if (currentModel is null || interpreter == null)
+            {
+                Debug.LogWarning("Generate model is not assigned");
+                yield break;
+            }
+
+            var model = currentModel;
+
             var resultPerLine = Mathf.RoundToInt(Mathf.Sqrt(model.Amount));
 
             if (resultPerLine <= 0)
                 resultPerLine = 1;
             
-            #region Generate meshes
-            // Generate block meshes
-            var buffers = new VertexBuffer[meshCount];
-            
-            for (int i = 0;i < buffers.Length;i++)
-                buffers[i] = new VertexBuffer();
+            var materials = new[] { blockMaterial };
 
-            // #0 is default cube mesh
-            CubeGeometry.Build(ref buffers[0], AtlasManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
+            System.Random rand = new();
+            var modelSeeds = model.Seeds;
+            if (modelSeeds != null && modelSeeds.Trim().Equals(string.Empty)) // Seed not specified
+                modelSeeds = null;
+            int[]? seeds = modelSeeds?.Split(' ').Select(s => int.Parse(s)).ToArray();
 
-            var dummyWorld = new MarkovBlocks.Mapping.World();
-            
-            foreach (var pair in meshTable) // StateId => Mesh index
-            {
-                var stateId = pair.Key;
-
-                packManager.StateModelTable[stateId].Geometries[0].Build(ref buffers[pair.Value], float3.zero, 0b111111,
-                        statePalette.GetBlockColor(stateId, dummyWorld, Location.Zero, statePalette.FromId(stateId)));
-
-            }
-
-            blockMeshes.AddRange(BlockMeshGenerator.GenerateMeshes(buffers));
-            #endregion
-            
-            var meshesArr = blockMeshes.ToArray();
+            // Set up stopwatch
+            var sw = System.Diagnostics.Stopwatch.StartNew();
 
             for (int k = 0; k < model.Amount; k++)
             {
@@ -201,7 +261,7 @@ namespace MarkovBlocks
                     float tick = 1F / playbackSpeed;
 
                     if (instanceDataRaw != null)
-                        VisualizeState(instanceDataRaw.Value, meshesArr, tick);
+                        BlockInstanceSpawner.VisualizeState(instanceDataRaw.Value, materials!, blockMeshes, tick);
 
                     // Update generation text
                     if (generationText != null)
@@ -212,82 +272,21 @@ namespace MarkovBlocks
                     int xCount = k / resultPerLine, zCount = k % resultPerLine;
                     int ox = xCount * (FX + 2), oz = zCount * (FY + 2);
 
-                    instanceDataRaw = CubeDataBuilder.GetInstanceData(result,
+                    instanceDataRaw = BlockDataBuilder.GetInstanceData(result,
                             FX, FY, FZ, ox, 0, oz, FZ > 1, stepPalette);
 
                     yield return new WaitForSeconds(tick);
                 }
 
                 if (instanceDataRaw != null)
-                    VisualizeState(instanceDataRaw.Value, meshesArr, 0F); // The final visualization is persistent
+                    BlockInstanceSpawner.VisualizeState(instanceDataRaw.Value, materials!, blockMeshes, 0F); // The final visualization is persistent
 
                 Debug.Log($"Generation complete. Frame Count: {frameCount}");
             }
 
             Debug.Log($"Time elapsed: {sw.ElapsedMilliseconds}ms");
-        }
 
-        private void VisualizeState((int3[], int2[]) instanceDataRaw, Mesh[] meshes, float persistence)
-        {
-            bool persistent = persistence <= 0F;
-            var entityCount = instanceDataRaw.Item1.Length;
-
-            var posData = new NativeArray<int3>(entityCount, Allocator.TempJob);
-            posData.CopyFrom(instanceDataRaw.Item1);
-            var meshData = new NativeArray<int2>(entityCount, Allocator.TempJob);
-            meshData.CopyFrom(instanceDataRaw.Item2);
-
-            var world = Unity.Entities.World.DefaultGameObjectInjectionWorld;
-            var entityManager = world.EntityManager;
-            EntityCommandBuffer ecbJob = new EntityCommandBuffer(Allocator.TempJob);
-            
-            #region Prepare entity prototype
-            var filterSettings = RenderFilterSettings.Default;
-
-            var renderMeshArray = new RenderMeshArray(new[] { blockMaterial }, meshes);
-            var renderMeshDescription = new RenderMeshDescription
-            {
-                FilterSettings = filterSettings,
-                LightProbeUsage = LightProbeUsage.Off,
-            };
-
-            var prototype = entityManager.CreateEntity();
-
-            RenderMeshUtility.AddComponents(
-                prototype,
-                entityManager,
-                renderMeshDescription,
-                renderMeshArray,
-                MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
-            
-            entityManager.AddComponentData(prototype, new InstanceBlockColor());
-
-            if (!persistent) // Add magic component to make it expire after some time
-                entityManager.AddComponentData(prototype, new MagicComponent());
-            
-            #endregion
-
-            // Spawn most of the entities in a Burst job by cloning a pre-created prototype entity,
-            // which can be either a Prefab or an entity created at run time like in this sample.
-            // This is the fastest and most efficient way to create entities at run time.
-            var spawnJob = new SpawnJob
-            {
-                Ecb = ecbJob.AsParallelWriter(),
-                Prototype = prototype,
-                RenderBounds = renderBounds,
-                PositionData = posData,
-                MeshData = meshData,
-                LifeTime = persistence
-            };
-
-            var spawnHandle = spawnJob.Schedule(entityCount, 128);
-
-            spawnHandle.Complete();
-
-            ecbJob.Playback(entityManager);
-            ecbJob.Dispose();
-
-            entityManager.DestroyEntity(prototype);
+            sw.Stop(); // Stop stopwatch
         }
 
         void Start()
@@ -303,12 +302,17 @@ namespace MarkovBlocks
                 return;
             }
 
-            // Start it up!
-            StartCoroutine(RunTest(generationModel, "markov", new string[] { "vanilla-1.16.5", "vanilla_fix", "default" }));
+            // First load Minecraft data & resources
+            StartCoroutine(LoadMCData("markov", new string[] {
+                    "vanilla-1.16.5", "vanilla_fix", "default"
+                }, () => {
+                    // Set active generation model
+                    SetGenerationModel(generationModel);
 
+                    // Start it up!
+                    StartCoroutine(RunTest());
+                }));
         }
-
-        public const int WINDOWED_APP_WIDTH = 1600, WINDOWED_APP_HEIGHT = 900;
 
         void Update()
         {
@@ -328,10 +332,8 @@ namespace MarkovBlocks
                 
             }
 
-            if (loadStateInfo.loggingIn && generationText != null)
-            {
-                generationText.text = loadStateInfo.infoText;
-            }
+            if (loadInfo.Loading && generationText != null)
+                generationText.text = loadInfo.InfoText;
 
         }
 

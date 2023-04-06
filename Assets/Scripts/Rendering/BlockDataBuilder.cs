@@ -1,11 +1,10 @@
 #nullable enable
 using System.Collections.Generic;
-using UnityEngine;
 using Unity.Mathematics;
 
 namespace MarkovBlocks
 {
-    public static class CubeDataBuilder
+    public static class BlockDataBuilder
     {
         private static bool checkNotOpaque3d(byte block) => block == 0;
 
