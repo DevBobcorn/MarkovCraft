@@ -4,15 +4,12 @@ using System;
 using System.IO;
 using UnityEngine;
 
+using MarkovBlocks;
+
 namespace MarkovJunior
 {
     static class Graphics
     {
-        private static int GetColorInt(Color32 color)
-        {
-            return (color.a << 24) + (color.r << 16) + (color.g << 8) + color.b;
-        }
-
         public static (int[], int, int, int) LoadBitmap(string filename)
         {
             try
@@ -27,7 +24,7 @@ namespace MarkovJunior
 
                 for (int y = 0;y < height;y++)
                     for (int x = 0;x < width;x++)
-                        result[(height - 1 - y) * width + x] = GetColorInt(pixels[y * width + x]);
+                        result[(height - 1 - y) * width + x] = ColorConvert.GetRGB(pixels[y * width + x]);
 
                 return (result, width, height, 1);
             }

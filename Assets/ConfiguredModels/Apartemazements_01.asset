@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3a8f9d1c9985a54aadb51d10c9917d6, type: 3}
-  m_Name: Apartemazements_8x8x8_1_1000
+  m_Name: Apartemazements_01
   m_EditorClassIdentifier: 
   Name: Apartemazements
   SizeX: 8
@@ -19,7 +19,7 @@ MonoBehaviour:
   Amount: 1
   Steps: 1000
   Animated: 1
-  Seeds: 
+  Seeds: 7b000000c8010000
   CustomRemapping:
   - Symbol: 69
     RemapTarget: minecraft:grass_block[snowy=false]

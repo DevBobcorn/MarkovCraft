@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -19,25 +20,23 @@ namespace MarkovBlocks
     {
         public const int WINDOWED_APP_WIDTH = 1600, WINDOWED_APP_HEIGHT = 900;
 
-        [SerializeField] MarkovJuniorModel? generationModel;
-
         [SerializeField] public TMP_Text? playbackSpeedText, generationText;
         [SerializeField] public Slider? playbackSpeedSlider;
-
-        [SerializeField] public Material? blockMaterial;
         [SerializeField] public RawImage? graphImage;
+
+        [SerializeField] public string selectedModelPath = string.Empty;
 
         private MarkovJuniorModel? currentModel = null;
         private Interpreter? interpreter = null;
-        private bool modelIsAvailable = false;
-
         private float playbackSpeed = 1F;
+        private bool running = false;
 
         // Palettes and meshes
         private readonly ResourcePackManager packManager = new();
         private Mesh[] blockMeshes = { };
         private int blockMeshCount = 0;
         private readonly Dictionary<char, int2> fullPalette = new();
+        private Material? blockMaterial;
 
         private readonly LoadStateInfo loadInfo = new();
 
@@ -57,7 +56,7 @@ namespace MarkovBlocks
                 for (int y = 0; y < imageY; y++) for (int x = 0; x < imageX; x++)
                 {
                     int rgb = image[x + (imageY - 1 - y) * imageX];
-                    color32s[x + y * imageX] = new((byte)((rgb & 0xFF0000) >> 16), (byte)((rgb & 0xFF00) >> 8), (byte)(rgb & 0xFF), 255);
+                    color32s[x + y * imageX] = ColorConvert.GetOpaqueColor32(rgb);
                 }
 
                 texture.SetPixels32(color32s);
@@ -143,10 +142,9 @@ namespace MarkovBlocks
 
             foreach (var remap in model.CustomRemapping) // Read and assign custom remapping
             {
-                var color = remap.RemapColor;
-                int rgba = (color.a << 24) + (color.r << 16) + (color.g << 8) + color.b;
+                int rgba = ColorConvert.GetRGBA(remap.RemapColor);
 
-                if (!string.IsNullOrEmpty(remap.RemapTarget))
+                if (!string.IsNullOrWhiteSpace(remap.RemapTarget))
                 {
                     int remapStateId = BlockStateRemapper.GetStateIdFromString(remap.RemapTarget);
                     
@@ -157,11 +155,7 @@ namespace MarkovBlocks
                         Debug.Log($"Remapped '{remap.Symbol}' to [{remapStateId}] {state}");
 
                         if (stateId2Mesh.TryAdd(remapStateId, blockMeshCount))
-                        {
-                            Debug.Log($"Assigned mesh for [{remapStateId}] {state} to #{blockMeshCount}");
-
                             fullPalette[remap.Symbol] = new(blockMeshCount++, rgba);
-                        }
                         else // The mesh of this block state is already regestered, just use it
                             fullPalette[remap.Symbol] = new(stateId2Mesh[remapStateId], rgba);
                     }
@@ -222,28 +216,25 @@ namespace MarkovBlocks
                 callback.Invoke();
         }
 
-        private IEnumerator RunTest()
+        private IEnumerator RunGeneration()
         {
-            if (currentModel is null || interpreter == null)
+            if (currentModel is null || interpreter is null || blockMaterial is null || loadInfo.Loading || running)
             {
-                Debug.LogWarning("Generate model is not assigned");
+                Debug.LogWarning("Generation cannot be initiated");
                 yield break;
             }
+
+            running = true;
 
             var model = currentModel;
 
             var resultPerLine = Mathf.RoundToInt(Mathf.Sqrt(model.Amount));
-
-            if (resultPerLine <= 0)
-                resultPerLine = 1;
+            resultPerLine = Mathf.Max(resultPerLine, 1);
             
-            var materials = new[] { blockMaterial };
+            Material[] materials = { blockMaterial };
 
             System.Random rand = new();
-            var modelSeeds = model.Seeds;
-            if (modelSeeds != null && modelSeeds.Trim().Equals(string.Empty)) // Seed not specified
-                modelSeeds = null;
-            int[]? seeds = modelSeeds?.Split(' ').Select(s => int.Parse(s)).ToArray();
+            var seeds = model.Seeds;
 
             // Set up stopwatch
             var sw = System.Diagnostics.Stopwatch.StartNew();
@@ -261,7 +252,7 @@ namespace MarkovBlocks
                     float tick = 1F / playbackSpeed;
 
                     if (instanceDataRaw != null)
-                        BlockInstanceSpawner.VisualizeState(instanceDataRaw.Value, materials!, blockMeshes, tick);
+                        BlockInstanceSpawner.VisualizeState(instanceDataRaw.Value, materials, blockMeshes, tick);
 
                     // Update generation text
                     if (generationText != null)
@@ -279,7 +270,7 @@ namespace MarkovBlocks
                 }
 
                 if (instanceDataRaw != null)
-                    BlockInstanceSpawner.VisualizeState(instanceDataRaw.Value, materials!, blockMeshes, 0F); // The final visualization is persistent
+                    BlockInstanceSpawner.VisualizeState(instanceDataRaw.Value, materials, blockMeshes, 0F); // The final visualization is persistent
 
                 Debug.Log($"Generation complete. Frame Count: {frameCount}");
             }
@@ -287,6 +278,7 @@ namespace MarkovBlocks
             Debug.Log($"Time elapsed: {sw.ElapsedMilliseconds}ms");
 
             sw.Stop(); // Stop stopwatch
+            running = false;
         }
 
         void Start()
@@ -295,22 +287,40 @@ namespace MarkovBlocks
                 UpdatePlaybackSpeed(playbackSpeedSlider.value);
             else
                 Debug.LogWarning("Playback speed slider is not assigned!");
-            
-            if (generationModel == null)
-            {
-                Debug.LogWarning("Markov Junior model not assigned!");
-                return;
-            }
 
             // First load Minecraft data & resources
             StartCoroutine(LoadMCData("markov", new string[] {
                     "vanilla-1.16.5", "vanilla_fix", "default"
                 }, () => {
-                    // Set active generation model
-                    SetGenerationModel(generationModel);
+                    //AssetBundle.LoadFromFileAsync()
+                    var dir = PathHelper.GetExtraDataFile("configured_models");
+                    if (Directory.Exists(dir))
+                    {
+                        var models = Directory.GetFiles(dir, "*.xml", SearchOption.AllDirectories);
 
-                    // Start it up!
-                    StartCoroutine(RunTest());
+                        foreach (var m in models)
+                        {
+                            var modelPath = m.Substring(dir.Length + 1);
+                            Debug.Log($"Configured model: {modelPath}");
+                            
+                            if (string.IsNullOrWhiteSpace(selectedModelPath))
+                                selectedModelPath = modelPath;
+                            
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(selectedModelPath))
+                        {
+                            // Set default generation model
+                            var xdoc = XDocument.Load($"{dir}/{selectedModelPath}");
+                            SetGenerationModel(MarkovJuniorModel.CreateFromXMLDoc(xdoc));
+
+                            // Start it up!
+                            StartCoroutine(RunGeneration());
+                        }
+                        
+                    }
+                    else
+                        Debug.LogWarning("Configured model folder not found!");
                 }));
         }
 

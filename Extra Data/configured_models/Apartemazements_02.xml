@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ConfiguredModel Name="Apartemazements" SizeX="8" SizeY="8" SizeZ="8" Amount="2" Steps="1000" Animated="true">
+  <Seeds>
+    <Seed Value="123" />
+    <Seed Value="456" />
+  </Seeds>
+  <CustomRemapping>
+    <Item Symbol="E" RemapColor="-1476395009" RemapTarget="minecraft:grass_block[snowy=false]" />
+    <Item Symbol="N" RemapColor="16777215" RemapTarget="minecraft:dirt" />
+    <Item Symbol="W" RemapColor="16761281" RemapTarget="minecraft:quartz_block" />
+    <Item Symbol="P" RemapColor="16745436" />
+    <Item Symbol="R" RemapColor="16777215" RemapTarget="555" />
+    <Item Symbol="C" RemapColor="16777215" RemapTarget="minecraft:diamond_block" />
+    <Item Symbol="B" RemapColor="65465" />
+    <Item Symbol="A" RemapColor="16777215" RemapTarget="minecraft:quartz_block" />
+  </CustomRemapping>
+</ConfiguredModel>
