@@ -16,9 +16,9 @@ MonoBehaviour:
   SizeX: 8
   SizeY: 8
   SizeZ: 8
-  Amount: 2
+  Amount: 4
   Steps: 1000
-  Animated: 1
+  Animated: 0
   Seeds: 7b000000c8010000
   CustomRemapping:
   - Symbol: 69
@@ -42,7 +42,7 @@ MonoBehaviour:
       serializedVersion: 2
       rgba: 14451711
   - Symbol: 82
-    RemapTarget: 555
+    RemapTarget: 
     RemapColor:
       serializedVersion: 2
       rgba: 16777215
