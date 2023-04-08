@@ -27,8 +27,8 @@ namespace MarkovBlocks
         [SerializeField] public Button? executeButton;
         [SerializeField] public RawImage? graphImage;
 
-        private string selectedModelPath = string.Empty;
-        private readonly Dictionary<int, string> loadedModels = new();
+        private string confModelName = string.Empty;
+        private readonly Dictionary<int, string> loadedConfModels = new();
 
         private MarkovJuniorModel? currentModel = null;
         private Interpreter? interpreter = null;
@@ -108,9 +108,10 @@ namespace MarkovBlocks
             blockMeshes = BlockMeshGenerator.GenerateMeshes(buffers);
         }
 
-        public IEnumerator SetGenerationModel(MarkovJuniorModel model)
+        public IEnumerator SetConfiguredModel(string confModelName, MarkovJuniorModel model)
         {
             loadInfo.Loading = true;
+            loadInfo.InfoText = $"Loading configured model [{confModelName}]...";
 
             // Assign new generation model
             currentModel = model;
@@ -214,6 +215,9 @@ namespace MarkovBlocks
             yield return null;
 
             loadInfo.Loading = false;
+
+            if (generationText != null)
+                generationText.text = $"[{confModelName}] loaded";
         }
 
         private IEnumerator LoadMCData(string dataVersion, string[] packs, Action? callback = null)
@@ -325,7 +329,8 @@ namespace MarkovBlocks
                 
             }
 
-            StopExecution();
+            if (executing) // If the execution wasn't forced stopped
+                StopExecution();
         }
 
         void Start()
@@ -351,13 +356,13 @@ namespace MarkovBlocks
                     {
                         var models = Directory.GetFiles(dir, "*.xml", SearchOption.AllDirectories);
                         var options = new List<TMP_Dropdown.OptionData>();
-                        loadedModels.Clear();
+                        loadedConfModels.Clear();
                         int index = 0;
                         foreach (var m in models)
                         {
                             var modelPath = m.Substring(dir.Length + 1);
                             options.Add(new(modelPath));
-                            loadedModels.Add(index++, modelPath);
+                            loadedConfModels.Add(index++, modelPath);
                         }
 
                         modelDropdown.AddOptions(options);
@@ -406,18 +411,18 @@ namespace MarkovBlocks
             if (executing)
                 StopExecution();
 
-            if (loadedModels.ContainsKey(newValue))
+            if (loadedConfModels.ContainsKey(newValue))
             {
                 var dir = PathHelper.GetExtraDataFile("configured_models");
 
-                // Update selected model
-                selectedModelPath = loadedModels[newValue];
+                // Update selected configured model
+                confModelName = loadedConfModels[newValue];
 
-                var xdoc = XDocument.Load($"{dir}/{selectedModelPath}");
+                var xdoc = XDocument.Load($"{dir}/{confModelName}");
                 var model = MarkovJuniorModel.CreateFromXMLDoc(xdoc);
 
                 if (!loadInfo.Loading)
-                    StartCoroutine(SetGenerationModel(model));
+                    StartCoroutine(SetConfiguredModel(confModelName, model));
             }
         }
 
