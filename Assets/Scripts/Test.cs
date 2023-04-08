@@ -24,6 +24,7 @@ namespace MarkovBlocks
         [SerializeField] public TMP_Text? playbackSpeedText, generationText;
         [SerializeField] public TMP_Dropdown? modelDropdown;
         [SerializeField] public Slider? playbackSpeedSlider;
+        [SerializeField] public Toggle? dyeBlockMeshesToggle;
         [SerializeField] public Button? executeButton;
         [SerializeField] public RawImage? graphImage;
 
@@ -33,6 +34,7 @@ namespace MarkovBlocks
         private MarkovJuniorModel? currentModel = null;
         private Interpreter? interpreter = null;
         private float playbackSpeed = 1F;
+        private bool dyeBlockMeshes = false;
         private bool executing = false;
 
         // Palettes and meshes
@@ -106,6 +108,29 @@ namespace MarkovBlocks
 
             // Set result to blockMeshes
             blockMeshes = BlockMeshGenerator.GenerateMeshes(buffers);
+        }
+
+        private void VisualizePaletteMapping()
+        {
+            int ia = 0;
+            foreach (var pair in fullPalette)
+            {
+                var go = new GameObject($"Character [{pair.Key}]");
+
+                go.AddComponent<MeshFilter>().mesh = blockMeshes[pair.Value.x];
+
+                if (pair.Value.x != 0)
+                    go.AddComponent<MeshRenderer>().sharedMaterial = blockMaterial;
+                else
+                {
+                    var mr = go.AddComponent<MeshRenderer>();
+                    mr.material = blockMaterial; // Create a new material instance
+                    mr.material!.SetColor("_InstanceBlockColor",
+                            ColorConvert.GetOpaqueColor32(pair.Value.y));
+                }
+
+                go.transform.position = (ia++) % 2 == 0 ? new(ia - 3, 0, -2) : new(-2, 0, ia - 2);
+            }
         }
 
         public IEnumerator SetConfiguredModel(string confModelName, MarkovJuniorModel model)
@@ -285,6 +310,17 @@ namespace MarkovBlocks
             System.Random rand = new();
             var seeds = model.Seeds;
 
+            // Prepare a copy of full palette in which blockstate meshes are not dyed
+            var undyedFullPalette = new Dictionary<char, int2>();
+
+            foreach (var pair in fullPalette)
+            {
+                if (pair.Value.x == 0) // Cube meshes will still preserve their colors so as to be distinguished from each other
+                    undyedFullPalette.Add(pair.Key, pair.Value);
+                else // For Minecraft block meshes, set their color to white
+                    undyedFullPalette.Add(pair.Key, new int2(pair.Value.x, 0xFFFFFF));
+            }
+
             for (int k = 0; k < model.Amount; k++)
             {
                 if (!executing) // Stop execution
@@ -300,7 +336,7 @@ namespace MarkovBlocks
                     if (!executing) // Stop execution
                         break;
 
-                    int2[] stepPalette = legend.Select(ch => fullPalette[ch]).ToArray();
+                    int2[] stepPalette = legend.Select(ch => dyeBlockMeshes ? fullPalette[ch] : undyedFullPalette[ch]).ToArray();
                     float tick = 1F / playbackSpeed;
 
                     if (instanceDataRaw != null)
@@ -312,11 +348,10 @@ namespace MarkovBlocks
 
                     frameCount++;
 
-                    int xCount = k / resultPerLine, zCount = k % resultPerLine;
-                    int ox = xCount * (FX + 2), oz = zCount * (FY + 2);
+                    int xCount = k / resultPerLine,  zCount = k % resultPerLine;
+                    var pos = new int3(xCount * (FX + 2), 0, zCount * (FY + 2));
 
-                    instanceDataRaw = BlockDataBuilder.GetInstanceData(result,
-                            FX, FY, FZ, ox, 0, oz, FZ > 1, stepPalette);
+                    instanceDataRaw = BlockDataBuilder.GetInstanceData(result, FX, FY, FZ, pos, FZ > 1, stepPalette);
 
                     yield return new WaitForSeconds(tick);
                 }
@@ -343,6 +378,12 @@ namespace MarkovBlocks
                     {
                         playbackSpeedSlider.onValueChanged.AddListener(UpdatePlaybackSpeed);
                         UpdatePlaybackSpeed(playbackSpeedSlider.value);
+                    }
+
+                    if (dyeBlockMeshesToggle != null)
+                    {
+                        dyeBlockMeshesToggle.onValueChanged.AddListener(UpdateDyeBlockMeshes);
+                        UpdateDyeBlockMeshes(dyeBlockMeshesToggle.isOn);
                     }
                     
                     if (executeButton != null)
@@ -403,6 +444,12 @@ namespace MarkovBlocks
 
             if (playbackSpeedText != null)
                 playbackSpeedText.text = $"{newValue:0.0}";
+            
+        }
+
+        public void UpdateDyeBlockMeshes(bool newValue)
+        {
+            dyeBlockMeshes = newValue;
             
         }
 

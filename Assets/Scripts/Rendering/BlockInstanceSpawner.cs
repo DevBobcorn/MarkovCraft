@@ -17,7 +17,6 @@ namespace MarkovBlocks
 
         public static void VisualizeState((int3[], int2[]) instanceDataRaw, Material[] materials, Mesh[] meshes, float persistence)
         {
-            bool persistent = persistence <= 0F;
             var entityCount = instanceDataRaw.Item1.Length;
 
             var posData = new NativeArray<int3>(entityCount, Allocator.TempJob);
@@ -49,9 +48,7 @@ namespace MarkovBlocks
                 MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
             
             entityManager.AddComponentData(prototype, new InstanceBlockColor());
-
-            if (!persistent) // Add magic component to make it expire after some time
-                entityManager.AddComponentData(prototype, new MagicComponent());
+            entityManager.AddComponentData(prototype, new MagicComponent());
             
             #endregion
 
@@ -79,8 +76,12 @@ namespace MarkovBlocks
     
         public static void ClearUpPersistentState()
         {
-            // TODO: Implement
+            var world = Unity.Entities.World.DefaultGameObjectInjectionWorld;
+            var entityManager = world.EntityManager;
+            EntityCommandBuffer ecbJob = new EntityCommandBuffer(Allocator.TempJob);
             
+            ecbJob.Playback(entityManager);
+            ecbJob.Dispose();
         }
     }
 }

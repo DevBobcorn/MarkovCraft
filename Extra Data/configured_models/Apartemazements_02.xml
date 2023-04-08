@@ -9,7 +9,7 @@
     <Item Symbol="N" RemapColor="16777215" RemapTarget="minecraft:dirt" />
     <Item Symbol="W" RemapColor="16761281" RemapTarget="minecraft:quartz_block" />
     <Item Symbol="P" RemapColor="16745436" />
-    <Item Symbol="R" RemapColor="16777215" />
+    <Item Symbol="R" RemapColor="16711680" />
     <Item Symbol="C" RemapColor="16777215" RemapTarget="minecraft:diamond_block" />
     <Item Symbol="B" RemapColor="65465" />
     <Item Symbol="A" RemapColor="16777215" RemapTarget="minecraft:quartz_block" />

@@ -25,39 +25,29 @@ MonoBehaviour:
     RemapTarget: minecraft:grass_block[snowy=false]
     RemapColor:
       serializedVersion: 2
-      rgba: 2818572287
+      rgba: 4278242407
   - Symbol: 78
     RemapTarget: minecraft:dirt
     RemapColor:
       serializedVersion: 2
-      rgba: 16777215
+      rgba: 4280971703
   - Symbol: 87
     RemapTarget: minecraft:quartz_block
     RemapColor:
       serializedVersion: 2
-      rgba: 12698111
-  - Symbol: 80
-    RemapTarget: 
-    RemapColor:
-      serializedVersion: 2
-      rgba: 14451711
+      rgba: 4294967295
   - Symbol: 82
-    RemapTarget: 
+    RemapTarget: white_terracotta
     RemapColor:
       serializedVersion: 2
-      rgba: 12189440
-  - Symbol: 67
-    RemapTarget: minecraft:diamond_block
-    RemapColor:
-      serializedVersion: 2
-      rgba: 16777215
-  - Symbol: 66
-    RemapTarget: 
-    RemapColor:
-      serializedVersion: 2
-      rgba: 12189440
+      rgba: 4287413223
   - Symbol: 65
     RemapTarget: minecraft:quartz_block
     RemapColor:
       serializedVersion: 2
-      rgba: 16777215
+      rgba: 4291546111
+  - Symbol: 67
+    RemapTarget: minecraft:diamond_block
+    RemapColor:
+      serializedVersion: 2
+      rgba: 4294959360

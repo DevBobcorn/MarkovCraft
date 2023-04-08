@@ -8,7 +8,7 @@ namespace MarkovBlocks
     {
         private static bool checkNotOpaque3d(byte block) => block == 0;
 
-        public static (int3[], int2[]) GetInstanceData(byte[] states, int FX, int FY, int FZ, int ox, int oy, int oz, bool is3d, int2[] palette)
+        public static (int3[], int2[]) GetInstanceData(byte[] states, int FX, int FY, int FZ, int3 pos, bool is3d, int2[] palette)
         {
             List<int3> posData = new();
             List<int2> meshData = new();
@@ -43,7 +43,7 @@ namespace MarkovBlocks
 
                         if (cull != 0) // At least one side of this cube is visible
                         {
-                            posData.Add(new(x + ox, z + oy, y + oz));
+                            posData.Add(new int3(x, z, y) + pos);
                             meshData.Add(palette[v]);
                         }
                         
@@ -52,7 +52,7 @@ namespace MarkovBlocks
                 else // 2d structure, all blocks should be shown even those with value 0. In other words, there's no air block
                 {
                     // No cube can be totally occluded in 2d mode
-                    posData.Add(new(x + ox, z + oy, y + oz));
+                    posData.Add(new int3(x, z, y) + pos);
                     meshData.Add(palette[v]);
                 }
             }

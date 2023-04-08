@@ -45,7 +45,7 @@ MonoBehaviour:
     RemapTarget: 
     RemapColor:
       serializedVersion: 2
-      rgba: 16777215
+      rgba: 255
   - Symbol: 67
     RemapTarget: minecraft:diamond_block
     RemapColor:

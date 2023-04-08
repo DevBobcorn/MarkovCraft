@@ -5,7 +5,6 @@ using Unity.Transforms;
 
 namespace MarkovBlocks
 {
-    [BurstCompile]
     public partial struct MagicSystem : ISystem
     {
         [BurstCompile]
@@ -34,6 +33,9 @@ namespace MarkovBlocks
             foreach (var (magic, trs, entity) in
                      SystemAPI.Query<RefRW<MagicComponent>, RefRW<LocalToWorld>>().WithEntityAccess())
             {
+                if (magic.ValueRO.LifeTime <= 0F)
+                    continue;
+
                 magic.ValueRW.TimeLeft -= SystemAPI.Time.DeltaTime;
 
                 if (magic.ValueRO.TimeLeft <= -magic.ValueRO.LifeTime)
