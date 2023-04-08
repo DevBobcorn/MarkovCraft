@@ -13,6 +13,7 @@ using TMPro;
 
 using MarkovJunior;
 using MarkovBlocks.Mapping;
+using System.Threading.Tasks;
 
 namespace MarkovBlocks
 {
@@ -21,15 +22,18 @@ namespace MarkovBlocks
         public const int WINDOWED_APP_WIDTH = 1600, WINDOWED_APP_HEIGHT = 900;
 
         [SerializeField] public TMP_Text? playbackSpeedText, generationText;
+        [SerializeField] public TMP_Dropdown? modelDropdown;
         [SerializeField] public Slider? playbackSpeedSlider;
+        [SerializeField] public Button? executeButton;
         [SerializeField] public RawImage? graphImage;
 
-        [SerializeField] public string selectedModelPath = string.Empty;
+        private string selectedModelPath = string.Empty;
+        private readonly Dictionary<int, string> loadedModels = new();
 
         private MarkovJuniorModel? currentModel = null;
         private Interpreter? interpreter = null;
         private float playbackSpeed = 1F;
-        private bool running = false;
+        private bool executing = false;
 
         // Palettes and meshes
         private readonly ResourcePackManager packManager = new();
@@ -50,6 +54,7 @@ namespace MarkovBlocks
                 MarkovJunior.GUI.Draw(currentModel.Name, interpreter.root, null, image, imageX, imageY, palette);
                 
                 Texture2D texture = new(imageX, imageY);
+                texture.filterMode = FilterMode.Point;
 
                 var color32s = new Color32[imageX * imageY];
 
@@ -60,7 +65,7 @@ namespace MarkovBlocks
                 }
 
                 texture.SetPixels32(color32s);
-                texture.Apply(false);
+                texture.Apply(true, false);
                 
                 graphImage.texture = texture;
                 graphImage.SetNativeSize();
@@ -103,29 +108,60 @@ namespace MarkovBlocks
             blockMeshes = BlockMeshGenerator.GenerateMeshes(buffers);
         }
 
-        public void SetGenerationModel(MarkovJuniorModel model)
+        public IEnumerator SetGenerationModel(MarkovJuniorModel model)
         {
+            loadInfo.Loading = true;
+
             // Assign new generation model
             currentModel = model;
 
             string fileName = PathHelper.GetExtraDataFile($"models/{model.Name}.xml");
             Debug.Log($"{model.Name} > {fileName}");
 
-            XDocument modeldoc;
-            try { modeldoc = XDocument.Load(fileName, LoadOptions.SetLineInfo); }
-            catch (Exception)
+            XDocument? modelDoc = null;
+
+            if (File.Exists(fileName))
+            {
+                FileStream fs = new(fileName, FileMode.Open);
+
+                var task = XDocument.LoadAsync(fs, LoadOptions.SetLineInfo, new());
+
+                while (!task.IsCompleted)
+                    yield return null;
+                
+                fs.Close();
+                
+                if (task.IsCompletedSuccessfully)
+                    modelDoc = task.Result;
+            }
+            
+            if (modelDoc is null)
             {
                 Debug.LogWarning($"ERROR: Couldn't open xml file at {fileName}");
-                return;
+                yield break;
             }
 
-            interpreter = Interpreter.Load(modeldoc.Root, model.SizeX, model.SizeY, model.SizeZ);
+            yield return null;
+
+            var loadComplete = false;
+
+            Task.Run(() => {
+                // Use a task to load this in so that the main thread doesn't get blocked
+                interpreter = Interpreter.Load(modelDoc.Root, model.SizeX, model.SizeY, model.SizeZ);
+
+                loadComplete = true;
+            });
+
+            while (!loadComplete)
+                yield return null;
 
             if (interpreter == null)
             {
-                Debug.LogWarning("ERROR: Failed to creating model interpreter");
-                return;
+                Debug.LogWarning("ERROR: Failed to create model interpreter");
+                yield break;
             }
+
+            yield return null;
 
             var statePalette = BlockStatePalette.INSTANCE;
             var stateId2Mesh = new Dictionary<int, int>(); // StateId => Mesh index
@@ -151,8 +187,7 @@ namespace MarkovBlocks
                     if (remapStateId != BlockStateRemapper.INVALID_BLOCKSTATE)
                     {
                         var state = statePalette.StatesTable[remapStateId];
-
-                        Debug.Log($"Remapped '{remap.Symbol}' to [{remapStateId}] {state}");
+                        //Debug.Log($"Remapped '{remap.Symbol}' to [{remapStateId}] {state}");
 
                         if (stateId2Mesh.TryAdd(remapStateId, blockMeshCount))
                             fullPalette[remap.Symbol] = new(blockMeshCount++, rgba);
@@ -164,13 +199,21 @@ namespace MarkovBlocks
                 }
                 else // Default cube mesh with custom color
                     fullPalette[remap.Symbol] = new(0, rgba);
+                
+                yield return null;
             }
 
             // Update procedure graph
             RedrawProcedureGraph(fullPalette);
 
+            yield return null;
+
             // Generate block meshes
             GenerateBlockMeshes(stateId2Mesh);
+
+            yield return null;
+
+            loadInfo.Loading = false;
         }
 
         private IEnumerator LoadMCData(string dataVersion, string[] packs, Action? callback = null)
@@ -218,14 +261,16 @@ namespace MarkovBlocks
 
         private IEnumerator RunGeneration()
         {
-            if (currentModel is null || interpreter is null || blockMaterial is null || loadInfo.Loading || running)
+            if (currentModel is null || interpreter is null || blockMaterial is null)
             {
                 Debug.LogWarning("Generation cannot be initiated");
                 yield break;
             }
 
-            running = true;
+            // Do the cleaning
+            BlockInstanceSpawner.ClearUpPersistentState();
 
+            executing = true;
             var model = currentModel;
 
             var resultPerLine = Mathf.RoundToInt(Mathf.Sqrt(model.Amount));
@@ -236,11 +281,11 @@ namespace MarkovBlocks
             System.Random rand = new();
             var seeds = model.Seeds;
 
-            // Set up stopwatch
-            var sw = System.Diagnostics.Stopwatch.StartNew();
-
             for (int k = 0; k < model.Amount; k++)
             {
+                if (!executing) // Stop execution
+                    break;
+                
                 int seed = seeds != null && k < seeds.Length ? seeds[k] : rand.Next();
                 int frameCount = 0;
 
@@ -248,6 +293,9 @@ namespace MarkovBlocks
 
                 foreach ((byte[] result, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, model.Steps, model.Animated))
                 {
+                    if (!executing) // Stop execution
+                        break;
+
                     int2[] stepPalette = legend.Select(ch => fullPalette[ch]).ToArray();
                     float tick = 1F / playbackSpeed;
 
@@ -269,58 +317,55 @@ namespace MarkovBlocks
                     yield return new WaitForSeconds(tick);
                 }
 
-                if (instanceDataRaw != null)
+                if (instanceDataRaw != null && executing)
+                {
                     BlockInstanceSpawner.VisualizeState(instanceDataRaw.Value, materials, blockMeshes, 0F); // The final visualization is persistent
-
-                Debug.Log($"Generation complete. Frame Count: {frameCount}");
+                    Debug.Log($"Generation complete. Frame Count: {frameCount}");
+                }
+                
             }
 
-            Debug.Log($"Time elapsed: {sw.ElapsedMilliseconds}ms");
-
-            sw.Stop(); // Stop stopwatch
-            running = false;
+            StopExecution();
         }
 
         void Start()
         {
-            if (playbackSpeedSlider != null) // Initialize playback speed
-                UpdatePlaybackSpeed(playbackSpeedSlider.value);
-            else
-                Debug.LogWarning("Playback speed slider is not assigned!");
-
             // First load Minecraft data & resources
             StartCoroutine(LoadMCData("markov", new string[] {
                     "vanilla-1.16.5", "vanilla_fix", "default"
                 }, () => {
-                    //AssetBundle.LoadFromFileAsync()
+                    if (playbackSpeedSlider != null)
+                    {
+                        playbackSpeedSlider.onValueChanged.AddListener(UpdatePlaybackSpeed);
+                        UpdatePlaybackSpeed(playbackSpeedSlider.value);
+                    }
+                    
+                    if (executeButton != null)
+                    {
+                        executeButton.GetComponentInChildren<TMP_Text>().text = "Start Execution";
+                        executeButton.onClick.AddListener(StartExecution);
+                    }
+
                     var dir = PathHelper.GetExtraDataFile("configured_models");
-                    if (Directory.Exists(dir))
+                    if (Directory.Exists(dir) && modelDropdown != null)
                     {
                         var models = Directory.GetFiles(dir, "*.xml", SearchOption.AllDirectories);
-
+                        var options = new List<TMP_Dropdown.OptionData>();
+                        loadedModels.Clear();
+                        int index = 0;
                         foreach (var m in models)
                         {
                             var modelPath = m.Substring(dir.Length + 1);
-                            Debug.Log($"Configured model: {modelPath}");
-                            
-                            if (string.IsNullOrWhiteSpace(selectedModelPath))
-                                selectedModelPath = modelPath;
-                            
+                            options.Add(new(modelPath));
+                            loadedModels.Add(index++, modelPath);
                         }
 
-                        if (!string.IsNullOrWhiteSpace(selectedModelPath))
-                        {
-                            // Set default generation model
-                            var xdoc = XDocument.Load($"{dir}/{selectedModelPath}");
-                            SetGenerationModel(MarkovJuniorModel.CreateFromXMLDoc(xdoc));
+                        modelDropdown.AddOptions(options);
+                        modelDropdown.onValueChanged.AddListener(UpdateDropdownOption);
 
-                            // Start it up!
-                            StartCoroutine(RunGeneration());
-                        }
-                        
+                        if (options.Count > 0) // Use first model by default
+                            UpdateDropdownOption(0);
                     }
-                    else
-                        Debug.LogWarning("Configured model folder not found!");
                 }));
         }
 
@@ -349,14 +394,67 @@ namespace MarkovBlocks
 
         public void UpdatePlaybackSpeed(float newValue)
         {
-            if (playbackSpeedText != null) // Update playback speed
-            {
+            playbackSpeed = newValue;
+
+            if (playbackSpeedText != null)
                 playbackSpeedText.text = $"{newValue:0.0}";
-                playbackSpeed = newValue;
-            }
-            else
-                Debug.LogWarning("Playback speed text is not assigned!");
             
+        }
+
+        public void UpdateDropdownOption(int newValue)
+        {
+            if (executing)
+                StopExecution();
+
+            if (loadedModels.ContainsKey(newValue))
+            {
+                var dir = PathHelper.GetExtraDataFile("configured_models");
+
+                // Update selected model
+                selectedModelPath = loadedModels[newValue];
+
+                var xdoc = XDocument.Load($"{dir}/{selectedModelPath}");
+                var model = MarkovJuniorModel.CreateFromXMLDoc(xdoc);
+
+                if (!loadInfo.Loading)
+                    StartCoroutine(SetGenerationModel(model));
+            }
+        }
+
+        public void StartExecution()
+        {
+            if (loadInfo.Loading || executing)
+            {
+                Debug.LogWarning("Execution cannot be started.");
+                return;
+            }
+
+            StartCoroutine(RunGeneration());
+
+            if (executeButton != null)
+            {
+                executeButton.GetComponentInChildren<TMP_Text>().text = "Stop Execution";
+                executeButton.onClick.RemoveAllListeners();
+                executeButton.onClick.AddListener(StopExecution);
+            }
+        }
+
+        public void StopExecution()
+        {
+            if (loadInfo.Loading)
+            {
+                Debug.LogWarning("Execution cannot be stopped.");
+                return;
+            }
+
+            executing = false;
+
+            if (executeButton != null)
+            {
+                executeButton.GetComponentInChildren<TMP_Text>().text = "Start Execution";
+                executeButton.onClick.RemoveAllListeners();
+                executeButton.onClick.AddListener(StartExecution);
+            }
         }
 
     }

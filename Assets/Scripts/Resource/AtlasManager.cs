@@ -205,8 +205,6 @@ namespace MarkovBlocks
                     consumedTexCount = 1;
                 }
 
-                Debug.Log($"{curTexIndex} ~ {lastTexIndex + 1} / {textures.Length}");
-
                 // Then we go stitch 'em        (inclusive)..(exclusive)
                 var texturesConsumed = textures[curTexIndex..(lastTexIndex + 1)];
 

@@ -112,7 +112,7 @@ namespace MarkovJunior
             }
 
             P = tiledata.Count;
-            Debug.Log($"P = {P}");
+            //Debug.Log($"P = {P}");
             weights = tempStationary.ToArray();
 
             map = new Dictionary<byte, bool[]>();

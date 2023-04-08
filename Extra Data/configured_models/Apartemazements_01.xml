@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ConfiguredModel Name="Apartemazements" SizeX="12" SizeY="12" SizeZ="12" Amount="1" Steps="1000" Animated="true">
+<ConfiguredModel Name="Apartemazements" SizeX="5" SizeY="6" SizeZ="7" Amount="1" Steps="1000" Animated="true">
   <CustomRemapping>
     <Item Symbol="E" RemapColor="-1476395009" RemapTarget="minecraft:grass_block[snowy=false]" />
     <Item Symbol="N" RemapColor="16777215" RemapTarget="minecraft:dirt" />

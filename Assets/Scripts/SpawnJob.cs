@@ -15,9 +15,6 @@ namespace MarkovBlocks
         public EntityCommandBuffer.ParallelWriter Ecb;
 
         [ReadOnly]
-        public RenderBounds RenderBounds;
-
-        [ReadOnly]
         public NativeArray<int3> PositionData; // x, y, z
 
         [ReadOnly]
@@ -43,7 +40,6 @@ namespace MarkovBlocks
             
             Ecb.SetComponent(index, e, new InstanceBlockColor() { Value = ComputeColor(mesh.y) });
             Ecb.SetComponent(index, e, MaterialMeshInfo.FromRenderMeshArrayIndices(0, mesh.x));
-            Ecb.SetComponent(index, e, RenderBounds);
 
             if (LifeTime > 0F)
                 Ecb.SetComponent(index, e, new MagicComponent { TimeLeft = LifeTime, LifeTime = LifeTime, Position = pos });

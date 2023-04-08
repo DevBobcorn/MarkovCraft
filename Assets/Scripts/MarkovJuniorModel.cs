@@ -34,8 +34,8 @@ namespace MarkovBlocks
 
         public static MarkovJuniorModel CreateFromXMLDoc(XDocument xdoc)
         {
-            var model = new MarkovJuniorModel { Name = "Model", SizeX = 1, SizeY = 1, SizeZ = 1 };
-            UpdateFromXMLDoc(ref model, xdoc);
+            var model = ScriptableObject.CreateInstance(typeof (MarkovJuniorModel)) as MarkovJuniorModel;
+            UpdateFromXMLDoc(ref model!, xdoc);
 
             return model;
         }

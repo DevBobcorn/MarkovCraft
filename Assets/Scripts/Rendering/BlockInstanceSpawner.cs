@@ -62,7 +62,6 @@ namespace MarkovBlocks
             {
                 Ecb = ecbJob.AsParallelWriter(),
                 Prototype = prototype,
-                RenderBounds = renderBounds,
                 PositionData = posData,
                 MeshData = meshData,
                 LifeTime = persistence
@@ -76,6 +75,12 @@ namespace MarkovBlocks
             ecbJob.Dispose();
 
             entityManager.DestroyEntity(prototype);
+        }
+    
+        public static void ClearUpPersistentState()
+        {
+            // TODO: Implement
+            
         }
     }
 }

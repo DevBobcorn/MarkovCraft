@@ -221,8 +221,8 @@ namespace MarkovBlocks.Mapping
                                     Debug.LogWarning($"Failed to apply dynamic color rules to {blockId} ({stateId})!");
                             }
                         }
-                        else
-                            Debug.LogWarning($"Applying dynamic color rules to undefined block {blockId}!");
+                        //else
+                        //    Debug.LogWarning($"Applying dynamic color rules to undefined block {blockId}!");
                         
                         count++;
                         if (count % yieldCount == 0)
@@ -251,8 +251,8 @@ namespace MarkovBlocks.Mapping
                                 yield return null;
                         }
                     }
-                    else
-                        Debug.LogWarning($"Applying fixed color rules to undefined block {blockId}!");
+                    //else
+                    //    Debug.LogWarning($"Applying fixed color rules to undefined block {blockId}!");
                 }
             }
 
