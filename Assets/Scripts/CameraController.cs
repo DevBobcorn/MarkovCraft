@@ -5,7 +5,8 @@ namespace MarkovBlocks
 {
     public class CameraController : MonoBehaviour
     {
-        [SerializeField] public float moveSpeed = 10F;
+        [SerializeField] public float moveSpeed   =  10F;
+        [SerializeField] public float scrollSpeed = 500F;
 
         void Update()
         {
@@ -26,8 +27,7 @@ namespace MarkovBlocks
 
             if (scroll != 0F)
             {
-                transform.position += transform.forward * (scroll * 100F) * Time.deltaTime * moveSpeed;
-                Debug.Log($"Scroll {scroll}");
+                transform.position += transform.forward * scroll * Time.deltaTime * scrollSpeed;
             }
 
         }
