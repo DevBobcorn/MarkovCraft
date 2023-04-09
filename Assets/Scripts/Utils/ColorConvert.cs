@@ -30,5 +30,15 @@ namespace MarkovBlocks
             return new((byte)((rgb & 0xFF0000) >> 16), (byte)((rgb & 0xFF00) >> 8), (byte)(rgb & 0xFF), 255);
         }
 
+        public static string GetHexRGBString(int rgb)
+        {
+            return $"{(rgb & 0xFFFFFF):X}".PadLeft(6, '0');
+        }
+
+        public static string GetHexRGBAString(int rgba)
+        {
+            return $"{(rgba & 0xFFFFFFFF):X}".PadLeft(8, '0');
+        }
+
     }
 }

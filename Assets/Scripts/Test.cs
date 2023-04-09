@@ -29,9 +29,12 @@ namespace MarkovBlocks
         [SerializeField] public RawImage? graphImage;
 
         private string confModelName = string.Empty;
+        public string ConfiguredModelName => confModelName;
         private readonly Dictionary<int, string> loadedConfModels = new();
 
         private MarkovJuniorModel? currentModel = null;
+        public MarkovJuniorModel? CurrentModel => currentModel;
+
         private Interpreter? interpreter = null;
         private float playbackSpeed = 1F;
         private bool dyeBlockMeshes = false;
@@ -45,6 +48,17 @@ namespace MarkovBlocks
         private Material? blockMaterial;
 
         private readonly LoadStateInfo loadInfo = new();
+
+        private static Test? instance;
+        public static Test Instance
+        {
+            get {
+                if (instance == null)
+                    instance = Component.FindObjectOfType<Test>();
+
+                return instance!;
+            }
+        }
 
         private void RedrawProcedureGraph(Dictionary<char, int2> palette)
         {
