@@ -138,6 +138,9 @@ namespace MarkovBlocks
             loadInfo.Loading = true;
             loadInfo.InfoText = $"Loading configured model [{confModelName}]...";
 
+            // Clear up persistent entities
+            BlockInstanceSpawner.ClearUpPersistentState();
+
             // Assign new generation model
             currentModel = model;
 
@@ -247,8 +250,6 @@ namespace MarkovBlocks
 
         private IEnumerator LoadMCData(string dataVersion, string[] packs, Action? callback = null)
         {
-            var wait = new WaitForSecondsRealtime(0.1F);
-
             loadInfo.Loading = true;
 
             // First load all possible Block States...
@@ -256,7 +257,7 @@ namespace MarkovBlocks
             StartCoroutine(BlockStatePalette.INSTANCE.PrepareData(dataVersion, loadFlag, loadInfo));
 
             while (!loadFlag.Finished)
-                yield return wait;
+                yield return null;
             
             // Then load all Items...
             // [Code removed]
@@ -296,7 +297,7 @@ namespace MarkovBlocks
                 yield break;
             }
 
-            // Do the cleaning
+            // Clear up persistent entities
             BlockInstanceSpawner.ClearUpPersistentState();
 
             executing = true;
@@ -340,7 +341,7 @@ namespace MarkovBlocks
                     float tick = 1F / playbackSpeed;
 
                     if (instanceDataRaw != null)
-                        BlockInstanceSpawner.VisualizeState(instanceDataRaw.Value, materials, blockMeshes, tick);
+                        BlockInstanceSpawner.VisualizeState(instanceDataRaw.Value, materials, blockMeshes, tick, 0.5F);
 
                     // Update generation text
                     if (generationText != null)
@@ -358,7 +359,8 @@ namespace MarkovBlocks
 
                 if (instanceDataRaw != null && executing)
                 {
-                    BlockInstanceSpawner.VisualizeState(instanceDataRaw.Value, materials, blockMeshes, 0F); // The final visualization is persistent
+                    // The final visualization is persistent
+                    BlockInstanceSpawner.VisualizeState(instanceDataRaw.Value, materials, blockMeshes, 0F, 0.5F);
                     Debug.Log($"Generation complete. Frame Count: {frameCount}");
                 }
                 
@@ -413,6 +415,8 @@ namespace MarkovBlocks
                             UpdateDropdownOption(0);
                     }
                 }));
+            
+            
         }
 
         void Update()

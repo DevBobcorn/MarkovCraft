@@ -23,6 +23,9 @@ namespace MarkovBlocks
         [ReadOnly]
         public float LifeTime;
 
+        [ReadOnly]
+        public float TimeLeft;
+
         public void Execute(int index)
         {
             var e = Ecb.Instantiate(index, Prototype);
@@ -41,7 +44,7 @@ namespace MarkovBlocks
             Ecb.SetComponent(index, e, new InstanceBlockColor() { Value = ComputeColor(mesh.y) });
             Ecb.SetComponent(index, e, MaterialMeshInfo.FromRenderMeshArrayIndices(0, mesh.x));
 
-            Ecb.SetComponent(index, e, new MagicComponent { TimeLeft = LifeTime, LifeTime = LifeTime, Position = pos });
+            Ecb.SetComponent(index, e, new BlockInstanceComponent { TimeLeft = TimeLeft, LifeTime = LifeTime, Position = pos });
             
         }
 

@@ -4,7 +4,7 @@ using Unity.Mathematics;
 
 namespace MarkovBlocks
 {
-    public struct MagicComponent : IComponentData
+    public struct BlockInstanceComponent : IComponentData
     {
         public float LifeTime;
         public float TimeLeft;

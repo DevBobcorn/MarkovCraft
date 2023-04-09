@@ -5,12 +5,13 @@ using Unity.Transforms;
 
 namespace MarkovBlocks
 {
-    public partial struct MagicSystem : ISystem
+    public partial struct BlockInstanceSystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<MagicComponent>();
+            state.RequireForUpdate<BlockInstanceComponent>();
+            
         }
 
         [BurstCompile]
@@ -27,11 +28,8 @@ namespace MarkovBlocks
             var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            // WithAll() includes RotationSpeed in the query, but
-            // the RotationSpeed component values will not be accessed.
-            // WithEntityAccess() includes the Entity ID as the last element of the tuple.
             foreach (var (magic, trs, entity) in
-                     SystemAPI.Query<RefRW<MagicComponent>, RefRW<LocalToWorld>>().WithEntityAccess())
+                    SystemAPI.Query<RefRW<BlockInstanceComponent>, RefRW<LocalToWorld>>().WithEntityAccess())
             {
                 if (magic.ValueRO.LifeTime <= 0F)
                     continue;
@@ -57,6 +55,8 @@ namespace MarkovBlocks
                     );
                 }
             }
+        
+            
         }
     }
 }

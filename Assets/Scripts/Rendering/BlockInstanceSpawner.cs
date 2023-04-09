@@ -15,7 +15,7 @@ namespace MarkovBlocks
         private static readonly Bounds cubeBounds = new Bounds(new(0.5F, 0.5F, 0.5F), new(1F, 1F, 1F));
         private static readonly RenderBounds renderBounds = new RenderBounds { Value = cubeBounds.ToAABB() };
 
-        public static void VisualizeState((int3[], int2[]) instanceDataRaw, Material[] materials, Mesh[] meshes, float persistence)
+        public static void VisualizeState((int3[], int2[]) instanceDataRaw, Material[] materials, Mesh[] meshes, float lifeTime, float timeLeft)
         {
             var entityCount = instanceDataRaw.Item1.Length;
 
@@ -48,7 +48,7 @@ namespace MarkovBlocks
                 MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
             
             entityManager.AddComponentData(prototype, new InstanceBlockColor());
-            entityManager.AddComponentData(prototype, new MagicComponent());
+            entityManager.AddComponentData(prototype, new BlockInstanceComponent());
             
             #endregion
 
@@ -61,7 +61,8 @@ namespace MarkovBlocks
                 Prototype = prototype,
                 PositionData = posData,
                 MeshData = meshData,
-                LifeTime = persistence
+                LifeTime = lifeTime,
+                TimeLeft = timeLeft
             };
 
             var spawnHandle = spawnJob.Schedule(entityCount, 128);
@@ -73,15 +74,15 @@ namespace MarkovBlocks
 
             entityManager.DestroyEntity(prototype);
         }
-    
+
         public static void ClearUpPersistentState()
         {
             var world = Unity.Entities.World.DefaultGameObjectInjectionWorld;
             var entityManager = world.EntityManager;
-            EntityCommandBuffer ecbJob = new EntityCommandBuffer(Allocator.TempJob);
-            
-            ecbJob.Playback(entityManager);
-            ecbJob.Dispose();
+
+            var markovEntity = entityManager.CreateEntity();
+            entityManager.AddComponentData(markovEntity, new ClearTagComponent());
+
         }
     }
 }
