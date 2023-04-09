@@ -15,6 +15,11 @@ namespace MarkovBlocks
         private static readonly Bounds cubeBounds = new Bounds(new(0.5F, 0.5F, 0.5F), new(1F, 1F, 1F));
         private static readonly RenderBounds renderBounds = new RenderBounds { Value = cubeBounds.ToAABB() };
 
+        public static void VisualizePersistentState((int3[], int2[]) instanceDataRaw, Material[] materials, Mesh[] meshes)
+        {
+            VisualizeState(instanceDataRaw, materials, meshes, 0F, 0.35F);
+        }
+
         public static void VisualizeState((int3[], int2[]) instanceDataRaw, Material[] materials, Mesh[] meshes, float lifeTime, float timeLeft)
         {
             var entityCount = instanceDataRaw.Item1.Length;

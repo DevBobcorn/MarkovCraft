@@ -360,7 +360,7 @@ namespace MarkovBlocks
                 if (instanceDataRaw != null && executing)
                 {
                     // The final visualization is persistent
-                    BlockInstanceSpawner.VisualizeState(instanceDataRaw.Value, materials, blockMeshes, 0F, 0.5F);
+                    BlockInstanceSpawner.VisualizePersistentState(instanceDataRaw.Value, materials, blockMeshes);
                     Debug.Log($"Generation complete. Frame Count: {frameCount}");
                 }
                 
