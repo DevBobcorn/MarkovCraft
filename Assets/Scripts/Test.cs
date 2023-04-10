@@ -21,19 +21,19 @@ namespace MarkovBlocks
     {
         public const int WINDOWED_APP_WIDTH = 1600, WINDOWED_APP_HEIGHT = 900;
 
-        [SerializeField] public TMP_Text? playbackSpeedText, generationText;
-        [SerializeField] public TMP_Dropdown? modelDropdown;
-        [SerializeField] public Slider? playbackSpeedSlider;
-        [SerializeField] public Toggle? dyeBlockMeshesToggle;
-        [SerializeField] public Button? executeButton;
-        [SerializeField] public RawImage? graphImage;
+        [SerializeField] public TMP_Text? PlaybackSpeedText, GenerationText;
+        [SerializeField] public TMP_Dropdown? ConfiguredModelDropdown;
+        [SerializeField] public Slider? PlaybackSpeedSlider;
+        [SerializeField] public Toggle? DyeBlockMeshesToggle;
+        [SerializeField] public Button? ExecuteButton;
+        [SerializeField] public RawImage? GraphImage;
 
         private string confModelName = string.Empty;
         public string ConfiguredModelName => confModelName;
         private readonly Dictionary<int, string> loadedConfModels = new();
 
-        private MarkovJuniorModel? currentModel = null;
-        public MarkovJuniorModel? CurrentModel => currentModel;
+        private ConfiguredModel? currentConfiguredModel = null;
+        public ConfiguredModel? CurrentConfiguredModel => currentConfiguredModel;
 
         private Interpreter? interpreter = null;
         private float playbackSpeed = 1F;
@@ -60,14 +60,31 @@ namespace MarkovBlocks
             }
         }
 
+        private bool isPaused = true;
+
+        public bool IsPaused
+        {
+            get => isPaused;
+
+            set {
+                isPaused = value;
+
+                if (isPaused)
+                    Time.timeScale = 0F;
+                else
+                    Time.timeScale = 1F;
+
+            }
+        }
+
         private void RedrawProcedureGraph(Dictionary<char, int2> palette)
         {
-            if (currentModel != null && interpreter != null && graphImage != null)
+            if (currentConfiguredModel != null && interpreter != null && GraphImage != null)
             {
                 int imageX = 200, imageY = 600;
                 var image = new int[imageX * imageY];
 
-                MarkovJunior.GUI.Draw(currentModel.Name, interpreter.root, null, image, imageX, imageY, palette);
+                MarkovJunior.GUI.Draw(currentConfiguredModel.Model, interpreter.root, null, image, imageX, imageY, palette);
                 
                 Texture2D texture = new(imageX, imageY);
                 texture.filterMode = FilterMode.Point;
@@ -83,8 +100,8 @@ namespace MarkovBlocks
                 texture.SetPixels32(color32s);
                 texture.Apply(true, false);
                 
-                graphImage.texture = texture;
-                graphImage.SetNativeSize();
+                GraphImage.texture = texture;
+                GraphImage.SetNativeSize();
 
             }
             else
@@ -147,7 +164,7 @@ namespace MarkovBlocks
             }
         }
 
-        public IEnumerator SetConfiguredModel(string confModelName, MarkovJuniorModel model)
+        public IEnumerator SetConfiguredModel(string confModelName, ConfiguredModel model)
         {
             loadInfo.Loading = true;
             loadInfo.InfoText = $"Loading configured model [{confModelName}]...";
@@ -156,10 +173,10 @@ namespace MarkovBlocks
             BlockInstanceSpawner.ClearUpPersistentState();
 
             // Assign new generation model
-            currentModel = model;
+            currentConfiguredModel = model;
 
-            string fileName = PathHelper.GetExtraDataFile($"models/{model.Name}.xml");
-            Debug.Log($"{model.Name} > {fileName}");
+            string fileName = PathHelper.GetExtraDataFile($"models/{model.Model}.xml");
+            Debug.Log($"{model.Model} > {fileName}");
 
             XDocument? modelDoc = null;
 
@@ -258,8 +275,8 @@ namespace MarkovBlocks
 
             loadInfo.Loading = false;
 
-            if (generationText != null)
-                generationText.text = $"[{confModelName}] loaded";
+            if (GenerationText != null)
+                GenerationText.text = $"[{confModelName}] loaded";
         }
 
         private IEnumerator LoadMCData(string dataVersion, string[] packs, Action? callback = null)
@@ -305,7 +322,7 @@ namespace MarkovBlocks
 
         private IEnumerator RunGeneration()
         {
-            if (currentModel is null || interpreter is null || blockMaterial is null)
+            if (currentConfiguredModel is null || interpreter is null || blockMaterial is null)
             {
                 Debug.LogWarning("Generation cannot be initiated");
                 yield break;
@@ -315,7 +332,7 @@ namespace MarkovBlocks
             BlockInstanceSpawner.ClearUpPersistentState();
 
             executing = true;
-            var model = currentModel;
+            var model = currentConfiguredModel;
 
             var resultPerLine = Mathf.RoundToInt(Mathf.Sqrt(model.Amount));
             resultPerLine = Mathf.Max(resultPerLine, 1);
@@ -358,8 +375,8 @@ namespace MarkovBlocks
                         BlockInstanceSpawner.VisualizeState(instanceDataRaw.Value, materials, blockMeshes, tick, 0.5F);
 
                     // Update generation text
-                    if (generationText != null)
-                        generationText.text = $"Iteration: {k + 1}\nFrame: {frameCount}\nTick: {(int)(tick * 1000)}ms";
+                    if (GenerationText != null)
+                        GenerationText.text = $"Iteration: {k + 1}\nFrame: {frameCount}\nTick: {(int)(tick * 1000)}ms";
 
                     frameCount++;
 
@@ -390,40 +407,39 @@ namespace MarkovBlocks
             StartCoroutine(LoadMCData("markov", new string[] {
                     "vanilla-1.16.5", "vanilla_fix", "default"
                 }, () => {
-                    if (playbackSpeedSlider != null)
+                    if (PlaybackSpeedSlider != null)
                     {
-                        playbackSpeedSlider.onValueChanged.AddListener(UpdatePlaybackSpeed);
-                        UpdatePlaybackSpeed(playbackSpeedSlider.value);
+                        PlaybackSpeedSlider.onValueChanged.AddListener(UpdatePlaybackSpeed);
+                        UpdatePlaybackSpeed(PlaybackSpeedSlider.value);
                     }
 
-                    if (dyeBlockMeshesToggle != null)
+                    if (DyeBlockMeshesToggle != null)
                     {
-                        dyeBlockMeshesToggle.onValueChanged.AddListener(UpdateDyeBlockMeshes);
-                        UpdateDyeBlockMeshes(dyeBlockMeshesToggle.isOn);
+                        DyeBlockMeshesToggle.onValueChanged.AddListener(UpdateDyeBlockMeshes);
+                        UpdateDyeBlockMeshes(DyeBlockMeshesToggle.isOn);
                     }
                     
-                    if (executeButton != null)
+                    if (ExecuteButton != null)
                     {
-                        executeButton.GetComponentInChildren<TMP_Text>().text = "Start Execution";
-                        executeButton.onClick.AddListener(StartExecution);
+                        ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Start Execution";
+                        ExecuteButton.onClick.AddListener(StartExecution);
                     }
 
                     var dir = PathHelper.GetExtraDataFile("configured_models");
-                    if (Directory.Exists(dir) && modelDropdown != null)
+                    if (Directory.Exists(dir) && ConfiguredModelDropdown != null)
                     {
-                        var models = Directory.GetFiles(dir, "*.xml", SearchOption.AllDirectories);
                         var options = new List<TMP_Dropdown.OptionData>();
                         loadedConfModels.Clear();
                         int index = 0;
-                        foreach (var m in models)
+                        foreach (var m in Directory.GetFiles(dir, "*.xml", SearchOption.AllDirectories))
                         {
                             var modelPath = m.Substring(dir.Length + 1);
                             options.Add(new(modelPath));
                             loadedConfModels.Add(index++, modelPath);
                         }
 
-                        modelDropdown.AddOptions(options);
-                        modelDropdown.onValueChanged.AddListener(UpdateDropdownOption);
+                        ConfiguredModelDropdown.AddOptions(options);
+                        ConfiguredModelDropdown.onValueChanged.AddListener(UpdateDropdownOption);
 
                         if (options.Count > 0) // Use first model by default
                             UpdateDropdownOption(0);
@@ -451,8 +467,8 @@ namespace MarkovBlocks
                 
             }
 
-            if (loadInfo.Loading && generationText != null)
-                generationText.text = loadInfo.InfoText;
+            if (loadInfo.Loading && GenerationText != null)
+                GenerationText.text = loadInfo.InfoText;
 
         }
 
@@ -460,8 +476,8 @@ namespace MarkovBlocks
         {
             playbackSpeed = newValue;
 
-            if (playbackSpeedText != null)
-                playbackSpeedText.text = $"{newValue:0.0}";
+            if (PlaybackSpeedText != null)
+                PlaybackSpeedText.text = $"{newValue:0.0}";
             
         }
 
@@ -484,7 +500,7 @@ namespace MarkovBlocks
                 confModelName = loadedConfModels[newValue];
 
                 var xdoc = XDocument.Load($"{dir}/{confModelName}");
-                var model = MarkovJuniorModel.CreateFromXMLDoc(xdoc);
+                var model = ConfiguredModel.CreateFromXMLDoc(xdoc);
 
                 if (!loadInfo.Loading)
                     StartCoroutine(SetConfiguredModel(confModelName, model));
@@ -501,11 +517,11 @@ namespace MarkovBlocks
 
             StartCoroutine(RunGeneration());
 
-            if (executeButton != null)
+            if (ExecuteButton != null)
             {
-                executeButton.GetComponentInChildren<TMP_Text>().text = "Stop Execution";
-                executeButton.onClick.RemoveAllListeners();
-                executeButton.onClick.AddListener(StopExecution);
+                ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Stop Execution";
+                ExecuteButton.onClick.RemoveAllListeners();
+                ExecuteButton.onClick.AddListener(StopExecution);
             }
         }
 
@@ -519,11 +535,11 @@ namespace MarkovBlocks
 
             executing = false;
 
-            if (executeButton != null)
+            if (ExecuteButton != null)
             {
-                executeButton.GetComponentInChildren<TMP_Text>().text = "Start Execution";
-                executeButton.onClick.RemoveAllListeners();
-                executeButton.onClick.AddListener(StartExecution);
+                ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Start Execution";
+                ExecuteButton.onClick.RemoveAllListeners();
+                ExecuteButton.onClick.AddListener(StartExecution);
             }
         }
 

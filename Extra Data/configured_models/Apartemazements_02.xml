@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ConfiguredModel Name="Apartemazements" SizeX="8" SizeY="8" SizeZ="8" Amount="4" Steps="1000" Animated="false">
+<ConfiguredModel Model="Apartemazements" SizeX="8" SizeY="8" SizeZ="8" Amount="4" Steps="1000" Animated="false">
   <Seeds>
     <Seed Value="123" />
     <Seed Value="456" />

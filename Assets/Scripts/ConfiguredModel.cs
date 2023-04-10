@@ -19,9 +19,9 @@ namespace MarkovBlocks
     }
 
     [CreateAssetMenu(fileName = "MarkovJuniorModel", menuName = "MarkovBlocks/MarkovJuniorModel")]
-    public class MarkovJuniorModel : ScriptableObject
+    public class ConfiguredModel : ScriptableObject
     {
-        [SerializeField] public string Name = "Apartemazements";
+        [SerializeField] public string Model = "Apartemazements";
         [SerializeField] public int SizeX = 8;
         [SerializeField] public int SizeY = 8;
         [SerializeField] public int SizeZ = 8;
@@ -32,20 +32,20 @@ namespace MarkovBlocks
 
         [SerializeField] public CustomCharRemap[] CustomRemapping = { };
 
-        public static MarkovJuniorModel CreateFromXMLDoc(XDocument xdoc)
+        public static ConfiguredModel CreateFromXMLDoc(XDocument xdoc)
         {
-            var model = ScriptableObject.CreateInstance(typeof (MarkovJuniorModel)) as MarkovJuniorModel;
+            var model = ScriptableObject.CreateInstance(typeof (ConfiguredModel)) as ConfiguredModel;
             UpdateFromXMLDoc(ref model!, xdoc);
 
             return model;
         }
 
-        public static void UpdateFromXMLDoc(ref MarkovJuniorModel model, XDocument xdoc)
+        public static void UpdateFromXMLDoc(ref ConfiguredModel model, XDocument xdoc)
         {
             var root = xdoc.Root;
 
             // Basic configurations
-            model.Name = root.Get<string>("Name", model.Name);
+            model.Model = root.Get<string>("Model", model.Model);
             model.SizeX = root.Get<int>("SizeX", model.SizeX);
             model.SizeY = root.Get<int>("SizeY", model.SizeY);
             model.SizeZ = root.Get<int>("SizeZ", model.SizeZ);
@@ -84,13 +84,13 @@ namespace MarkovBlocks
                 model.CustomRemapping = new CustomCharRemap[] { };
         }
 
-        public static XDocument GetXMLDoc(MarkovJuniorModel model)
+        public static XDocument GetXMLDoc(ConfiguredModel model)
         {
             var xdoc = new XDocument();
 
             var root = new XElement("ConfiguredModel",
                 // Basic configurations
-                new XAttribute("Name", model.Name),
+                new XAttribute("Model", model.Model),
                 new XAttribute("SizeX", model.SizeX),
                 new XAttribute("SizeY", model.SizeY),
                 new XAttribute("SizeZ", model.SizeZ),
@@ -145,8 +145,9 @@ namespace MarkovBlocks
 
     }
 
-    [CustomEditor(typeof (MarkovJuniorModel))]
-    public class MarkovJuniorModelEditor : Editor
+#if UNITY_EDITOR
+    [CustomEditor(typeof (ConfiguredModel))]
+    public class ConfiguredModelEditor : Editor
     {
         private const string PLACE_HOLDER = "<model/path/here>";
         private const string MODEL_FOLDER = "configured_models";
@@ -162,7 +163,7 @@ namespace MarkovBlocks
 
             if (XDocFileName.Equals(PLACE_HOLDER)) // Fill in default xml model path
             {
-                var modelObj = this.target as MarkovJuniorModel;
+                var modelObj = this.target as ConfiguredModel;
 
                 if (modelObj is not null)
                     XDocFileName = $"{modelObj.name}.xml";
@@ -175,7 +176,7 @@ namespace MarkovBlocks
             // XDoc import button
             if (GUILayout.Button("Load from .xml file"))
             {
-                var modelObj = this.target as MarkovJuniorModel;
+                var modelObj = this.target as ConfiguredModel;
 
                 if (modelObj is not null)
                 {
@@ -184,7 +185,7 @@ namespace MarkovBlocks
                     if (File.Exists(path))
                     {
                         var xdoc = XDocument.Load(path);
-                        MarkovJuniorModel.UpdateFromXMLDoc(ref modelObj, xdoc);
+                        ConfiguredModel.UpdateFromXMLDoc(ref modelObj, xdoc);
                         Debug.Log($"Configured model updated from {path}");
                     }
                     else
@@ -195,12 +196,12 @@ namespace MarkovBlocks
             // XDoc export button
             if (GUILayout.Button("Save as .xml file"))
             {
-                var modelObj = this.target as MarkovJuniorModel;
+                var modelObj = this.target as ConfiguredModel;
 
                 if (modelObj is not null)
                 {
                     var path = PathHelper.GetExtraDataFile($"{MODEL_FOLDER}/{XDocFileName}");
-                    var xdoc = MarkovJuniorModel.GetXMLDoc(modelObj);
+                    var xdoc = ConfiguredModel.GetXMLDoc(modelObj);
                     xdoc.Save(path);
 
                     Debug.Log($"Configured model exported to {path}");
@@ -214,4 +215,6 @@ namespace MarkovBlocks
         }
 
     }
+
+#endif
 }

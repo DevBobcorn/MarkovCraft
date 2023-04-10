@@ -34,6 +34,8 @@ namespace MarkovBlocks
 
         public virtual void OnHide(ScreenManager manager) { }
 
+        public virtual bool ShouldPause() => false;
+
         public abstract void ScreenUpdate(ScreenManager manager);
     }
 }

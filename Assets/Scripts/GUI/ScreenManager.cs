@@ -14,6 +14,7 @@ namespace MarkovBlocks
                 activeScreen.Hide(this);
             
             activeScreen = newScreen;
+            Test.Instance.IsPaused = newScreen.ShouldPause();
 
             newScreen.Show(this);
         }

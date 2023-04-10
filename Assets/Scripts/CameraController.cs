@@ -10,6 +10,9 @@ namespace MarkovBlocks
 
         void Update()
         {
+            if (Test.Instance.IsPaused)
+                return;
+
             float hor = Input.GetAxis("Horizontal");
             float ver = Input.GetAxis("Vertical");
 
