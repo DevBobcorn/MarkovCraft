@@ -53,9 +53,9 @@ namespace MarkovJunior
             AFTERFONT = settings.Get("afterfont", 4);
             DENSE = settings.Get("dense", true);
             D3 = settings.Get("d3", true);
-            BACKGROUND = (255 << 24) + Convert.ToInt32(settings.Get("background", "222222"), 16);
-            INACTIVE = (255 << 24) + Convert.ToInt32(settings.Get("inactive", "666666"), 16);
-            ACTIVE = (255 << 24) + Convert.ToInt32(settings.Get("active", "ffffff"), 16);
+            BACKGROUND = ColorConvert.OpaqueRGBFromHexString(settings.Get("background", "222222"));
+            INACTIVE = ColorConvert.OpaqueRGBFromHexString(settings.Get("inactive", "666666"));
+            ACTIVE = ColorConvert.OpaqueRGBFromHexString(settings.Get("active", "FFFFFF"));
         }
 
         public static void Draw(string name, Branch root, Branch current, int[] bitmap, int WIDTH, int HEIGHT, Dictionary<char, int2> palette)

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3a8f9d1c9985a54aadb51d10c9917d6, type: 3}
   m_Name: Apartemazements_01
   m_EditorClassIdentifier: 
-  Name: Apartemazements
+  Model: Apartemazements
   SizeX: 5
   SizeY: 6
   SizeZ: 7

@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ConfiguredModel Model="Apartemazements" SizeX="5" SizeY="6" SizeZ="7" Amount="1" Steps="1000" Animated="true">
   <CustomRemapping>
-    <Item Symbol="E" RemapColor="-9974784" RemapTarget="minecraft:grass_block[snowy=false]" />
-    <Item Symbol="N" RemapColor="-4755158" RemapTarget="minecraft:dirt" />
-    <Item Symbol="W" RemapColor="-1" RemapTarget="minecraft:quartz_block" />
-    <Item Symbol="R" RemapColor="-1590388" RemapTarget="white_terracotta" />
-    <Item Symbol="A" RemapColor="-13365" RemapTarget="minecraft:quartz_block" />
-    <Item Symbol="C" RemapColor="-16719361" RemapTarget="minecraft:diamond_block" />
+    <Item Symbol="E" RemapColor="67CC00" RemapTarget="minecraft:grass_block[snowy=false]" />
+    <Item Symbol="N" RemapColor="B7712A" RemapTarget="minecraft:dirt" />
+    <Item Symbol="W" RemapColor="FFFFFF" RemapTarget="minecraft:quartz_block" />
+    <Item Symbol="R" RemapColor="E7BB8C" RemapTarget="white_terracotta" />
+    <Item Symbol="A" RemapColor="FFCBCB" RemapTarget="minecraft:quartz_block" />
+    <Item Symbol="C" RemapColor="00E1FF" RemapTarget="minecraft:diamond_block" />
   </CustomRemapping>
 </ConfiguredModel>

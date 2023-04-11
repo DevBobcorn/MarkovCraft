@@ -74,7 +74,7 @@ namespace MarkovBlocks
                 foreach (var remap in xRemap.Elements("Item"))
                     remaps.Add(new() {
                         Symbol = remap.Get<char>("Symbol"),
-                        RemapColor = ColorConvert.GetColor32(remap.Get<int>("RemapColor")),
+                        RemapColor = ColorConvert.OpaqueColor32FromHexString(remap.Get<string>("RemapColor")),
                         RemapTarget = remap.Get<string>("RemapTarget", string.Empty)
                     });
 
@@ -126,7 +126,7 @@ namespace MarkovBlocks
                     var item = new XElement("Item",
                         new XAttribute("Symbol", remap[i].Symbol),
                         new XAttribute("RemapColor",
-                            ColorConvert.GetRGBA(remap[i].RemapColor))
+                            ColorConvert.GetHexRGBString(remap[i].RemapColor))
                     );
 
                     if (!string.IsNullOrWhiteSpace(remap[i].RemapTarget))

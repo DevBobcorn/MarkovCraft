@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using UnityEngine;
 
 namespace MarkovBlocks
@@ -30,14 +31,29 @@ namespace MarkovBlocks
             return new((byte)((rgb & 0xFF0000) >> 16), (byte)((rgb & 0xFF00) >> 8), (byte)(rgb & 0xFF), 255);
         }
 
+        public static Color32 OpaqueColor32FromHexString(string hexrgb)
+        {
+            return GetOpaqueColor32(RGBFromHexString(hexrgb));
+        }
+
+        public static int OpaqueRGBFromHexString(string hexrgb)
+        {
+            return (255 << 24) + Convert.ToInt32(hexrgb, 16);
+        }
+
+        public static int RGBFromHexString(string hexrgb)
+        {
+            return Convert.ToInt32(hexrgb, 16);
+        }
+
+        public static string GetHexRGBString(Color32 color)
+        {
+            return $"{(GetRGB(color) & 0xFFFFFF):X}".PadLeft(6, '0');
+        }
+
         public static string GetHexRGBString(int rgb)
         {
             return $"{(rgb & 0xFFFFFF):X}".PadLeft(6, '0');
-        }
-
-        public static string GetHexRGBAString(int rgba)
-        {
-            return $"{(rgba & 0xFFFFFFFF):X}".PadLeft(8, '0');
         }
 
     }

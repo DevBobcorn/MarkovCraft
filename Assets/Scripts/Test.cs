@@ -164,7 +164,7 @@ namespace MarkovBlocks
             }
         }
 
-        public IEnumerator SetConfiguredModel(string confModelName, ConfiguredModel model)
+        public IEnumerator SetConfiguredModel(string confModelName, ConfiguredModel confModel)
         {
             loadInfo.Loading = true;
             loadInfo.InfoText = $"Loading configured model [{confModelName}]...";
@@ -173,10 +173,10 @@ namespace MarkovBlocks
             BlockInstanceSpawner.ClearUpPersistentState();
 
             // Assign new generation model
-            currentConfiguredModel = model;
+            currentConfiguredModel = confModel;
 
-            string fileName = PathHelper.GetExtraDataFile($"models/{model.Model}.xml");
-            Debug.Log($"{model.Model} > {fileName}");
+            string fileName = PathHelper.GetExtraDataFile($"models/{confModel.Model}.xml");
+            Debug.Log($"{confModel.Model} > {fileName}");
 
             XDocument? modelDoc = null;
 
@@ -207,7 +207,7 @@ namespace MarkovBlocks
 
             Task.Run(() => {
                 // Use a task to load this in so that the main thread doesn't get blocked
-                interpreter = Interpreter.Load(modelDoc.Root, model.SizeX, model.SizeY, model.SizeZ);
+                interpreter = Interpreter.Load(modelDoc.Root, confModel.SizeX, confModel.SizeY, confModel.SizeZ);
 
                 loadComplete = true;
             });
@@ -229,14 +229,14 @@ namespace MarkovBlocks
             fullPalette.Clear();
 
             Dictionary<char, int> basePalette = XDocument.Load(PathHelper.GetExtraDataFile("palette.xml")).Root.Elements("color")
-                    .ToDictionary(x => x.Get<char>("symbol"), x => (255 << 24) + Convert.ToInt32(x.Get<string>("value"), 16));
+                    .ToDictionary(x => x.Get<char>("symbol"), x => ColorConvert.OpaqueRGBFromHexString(x.Get<string>("value")));
             
             foreach (var item in basePalette) // Use mesh #0 by default (cube mesh)
                 fullPalette.Add(item.Key, new(0, item.Value));
 
             blockMeshCount = 1; // #0 is preserved for default cube mesh
 
-            foreach (var remap in model.CustomRemapping) // Read and assign custom remapping
+            foreach (var remap in confModel.CustomRemapping) // Read and assign custom remapping
             {
                 int rgba = ColorConvert.GetRGBA(remap.RemapColor);
 

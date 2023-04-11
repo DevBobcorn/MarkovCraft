@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3a8f9d1c9985a54aadb51d10c9917d6, type: 3}
   m_Name: Apartemazements_02
   m_EditorClassIdentifier: 
-  Name: Apartemazements
+  Model: Apartemazements
   SizeX: 8
   SizeY: 8
   SizeZ: 8
@@ -25,39 +25,39 @@ MonoBehaviour:
     RemapTarget: minecraft:grass_block[snowy=false]
     RemapColor:
       serializedVersion: 2
-      rgba: 2818572287
+      rgba: 4294967295
   - Symbol: 78
     RemapTarget: minecraft:dirt
     RemapColor:
       serializedVersion: 2
-      rgba: 16777215
+      rgba: 4294967295
   - Symbol: 87
     RemapTarget: minecraft:quartz_block
     RemapColor:
       serializedVersion: 2
-      rgba: 12698111
+      rgba: 4290888191
   - Symbol: 80
     RemapTarget: 
     RemapColor:
       serializedVersion: 2
-      rgba: 14451711
+      rgba: 4292641791
   - Symbol: 82
     RemapTarget: 
     RemapColor:
       serializedVersion: 2
-      rgba: 255
+      rgba: 4278190335
   - Symbol: 67
     RemapTarget: minecraft:diamond_block
     RemapColor:
       serializedVersion: 2
-      rgba: 16777215
+      rgba: 4294967295
   - Symbol: 66
     RemapTarget: 
     RemapColor:
       serializedVersion: 2
-      rgba: 12189440
+      rgba: 4290379520
   - Symbol: 65
     RemapTarget: minecraft:quartz_block
     RemapColor:
       serializedVersion: 2
-      rgba: 16777215
+      rgba: 4294967295
