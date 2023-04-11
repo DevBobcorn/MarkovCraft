@@ -1546,7 +1546,7 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 16777215
   ColorPreviewImage: {fileID: 5921708926106289629}
-  IsUsedIndicator: {fileID: 8807093560452054591}
+  MarkCornerImage: {fileID: 8807093560452054591}
   CharacterInput: {fileID: 647467382571462068}
   ColorCodeInput: {fileID: 6290190071088672605}
   BlockStateInput: {fileID: 6145053314581376766}
@@ -1775,7 +1775,7 @@ GameObject:
   - component: {fileID: 337272096122712395}
   - component: {fileID: 8807093560452054591}
   m_Layer: 5
-  m_Name: IsUsed Indicator
+  m_Name: Mark Corner Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

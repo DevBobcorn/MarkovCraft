@@ -9,14 +9,13 @@ namespace MarkovBlocks
     {
         [SerializeField] Color32 MappingColor;
 
-        [SerializeField] Image? ColorPreviewImage, IsUsedIndicator;
+        [SerializeField] Image? ColorPreviewImage, MarkCornerImage;
         [SerializeField] TMP_InputField? CharacterInput;
         [SerializeField] TMP_InputField? ColorCodeInput;
         [SerializeField] TMP_InputField? BlockStateInput;
 
         [SerializeField] Button? RevertOverrideButton;
 
-        private bool isUsedByCurrentModel = false;
         private bool overridesPaletteColor = false;
 
         // RGB color of this item in the base palette
@@ -28,7 +27,7 @@ namespace MarkovBlocks
         public void InitializeData(char character, int defoRgb, int rgb, string blockState)
         {
             if (ColorPreviewImage == null || CharacterInput == null || ColorCodeInput == null || BlockStateInput == null
-                    || IsUsedIndicator == null || RevertOverrideButton == null)
+                    || MarkCornerImage == null || RevertOverrideButton == null)
             {
                 Debug.LogError("Mapping Item missing components!");
                 return;
@@ -45,7 +44,7 @@ namespace MarkovBlocks
             // Black state input
             BlockStateInput.text = blockState;
 
-            TagAsUsed(false);
+            TagAsSpecial(false);
 
             SetOverridesPaletteColor(!blockState.Equals(string.Empty) || defoRgb != rgb);
 
@@ -84,11 +83,9 @@ namespace MarkovBlocks
 
         }
 
-        public void TagAsUsed(bool isUsed)
+        public void TagAsSpecial(bool s)
         {
-            isUsedByCurrentModel = isUsed;
-
-            IsUsedIndicator?.gameObject.SetActive(isUsed);
+            MarkCornerImage?.gameObject.SetActive(s);
         }
 
         public void SetOverridesPaletteColor(bool o)
