@@ -36,60 +36,60 @@ namespace MarkovBlocks
 
             if ((cullFlags & (1 << 0)) != 0) // Up
             {
-                verts[vertOffset]     = new(0 + z, 1 + y, 1 + x); // 4 => 2
-                verts[vertOffset + 1] = new(1 + z, 1 + y, 1 + x); // 5 => 3
-                verts[vertOffset + 2] = new(0 + z, 1 + y, 0 + x); // 3 => 1
-                verts[vertOffset + 3] = new(1 + z, 1 + y, 0 + x); // 2 => 0
+                verts[vertOffset]     = new(0 + x, 1 + y, 1 + z); // 4 => 2
+                verts[vertOffset + 1] = new(1 + x, 1 + y, 1 + z); // 5 => 3
+                verts[vertOffset + 2] = new(0 + x, 1 + y, 0 + z); // 3 => 1
+                verts[vertOffset + 3] = new(1 + x, 1 + y, 0 + z); // 2 => 0
                 fullUVs.CopyTo(txuvs, vertOffset);
                 vertOffset += 4;
             }
 
             if ((cullFlags & (1 << 1)) != 0) // Down
             {
-                verts[vertOffset]     = new(0 + z, 0 + y, 0 + x); // 0 => 0
-                verts[vertOffset + 1] = new(1 + z, 0 + y, 0 + x); // 1 => 1
-                verts[vertOffset + 2] = new(0 + z, 0 + y, 1 + x); // 7 => 3
-                verts[vertOffset + 3] = new(1 + z, 0 + y, 1 + x); // 6 => 2
+                verts[vertOffset]     = new(0 + x, 0 + y, 0 + z); // 0 => 0
+                verts[vertOffset + 1] = new(1 + x, 0 + y, 0 + z); // 1 => 1
+                verts[vertOffset + 2] = new(0 + x, 0 + y, 1 + z); // 7 => 3
+                verts[vertOffset + 3] = new(1 + x, 0 + y, 1 + z); // 6 => 2
                 fullUVs.CopyTo(txuvs, vertOffset);
                 vertOffset += 4;
             }
 
             if ((cullFlags & (1 << 2)) != 0) // South
             {
-                verts[vertOffset]     = new(1 + z, 1 + y, 0 + x); // 2 => 1
-                verts[vertOffset + 1] = new(1 + z, 1 + y, 1 + x); // 5 => 2
-                verts[vertOffset + 2] = new(1 + z, 0 + y, 0 + x); // 1 => 0
-                verts[vertOffset + 3] = new(1 + z, 0 + y, 1 + x); // 6 => 3
+                verts[vertOffset]     = new(1 + x, 1 + y, 0 + z); // 2 => 1
+                verts[vertOffset + 1] = new(1 + x, 1 + y, 1 + z); // 5 => 2
+                verts[vertOffset + 2] = new(1 + x, 0 + y, 0 + z); // 1 => 0
+                verts[vertOffset + 3] = new(1 + x, 0 + y, 1 + z); // 6 => 3
                 fullUVs.CopyTo(txuvs, vertOffset);
                 vertOffset += 4;
             }
 
             if ((cullFlags & (1 << 3)) != 0) // North
             {
-                verts[vertOffset]     = new(0 + z, 1 + y, 1 + x); // 4 => 2
-                verts[vertOffset + 1] = new(0 + z, 1 + y, 0 + x); // 3 => 1
-                verts[vertOffset + 2] = new(0 + z, 0 + y, 1 + x); // 7 => 3
-                verts[vertOffset + 3] = new(0 + z, 0 + y, 0 + x); // 0 => 0
+                verts[vertOffset]     = new(0 + x, 1 + y, 1 + z); // 4 => 2
+                verts[vertOffset + 1] = new(0 + x, 1 + y, 0 + z); // 3 => 1
+                verts[vertOffset + 2] = new(0 + x, 0 + y, 1 + z); // 7 => 3
+                verts[vertOffset + 3] = new(0 + x, 0 + y, 0 + z); // 0 => 0
                 fullUVs.CopyTo(txuvs, vertOffset);
                 vertOffset += 4;
             }
 
             if ((cullFlags & (1 << 4)) != 0) // East
             {
-                verts[vertOffset]     = new(1 + z, 1 + y, 1 + x); // 5 => 1
-                verts[vertOffset + 1] = new(0 + z, 1 + y, 1 + x); // 4 => 0
-                verts[vertOffset + 2] = new(1 + z, 0 + y, 1 + x); // 6 => 2
-                verts[vertOffset + 3] = new(0 + z, 0 + y, 1 + x); // 7 => 3
+                verts[vertOffset]     = new(1 + x, 1 + y, 1 + z); // 5 => 1
+                verts[vertOffset + 1] = new(0 + x, 1 + y, 1 + z); // 4 => 0
+                verts[vertOffset + 2] = new(1 + x, 0 + y, 1 + z); // 6 => 2
+                verts[vertOffset + 3] = new(0 + x, 0 + y, 1 + z); // 7 => 3
                 fullUVs.CopyTo(txuvs, vertOffset);
                 vertOffset += 4;
             }
 
             if ((cullFlags & (1 << 5)) != 0) // West
             {
-                verts[vertOffset]     = new(0 + z, 1 + y, 0 + x); // 3 => 3
-                verts[vertOffset + 1] = new(1 + z, 1 + y, 0 + x); // 2 => 2
-                verts[vertOffset + 2] = new(0 + z, 0 + y, 0 + x); // 0 => 0
-                verts[vertOffset + 3] = new(1 + z, 0 + y, 0 + x); // 1 => 1
+                verts[vertOffset]     = new(0 + x, 1 + y, 0 + z); // 3 => 3
+                verts[vertOffset + 1] = new(1 + x, 1 + y, 0 + z); // 2 => 2
+                verts[vertOffset + 2] = new(0 + x, 0 + y, 0 + z); // 0 => 0
+                verts[vertOffset + 3] = new(1 + x, 0 + y, 0 + z); // 1 => 1
                 fullUVs.CopyTo(txuvs, vertOffset);
                 // Not necessary vertOffset += 4;
             }

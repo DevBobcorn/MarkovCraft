@@ -17,7 +17,7 @@ namespace MarkovBlocks
 
         public static void VisualizePersistentState((int3[], int2[]) instanceDataRaw, Material[] materials, Mesh[] meshes)
         {
-            VisualizeState(instanceDataRaw, materials, meshes, 0F, 0.35F);
+            VisualizeState(instanceDataRaw, materials, meshes, 0F, 0F);
         }
 
         public static void VisualizeState((int3[], int2[]) instanceDataRaw, Material[] materials, Mesh[] meshes, float lifeTime, float timeLeft)
@@ -67,7 +67,8 @@ namespace MarkovBlocks
                 PositionData = posData,
                 MeshData = meshData,
                 LifeTime = lifeTime,
-                TimeLeft = timeLeft
+                TimeLeft = timeLeft,
+                Simplified = meshes.Length == 1
             };
 
             var spawnHandle = spawnJob.Schedule(entityCount, 128);

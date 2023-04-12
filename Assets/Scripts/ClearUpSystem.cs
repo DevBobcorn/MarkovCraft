@@ -1,6 +1,5 @@
 using Unity.Burst;
 using Unity.Entities;
-using Unity.Transforms;
 
 namespace MarkovBlocks
 {
@@ -27,11 +26,11 @@ namespace MarkovBlocks
             var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            foreach (var (magic, trs, entity) in
-                    SystemAPI.Query<RefRW<BlockInstanceComponent>, RefRW<LocalToWorld>>().WithEntityAccess())
+            foreach (var (magic, entity) in
+                    SystemAPI.Query<RefRW<BlockInstanceComponent>>().WithEntityAccess())
             {
                 if (magic.ValueRO.LifeTime <= 0F)
-                    magic.ValueRW.LifeTime = magic.ValueRO.TimeLeft;
+                    magic.ValueRW.LifeTime = 1F;
             }
 
             // Remove all clear up tag components

@@ -24,7 +24,6 @@ namespace MarkovBlocks
         [SerializeField] public TMP_Text? PlaybackSpeedText, GenerationText;
         [SerializeField] public TMP_Dropdown? ConfiguredModelDropdown;
         [SerializeField] public Slider? PlaybackSpeedSlider;
-        [SerializeField] public Toggle? DyeBlockMeshesToggle;
         [SerializeField] public Button? ExecuteButton;
         [SerializeField] public RawImage? GraphImage;
 
@@ -35,12 +34,13 @@ namespace MarkovBlocks
 
         private Interpreter? interpreter = null;
         private float playbackSpeed = 1F;
-        private bool dyeBlockMeshes = false;
         private bool executing = false;
 
         // Palettes and meshes
         private readonly ResourcePackManager packManager = new();
         private Mesh[] blockMeshes = { };
+        private BlockGeometry?[] blockGeometries = { };
+        private float3[] blockTints = { };
         private int blockMeshCount = 0;
         private readonly Dictionary<char, int2> fullPalette = new();
         private Material? blockMaterial;
@@ -112,6 +112,9 @@ namespace MarkovBlocks
         {
             var statePalette = BlockStatePalette.INSTANCE;
             var buffers = new VertexBuffer[blockMeshCount];
+
+            blockGeometries = new BlockGeometry[blockMeshCount];
+            blockTints = new float3[blockMeshCount];
             
             for (int i = 0;i < buffers.Length;i++)
                 buffers[i] = new VertexBuffer();
@@ -127,40 +130,24 @@ namespace MarkovBlocks
                 var stateId = pair.Key;
 
                 if (modelTable.ContainsKey(stateId))
-                    modelTable[stateId].Geometries[0].Build(ref buffers[pair.Value], float3.zero, 0b111111,
-                            statePalette.GetBlockColor(stateId, dummyWorld, Location.Zero, statePalette.FromId(stateId)));
+                {
+                    var blockGeometry = modelTable[stateId].Geometries[0];
+                    var blockTint = statePalette.GetBlockColor(stateId, dummyWorld, Location.Zero, statePalette.FromId(stateId));
+
+                    blockGeometry.Build(ref buffers[pair.Value], float3.zero, 0b111111, blockTint);
+                    
+                    blockGeometries[pair.Value] = blockGeometry;
+                    blockTints[pair.Value] = blockTint;
+                }
                 else
                 {
                     Debug.LogWarning($"Model for block state #{stateId} ({statePalette.FromId(stateId)}) is not available. Using cube model instead.");
-                    CubeGeometry.Build(ref buffers[pair.Value], AtlasManager.HAKU, 0, 0, 0, 0b111111, new float3(1F, 1F, 1F));
+                    CubeGeometry.Build(ref buffers[pair.Value], AtlasManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
                 }
             }
 
             // Set result to blockMeshes
             blockMeshes = BlockMeshGenerator.GenerateMeshes(buffers);
-        }
-
-        private void VisualizePaletteMapping()
-        {
-            int ia = 0;
-            foreach (var pair in fullPalette)
-            {
-                var go = new GameObject($"Character [{pair.Key}]");
-
-                go.AddComponent<MeshFilter>().mesh = blockMeshes[pair.Value.x];
-
-                if (pair.Value.x != 0)
-                    go.AddComponent<MeshRenderer>().sharedMaterial = blockMaterial;
-                else
-                {
-                    var mr = go.AddComponent<MeshRenderer>();
-                    mr.material = blockMaterial; // Create a new material instance
-                    mr.material!.SetColor("_InstanceBlockColor",
-                            ColorConvert.GetOpaqueColor32(pair.Value.y));
-                }
-
-                go.transform.position = (ia++) % 2 == 0 ? new(ia - 3, 0, -2) : new(-2, 0, ia - 2);
-            }
         }
 
         public IEnumerator UpdateConfiguredModel(string confModelFile, ConfiguredModel confModel)
@@ -325,6 +312,7 @@ namespace MarkovBlocks
             if (currentConfModel is null || interpreter is null || blockMaterial is null)
             {
                 Debug.LogWarning("Generation cannot be initiated");
+                StopExecution();
                 yield break;
             }
 
@@ -342,16 +330,8 @@ namespace MarkovBlocks
             System.Random rand = new();
             var seeds = model.Seeds;
 
-            // Prepare a copy of full palette in which blockstate meshes are not dyed
-            var undyedFullPalette = new Dictionary<char, int2>();
-
-            foreach (var pair in fullPalette)
-            {
-                if (pair.Value.x == 0) // Cube meshes will still preserve their colors so as to be distinguished from each other
-                    undyedFullPalette.Add(pair.Key, pair.Value);
-                else // For Minecraft block meshes, set their color to white
-                    undyedFullPalette.Add(pair.Key, new int2(pair.Value.x, 0xFFFFFF));
-            }
+            var cubeMeshAsArray = new[] { blockMeshes[0] };
+            bool simplified = false;
 
             for (int k = 0; k < model.Amount; k++)
             {
@@ -361,18 +341,18 @@ namespace MarkovBlocks
                 int seed = seeds != null && k < seeds.Length ? seeds[k] : rand.Next();
                 int frameCount = 0;
 
-                (int3[], int2[])? instanceDataRaw = null;
+                (int3[], int2[])? dataRaw = null;
 
                 foreach ((byte[] result, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, model.Steps, model.Animated))
                 {
                     if (!executing) // Stop execution
                         break;
 
-                    int2[] stepPalette = legend.Select(ch => dyeBlockMeshes ? fullPalette[ch] : undyedFullPalette[ch]).ToArray();
+                    int2[] stepPalette = legend.Select(ch => fullPalette[ch]).ToArray();
                     float tick = 1F / playbackSpeed;
 
-                    if (instanceDataRaw != null)
-                        BlockInstanceSpawner.VisualizeState(instanceDataRaw.Value, materials, blockMeshes, tick, 0.5F);
+                    if (dataRaw != null)
+                        BlockInstanceSpawner.VisualizeState(dataRaw.Value, materials, simplified ? cubeMeshAsArray : blockMeshes, tick, 0.5F);
 
                     // Update generation text
                     if (GenerationText != null)
@@ -383,15 +363,16 @@ namespace MarkovBlocks
                     int xCount = k / resultPerLine,  zCount = k % resultPerLine;
                     var pos = new int3(xCount * (FX + 2), 0, zCount * (FY + 2));
 
-                    instanceDataRaw = BlockDataBuilder.GetInstanceData(result, FX, FY, FZ, pos, FZ > 1, stepPalette);
+                    dataRaw = BlockDataBuilder.GetInstanceData(result, FX, FY, FZ, pos, FZ > 1, stepPalette);
 
                     yield return new WaitForSeconds(tick);
                 }
 
-                if (instanceDataRaw != null && executing)
+                if (dataRaw != null && executing)
                 {
                     // The final visualization is persistent
-                    BlockInstanceSpawner.VisualizePersistentState(instanceDataRaw.Value, materials, blockMeshes);
+                    BlockInstanceSpawner.VisualizePersistentState(dataRaw.Value, materials, simplified ? cubeMeshAsArray : blockMeshes);
+
                     Debug.Log($"Generation complete. Frame Count: {frameCount}");
                 }
                 
@@ -413,15 +394,10 @@ namespace MarkovBlocks
                         UpdatePlaybackSpeed(PlaybackSpeedSlider.value);
                     }
 
-                    if (DyeBlockMeshesToggle != null)
-                    {
-                        DyeBlockMeshesToggle.onValueChanged.AddListener(UpdateDyeBlockMeshes);
-                        UpdateDyeBlockMeshes(DyeBlockMeshesToggle.isOn);
-                    }
-                    
                     if (ExecuteButton != null)
                     {
                         ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Start Execution";
+                        ExecuteButton.onClick.RemoveAllListeners();
                         ExecuteButton.onClick.AddListener(StartExecution);
                     }
 
@@ -478,12 +454,6 @@ namespace MarkovBlocks
 
             if (PlaybackSpeedText != null)
                 PlaybackSpeedText.text = $"{newValue:0.0}";
-            
-        }
-
-        public void UpdateDyeBlockMeshes(bool newValue)
-        {
-            dyeBlockMeshes = newValue;
             
         }
 

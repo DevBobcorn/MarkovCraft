@@ -26,6 +26,11 @@ namespace MarkovBlocks
         [ReadOnly]
         public float TimeLeft;
 
+        [ReadOnly]
+        public bool Simplified;
+
+        private static readonly float4 WHITE = new(1F);
+
         public void Execute(int index)
         {
             var e = Ecb.Instantiate(index, Prototype);
@@ -41,8 +46,10 @@ namespace MarkovBlocks
                         new(1F, 1F, 1F)
                     ) });
             
-            Ecb.SetComponent(index, e, new InstanceBlockColor() { Value = ComputeColor(mesh.y) });
-            Ecb.SetComponent(index, e, MaterialMeshInfo.FromRenderMeshArrayIndices(0, mesh.x));
+            var meshIndex = Simplified ? 0 : mesh.x;
+            
+            Ecb.SetComponent(index, e, new InstanceBlockColor() { Value = meshIndex == 0 ? ComputeColor(mesh.y) : WHITE });
+            Ecb.SetComponent(index, e, MaterialMeshInfo.FromRenderMeshArrayIndices(0, meshIndex));
 
             Ecb.SetComponent(index, e, new BlockInstanceComponent { TimeLeft = TimeLeft, LifeTime = LifeTime, Position = pos });
             
