@@ -11,14 +11,14 @@ using MarkovJunior;
 namespace MarkovBlocks
 {
     [Serializable]
-    public struct CustomCharRemap
+    public struct CustomMappingItem
     {
-        public char Symbol;
-        public string RemapTarget;
-        public Color32 RemapColor;
+        public char Character;
+        public string BlockState;
+        public Color32 Color;
     }
 
-    [CreateAssetMenu(fileName = "MarkovJuniorModel", menuName = "MarkovBlocks/MarkovJuniorModel")]
+    [CreateAssetMenu(fileName = "ConfiguredModel", menuName = "Markov Blocks/Configured Model")]
     public class ConfiguredModel : ScriptableObject
     {
         [SerializeField] public string Model = "Apartemazements";
@@ -30,7 +30,7 @@ namespace MarkovBlocks
         [SerializeField] public bool Animated = true;
         [SerializeField] public int[] Seeds = { };
 
-        [SerializeField] public CustomCharRemap[] CustomRemapping = { };
+        [SerializeField] public CustomMappingItem[] CustomMapping = { };
 
         public static ConfiguredModel CreateFromXMLDoc(XDocument xdoc)
         {
@@ -66,22 +66,22 @@ namespace MarkovBlocks
             else // No seeds specified
                 model.Seeds = new int[] { };
 
-            // Custom remapping items
-            var xRemap = root.Element("CustomRemapping");
-            if (xRemap is not null)
+            // Custom mapping items
+            var xMapping = root.Element("CustomMapping");
+            if (xMapping is not null)
             {
-                var remaps = new List<CustomCharRemap>();
-                foreach (var remap in xRemap.Elements("Item"))
-                    remaps.Add(new() {
-                        Symbol = remap.Get<char>("Symbol"),
-                        RemapColor = ColorConvert.OpaqueColor32FromHexString(remap.Get<string>("RemapColor")),
-                        RemapTarget = remap.Get<string>("RemapTarget", string.Empty)
+                var mapping = new List<CustomMappingItem>();
+                foreach (var item in xMapping.Elements("Item"))
+                    mapping.Add(new() {
+                        Character = item.Get<char>("Character"),
+                        Color = ColorConvert.OpaqueColor32FromHexString(item.Get<string>("Color")),
+                        BlockState = item.Get<string>("BlockState", string.Empty)
                     });
 
-                model.CustomRemapping = remaps.ToArray();
+                model.CustomMapping = mapping.ToArray();
             }
-            else // No custom remapping specified
-                model.CustomRemapping = new CustomCharRemap[] { };
+            else // No custom mapping specified
+                model.CustomMapping = new CustomMappingItem[] { };
         }
 
         public static XDocument GetXMLDoc(ConfiguredModel model)
@@ -115,27 +115,27 @@ namespace MarkovBlocks
                 root.Add(xSeeds);
             }
 
-            // Custom remapping items
-            if (model.CustomRemapping.Length > 0)
+            // Custom mapping items
+            if (model.CustomMapping.Length > 0)
             {
-                var xRemap = new XElement("CustomRemapping");
-                var remap = model.CustomRemapping;
+                var xMapping = new XElement("CustomMapping");
+                var mapping = model.CustomMapping;
 
-                for (int i = 0;i < remap.Length;i++)
+                for (int i = 0;i < mapping.Length;i++)
                 {
                     var item = new XElement("Item",
-                        new XAttribute("Symbol", remap[i].Symbol),
-                        new XAttribute("RemapColor",
-                            ColorConvert.GetHexRGBString(remap[i].RemapColor))
+                        new XAttribute("Character", mapping[i].Character),
+                        new XAttribute("Color",
+                            ColorConvert.GetHexRGBString(mapping[i].Color))
                     );
 
-                    if (!string.IsNullOrWhiteSpace(remap[i].RemapTarget))
-                        item.SetAttributeValue("RemapTarget", remap[i].RemapTarget);
+                    if (!string.IsNullOrWhiteSpace(mapping[i].BlockState))
+                        item.SetAttributeValue("BlockState", mapping[i].BlockState);
                     
-                    xRemap.Add(item);
+                    xMapping.Add(item);
                 }
 
-                root.Add(xRemap);
+                root.Add(xMapping);
             }
 
             xdoc.Add(root);

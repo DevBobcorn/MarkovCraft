@@ -4,14 +4,14 @@
     <Seed Value="123" />
     <Seed Value="456" />
   </Seeds>
-  <CustomRemapping>
-    <Item Symbol="E" RemapColor="FFFFFF" RemapTarget="minecraft:grass_block[snowy=false]" />
-    <Item Symbol="N" RemapColor="FFFFFF" RemapTarget="minecraft:dirt" />
-    <Item Symbol="W" RemapColor="FFC1C1" RemapTarget="minecraft:quartz_block" />
-    <Item Symbol="P" RemapColor="FF83DC" />
-    <Item Symbol="R" RemapColor="FF0000" />
-    <Item Symbol="C" RemapColor="FFFFFF" RemapTarget="minecraft:diamond_block" />
-    <Item Symbol="B" RemapColor="00FFB9" />
-    <Item Symbol="A" RemapColor="FFFFFF" RemapTarget="minecraft:quartz_block" />
-  </CustomRemapping>
+  <CustomMapping>
+    <Item Character="E" Color="FFFFFF" BlockState="minecraft:grass_block[snowy=false]" />
+    <Item Character="N" Color="FFFFFF" BlockState="minecraft:dirt" />
+    <Item Character="W" Color="FFC1C1" BlockState="minecraft:quartz_block" />
+    <Item Character="P" Color="FF83DC" />
+    <Item Character="R" Color="FF0000" />
+    <Item Character="C" Color="FFFFFF" BlockState="minecraft:diamond_block" />
+    <Item Character="B" Color="00FFB9" />
+    <Item Character="A" Color="FFFFFF" BlockState="minecraft:quartz_block" />
+  </CustomMapping>
 </ConfiguredModel>

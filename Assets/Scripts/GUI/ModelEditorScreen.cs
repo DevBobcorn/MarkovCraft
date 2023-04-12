@@ -30,7 +30,7 @@ namespace MarkovBlocks
 
         private readonly Dictionary<int, string> loadedModels = new();
         private readonly Dictionary<char, int> basePalette = new();
-        private readonly List<MappingItem> mappingItems = new();
+        private readonly List<MappingEditorItem> mappingItems = new();
         private bool loading = false, properlyLoaded = false;
 
         public override bool ShouldPause() => true;
@@ -125,37 +125,21 @@ namespace MarkovBlocks
             
             var charSet = basePalette.Keys.ToHashSet();
 
-            foreach (var item in confModel.CustomRemapping)
-            {
-                if (charSet.Contains(item.Symbol))
-                    charSet.Remove(item.Symbol);
+            var customMapping = confModel.CustomMapping.ToDictionary(x => x.Character, x => x);
 
-                var newItemObj = GameObject.Instantiate(MappingItemPrefab);
-                var newItem = newItemObj!.GetComponent<MappingItem>();
-
-                mappingItems.Add(newItem);
-
-                var defoColor = basePalette[item.Symbol];
-                var overrideColor = ColorConvert.GetRGB(item.RemapColor);
-
-                newItem.InitializeData(item.Symbol, defoColor, overrideColor, item.RemapTarget);
-
-                newItem.transform.SetParent(GridTransform);
-                newItem.transform.localScale = Vector3.one;
-            }
-            
-            yield return null;
-
+            // Populate mapping item grid
             foreach (var ch in charSet)
             {
                 var newItemObj = GameObject.Instantiate(MappingItemPrefab);
-                var newItem = newItemObj!.GetComponent<MappingItem>();
+                var newItem = newItemObj!.GetComponent<MappingEditorItem>();
 
                 mappingItems.Add(newItem);
 
                 var defoColor = basePalette[ch];
 
-                newItem.InitializeData(ch, defoColor, defoColor, string.Empty);
+                var custom = customMapping.ContainsKey(ch);
+                newItem.InitializeData(ch, defoColor, custom ? ColorConvert.GetRGB(customMapping[ch].Color)
+                        : defoColor, custom ? customMapping[ch].BlockState : string.Empty);
 
                 newItem.transform.SetParent(GridTransform);
                 newItem.transform.localScale = Vector3.one;

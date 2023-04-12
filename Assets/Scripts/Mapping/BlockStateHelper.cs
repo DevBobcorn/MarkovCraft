@@ -1,11 +1,10 @@
 #nullable enable
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace MarkovBlocks.Mapping
 {
-    public static class BlockStateRemapper
+    public static class BlockStateHelper
     {
         public const int INVALID_BLOCKSTATE = -1;
 

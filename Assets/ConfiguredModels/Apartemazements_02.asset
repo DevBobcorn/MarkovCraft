@@ -20,44 +20,44 @@ MonoBehaviour:
   Steps: 1000
   Animated: 0
   Seeds: 7b000000c8010000
-  CustomRemapping:
-  - Symbol: 69
-    RemapTarget: minecraft:grass_block[snowy=false]
-    RemapColor:
+  CustomMapping:
+  - Character: 69
+    BlockState: minecraft:grass_block[snowy=false]
+    Color:
       serializedVersion: 2
       rgba: 4294967295
-  - Symbol: 78
-    RemapTarget: minecraft:dirt
-    RemapColor:
+  - Character: 78
+    BlockState: minecraft:dirt
+    Color:
       serializedVersion: 2
       rgba: 4294967295
-  - Symbol: 87
-    RemapTarget: minecraft:quartz_block
-    RemapColor:
+  - Character: 87
+    BlockState: minecraft:quartz_block
+    Color:
       serializedVersion: 2
       rgba: 4290888191
-  - Symbol: 80
-    RemapTarget: 
-    RemapColor:
+  - Character: 80
+    BlockState: 
+    Color:
       serializedVersion: 2
       rgba: 4292641791
-  - Symbol: 82
-    RemapTarget: 
-    RemapColor:
+  - Character: 82
+    BlockState: 
+    Color:
       serializedVersion: 2
       rgba: 4278190335
-  - Symbol: 67
-    RemapTarget: minecraft:diamond_block
-    RemapColor:
+  - Character: 67
+    BlockState: minecraft:diamond_block
+    Color:
       serializedVersion: 2
       rgba: 4294967295
-  - Symbol: 66
-    RemapTarget: 
-    RemapColor:
+  - Character: 66
+    BlockState: 
+    Color:
       serializedVersion: 2
       rgba: 4290379520
-  - Symbol: 65
-    RemapTarget: minecraft:quartz_block
-    RemapColor:
+  - Character: 65
+    BlockState: minecraft:quartz_block
+    Color:
       serializedVersion: 2
       rgba: 4294967295

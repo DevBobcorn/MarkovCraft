@@ -5,12 +5,12 @@ using TMPro;
 
 namespace MarkovBlocks
 {
-    public class MappingItem : MonoBehaviour
+    public class MappingEditorItem : MonoBehaviour
     {
         [SerializeField] Color32 MappingColor;
 
         [SerializeField] Image? ColorPreviewImage, MarkCornerImage;
-        [SerializeField] TMP_InputField? CharacterInput;
+        [SerializeField] TMP_Text? CharacterText;
         [SerializeField] TMP_InputField? ColorCodeInput;
         [SerializeField] TMP_InputField? BlockStateInput;
 
@@ -26,7 +26,7 @@ namespace MarkovBlocks
 
         public void InitializeData(char character, int defoRgb, int rgb, string blockState)
         {
-            if (ColorPreviewImage == null || CharacterInput == null || ColorCodeInput == null || BlockStateInput == null
+            if (ColorPreviewImage == null || CharacterText == null || ColorCodeInput == null || BlockStateInput == null
                     || MarkCornerImage == null || RevertOverrideButton == null)
             {
                 Debug.LogError("Mapping Item missing components!");
@@ -37,7 +37,7 @@ namespace MarkovBlocks
             defaultRgb = defoRgb & 0xFFFFFF; // Remove alpha channel if presents
 
             // Character input
-            CharacterInput.text = character.ToString();
+            CharacterText.text = character.ToString();
             // Color input
             ColorCodeInput.text = ColorConvert.GetHexRGBString(rgb);
             ColorPreviewImage.color = ColorConvert.GetOpaqueColor32(rgb);
@@ -103,7 +103,7 @@ namespace MarkovBlocks
 
         public void RevertColorToBaseValue()
         {
-            if (ColorPreviewImage == null || CharacterInput == null || ColorCodeInput == null || BlockStateInput == null)
+            if (ColorPreviewImage == null || CharacterText == null || ColorCodeInput == null || BlockStateInput == null)
             {
                 Debug.LogError("Mapping Item missing components!");
                 return;

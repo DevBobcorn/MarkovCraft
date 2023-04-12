@@ -20,4 +20,4 @@ MonoBehaviour:
   Steps: 1000
   Animated: 1
   Seeds: 
-  CustomRemapping: []
+  CustomMapping: []

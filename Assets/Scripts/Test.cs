@@ -236,29 +236,29 @@ namespace MarkovBlocks
 
             blockMeshCount = 1; // #0 is preserved for default cube mesh
 
-            foreach (var remap in confModel.CustomRemapping) // Read and assign custom remapping
+            foreach (var item in confModel.CustomMapping) // Read and assign custom mapping
             {
-                int rgba = ColorConvert.GetRGBA(remap.RemapColor);
+                int rgba = ColorConvert.GetRGBA(item.Color);
 
-                if (!string.IsNullOrWhiteSpace(remap.RemapTarget))
+                if (!string.IsNullOrWhiteSpace(item.BlockState))
                 {
-                    int remapStateId = BlockStateRemapper.GetStateIdFromString(remap.RemapTarget);
+                    int stateId = BlockStateHelper.GetStateIdFromString(item.BlockState);
                     
-                    if (remapStateId != BlockStateRemapper.INVALID_BLOCKSTATE)
+                    if (stateId != BlockStateHelper.INVALID_BLOCKSTATE)
                     {
-                        var state = statePalette.StatesTable[remapStateId];
-                        //Debug.Log($"Remapped '{remap.Symbol}' to [{remapStateId}] {state}");
+                        var state = statePalette.StatesTable[stateId];
+                        //Debug.Log($"Mapped '{item.Character}' to [{stateId}] {state}");
 
-                        if (stateId2Mesh.TryAdd(remapStateId, blockMeshCount))
-                            fullPalette[remap.Symbol] = new(blockMeshCount++, rgba);
+                        if (stateId2Mesh.TryAdd(stateId, blockMeshCount))
+                            fullPalette[item.Character] = new(blockMeshCount++, rgba);
                         else // The mesh of this block state is already regestered, just use it
-                            fullPalette[remap.Symbol] = new(stateId2Mesh[remapStateId], rgba);
+                            fullPalette[item.Character] = new(stateId2Mesh[stateId], rgba);
                     }
                     else // Default cube mesh with custom color
-                        fullPalette[remap.Symbol] = new(0, rgba);
+                        fullPalette[item.Character] = new(0, rgba);
                 }
                 else // Default cube mesh with custom color
-                    fullPalette[remap.Symbol] = new(0, rgba);
+                    fullPalette[item.Character] = new(0, rgba);
                 
                 yield return null;
             }
