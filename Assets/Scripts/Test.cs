@@ -28,12 +28,10 @@ namespace MarkovBlocks
         [SerializeField] public Button? ExecuteButton;
         [SerializeField] public RawImage? GraphImage;
 
-        private string confModelName = string.Empty;
-        public string ConfiguredModelName => confModelName;
+        private string confModelFile = string.Empty;
+        public string ConfiguredModelName => confModelFile;
         private readonly Dictionary<int, string> loadedConfModels = new();
-
-        private ConfiguredModel? currentConfiguredModel = null;
-        public ConfiguredModel? CurrentConfiguredModel => currentConfiguredModel;
+        private ConfiguredModel? currentConfModel = null;
 
         private Interpreter? interpreter = null;
         private float playbackSpeed = 1F;
@@ -77,14 +75,14 @@ namespace MarkovBlocks
             }
         }
 
-        private void RedrawProcedureGraph(Dictionary<char, int2> palette)
+        private void RedrawProcedureGraph(ConfiguredModel confModel, Dictionary<char, int2> palette)
         {
-            if (currentConfiguredModel != null && interpreter != null && GraphImage != null)
+            if (interpreter != null && GraphImage != null)
             {
                 int imageX = 200, imageY = 600;
                 var image = new int[imageX * imageY];
 
-                MarkovJunior.GUI.Draw(currentConfiguredModel.Model, interpreter.root, null, image, imageX, imageY, palette);
+                MarkovJunior.GUI.Draw(confModel.Model, interpreter.root, null, image, imageX, imageY, palette);
                 
                 Texture2D texture = new(imageX, imageY);
                 texture.filterMode = FilterMode.Point;
@@ -103,9 +101,10 @@ namespace MarkovBlocks
                 GraphImage.texture = texture;
                 GraphImage.SetNativeSize();
 
+                GraphImage.gameObject.SetActive(true);
             }
             else
-                Debug.LogWarning("Failed to update procedure graph due to stuffs missing!");
+                GraphImage?.gameObject.SetActive(false);
 
         }
 
@@ -164,16 +163,13 @@ namespace MarkovBlocks
             }
         }
 
-        public IEnumerator SetConfiguredModel(string confModelName, ConfiguredModel confModel)
+        public IEnumerator UpdateConfiguredModel(string confModelFile, ConfiguredModel confModel)
         {
             loadInfo.Loading = true;
-            loadInfo.InfoText = $"Loading configured model [{confModelName}]...";
+            loadInfo.InfoText = $"Loading configured model [{confModelFile}]...";
 
             // Clear up persistent entities
             BlockInstanceSpawner.ClearUpPersistentState();
-
-            // Assign new generation model
-            currentConfiguredModel = confModel;
 
             string fileName = PathHelper.GetExtraDataFile($"models/{confModel.Model}.xml");
             Debug.Log($"{confModel.Model} > {fileName}");
@@ -198,6 +194,8 @@ namespace MarkovBlocks
             if (modelDoc is null)
             {
                 Debug.LogWarning($"ERROR: Couldn't open xml file at {fileName}");
+                loadInfo.Loading = false;
+                GenerationText!.text = $"Couldn't open xml file at {fileName}";
                 yield break;
             }
 
@@ -218,6 +216,8 @@ namespace MarkovBlocks
             if (interpreter == null)
             {
                 Debug.LogWarning("ERROR: Failed to create model interpreter");
+                loadInfo.Loading = false;
+                GenerationText!.text = $"Failed to create model interpreter";
                 yield break;
             }
 
@@ -264,7 +264,7 @@ namespace MarkovBlocks
             }
 
             // Update procedure graph
-            RedrawProcedureGraph(fullPalette);
+            RedrawProcedureGraph(confModel, fullPalette);
 
             yield return null;
 
@@ -276,7 +276,7 @@ namespace MarkovBlocks
             loadInfo.Loading = false;
 
             if (GenerationText != null)
-                GenerationText.text = $"[{confModelName}] loaded";
+                GenerationText.text = $"[{confModelFile}] loaded";
         }
 
         private IEnumerator LoadMCData(string dataVersion, string[] packs, Action? callback = null)
@@ -322,7 +322,7 @@ namespace MarkovBlocks
 
         private IEnumerator RunGeneration()
         {
-            if (currentConfiguredModel is null || interpreter is null || blockMaterial is null)
+            if (currentConfModel is null || interpreter is null || blockMaterial is null)
             {
                 Debug.LogWarning("Generation cannot be initiated");
                 yield break;
@@ -332,7 +332,7 @@ namespace MarkovBlocks
             BlockInstanceSpawner.ClearUpPersistentState();
 
             executing = true;
-            var model = currentConfiguredModel;
+            var model = currentConfModel;
 
             var resultPerLine = Mathf.RoundToInt(Mathf.Sqrt(model.Amount));
             resultPerLine = Mathf.Max(resultPerLine, 1);
@@ -489,22 +489,25 @@ namespace MarkovBlocks
 
         public void UpdateDropdownOption(int newValue)
         {
+            if (loadedConfModels.ContainsKey(newValue))
+                SetConfiguredModel(loadedConfModels[newValue]);
+        }
+
+        public void SetConfiguredModel(string newConfModelFile)
+        {
             if (executing)
                 StopExecution();
+            
+            confModelFile = newConfModelFile;
 
-            if (loadedConfModels.ContainsKey(newValue))
-            {
-                var dir = PathHelper.GetExtraDataFile("configured_models");
+            var xdoc = XDocument.Load($"{PathHelper.GetExtraDataFile("configured_models")}/{confModelFile}");
+            var newConfModel = ConfiguredModel.CreateFromXMLDoc(xdoc);
 
-                // Update selected configured model
-                confModelName = loadedConfModels[newValue];
+            // Assign new configured model
+            currentConfModel = newConfModel;
 
-                var xdoc = XDocument.Load($"{dir}/{confModelName}");
-                var model = ConfiguredModel.CreateFromXMLDoc(xdoc);
-
-                if (!loadInfo.Loading)
-                    StartCoroutine(SetConfiguredModel(confModelName, model));
-            }
+            if (!loadInfo.Loading)
+                StartCoroutine(UpdateConfiguredModel(newConfModelFile, newConfModel));
         }
 
         public void StartExecution()

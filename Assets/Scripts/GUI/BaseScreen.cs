@@ -6,8 +6,12 @@ namespace MarkovBlocks
     [RequireComponent(typeof (CanvasGroup))]
     public abstract class BaseScreen : MonoBehaviour
     {
+        public ScreenManager? manager;
+
         public void Show(ScreenManager manager)
         {
+            this.manager = manager;
+            
             var canvasGroup = GetComponent<CanvasGroup>();
 
             canvasGroup.interactable = true;

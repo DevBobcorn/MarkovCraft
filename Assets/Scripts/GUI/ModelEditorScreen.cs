@@ -14,6 +14,8 @@ namespace MarkovBlocks
 {
     public class ModelEditorScreen : BaseScreen
     {
+        private const string MODEL_FOLDER = "configured_models";
+
         [SerializeField] public TMP_Text? ScreenHeader;
         // Settings panel
         [SerializeField] public TMP_Dropdown? ModelDropdown;
@@ -25,18 +27,23 @@ namespace MarkovBlocks
         [SerializeField] public TMP_InputField? SeedsInput;
         [SerializeField] public Toggle? AnimatedToggle;
 
+        [SerializeField] public Button? SaveButton;
+
         [SerializeField] public RectTransform? GridTransform;
         [SerializeField] public GameObject? MappingItemPrefab;
 
-        private readonly Dictionary<int, string> loadedModels = new();
-        private readonly Dictionary<char, int> basePalette = new();
         private readonly List<MappingEditorItem> mappingItems = new();
-        private bool loading = false, properlyLoaded = false;
+        private bool working = false, properlyLoaded = false;
+        private string confModelFile = string.Empty;
 
         public override bool ShouldPause() => true;
 
-        private IEnumerator InitializePanels(ConfiguredModel confModel)
+        private IEnumerator InitializeScreen(string confModelFile)
         {
+            // Load configured model file
+            var xdoc = XDocument.Load($"{PathHelper.GetExtraDataFile("configured_models")}/{confModelFile}");
+            var confModel = ConfiguredModel.CreateFromXMLDoc(xdoc);
+
             // Initialize settings panel
             var dir = PathHelper.GetExtraDataFile("models");
             int index = 0, selectedIndex = -1;
@@ -48,15 +55,15 @@ namespace MarkovBlocks
                 options.Add(new(confModelModel));
 
                 if (confModelModel.Equals(confModel.Model))
-                {
                     selectedIndex = index;
-                    Debug.Log($"Selected [{index}] {confModel.Model}");
-                }
-
-                loadedModels.Add(index++, confModelModel);
+                
+                index++;
             }
             
-            ModelDropdown!.AddOptions(options);
+            ModelDropdown!.ClearOptions();
+            ModelDropdown.AddOptions(options);
+
+            ModelDropdown.onValueChanged.RemoveAllListeners();
             ModelDropdown.onValueChanged.AddListener(UpdateDropdownOption);
 
             if (selectedIndex != -1)
@@ -76,8 +83,11 @@ namespace MarkovBlocks
             
             AnimatedToggle!.isOn = confModel.Animated;
 
+            SaveButton!.onClick.RemoveAllListeners();
+            SaveButton.onClick.AddListener(SaveConfiguredModel);
+
             // Initialize mappings panel
-            XDocument? paletteDoc = null, modelDoc = null;
+            XDocument? paletteDoc = null, confModelDoc = null;
 
             string paletteFileName = PathHelper.GetExtraDataFile($"palette.xml");
             string modelFileName = PathHelper.GetExtraDataFile($"models/{confModel.Model}.xml");
@@ -99,36 +109,38 @@ namespace MarkovBlocks
                 if (task1.IsCompletedSuccessfully && task2.IsCompletedSuccessfully)
                 {
                     paletteDoc = task1.Result;
-                    modelDoc = task2.Result;
+                    confModelDoc = task2.Result;
                 }
             }
             
-            if (paletteDoc is null || modelDoc is null)
+            if (paletteDoc is null || confModelDoc is null)
             {
                 Debug.LogWarning($"ERROR: Couldn't open xml file at {paletteFileName}");
-                loading = false;
+                working = false;
                 properlyLoaded = false;
                 yield break;
             }
 
             yield return null;
 
+            var basePalette = new Dictionary<char, int>();
+
             paletteDoc.Root.Elements("color").ToList().ForEach(x => basePalette.Add(
                     x.Get<char>("symbol"), ColorConvert.RGBFromHexString(x.Get<string>("value"))));
             
             var activeCharSet = new HashSet<char>();
 
-            foreach (var vals in from node in modelDoc.Descendants()
+            foreach (var vals in from node in confModelDoc.Descendants()
                     where node.Attribute("values") is not null
                     select node.Attribute("values").Value )
                 vals.ToList().ForEach(ch => activeCharSet.Add(ch));
             
-            var charSet = basePalette.Keys.ToHashSet();
+            var FullCharSet = basePalette.Keys.ToHashSet();
 
             var customMapping = confModel.CustomMapping.ToDictionary(x => x.Character, x => x);
 
             // Populate mapping item grid
-            foreach (var ch in charSet)
+            foreach (var ch in FullCharSet)
             {
                 var newItemObj = GameObject.Instantiate(MappingItemPrefab);
                 var newItem = newItemObj!.GetComponent<MappingEditorItem>();
@@ -147,13 +159,16 @@ namespace MarkovBlocks
 
             ShowActiveCharSet(activeCharSet);
 
-            loading = false;
+            working = false;
             properlyLoaded = true;
+
+            if (ScreenHeader != null)
+                ScreenHeader.text = $"Editing {confModelFile}";
         }
 
         public IEnumerator UpdateActiveCharSetFromModel(string modelFileName)
         {
-            loading = true;
+            working = true;
 
             XDocument? modelDoc = null;
 
@@ -174,7 +189,7 @@ namespace MarkovBlocks
             if (modelDoc is null)
             {
                 Debug.LogWarning($"ERROR: Couldn't open xml file at {modelFileName}");
-                loading = false;
+                working = false;
                 properlyLoaded = false;
                 yield break;
             }
@@ -187,56 +202,54 @@ namespace MarkovBlocks
                 vals.ToList().ForEach(ch => activeCharSet.Add(ch));
             
             ShowActiveCharSet(activeCharSet);
-            loading = false;
+            working = false;
         }
 
         public void UpdateDropdownOption(int newValue)
         {
-            if (loading || !properlyLoaded) return;
+            if (working || !properlyLoaded) return;
 
-            if (loadedModels.ContainsKey(newValue))
-            {
-                var confModelModel = loadedModels[newValue];
+            var confModelModel = ModelDropdown?.options[newValue].text;
+            if (confModelModel is null) return;
 
-                string modelFileName = PathHelper.GetExtraDataFile($"models/{confModelModel}.xml");
-                StartCoroutine(UpdateActiveCharSetFromModel(modelFileName));
-            }
+            string modelFileName = PathHelper.GetExtraDataFile($"models/{confModelModel}.xml");
+            StartCoroutine(UpdateActiveCharSetFromModel(modelFileName));
         }
 
         public override void OnShow(ScreenManager manager)
         {
-            if (loading) return;
-            loading = true;
-
-            // Just to make sure things are cleared up
-            ClearItems();
-
+            if (working) return;
+            working = true;
             properlyLoaded = false;
+
+            if (ScreenHeader != null)
+                ScreenHeader.text = "Loading...";
             
-            var game = Test.Instance;
-            var currentConfModel = game.CurrentConfiguredModel;
-            var currentConfModelName = game.ConfiguredModelName;
+            confModelFile = Test.Instance.ConfiguredModelName;
             
-            if (currentConfModel is null || ScreenHeader == null || ModelDropdown == null || SizeXInput == null || SizeYInput == null || SizeZInput == null ||
+            if (ModelDropdown == null || SizeXInput == null || SizeYInput == null || SizeZInput == null ||SaveButton == null ||
                     AmountInput == null || StepsInput == null || SeedsInput == null || AnimatedToggle == null || GridTransform == null)
             {
-                Debug.LogWarning("The editor is not properly loaded!");
+                Debug.LogWarning("Editor is not properly loaded!");
 
                 if (ScreenHeader != null)
                     ScreenHeader.text = "0.0 Editor not loaded";
 
-                loading = false;
+                working = false;
                 return;
             }
 
-            ScreenHeader.text = game.ConfiguredModelName;
-
-            StartCoroutine(InitializePanels(currentConfModel));
+            StartCoroutine(InitializeScreen(Test.Instance.ConfiguredModelName));
         }
 
         public override void OnHide(ScreenManager manager)
         {
-            ClearItems();
+            var array = mappingItems.ToArray();
+
+            for (int i = 0;i < array.Length;i++)
+                Destroy(array[i].gameObject);
+            
+            mappingItems.Clear();
 
         }
 
@@ -251,30 +264,56 @@ namespace MarkovBlocks
             }
         }
 
-        private void ClearItems()
+        private void SaveConfiguredModel()
         {
-            loadedModels.Clear();
-            basePalette.Clear();
+            if (working) return;
 
-            var array = mappingItems.ToArray();
-
-            for (int i = 0;i < array.Length;i++)
-                Destroy(array[i].gameObject);
-            
-            mappingItems.Clear();
-        }
-
-        private void SaveChanges()
-        {
-            if (properlyLoaded) // The configured model is properly opened
+            if (properlyLoaded) // The editor is properly loaded
             {
+                working = true;
 
+                var model = ScriptableObject.CreateInstance(typeof (ConfiguredModel)) as ConfiguredModel;
+
+                if (model is not null)
+                {
+                    model.Model = ModelDropdown!.options[ModelDropdown.value].text;
+
+                    int.TryParse(SizeXInput!.text, out model.SizeX);
+                    int.TryParse(SizeYInput!.text, out model.SizeY);
+                    int.TryParse(SizeZInput!.text, out model.SizeZ);
+                    int.TryParse(AmountInput!.text, out model.Amount);
+                    int.TryParse(StepsInput!.text, out model.Steps);
+
+                    model.Animated = AnimatedToggle!.isOn;
+                    model.Seeds = SeedsInput!.text.Split(' ').Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => int.Parse(x)).ToArray();
+                    model.CustomMapping = mappingItems.Where(x => x.ShouldBeSaved()).Select(x => new CustomMappingItem()
+                    {
+                        Character = x.Character,
+                        Color = ColorConvert.OpaqueColor32FromHexString(x.GetColorCode()),
+                        BlockState = x.GetBlockState()
+                    }).ToArray();
+
+                    Debug.Log($"M: {model.CustomMapping.Length} out of {mappingItems.Count}");
+                    foreach (var m in model.CustomMapping)
+                    {
+                        Debug.Log($"{m.Character} => {m.Color} {m.BlockState}");
+                    }
+                    
+                    ConfiguredModel.GetXMLDoc(model).Save($"{PathHelper.GetExtraDataFile("configured_models")}/{confModelFile}");
+                }
+                
+                working = false;
+
+                manager?.SetActiveScreenByType<HUDScreen>();
+
+                Test.Instance.SetConfiguredModel(confModelFile);
             }
+
         }
 
         public override void ScreenUpdate(ScreenManager manager)
         {
-            if (loading) return;
+            if (working) return;
             
             if (Input.GetKeyDown(KeyCode.Escape))
             {

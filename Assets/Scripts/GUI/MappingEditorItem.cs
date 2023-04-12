@@ -46,9 +46,9 @@ namespace MarkovBlocks
 
             TagAsSpecial(false);
 
-            SetOverridesPaletteColor(!blockState.Equals(string.Empty) || defoRgb != rgb);
+            SetOverridesPaletteColor(defoRgb != rgb);
 
-            // Assign control events
+            // Assign control events (should get called only once)
             RevertOverrideButton.onClick.AddListener(RevertColorToBaseValue);
             ColorCodeInput.onValueChanged.AddListener(UpdateColorCode);
             ColorCodeInput.onEndEdit.AddListener(ValidateColorCode);
@@ -57,8 +57,6 @@ namespace MarkovBlocks
 
         public void UpdateColorCode(string colorHex)
         {
-            var padded = colorHex.PadRight(6, '0'); // Pad left with '0's
-
             int newRgb = ColorConvert.RGBFromHexString(colorHex);
             ColorPreviewImage!.color = ColorConvert.GetOpaqueColor32(newRgb);
 
@@ -70,17 +68,20 @@ namespace MarkovBlocks
 
         public void ValidateColorCode(string colorHex)
         {
-            var paddedUpper = colorHex.PadRight(6, '0').ToUpper(); // Pad left with '0's
-            ColorCodeInput!.text = paddedUpper;
+            ColorCodeInput!.text = colorHex.PadRight(6, '0').ToUpper();
 
-            int newRgb = ColorConvert.RGBFromHexString(colorHex);
-            ColorPreviewImage!.color = ColorConvert.GetOpaqueColor32(newRgb);
+        }
 
-            if (newRgb == defaultRgb)
-                SetOverridesPaletteColor(false);
-            else
-                SetOverridesPaletteColor(true);
+        public string GetColorCode() => ColorCodeInput?.text ?? "000000";
 
+        public string GetBlockState()
+        {
+            var blockState = BlockStateInput?.text;
+
+            if (string.IsNullOrWhiteSpace(blockState))
+                return string.Empty;
+            
+            return blockState;
         }
 
         public void TagAsSpecial(bool s)
@@ -92,8 +93,7 @@ namespace MarkovBlocks
         {
             overridesPaletteColor = o;
 
-            if (RevertOverrideButton?.gameObject.activeSelf != o)
-                RevertOverrideButton?.gameObject.SetActive(o);
+            RevertOverrideButton?.gameObject.SetActive(o);
         }
 
         public bool ShouldBeSaved()

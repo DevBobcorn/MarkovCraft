@@ -4826,6 +4826,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eebd0a09a61b3a94ea97f7773195147f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 0}
 --- !u!1 &771236942
 GameObject:
   m_ObjectHideFlags: 0
@@ -4984,6 +4985,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d23065ffd1369d4f8f2ac7f93ce6689, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 0}
   ScreenHeader: {fileID: 436192276}
   ModelDropdown: {fileID: 1309233628}
   SizeXInput: {fileID: 731267317}
@@ -4993,6 +4995,7 @@ MonoBehaviour:
   StepsInput: {fileID: 682298233}
   SeedsInput: {fileID: 2135130116}
   AnimatedToggle: {fileID: 21867925}
+  SaveButton: {fileID: 1394694505}
   GridTransform: {fileID: 1389920733}
   MappingItemPrefab: {fileID: 5617611025670901720, guid: db98dd82d54a82242bb116f28ca38e92,
     type: 3}
@@ -6102,7 +6105,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 2}
-  m_SizeDelta: {x: 0, y: 150}
+  m_SizeDelta: {x: 0, y: 400}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &978756921
 MonoBehaviour:
@@ -11374,7 +11377,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 28}
+  m_SizeDelta: {x: 0, y: 40}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &2135130114
 GameObject:
