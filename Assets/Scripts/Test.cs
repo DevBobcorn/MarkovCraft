@@ -8,6 +8,7 @@ using System.Xml.Linq;
 
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using Unity.Mathematics;
 using TMPro;
 
@@ -21,11 +22,19 @@ namespace MarkovBlocks
     {
         public const int WINDOWED_APP_WIDTH = 1600, WINDOWED_APP_HEIGHT = 900;
 
-        [SerializeField] public TMP_Text? PlaybackSpeedText, GenerationText;
+        [SerializeField] public CameraController? CamController;
+        [SerializeField] public LayerMask VolumeLayerMask;
+        [SerializeField] public VolumeSelection? VolumeSelection;
+
+        [SerializeField] public TMP_Text? VolumeText, PlaybackSpeedText, GenerationText;
         [SerializeField] public TMP_Dropdown? ConfiguredModelDropdown;
         [SerializeField] public Slider? PlaybackSpeedSlider;
         [SerializeField] public Button? ExecuteButton;
         [SerializeField] public RawImage? GraphImage;
+
+        [SerializeField] public GameObject? GenerationVolumePrefab;
+        private readonly List<GenerationVolume> generationVolumes = new();
+        private GenerationVolume? selectedVolume = null;
 
         private string confModelFile = string.Empty;
         public string ConfiguredModelName => confModelFile;
@@ -59,7 +68,6 @@ namespace MarkovBlocks
         }
 
         private bool isPaused = true;
-
         public bool IsPaused
         {
             get => isPaused;
@@ -155,8 +163,7 @@ namespace MarkovBlocks
             loadInfo.Loading = true;
             loadInfo.InfoText = $"Loading configured model [{confModelFile}]...";
 
-            // Clear up persistent entities
-            BlockInstanceSpawner.ClearUpPersistentState();
+            ClearUpScene();
 
             string fileName = PathHelper.GetExtraDataFile($"models/{confModel.Model}.xml");
             Debug.Log($"{confModel.Model} > {fileName}");
@@ -262,8 +269,7 @@ namespace MarkovBlocks
 
             loadInfo.Loading = false;
 
-            if (GenerationText != null)
-                GenerationText.text = $"[{confModelFile}] loaded";
+            GenerationText!.text = $"[{confModelFile}] loaded";
         }
 
         private IEnumerator LoadMCData(string dataVersion, string[] packs, Action? callback = null)
@@ -309,20 +315,19 @@ namespace MarkovBlocks
 
         private IEnumerator RunGeneration()
         {
-            if (currentConfModel is null || interpreter is null || blockMaterial is null)
+            if (currentConfModel is null || interpreter is null || blockMaterial is null || GenerationText == null || GenerationVolumePrefab is null)
             {
                 Debug.LogWarning("Generation cannot be initiated");
                 StopExecution();
                 yield break;
             }
 
-            // Clear up persistent entities
-            BlockInstanceSpawner.ClearUpPersistentState();
+            ClearUpScene();
 
             executing = true;
             var model = currentConfModel;
 
-            var resultPerLine = Mathf.RoundToInt(Mathf.Sqrt(model.Amount));
+            var resultPerLine = Mathf.CeilToInt(Mathf.Sqrt(model.Amount));
             resultPerLine = Mathf.Max(resultPerLine, 1);
             
             Material[] materials = { blockMaterial };
@@ -330,15 +335,19 @@ namespace MarkovBlocks
             System.Random rand = new();
             var seeds = model.Seeds;
 
-            var cubeMeshAsArray = new[] { blockMeshes[0] };
-            bool simplified = false;
-
-            for (int k = 0; k < model.Amount; k++)
+            for (int k = 1; k <= model.Amount; k++)
             {
                 if (!executing) // Stop execution
                     break;
                 
-                int seed = seeds != null && k < seeds.Length ? seeds[k] : rand.Next();
+                int seed = seeds != null && k <= seeds.Length ? seeds[k - 1] : rand.Next();
+                
+                var volumeObj = GameObject.Instantiate(GenerationVolumePrefab);
+                volumeObj.name = $"Iteration #{k} (Seed: {seed})";
+                var volume = volumeObj!.GetComponent<GenerationVolume>();
+                volume.GenerationSeed = seed;
+                volume.Iteration = k;
+                
                 int frameCount = 0;
 
                 (int3[], int2[])? dataRaw = null;
@@ -346,22 +355,27 @@ namespace MarkovBlocks
                 foreach ((byte[] result, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, model.Steps, model.Animated))
                 {
                     if (!executing) // Stop execution
+                    {
+                        Destroy(volumeObj);
                         break;
+                    }
 
                     int2[] stepPalette = legend.Select(ch => fullPalette[ch]).ToArray();
                     float tick = 1F / playbackSpeed;
 
                     if (dataRaw != null)
-                        BlockInstanceSpawner.VisualizeState(dataRaw.Value, materials, simplified ? cubeMeshAsArray : blockMeshes, tick, 0.5F);
+                        BlockInstanceSpawner.VisualizeState(dataRaw.Value, materials, blockMeshes, tick, 0.5F);
 
                     // Update generation text
                     if (GenerationText != null)
-                        GenerationText.text = $"Iteration: {k + 1}\nFrame: {frameCount}\nTick: {(int)(tick * 1000)}ms";
+                        GenerationText.text = $"Iteration: #{k}\nFrame: {frameCount} ({(int)(tick * 1000)}ms/frame)";
 
                     frameCount++;
 
-                    int xCount = k / resultPerLine,  zCount = k % resultPerLine;
+                    int xCount = (k - 1) % resultPerLine,  zCount = (k - 1) / resultPerLine;
                     var pos = new int3(xCount * (FX + 2), 0, zCount * (FY + 2));
+
+                    volume.UpdateVolume(pos, new(FX, FZ, FY));
 
                     dataRaw = BlockDataBuilder.GetInstanceData(result, FX, FY, FZ, pos, FZ > 1, stepPalette);
 
@@ -371,9 +385,10 @@ namespace MarkovBlocks
                 if (dataRaw != null && executing)
                 {
                     // The final visualization is persistent
-                    BlockInstanceSpawner.VisualizePersistentState(dataRaw.Value, materials, simplified ? cubeMeshAsArray : blockMeshes);
+                    BlockInstanceSpawner.VisualizePersistentState(dataRaw.Value, materials, blockMeshes);
 
-                    Debug.Log($"Generation complete. Frame Count: {frameCount}");
+                    Debug.Log($"Iteration #{k} complete. Frame Count: {frameCount}");
+                    GenerationText!.text = $"Iteration: #{k}\nGeneration Complete";
                 }
                 
             }
@@ -445,7 +460,79 @@ namespace MarkovBlocks
 
             if (loadInfo.Loading && GenerationText != null)
                 GenerationText.text = loadInfo.InfoText;
+            
+            if (isPaused) return;
+            
+            var cam = CamController?.ViewCamera;
+            
+            if (cam != null && VolumeSelection != null)
+            {
+                if (!VolumeSelection.Locked) // Update selected volume
+                {
+                    var ray = cam.ScreenPointToRay(Input.mousePosition);
+                    RaycastHit hit;
 
+                    if (!EventSystem.current.IsPointerOverGameObject() && Physics.Raycast(ray.origin, ray.direction, out hit, 500F, VolumeLayerMask))
+                    {
+                        UpdateSelectedVolume(hit.collider.gameObject.GetComponent<GenerationVolume>());
+
+                        if (Input.GetKeyDown(KeyCode.Mouse0))
+                        {
+                            VolumeSelection!.Lock();
+
+                        }
+                    }
+                    else
+                        UpdateSelectedVolume(null);
+                }
+                else // Selection is locked
+                {
+                    if (!EventSystem.current.IsPointerOverGameObject() && Input.GetKeyDown(KeyCode.Mouse0))
+                    {
+                        VolumeSelection!.Unlock();
+
+                    }
+                }
+
+            }
+
+        }
+
+        private void UpdateSelectedVolume(GenerationVolume? newVolume)
+        {
+            if (selectedVolume == newVolume) return;
+
+            if (newVolume != null && newVolume.Valid)
+            {
+                var size = newVolume.GenerationSize;
+
+                VolumeText!.text = $"Iteration #{newVolume.Iteration} Seed: {newVolume.GenerationSeed}\nSize: {size.x}x{size.y}x{size.z}";
+                VolumeSelection!.UpdateVolume(newVolume.GetVolumePosition(), newVolume.GetVolumeSize());
+            }
+            else
+            {
+                VolumeText!.text = string.Empty;
+                VolumeSelection!.HideVolume();
+            }
+
+            selectedVolume = newVolume;
+        }
+
+        private void ClearUpScene()
+        {
+            // Clear up persistent entities
+            BlockInstanceSpawner.ClearUpPersistentState();
+
+            // Clear up volumes
+            UpdateSelectedVolume(null);
+
+            var volumes = Component.FindObjectsOfType<GenerationVolume>().ToArray();
+
+            for (int i = 0;i < volumes.Length;i++)
+            {
+                volumes[i].Valid = false;
+                Destroy(volumes[i].gameObject);
+            }
         }
 
         public void UpdatePlaybackSpeed(float newValue)

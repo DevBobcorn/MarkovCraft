@@ -67,8 +67,7 @@ namespace MarkovBlocks
                 PositionData = posData,
                 MeshData = meshData,
                 LifeTime = lifeTime,
-                TimeLeft = timeLeft,
-                Simplified = meshes.Length == 1
+                TimeLeft = timeLeft
             };
 
             var spawnHandle = spawnJob.Schedule(entityCount, 128);

@@ -3,10 +3,21 @@ using UnityEngine;
 
 namespace MarkovBlocks
 {
+    [RequireComponent(typeof (Camera))]
     public class CameraController : MonoBehaviour
     {
         [SerializeField] public float moveSpeed   =  10F;
         [SerializeField] public float scrollSpeed = 500F;
+
+        private Camera? viewCamera;
+        public Camera? ViewCamera => viewCamera;
+
+        void Start()
+        {
+            // Get camera component
+            viewCamera = GetComponent<Camera>();
+
+        }
 
         void Update()
         {
@@ -30,7 +41,7 @@ namespace MarkovBlocks
 
             if (scroll != 0F)
             {
-                transform.position += transform.forward * scroll * Time.deltaTime * scrollSpeed;
+                transform.position += transform.forward * scroll * scrollSpeed;
             }
 
         }
