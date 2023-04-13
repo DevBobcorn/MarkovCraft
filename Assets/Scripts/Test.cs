@@ -32,9 +32,9 @@ namespace MarkovBlocks
         [SerializeField] public Button? ExecuteButton;
         [SerializeField] public RawImage? GraphImage;
 
-        [SerializeField] public GameObject? GenerationVolumePrefab;
-        private readonly List<GenerationVolume> generationVolumes = new();
-        private GenerationVolume? selectedVolume = null;
+        [SerializeField] public GameObject? GenerationResultPrefab;
+        private readonly List<GenerationResult> generationResults = new();
+        private GenerationResult? selectedResult = null;
 
         private string confModelFile = string.Empty;
         public string ConfiguredModelName => confModelFile;
@@ -315,7 +315,7 @@ namespace MarkovBlocks
 
         private IEnumerator RunGeneration()
         {
-            if (currentConfModel is null || interpreter is null || blockMaterial is null || GenerationText == null || GenerationVolumePrefab is null)
+            if (currentConfModel is null || interpreter is null || blockMaterial is null || GenerationText == null || GenerationResultPrefab is null)
             {
                 Debug.LogWarning("Generation cannot be initiated");
                 StopExecution();
@@ -342,21 +342,21 @@ namespace MarkovBlocks
                 
                 int seed = seeds != null && k <= seeds.Length ? seeds[k - 1] : rand.Next();
                 
-                var volumeObj = GameObject.Instantiate(GenerationVolumePrefab);
-                volumeObj.name = $"Iteration #{k} (Seed: {seed})";
-                var volume = volumeObj!.GetComponent<GenerationVolume>();
-                volume.GenerationSeed = seed;
-                volume.Iteration = k;
+                var resultObj = GameObject.Instantiate(GenerationResultPrefab);
+                resultObj.name = $"Iteration #{k} (Seed: {seed})";
+                var result = resultObj!.GetComponent<GenerationResult>();
+                result.GenerationSeed = seed;
+                result.Iteration = k;
                 
                 int frameCount = 0;
 
                 (int3[], int2[])? dataRaw = null;
 
-                foreach ((byte[] result, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, model.Steps, model.Animated))
+                foreach ((byte[] state, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, model.Steps, model.Animated))
                 {
                     if (!executing) // Stop execution
                     {
-                        Destroy(volumeObj);
+                        Destroy(resultObj);
                         break;
                     }
 
@@ -375,17 +375,19 @@ namespace MarkovBlocks
                     int xCount = (k - 1) % resultPerLine,  zCount = (k - 1) / resultPerLine;
                     var pos = new int3(xCount * (FX + 2), 0, zCount * (FY + 2));
 
-                    volume.UpdateVolume(pos, new(FX, FZ, FY));
+                    result.UpdateVolume(pos, new(FX, FZ, FY));
 
-                    dataRaw = BlockDataBuilder.GetInstanceData(result, FX, FY, FZ, pos, FZ > 1, stepPalette);
+                    dataRaw = BlockDataBuilder.GetInstanceData(state, FX, FY, FZ, pos, FZ > 1, stepPalette);
 
                     yield return new WaitForSeconds(tick);
                 }
 
-                if (dataRaw != null && executing)
+                if (dataRaw is not null && executing)
                 {
                     // The final visualization is persistent
                     BlockInstanceSpawner.VisualizePersistentState(dataRaw.Value, materials, blockMeshes);
+
+                    result.SetData(dataRaw.Value);
 
                     Debug.Log($"Iteration #{k} complete. Frame Count: {frameCount}");
                     GenerationText!.text = $"Iteration: #{k}\nGeneration Complete";
@@ -474,7 +476,7 @@ namespace MarkovBlocks
 
                     if (!EventSystem.current.IsPointerOverGameObject() && Physics.Raycast(ray.origin, ray.direction, out hit, 500F, VolumeLayerMask))
                     {
-                        UpdateSelectedVolume(hit.collider.gameObject.GetComponent<GenerationVolume>());
+                        UpdateSelectedResult(hit.collider.gameObject.GetComponent<GenerationResult>());
 
                         if (Input.GetKeyDown(KeyCode.Mouse0))
                         {
@@ -483,7 +485,7 @@ namespace MarkovBlocks
                         }
                     }
                     else
-                        UpdateSelectedVolume(null);
+                        UpdateSelectedResult(null);
                 }
                 else // Selection is locked
                 {
@@ -498,16 +500,16 @@ namespace MarkovBlocks
 
         }
 
-        private void UpdateSelectedVolume(GenerationVolume? newVolume)
+        private void UpdateSelectedResult(GenerationResult? newResult)
         {
-            if (selectedVolume == newVolume) return;
+            if (selectedResult == newResult) return;
 
-            if (newVolume != null && newVolume.Valid)
+            if (newResult != null && newResult.Valid)
             {
-                var size = newVolume.GenerationSize;
+                var size = newResult.GenerationSize;
 
-                VolumeText!.text = $"Iteration #{newVolume.Iteration} Seed: {newVolume.GenerationSeed}\nSize: {size.x}x{size.y}x{size.z}";
-                VolumeSelection!.UpdateVolume(newVolume.GetVolumePosition(), newVolume.GetVolumeSize());
+                VolumeText!.text = $"Iteration #{newResult.Iteration} Seed: {newResult.GenerationSeed}\nSize: {size.x}x{size.y}x{size.z}";
+                VolumeSelection!.UpdateVolume(newResult.GetVolumePosition(), newResult.GetVolumeSize());
             }
             else
             {
@@ -515,7 +517,7 @@ namespace MarkovBlocks
                 VolumeSelection!.HideVolume();
             }
 
-            selectedVolume = newVolume;
+            selectedResult = newResult;
         }
 
         private void ClearUpScene()
@@ -523,15 +525,15 @@ namespace MarkovBlocks
             // Clear up persistent entities
             BlockInstanceSpawner.ClearUpPersistentState();
 
-            // Clear up volumes
-            UpdateSelectedVolume(null);
+            // Clear up generation results
+            UpdateSelectedResult(null);
 
-            var volumes = Component.FindObjectsOfType<GenerationVolume>().ToArray();
+            var results = Component.FindObjectsOfType<GenerationResult>().ToArray();
 
-            for (int i = 0;i < volumes.Length;i++)
+            for (int i = 0;i < results.Length;i++)
             {
-                volumes[i].Valid = false;
-                Destroy(volumes[i].gameObject);
+                results[i].Valid = false;
+                Destroy(results[i].gameObject);
             }
         }
 

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 340386583909130817}
   - component: {fileID: 139928807441608570}
   m_Layer: 8
-  m_Name: Generation Volume
+  m_Name: Generation Result
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
