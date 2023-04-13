@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 
 namespace MarkovBlocks
 {
+    [RequireComponent(typeof (ScreenManager))]
     public class Test : MonoBehaviour
     {
         public const int WINDOWED_APP_WIDTH = 1600, WINDOWED_APP_HEIGHT = 900;
@@ -29,7 +30,7 @@ namespace MarkovBlocks
         [SerializeField] public TMP_Text? VolumeText, PlaybackSpeedText, GenerationText;
         [SerializeField] public TMP_Dropdown? ConfiguredModelDropdown;
         [SerializeField] public Slider? PlaybackSpeedSlider;
-        [SerializeField] public Button? ExecuteButton;
+        [SerializeField] public Button? ConfigButton, ExecuteButton, ExportButton;
         [SerializeField] public RawImage? GraphImage;
 
         [SerializeField] public GameObject? GenerationResultPrefab;
@@ -411,6 +412,12 @@ namespace MarkovBlocks
                         UpdatePlaybackSpeed(PlaybackSpeedSlider.value);
                     }
 
+                    if (ConfigButton != null)
+                    {
+                        ConfigButton.onClick.RemoveAllListeners();
+                        ConfigButton.onClick.AddListener(() => GetComponent<ScreenManager>().SetActiveScreenByType<ModelEditorScreen>() );
+                    }
+
                     if (ExecuteButton != null)
                     {
                         ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Start Execution";
@@ -478,10 +485,12 @@ namespace MarkovBlocks
                     {
                         UpdateSelectedResult(hit.collider.gameObject.GetComponent<GenerationResult>());
 
-                        if (Input.GetKeyDown(KeyCode.Mouse0))
+                        if (Input.GetKeyDown(KeyCode.Mouse0) && selectedResult!.Completed)
                         {
                             VolumeSelection!.Lock();
 
+                            // Show export button
+                            ExportButton?.GetComponent<Animator>()?.SetBool("Hidden", false);
                         }
                     }
                     else
@@ -493,6 +502,8 @@ namespace MarkovBlocks
                     {
                         VolumeSelection!.Unlock();
 
+                        // Hide export button
+                        ExportButton?.GetComponent<Animator>()?.SetBool("Hidden", true);
                     }
                 }
 
@@ -504,20 +515,25 @@ namespace MarkovBlocks
         {
             if (selectedResult == newResult) return;
 
-            if (newResult != null && newResult.Valid)
+            if (newResult != null && newResult.Valid) // Valid
             {
                 var size = newResult.GenerationSize;
 
                 VolumeText!.text = $"Iteration #{newResult.Iteration} Seed: {newResult.GenerationSeed}\nSize: {size.x}x{size.y}x{size.z}";
                 VolumeSelection!.UpdateVolume(newResult.GetVolumePosition(), newResult.GetVolumeSize());
+            
+                selectedResult = newResult;
             }
-            else
+            else // Null or going to be destroyed
             {
                 VolumeText!.text = string.Empty;
                 VolumeSelection!.HideVolume();
-            }
 
-            selectedResult = newResult;
+                // Hide export button
+                ExportButton?.GetComponent<Animator>()?.SetBool("Hidden", true);
+
+                selectedResult = null;
+            }
         }
 
         private void ClearUpScene()

@@ -6,7 +6,7 @@ namespace MarkovBlocks
     [RequireComponent(typeof (CanvasGroup))]
     public abstract class BaseScreen : MonoBehaviour
     {
-        public ScreenManager? manager;
+        protected ScreenManager? manager;
 
         public void Show(ScreenManager manager)
         {

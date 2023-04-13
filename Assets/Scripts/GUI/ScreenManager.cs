@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace MarkovBlocks
 {
+    [RequireComponent(typeof (Test))]
     public class ScreenManager : MonoBehaviour
     {
         private BaseScreen? activeScreen;
