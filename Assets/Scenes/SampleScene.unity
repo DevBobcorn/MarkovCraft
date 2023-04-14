@@ -4657,6 +4657,7 @@ GameObject:
   m_Component:
   - component: {fileID: 732912707}
   - component: {fileID: 732912708}
+  - component: {fileID: 732912710}
   - component: {fileID: 732912709}
   m_Layer: 5
   m_Name: HUD Screen
@@ -4718,6 +4719,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eebd0a09a61b3a94ea97f7773195147f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!95 &732912710
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 732912706}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8c4ff23d94515df43935708ee0dda1c9, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 2
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &771236942
 GameObject:
   m_ObjectHideFlags: 0
@@ -4783,6 +4805,7 @@ GameObject:
   - component: {fileID: 775659448}
   - component: {fileID: 775659447}
   - component: {fileID: 775659449}
+  - component: {fileID: 775659451}
   - component: {fileID: 775659450}
   m_Layer: 5
   m_Name: Model Editor Screen
@@ -4889,6 +4912,27 @@ MonoBehaviour:
   GridTransform: {fileID: 1389920733}
   MappingItemPrefab: {fileID: 5617611025670901720, guid: db98dd82d54a82242bb116f28ca38e92,
     type: 3}
+--- !u!95 &775659451
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775659445}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8c4ff23d94515df43935708ee0dda1c9, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 2
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &791814463
 GameObject:
   m_ObjectHideFlags: 0
@@ -10141,7 +10185,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1450860884}
   m_HandleRect: {fileID: 1450860883}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

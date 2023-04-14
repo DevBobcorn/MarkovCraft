@@ -3,35 +3,23 @@ using UnityEngine;
 
 namespace MarkovBlocks
 {
-    [RequireComponent(typeof (CanvasGroup))]
+    [RequireComponent(typeof (CanvasGroup), typeof (Animator))]
     public abstract class BaseScreen : MonoBehaviour
     {
         protected ScreenManager? manager;
 
         public void Show(ScreenManager manager)
         {
-            this.manager = manager;
-            
-            var canvasGroup = GetComponent<CanvasGroup>();
+            GetComponent<Animator>().SetBool("Hidden", false);
+            OnShow(this.manager = manager);
 
-            canvasGroup.interactable = true;
-            canvasGroup.blocksRaycasts = true;
-
-            canvasGroup.alpha = 1F;
-
-            OnShow(manager);
         }
 
         public void Hide(ScreenManager manager)
         {
-            var canvasGroup = GetComponent<CanvasGroup>();
-
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-
-            canvasGroup.alpha = 0F;
-
+            GetComponent<Animator>().SetBool("Hidden", true);
             OnHide(manager);
+
         }
 
         public virtual void OnShow(ScreenManager manager) { }
