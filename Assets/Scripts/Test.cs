@@ -27,7 +27,7 @@ namespace MarkovBlocks
         [SerializeField] public LayerMask VolumeLayerMask;
         [SerializeField] public VolumeSelection? VolumeSelection;
 
-        [SerializeField] public TMP_Text? VolumeText, PlaybackSpeedText, GenerationText;
+        [SerializeField] public TMP_Text? VolumeText, PlaybackSpeedText, GenerationText, FPSText;
         [SerializeField] public TMP_Dropdown? ConfiguredModelDropdown;
         [SerializeField] public Slider? PlaybackSpeedSlider;
         [SerializeField] public Button? ConfigButton, ExecuteButton, ExportButton;
@@ -159,12 +159,15 @@ namespace MarkovBlocks
             blockMeshes = BlockMeshGenerator.GenerateMeshes(buffers);
         }
 
-        private Dictionary<char, string>? GetExportPalette()
+        public Dictionary<char, CustomMappingItem>? GetExportPalette(HashSet<char> charSet)
         {
             if (currentConfModel is null || loadInfo.Loading)
                 return null;
             
-            return currentConfModel.CustomMapping.ToDictionary(x => x.Character, x => x.BlockState);
+            var mapAsDict = currentConfModel.CustomMapping.ToDictionary(x => x.Character, x => x);
+            
+            return palette.Where(x => charSet.Contains(x.Key)).ToDictionary(x => x.Key, x => mapAsDict.ContainsKey(x.Key) ? mapAsDict[x.Key] :
+                    new CustomMappingItem() { Character = x.Key, BlockState = string.Empty, Color = ColorConvert.GetOpaqueColor32(x.Value.y) });
         }
 
         public IEnumerator UpdateConfiguredModel(string confModelFile, ConfiguredModel confModel)
@@ -238,7 +241,7 @@ namespace MarkovBlocks
 
             foreach (var item in confModel.CustomMapping) // Read and assign custom mapping
             {
-                int rgba = ColorConvert.GetRGBA(item.Color);
+                int rgb = ColorConvert.GetRGB(item.Color);
 
                 if (!string.IsNullOrWhiteSpace(item.BlockState))
                 {
@@ -250,15 +253,15 @@ namespace MarkovBlocks
                         //Debug.Log($"Mapped '{item.Character}' to [{stateId}] {state}");
 
                         if (stateId2Mesh.TryAdd(stateId, blockMeshCount))
-                            palette[item.Character] = new(blockMeshCount++, rgba);
+                            palette[item.Character] = new(blockMeshCount++, rgb);
                         else // The mesh of this block state is already regestered, just use it
-                            palette[item.Character] = new(stateId2Mesh[stateId], rgba);
+                            palette[item.Character] = new(stateId2Mesh[stateId], rgb);
                     }
                     else // Default cube mesh with custom color
-                        palette[item.Character] = new(0, rgba);
+                        palette[item.Character] = new(0, rgb);
                 }
                 else // Default cube mesh with custom color
-                    palette[item.Character] = new(0, rgba);
+                    palette[item.Character] = new(0, rgb);
                 
                 yield return null;
             }
@@ -427,6 +430,12 @@ namespace MarkovBlocks
                         ConfigButton.onClick.AddListener(() => GetComponent<ScreenManager>().SetActiveScreenByType<ModelEditorScreen>() );
                     }
 
+                    if (ExportButton != null)
+                    {
+                        ExportButton.onClick.RemoveAllListeners();
+                        ExportButton.onClick.AddListener(() => GetComponent<ScreenManager>().SetActiveScreenByType<ExporterScreen>() );
+                    }
+
                     if (ExecuteButton != null)
                     {
                         ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Start Execution";
@@ -478,6 +487,9 @@ namespace MarkovBlocks
 
             if (loadInfo.Loading && GenerationText != null)
                 GenerationText.text = loadInfo.InfoText;
+            
+            if (FPSText != null)
+                FPSText.text = $"FPS:{((int)(1 / Time.unscaledDeltaTime)).ToString().PadLeft(4, ' ')}";
             
             if (isPaused) return;
             
@@ -543,6 +555,15 @@ namespace MarkovBlocks
 
                 selectedResult = null;
             }
+        }
+
+        public (byte[] state, char[] legend, int FX, int FY, int FZ)? GetSelectedResultData()
+        {
+            if (selectedResult == null || !selectedResult.Valid || !selectedResult.Completed)
+                return null;
+
+            // Result data should be present if the generation is completed
+            return selectedResult.Data;
         }
 
         private void ClearUpScene()

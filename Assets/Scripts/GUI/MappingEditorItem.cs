@@ -7,6 +7,9 @@ namespace MarkovBlocks
 {
     public class MappingEditorItem : MonoBehaviour
     {
+        [SerializeField] Color32 ActiveTagColor;
+        [SerializeField] Color32 LockedTagColor;
+
         [SerializeField] Color32 MappingColor;
 
         [SerializeField] Image? ColorPreviewImage, MarkCornerImage;
@@ -44,8 +47,6 @@ namespace MarkovBlocks
             // Black state input
             BlockStateInput.text = blockState;
 
-            TagAsSpecial(false);
-
             SetOverridesPaletteColor(defoRgb != rgb);
 
             // Assign control events (should get called only once)
@@ -57,7 +58,7 @@ namespace MarkovBlocks
 
         public void UpdateColorCode(string colorHex)
         {
-            int newRgb = ColorConvert.RGBFromHexString(colorHex);
+            int newRgb = ColorConvert.RGBFromHexString(colorHex.PadLeft(6, '0'));
             ColorPreviewImage!.color = ColorConvert.GetOpaqueColor32(newRgb);
 
             if (newRgb == defaultRgb)
@@ -84,9 +85,19 @@ namespace MarkovBlocks
             return blockState;
         }
 
-        public void TagAsSpecial(bool s)
+        public void TagAsActive()
         {
-            MarkCornerImage?.gameObject.SetActive(s);
+            MarkCornerImage!.gameObject.SetActive(true);
+            MarkCornerImage!.color = ActiveTagColor;
+        }
+
+        public void TagAsLocked(string blockState)
+        {
+            BlockStateInput!.text = blockState;
+            BlockStateInput.interactable = false;
+
+            MarkCornerImage!.gameObject.SetActive(true);
+            MarkCornerImage!.color = LockedTagColor;
         }
 
         public void SetOverridesPaletteColor(bool o)

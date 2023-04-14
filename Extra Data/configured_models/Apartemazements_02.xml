@@ -5,13 +5,11 @@
     <Seed Value="456" />
   </Seeds>
   <CustomMapping>
-    <Item Character="B" Color="00FFB9" />
-    <Item Character="P" Color="FF83DC" />
-    <Item Character="E" Color="FFFFFF" BlockState="minecraft:grass_block[snowy=false]" />
-    <Item Character="N" Color="FFFFFF" BlockState="minecraft:dirt" />
+    <Item Character="E" Color="008751" BlockState="minecraft:grass_block[snowy=false]" />
+    <Item Character="N" Color="AB5236" BlockState="minecraft:dirt" />
     <Item Character="A" Color="FFFFFF" BlockState="minecraft:white_concrete" />
     <Item Character="W" Color="FFC1C1" BlockState="minecraft:quartz_block" />
     <Item Character="R" Color="FF0000" BlockState="minecraft:red_concrete" />
-    <Item Character="C" Color="FFFFFF" BlockState="minecraft:diamond_block" />
+    <Item Character="C" Color="00FFFF" BlockState="minecraft:diamond_block" />
   </CustomMapping>
 </ConfiguredModel>

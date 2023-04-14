@@ -17,7 +17,7 @@ namespace MarkovBlocks
         private const string MODEL_FOLDER = "configured_models";
 
         [SerializeField] public TMP_Text? ScreenHeader;
-        // Settings panel
+        // Settings Panel
         [SerializeField] public TMP_Dropdown? ModelDropdown;
         [SerializeField] public TMP_InputField? SizeXInput;
         [SerializeField] public TMP_InputField? SizeYInput;
@@ -26,9 +26,8 @@ namespace MarkovBlocks
         [SerializeField] public TMP_InputField? StepsInput;
         [SerializeField] public TMP_InputField? SeedsInput;
         [SerializeField] public Toggle? AnimatedToggle;
-
         [SerializeField] public Button? SaveButton;
-
+        // Mapping Items Panel
         [SerializeField] public RectTransform? GridTransform;
         [SerializeField] public GameObject? MappingItemPrefab;
 
@@ -166,7 +165,7 @@ namespace MarkovBlocks
                 ScreenHeader.text = $"Editing {confModelFile}";
         }
 
-        public IEnumerator UpdateActiveCharSetFromModel(string modelFileName)
+        private IEnumerator UpdateActiveCharSetFromModel(string modelFileName)
         {
             working = true;
 
@@ -205,7 +204,7 @@ namespace MarkovBlocks
             working = false;
         }
 
-        public void UpdateDropdownOption(int newValue)
+        private void UpdateDropdownOption(int newValue)
         {
             if (working || !properlyLoaded) return;
 
@@ -253,7 +252,7 @@ namespace MarkovBlocks
 
         }
 
-        public void ShowActiveCharSet(HashSet<char> charSet)
+        private void ShowActiveCharSet(HashSet<char> charSet)
         {
             foreach (var mappingItem in mappingItems)
             {
@@ -316,10 +315,7 @@ namespace MarkovBlocks
             if (working) return;
             
             if (Input.GetKeyDown(KeyCode.Escape))
-            {
-
                 manager.SetActiveScreenByType<HUDScreen>();
-            }
 
         }
     }
