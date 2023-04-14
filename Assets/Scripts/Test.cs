@@ -52,7 +52,7 @@ namespace MarkovBlocks
         private BlockGeometry?[] blockGeometries = { };
         private float3[] blockTints = { };
         private int blockMeshCount = 0;
-        private readonly Dictionary<char, int2> fullPalette = new();
+        private readonly Dictionary<char, int2> palette = new();
         private Material? blockMaterial;
 
         private readonly LoadStateInfo loadInfo = new();
@@ -84,7 +84,7 @@ namespace MarkovBlocks
             }
         }
 
-        private void RedrawProcedureGraph(ConfiguredModel confModel, Dictionary<char, int2> palette)
+        private void RedrawProcedureGraph(ConfiguredModel confModel)
         {
             if (interpreter != null && GraphImage != null)
             {
@@ -159,6 +159,14 @@ namespace MarkovBlocks
             blockMeshes = BlockMeshGenerator.GenerateMeshes(buffers);
         }
 
+        private Dictionary<char, string>? GetExportPalette()
+        {
+            if (currentConfModel is null || loadInfo.Loading)
+                return null;
+            
+            return currentConfModel.CustomMapping.ToDictionary(x => x.Character, x => x.BlockState);
+        }
+
         public IEnumerator UpdateConfiguredModel(string confModelFile, ConfiguredModel confModel)
         {
             loadInfo.Loading = true;
@@ -212,7 +220,7 @@ namespace MarkovBlocks
             {
                 Debug.LogWarning("ERROR: Failed to create model interpreter");
                 loadInfo.Loading = false;
-                GenerationText!.text = $"Failed to create model interpreter";
+                GenerationText!.text = "Failed to create model interpreter";
                 yield break;
             }
 
@@ -221,13 +229,10 @@ namespace MarkovBlocks
             var statePalette = BlockStatePalette.INSTANCE;
             var stateId2Mesh = new Dictionary<int, int>(); // StateId => Mesh index
 
-            fullPalette.Clear();
+            palette.Clear();
 
-            Dictionary<char, int> basePalette = XDocument.Load(PathHelper.GetExtraDataFile("palette.xml")).Root.Elements("color")
-                    .ToDictionary(x => x.Get<char>("symbol"), x => ColorConvert.OpaqueRGBFromHexString(x.Get<string>("value")));
-            
-            foreach (var item in basePalette) // Use mesh #0 by default (cube mesh)
-                fullPalette.Add(item.Key, new(0, item.Value));
+            XDocument.Load(PathHelper.GetExtraDataFile("palette.xml")).Root.Elements("color").ToList().ForEach(x =>
+                    palette.Add(x.Get<char>("symbol"), new(0, ColorConvert.RGBFromHexString(x.Get<string>("value")))));
 
             blockMeshCount = 1; // #0 is preserved for default cube mesh
 
@@ -245,21 +250,21 @@ namespace MarkovBlocks
                         //Debug.Log($"Mapped '{item.Character}' to [{stateId}] {state}");
 
                         if (stateId2Mesh.TryAdd(stateId, blockMeshCount))
-                            fullPalette[item.Character] = new(blockMeshCount++, rgba);
+                            palette[item.Character] = new(blockMeshCount++, rgba);
                         else // The mesh of this block state is already regestered, just use it
-                            fullPalette[item.Character] = new(stateId2Mesh[stateId], rgba);
+                            palette[item.Character] = new(stateId2Mesh[stateId], rgba);
                     }
                     else // Default cube mesh with custom color
-                        fullPalette[item.Character] = new(0, rgba);
+                        palette[item.Character] = new(0, rgba);
                 }
                 else // Default cube mesh with custom color
-                    fullPalette[item.Character] = new(0, rgba);
+                    palette[item.Character] = new(0, rgba);
                 
                 yield return null;
             }
 
             // Update procedure graph
-            RedrawProcedureGraph(confModel, fullPalette);
+            RedrawProcedureGraph(confModel);
 
             yield return null;
 
@@ -316,7 +321,7 @@ namespace MarkovBlocks
 
         private IEnumerator RunGeneration()
         {
-            if (currentConfModel is null || interpreter is null || blockMaterial is null || GenerationText == null || GenerationResultPrefab is null)
+            if (executing || currentConfModel is null || interpreter is null || blockMaterial is null || GenerationText == null || GenerationResultPrefab is null)
             {
                 Debug.LogWarning("Generation cannot be initiated");
                 StopExecution();
@@ -342,6 +347,7 @@ namespace MarkovBlocks
                     break;
                 
                 int seed = seeds != null && k <= seeds.Length ? seeds[k - 1] : rand.Next();
+                int xCount = (k - 1) % resultPerLine,  zCount = (k - 1) / resultPerLine;
                 
                 var resultObj = GameObject.Instantiate(GenerationResultPrefab);
                 resultObj.name = $"Iteration #{k} (Seed: {seed})";
@@ -349,9 +355,9 @@ namespace MarkovBlocks
                 result.GenerationSeed = seed;
                 result.Iteration = k;
                 
-                int frameCount = 0;
+                int frameCount = 1;
 
-                (int3[], int2[])? dataRaw = null;
+                (byte[] state, char[] legend, int FX, int FY, int FZ) data = new();
 
                 foreach ((byte[] state, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, model.Steps, model.Animated))
                 {
@@ -361,39 +367,42 @@ namespace MarkovBlocks
                         break;
                     }
 
-                    int2[] stepPalette = legend.Select(ch => fullPalette[ch]).ToArray();
+                    data = new(state, legend, FX, FY, FZ);
                     float tick = 1F / playbackSpeed;
 
-                    if (dataRaw != null)
-                        BlockInstanceSpawner.VisualizeState(dataRaw.Value, materials, blockMeshes, tick, 0.5F);
+                    if (model.Animated) // Visualize this frame
+                    {
+                        int2[] stepPalette = legend.Select(ch => palette[ch]).ToArray();
 
-                    // Update generation text
-                    if (GenerationText != null)
-                        GenerationText.text = $"Iteration: #{k}\nFrame: {frameCount} ({(int)(tick * 1000)}ms/frame)";
+                        // Update generation text
+                        GenerationText.text = $"Iteration: #{k}\nFrame: {frameCount++} ({(int)(tick * 1000)}ms/frame)";
 
-                    frameCount++;
+                        var pos = new int3(xCount * (FX + 2), 0, zCount * (FY + 2));
+                        result.UpdateVolume(pos, new(FX, FZ, FY));
 
-                    int xCount = (k - 1) % resultPerLine,  zCount = (k - 1) / resultPerLine;
-                    var pos = new int3(xCount * (FX + 2), 0, zCount * (FY + 2));
-
-                    result.UpdateVolume(pos, new(FX, FZ, FY));
-
-                    dataRaw = BlockDataBuilder.GetInstanceData(state, FX, FY, FZ, pos, FZ > 1, stepPalette);
+                        var instanceData = BlockDataBuilder.GetInstanceData(state, FX, FY, FZ, pos, stepPalette);
+                        BlockInstanceSpawner.VisualizeState(instanceData, materials, blockMeshes, tick, 0.5F);
+                    }
 
                     yield return new WaitForSeconds(tick);
                 }
 
-                if (dataRaw is not null && executing)
+                if (executing) // Visualize final state (last frame)
                 {
-                    // The final visualization is persistent
-                    BlockInstanceSpawner.VisualizePersistentState(dataRaw.Value, materials, blockMeshes);
+                    var pos = new int3(xCount * (data.FX + 2), 0, zCount * (data.FY + 2));
+                    result.UpdateVolume(pos, new(data.FX, data.FZ, data.FY));
 
-                    result.SetData(dataRaw.Value);
+                    var instanceData = BlockDataBuilder.GetInstanceData(data.state!, data.FX, data.FY, data.FZ, pos,
+                            data.legend.Select(ch => palette[ch]).ToArray());
+
+                    // The final visualization is persistent
+                    BlockInstanceSpawner.VisualizePersistentState(instanceData, materials, blockMeshes);
+
+                    result.SetData(data);
 
                     Debug.Log($"Iteration #{k} complete. Frame Count: {frameCount}");
-                    GenerationText!.text = $"Iteration: #{k}\nGeneration Complete";
+                    GenerationText.text = $"Iteration: #{k}\nGeneration Complete";
                 }
-                
             }
 
             if (executing) // If the execution wasn't forced stopped
@@ -481,11 +490,11 @@ namespace MarkovBlocks
                     var ray = cam.ScreenPointToRay(Input.mousePosition);
                     RaycastHit hit;
 
-                    if (!EventSystem.current.IsPointerOverGameObject() && Physics.Raycast(ray.origin, ray.direction, out hit, 500F, VolumeLayerMask))
+                    if (!EventSystem.current.IsPointerOverGameObject() && Physics.Raycast(ray.origin, ray.direction, out hit, 1000F, VolumeLayerMask))
                     {
                         UpdateSelectedResult(hit.collider.gameObject.GetComponent<GenerationResult>());
 
-                        if (Input.GetKeyDown(KeyCode.Mouse0) && selectedResult!.Completed)
+                        if (Input.GetKeyDown(KeyCode.Mouse0) && selectedResult!.Completed) // Lock can only be applied to completed results
                         {
                             VolumeSelection!.Lock();
 

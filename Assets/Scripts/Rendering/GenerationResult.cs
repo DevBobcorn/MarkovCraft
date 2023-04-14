@@ -17,10 +17,10 @@ namespace MarkovBlocks
 
         private bool completed = false;
         public bool Completed => completed;
-        private (int3[], int2[])? data = null;
-        public (int3[], int2[])? Data => data;
+        private (byte[] state, char[] legend, int FX, int FY, int FZ)? data = null;
+        public (byte[] state, char[] legend, int FX, int FY, int FZ)? Data => data;
 
-        public void SetData((int3[], int2[]) data)
+        public void SetData((byte[] state, char[] legend, int FX, int FY, int FZ) data)
         {
             this.data = data;
 
