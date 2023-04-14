@@ -4923,6 +4923,7 @@ GameObject:
   - component: {fileID: 682298235}
   - component: {fileID: 682298234}
   - component: {fileID: 682298233}
+  - component: {fileID: 682298236}
   m_Layer: 5
   m_Name: Steps Input
   m_TagString: Untagged
@@ -5013,7 +5014,19 @@ MonoBehaviour:
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_OnSubmit:
     m_PersistentCalls:
       m_Calls: []
@@ -5088,6 +5101,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 682298231}
   m_CullTransparentMesh: 1
+--- !u!114 &682298236
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682298231}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad8d641ed1dc21447bca2c89b3ea05f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MinValue: 1000
+  MaxValue: 100000
 --- !u!1 &704448747
 GameObject:
   m_ObjectHideFlags: 0
@@ -5267,6 +5294,7 @@ GameObject:
   - component: {fileID: 713965358}
   - component: {fileID: 713965357}
   - component: {fileID: 713965356}
+  - component: {fileID: 713965359}
   m_Layer: 5
   m_Name: SizeZ Input
   m_TagString: Untagged
@@ -5431,6 +5459,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 713965354}
   m_CullTransparentMesh: 1
+--- !u!114 &713965359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 713965354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad8d641ed1dc21447bca2c89b3ea05f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MinValue: 1
+  MaxValue: 256
 --- !u!1 &719041272
 GameObject:
   m_ObjectHideFlags: 0
@@ -5480,6 +5522,7 @@ GameObject:
   - component: {fileID: 731267319}
   - component: {fileID: 731267318}
   - component: {fileID: 731267317}
+  - component: {fileID: 731267320}
   m_Layer: 5
   m_Name: SizeX Input
   m_TagString: Untagged
@@ -5570,7 +5613,19 @@ MonoBehaviour:
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1317409355}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_OnSubmit:
     m_PersistentCalls:
       m_Calls: []
@@ -5645,6 +5700,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 731267315}
   m_CullTransparentMesh: 1
+--- !u!114 &731267320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 731267315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad8d641ed1dc21447bca2c89b3ea05f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MinValue: 1
+  MaxValue: 256
 --- !u!1 &732912706
 GameObject:
   m_ObjectHideFlags: 0
@@ -5943,6 +6012,7 @@ GameObject:
   - component: {fileID: 791814467}
   - component: {fileID: 791814466}
   - component: {fileID: 791814465}
+  - component: {fileID: 791814468}
   m_Layer: 5
   m_Name: Amount Input
   m_TagString: Untagged
@@ -6108,6 +6178,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 791814463}
   m_CullTransparentMesh: 1
+--- !u!114 &791814468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 791814463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad8d641ed1dc21447bca2c89b3ea05f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MinValue: 1
+  MaxValue: 100
 --- !u!1 &824991722
 GameObject:
   m_ObjectHideFlags: 0
@@ -6439,6 +6523,7 @@ GameObject:
   - component: {fileID: 881584652}
   - component: {fileID: 881584651}
   - component: {fileID: 881584650}
+  - component: {fileID: 881584653}
   m_Layer: 5
   m_Name: SizeY Input
   m_TagString: Untagged
@@ -6603,6 +6688,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 881584648}
   m_CullTransparentMesh: 1
+--- !u!114 &881584653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 881584648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad8d641ed1dc21447bca2c89b3ea05f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MinValue: 1
+  MaxValue: 256
 --- !u!1 &926882343
 GameObject:
   m_ObjectHideFlags: 0
@@ -8012,7 +8111,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1702752178}
   m_HandleRect: {fileID: 1702752177}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -10416,7 +10515,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 333209633}
   m_HandleRect: {fileID: 333209632}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -12157,7 +12256,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1450860884}
   m_HandleRect: {fileID: 1450860883}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -12652,7 +12751,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1968043859}
   m_HandleRect: {fileID: 1968043858}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

@@ -16,11 +16,16 @@ MonoBehaviour:
   SizeX: 5
   SizeY: 6
   SizeZ: 7
-  Amount: 1
+  Amount: 2
   Steps: 1000
-  Animated: 1
+  Animated: 0
   Seeds: 
   CustomMapping:
+  - Character: 80
+    BlockState: 
+    Color:
+      serializedVersion: 2
+      rgba: 4287142399
   - Character: 69
     BlockState: minecraft:grass_block[snowy=false]
     Color:
@@ -30,7 +35,12 @@ MonoBehaviour:
     BlockState: minecraft:dirt
     Color:
       serializedVersion: 2
-      rgba: 4280971703
+      rgba: 4281750187
+  - Character: 65
+    BlockState: minecraft:quartz_block
+    Color:
+      serializedVersion: 2
+      rgba: 4291546111
   - Character: 87
     BlockState: minecraft:quartz_block
     Color:
@@ -41,11 +51,6 @@ MonoBehaviour:
     Color:
       serializedVersion: 2
       rgba: 4287413223
-  - Character: 65
-    BlockState: minecraft:quartz_block
-    Color:
-      serializedVersion: 2
-      rgba: 4291546111
   - Character: 67
     BlockState: minecraft:diamond_block
     Color:

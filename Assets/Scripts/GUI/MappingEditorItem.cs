@@ -58,7 +58,7 @@ namespace MarkovBlocks
 
         public void UpdateColorCode(string colorHex)
         {
-            int newRgb = ColorConvert.RGBFromHexString(colorHex.PadLeft(6, '0'));
+            int newRgb = ColorConvert.RGBFromHexString(colorHex.PadRight(6, '0'));
             ColorPreviewImage!.color = ColorConvert.GetOpaqueColor32(newRgb);
 
             if (newRgb == defaultRgb)
