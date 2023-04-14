@@ -6,7 +6,7 @@ namespace MarkovBlocks
 {
     public static class BlockDataBuilder
     {
-        private static bool checkAir(byte block) => block == 0;
+        private static bool checkAir3d(byte block) => block == 0;
 
         public static (int3[], int2[]) GetInstanceData(byte[] states, int FX, int FY, int FZ, int3 pos, int2[] palette)
         {
@@ -17,21 +17,26 @@ namespace MarkovBlocks
             {
                 byte v = states[x + y * FX + z * FX * FY];
                 
-                if (!checkAir(v)) // Not air, do face culling
+                if (FZ == 1) // 2d mode, byte 0 is not air
+                {
+                    posData.Add(new int3(x, z, y) + pos);
+                    meshData.Add(palette[v]);
+                }
+                else if (!checkAir3d(v)) // 3d mode, byte 0 is air
                 {
                     var notCulled = false;
 
-                    if      (z == FZ - 1 || checkAir(states[x + y * FX + (z + 1) * FX * FY])) // Unity +Y (Up)    | Markov +Z
+                    if      (z == FZ - 1 || checkAir3d(states[x + y * FX + (z + 1) * FX * FY])) // Unity +Y (Up)    | Markov +Z
                         notCulled = true;
-                    else if (z ==      0 || checkAir(states[x + y * FX + (z - 1) * FX * FY])) // Unity -Y (Down)  | Markov -Z
+                    else if (z ==      0 || checkAir3d(states[x + y * FX + (z - 1) * FX * FY])) // Unity -Y (Down)  | Markov -Z
                         notCulled = true;
-                    else if (x == FX - 1 || checkAir(states[(x + 1) + y * FX + z * FX * FY])) // Unity +X (South) | Markov +X
+                    else if (x == FX - 1 || checkAir3d(states[(x + 1) + y * FX + z * FX * FY])) // Unity +X (South) | Markov +X
                         notCulled = true;
-                    else if (x ==      0 || checkAir(states[(x - 1) + y * FX + z * FX * FY])) // Unity -X (North) | Markov -X
+                    else if (x ==      0 || checkAir3d(states[(x - 1) + y * FX + z * FX * FY])) // Unity -X (North) | Markov -X
                         notCulled = true;
-                    else if (y == FY - 1 || checkAir(states[x + (y + 1) * FX + z * FX * FY])) // Unity +Z (East)  | Markov +Y
+                    else if (y == FY - 1 || checkAir3d(states[x + (y + 1) * FX + z * FX * FY])) // Unity +Z (East)  | Markov +Y
                         notCulled = true;
-                    else if (y ==      0 || checkAir(states[x + (y - 1) * FX + z * FX * FY])) // Unity -Z (East)  | Markov +Y
+                    else if (y ==      0 || checkAir3d(states[x + (y - 1) * FX + z * FX * FY])) // Unity -Z (East)  | Markov +Y
                         notCulled = true;
 
                     if (notCulled) // At least one side of this cube is visible
