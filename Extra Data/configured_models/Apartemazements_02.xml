@@ -3,6 +3,8 @@
   <Seeds>
     <Seed Value="123" />
     <Seed Value="456" />
+    <Seed Value="789" />
+    <Seed Value="12" />
   </Seeds>
   <CustomMapping>
     <Item Character="E" Color="008751" BlockState="minecraft:grass_block[snowy=false]" />
@@ -10,6 +12,6 @@
     <Item Character="A" Color="FFFFFF" BlockState="minecraft:white_concrete" />
     <Item Character="W" Color="FFC1C1" BlockState="minecraft:quartz_block" />
     <Item Character="R" Color="FF0000" BlockState="minecraft:red_concrete" />
-    <Item Character="C" Color="00FFFF" BlockState="minecraft:diamond_block" />
+    <Item Character="C" Color="00FFFF" BlockState="minecraft:sea_lantern" />
   </CustomMapping>
 </ConfiguredModel>

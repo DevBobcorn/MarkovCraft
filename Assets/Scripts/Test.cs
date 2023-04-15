@@ -38,7 +38,7 @@ namespace MarkovBlocks
         private GenerationResult? selectedResult = null;
 
         private string confModelFile = string.Empty;
-        public string ConfiguredModelName => confModelFile;
+        public string ConfiguredModelFile => confModelFile;
         private readonly Dictionary<int, string> loadedConfModels = new();
         private ConfiguredModel? currentConfModel = null;
 
@@ -344,6 +344,8 @@ namespace MarkovBlocks
             System.Random rand = new();
             var seeds = model.Seeds;
 
+            List<GenerationResult> results = new();
+
             for (int k = 1; k <= model.Amount; k++)
             {
                 if (!executing) // Stop execution
@@ -353,10 +355,12 @@ namespace MarkovBlocks
                 int xCount = (k - 1) % resultPerLine,  zCount = (k - 1) / resultPerLine;
                 
                 var resultObj = GameObject.Instantiate(GenerationResultPrefab);
-                resultObj.name = $"Iteration #{k} (Seed: {seed})";
+                resultObj.name = $"Result #{k} (Seed: {seed})";
                 var result = resultObj!.GetComponent<GenerationResult>();
                 result.GenerationSeed = seed;
                 result.Iteration = k;
+
+                results.Add(result);
                 
                 int frameCount = 1;
 
@@ -375,15 +379,13 @@ namespace MarkovBlocks
 
                     if (model.Animated) // Visualize this frame
                     {
-                        int2[] stepPalette = legend.Select(ch => palette[ch]).ToArray();
-
                         // Update generation text
                         GenerationText.text = $"Iteration: #{k}\nFrame: {frameCount++} ({(int)(tick * 1000)}ms/frame)";
 
                         var pos = new int3(xCount * (FX + 2), 0, zCount * (FY + 2));
                         result.UpdateVolume(pos, new(FX, FZ, FY));
 
-                        var instanceData = BlockDataBuilder.GetInstanceData(state, FX, FY, FZ, pos, stepPalette);
+                        var instanceData = BlockDataBuilder.GetInstanceData(state, FX, FY, FZ, pos, legend.Select(ch => palette[ch]).ToArray());
                         BlockInstanceSpawner.VisualizeState(instanceData, materials, blockMeshes, tick, 0.5F);
                     }
 
@@ -401,7 +403,13 @@ namespace MarkovBlocks
                     // The final visualization is persistent
                     BlockInstanceSpawner.VisualizePersistentState(instanceData, materials, blockMeshes);
 
-                    result.SetData(data);
+                    var stateClone = new byte[data.state!.Length];
+                    Array.Copy(data.state!, stateClone, stateClone.Length);
+
+                    var legendClone = new char[data.legend!.Length];
+                    Array.Copy(data.legend!, legendClone, legendClone.Length);
+
+                    result.SetData((new[] { confModelFile, $"{seed}" }, stateClone, legendClone, data.FX, data.FY, data.FZ));
 
                     Debug.Log($"Iteration #{k} complete. Frame Count: {frameCount}");
                     GenerationText.text = $"Iteration: #{k}\nGeneration Complete";
@@ -415,7 +423,7 @@ namespace MarkovBlocks
         void Start()
         {
             // First load Minecraft data & resources
-            StartCoroutine(LoadMCData("markov", new string[] {
+            StartCoroutine(LoadMCData("1.16", new string[] {
                     "vanilla-1.16.5", "vanilla_fix", "default"
                 }, () => {
                     if (PlaybackSpeedSlider != null)
@@ -540,7 +548,7 @@ namespace MarkovBlocks
             {
                 var size = newResult.GenerationSize;
 
-                VolumeText!.text = $"Iteration #{newResult.Iteration} Seed: {newResult.GenerationSeed}\nSize: {size.x}x{size.y}x{size.z}";
+                VolumeText!.text = $"Result #{newResult.Iteration} Seed: {newResult.GenerationSeed}\nSize: {size.x}x{size.y}x{size.z}";
                 VolumeSelection!.UpdateVolume(newResult.GetVolumePosition(), newResult.GetVolumeSize());
             
                 selectedResult = newResult;
@@ -557,7 +565,7 @@ namespace MarkovBlocks
             }
         }
 
-        public (byte[] state, char[] legend, int FX, int FY, int FZ)? GetSelectedResultData()
+        public (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ)? GetSelectedResultData()
         {
             if (selectedResult == null || !selectedResult.Valid || !selectedResult.Completed)
                 return null;

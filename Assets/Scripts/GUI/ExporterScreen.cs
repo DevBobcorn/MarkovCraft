@@ -10,21 +10,32 @@ namespace MarkovBlocks
 {
     public class ExporterScreen : BaseScreen
     {
-        [SerializeField] public TMP_Text? ScreenHeader;
+        [SerializeField] public TMP_Text? ScreenHeader, InfoText;
         // Settings Panel
         [SerializeField] public Button? ExportButton;
         // Mapping Items Panel
         [SerializeField] public RectTransform? GridTransform;
         [SerializeField] public GameObject? MappingItemPrefab;
 
+        private (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ)? exportData;
+        private Dictionary<char, CustomMappingItem>? exportPalette;
+
         private readonly List<MappingEditorItem> mappingItems = new();
         private bool working = false, properlyLoaded = false;
-        private string confModelFile = string.Empty;
 
         public override bool ShouldPause() => true;
 
-        private IEnumerator InitializeScreen((byte[] state, char[] legend, int FX, int FY, int FZ) data, Dictionary<char, CustomMappingItem> exportPalette, HashSet<char> minimumCharSet)
+        private IEnumerator InitializeScreen(HashSet<char> minimumCharSet)
         {
+            if (exportData is null || exportPalette is null)
+            {
+                Debug.LogWarning($"ERROR: Export data is not complete!");
+                working = false;
+                properlyLoaded = false;
+                yield break;
+            }
+
+            var data = exportData.Value;
             bool is2d = data.FZ == 1;
 
             // Initialize settings panel
@@ -71,7 +82,11 @@ namespace MarkovBlocks
             properlyLoaded = true;
 
             if (ScreenHeader != null)
-                ScreenHeader.text = $"Editing {confModelFile}";
+                ScreenHeader.text = $"Exporting generation result of {data.info[0]}";
+            
+            if (InfoText != null)
+                InfoText.text = $"Configured Model:\n<u>{data.info[0]}</u>\n\nSeed:\n<u>{data.info[1]}</u>\n\nSize:\n<u>{data.FX}x{data.FZ}x{data.FY}</u>";
+            
         }
 
         public override void OnShow(ScreenManager manager)
@@ -86,16 +101,15 @@ namespace MarkovBlocks
             var game = Test.Instance;
             
             // Get selected result data
-            var data = game.GetSelectedResultData();
+            exportData = game.GetSelectedResultData();
             // Get export palette
-            Dictionary<char, CustomMappingItem>? exportPalette = null;
             var minimumCharSet = new HashSet<char>();
             
-            if (data is not null)
+            if (exportData is not null)
             {
                 // Find out characters that appeared in the final result
-                var finalLegend = data.Value.legend;
-                var byteVals = data.Value.state.ToHashSet();
+                var finalLegend = exportData.Value.legend;
+                var byteVals = exportData.Value.state.ToHashSet();
 
                 foreach (var v in byteVals)
                     minimumCharSet.Add(finalLegend[v]);
@@ -103,7 +117,7 @@ namespace MarkovBlocks
                 exportPalette = game.GetExportPalette(finalLegend.ToHashSet());
             }
             
-            if (data is null || exportPalette is null || ExportButton == null || GridTransform == null)
+            if (exportData is null || exportPalette is null || ExportButton == null || GridTransform == null)
             {
                 Debug.LogWarning("Exporter is not properly loaded!");
 
@@ -114,7 +128,7 @@ namespace MarkovBlocks
                 return;
             }
 
-            StartCoroutine(InitializeScreen(data.Value, exportPalette, minimumCharSet));
+            StartCoroutine(InitializeScreen(minimumCharSet));
         }
 
         public override void OnHide(ScreenManager manager)
@@ -136,11 +150,14 @@ namespace MarkovBlocks
             {
                 working = true;
 
-                // TODO: Do work
+                var d = exportData!.Value;
+
+                // Both field shouldn't be null if exporter laods properly
+                McFuncExporter.Export(d.info, d.state, d.legend, d.FX, d.FY, d.FZ, exportPalette!);
                 
                 working = false;
 
-                //manager?.SetActiveScreenByType<HUDScreen>();
+                manager?.SetActiveScreenByType<HUDScreen>();
             }
 
         }

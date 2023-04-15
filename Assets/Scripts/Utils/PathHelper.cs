@@ -30,5 +30,10 @@ namespace MarkovBlocks
             return Directory.GetParent(Application.dataPath).ToString().Replace('\\', '/') + "/Extra Data/" + fileName;
         }
 
+        public static string GetExportedFile(string fileName)
+        {
+            return Directory.GetParent(Application.dataPath).ToString().Replace('\\', '/') + "/Exported/" + fileName;
+        }
+
     }
 }

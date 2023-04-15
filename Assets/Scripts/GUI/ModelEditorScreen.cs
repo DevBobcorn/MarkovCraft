@@ -224,7 +224,7 @@ namespace MarkovBlocks
             if (ScreenHeader != null)
                 ScreenHeader.text = "Loading...";
             
-            confModelFile = Test.Instance.ConfiguredModelName;
+            confModelFile = Test.Instance.ConfiguredModelFile;
             
             if (ModelDropdown == null || SizeXInput == null || SizeYInput == null || SizeZInput == null ||SaveButton == null ||
                     AmountInput == null || StepsInput == null || SeedsInput == null || AnimatedToggle == null || GridTransform == null)
@@ -238,7 +238,7 @@ namespace MarkovBlocks
                 return;
             }
 
-            StartCoroutine(InitializeScreen(Test.Instance.ConfiguredModelName));
+            StartCoroutine(InitializeScreen(Test.Instance.ConfiguredModelFile));
         }
 
         public override void OnHide(ScreenManager manager)
@@ -291,12 +291,6 @@ namespace MarkovBlocks
                         Color = ColorConvert.OpaqueColor32FromHexString(x.GetColorCode()),
                         BlockState = x.GetBlockState()
                     }).ToArray();
-
-                    Debug.Log($"M: {model.CustomMapping.Length} out of {mappingItems.Count}");
-                    foreach (var m in model.CustomMapping)
-                    {
-                        Debug.Log($"{m.Character} => {m.Color} {m.BlockState}");
-                    }
                     
                     ConfiguredModel.GetXMLDoc(model).Save($"{PathHelper.GetExtraDataFile("configured_models")}/{confModelFile}");
                 }
