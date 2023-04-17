@@ -16,7 +16,7 @@ MonoBehaviour:
   SizeX: 5
   SizeY: 6
   SizeZ: 7
-  Amount: 2
+  Amount: 1
   Steps: 1000
   Animated: 0
   Seeds: 
@@ -52,7 +52,7 @@ MonoBehaviour:
       serializedVersion: 2
       rgba: 4287413223
   - Character: 67
-    BlockState: minecraft:diamond_block
+    BlockState: minecraft:sea_lantern
     Color:
       serializedVersion: 2
       rgba: 4294959360

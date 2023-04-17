@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,9 +11,11 @@ namespace MarkovBlocks
 {
     public class ExporterScreen : BaseScreen
     {
+        private const string EXPORT_PATH_KEY = "ExportPath";
         [SerializeField] public TMP_Text? ScreenHeader, InfoText;
         // Settings Panel
-        [SerializeField] public Button? ExportButton;
+        [SerializeField] public TMP_InputField? ExportFolderInput;
+        [SerializeField] public Button? ExportButton, OpenExplorerButton;
         // Mapping Items Panel
         [SerializeField] public RectTransform? GridTransform;
         [SerializeField] public GameObject? MappingItemPrefab;
@@ -25,9 +28,12 @@ namespace MarkovBlocks
 
         public override bool ShouldPause() => true;
 
+        private bool CheckWindows() => Application.platform == RuntimePlatform.WindowsEditor ||
+                Application.platform == RuntimePlatform.WindowsPlayer;
+
         private IEnumerator InitializeScreen(HashSet<char> minimumCharSet)
         {
-            if (exportData is null || exportPalette is null)
+            if (exportData is null || exportPalette is null || ExportFolderInput == null || ExportButton == null || OpenExplorerButton == null)
             {
                 Debug.LogWarning($"ERROR: Export data is not complete!");
                 working = false;
@@ -39,9 +45,17 @@ namespace MarkovBlocks
             bool is2d = data.FZ == 1;
 
             // Initialize settings panel
-            ExportButton!.onClick.RemoveAllListeners();
+            var savedExportPath = PlayerPrefs.GetString(EXPORT_PATH_KEY, Directory.GetParent(Application.dataPath).ToString());
+            ExportFolderInput.text = savedExportPath;
+            if (CheckWindows())
+            {
+                OpenExplorerButton.onClick.RemoveAllListeners();
+                OpenExplorerButton.onClick.AddListener(ShowExplorer);
+            }
+            else // Hide this button
+                OpenExplorerButton.gameObject.SetActive(false);
+            ExportButton.onClick.RemoveAllListeners();
             ExportButton.onClick.AddListener(Export);
-
             // Initialize mappings panel
             // Populate mapping item grid
             foreach (var ch in exportPalette.Keys)
@@ -150,16 +164,41 @@ namespace MarkovBlocks
             {
                 working = true;
 
-                var d = exportData!.Value;
+                var path = ExportFolderInput!.text;
+                var data = exportData!.Value;
+
+                var dirInfo = new DirectoryInfo(path);
+
+                if (!dirInfo.Exists)
+                {
+                    try {
+                        dirInfo.Create();
+                    }
+                    catch (IOException e)
+                    {
+                        Debug.LogWarning($"ERROR: Failed to create export folder: {e}");
+                        working = false;
+                        return;
+                    }
+                }
+                
+                // SavePath is vaild, save it
+                PlayerPrefs.SetString(EXPORT_PATH_KEY, dirInfo.FullName);
 
                 // Both field shouldn't be null if exporter laods properly
-                McFuncExporter.Export(d.info, d.state, d.legend, d.FX, d.FY, d.FZ, exportPalette!);
+                McFuncExporter.Export(data.info, data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo);
                 
                 working = false;
 
                 manager?.SetActiveScreenByType<HUDScreen>();
             }
 
+        }
+
+        public void ShowExplorer()
+        {
+            if (CheckWindows())
+                System.Diagnostics.Process.Start("explorer.exe", $"/select,{ExportFolderInput!.text.Replace("/", @"\")}");
         }
 
         public override void ScreenUpdate(ScreenManager manager)

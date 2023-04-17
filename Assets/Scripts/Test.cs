@@ -366,7 +366,9 @@ namespace MarkovBlocks
 
                 (byte[] state, char[] legend, int FX, int FY, int FZ) data = new();
 
-                foreach ((byte[] state, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, model.Steps, model.Animated))
+                int stepsPerFrame = model.Animated ? model.Steps : 50000;
+
+                foreach ((byte[] state, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, stepsPerFrame, model.Animated))
                 {
                     if (!executing) // Stop execution
                     {

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ConfiguredModel Model="CarmaTower" SizeX="12" SizeY="12" SizeZ="18" Amount="1" Steps="1000" Animated="false">
+  <Seeds>
+    <Seed Value="123" />
+  </Seeds>
+  <CustomMapping>
+    <Item Character="D" Color="5F574F" BlockState="minecraft:white_concrete" />
+    <Item Character="W" Color="FFF1E8" BlockState="minecraft:sea_lantern" />
+    <Item Character="Y" Color="FFEC27" BlockState="minecraft:shroomlight" />
+    <Item Character="a" Color="A28879" BlockState="minecraft:light_gray_concrete" />
+    <Item Character="L" Color="847E87" BlockState="minecraft:gray_concrete" />
+    <Item Character="l" Color="696A6A" BlockState="minecraft:light_gray_concrete" />
+  </CustomMapping>
+</ConfiguredModel>

@@ -18,6 +18,6 @@ MonoBehaviour:
   SizeZ: 1
   Amount: 1
   Steps: 1000
-  Animated: 1
+  Animated: 0
   Seeds: 
   CustomMapping: []

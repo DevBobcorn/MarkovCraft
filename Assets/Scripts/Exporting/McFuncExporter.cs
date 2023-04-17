@@ -15,7 +15,7 @@ namespace MarkovBlocks
         private static bool checkAir3d(byte index) => index == 0;
 
         public static void Export(string[] info, byte[] state, char[] legend, int FX, int FY, int FZ,
-                Dictionary<char, CustomMappingItem> exportPalette)
+                Dictionary<char, CustomMappingItem> exportPalette, DirectoryInfo dirInfo)
         {
             var funcText = new StringBuilder();
 
@@ -38,10 +38,13 @@ namespace MarkovBlocks
                 }
             }
 
-            var path = PathHelper.GetExportedFile($"{info[0][0..^4].ToLower()}_{info[1]}.mcfunction");
-            File.WriteAllText(path, funcText.ToString());
+            var fileName = $"{info[0][0..^4].ToLower()}_{info[1]}.mcfunction";
+            var filePath = $"{dirInfo.FullName}/{fileName}";
+            
+            File.WriteAllText(filePath, funcText.ToString());
 
-            Debug.Log($"Find it at {path}");
+            Debug.Log($"McFunction file exported to {filePath}");
+
         }
     }
 }
