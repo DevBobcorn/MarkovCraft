@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ConfiguredModel Model="CarmaTower" SizeX="12" SizeY="12" SizeZ="18" Amount="1" Steps="1000" Animated="false">
+<ConfiguredModel Model="CarmaTower" SizeX="12" SizeY="12" SizeZ="18" Amount="9" Steps="1000" Animated="false">
   <Seeds>
     <Seed Value="123" />
   </Seeds>

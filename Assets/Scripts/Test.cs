@@ -362,21 +362,38 @@ namespace MarkovBlocks
 
                 results.Add(result);
                 
+                GenerationText.text = $"Iteration: #{k}\nWorking...";
                 int frameCount = 1;
 
                 (byte[] state, char[] legend, int FX, int FY, int FZ) data = new();
 
                 int stepsPerFrame = model.Animated ? model.Steps : 50000;
 
-                foreach ((byte[] state, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, stepsPerFrame, model.Animated))
+                var enumerator = interpreter.Run(seed, stepsPerFrame, model.Animated).GetEnumerator();
+
+                bool hasNext = true;
+
+                while (hasNext)
                 {
+                    bool frameCompleted = false;
+
+                    Task.Run(() => {
+                        hasNext = enumerator.MoveNext();
+                        frameCompleted = true;
+                    });
+
+                    data = enumerator.Current;
+
+                    while (!frameCompleted)
+                        yield return null;
+
                     if (!executing) // Stop execution
                     {
                         Destroy(resultObj);
                         break;
                     }
 
-                    data = new(state, legend, FX, FY, FZ);
+                    
                     float tick = 1F / playbackSpeed;
 
                     if (model.Animated) // Visualize this frame
@@ -384,10 +401,10 @@ namespace MarkovBlocks
                         // Update generation text
                         GenerationText.text = $"Iteration: #{k}\nFrame: {frameCount++} ({(int)(tick * 1000)}ms/frame)";
 
-                        var pos = new int3(xCount * (FX + 2), 0, zCount * (FY + 2));
-                        result.UpdateVolume(pos, new(FX, FZ, FY));
+                        var pos = new int3(xCount * (data.FX + 2), 0, zCount * (data.FY + 2));
+                        result.UpdateVolume(pos, new(data.FX, data.FZ, data.FY));
 
-                        var instanceData = BlockDataBuilder.GetInstanceData(state, FX, FY, FZ, pos, legend.Select(ch => palette[ch]).ToArray());
+                        var instanceData = BlockDataBuilder.GetInstanceData(data.state!, data.FX, data.FY, data.FZ, pos, data.legend.Select(ch => palette[ch]).ToArray());
                         BlockInstanceSpawner.VisualizeState(instanceData, materials, blockMeshes, tick, 0.5F);
                     }
 
