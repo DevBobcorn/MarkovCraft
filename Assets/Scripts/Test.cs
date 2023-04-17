@@ -382,10 +382,10 @@ namespace MarkovBlocks
                         frameCompleted = true;
                     });
 
-                    data = enumerator.Current;
-
                     while (!frameCompleted)
                         yield return null;
+                    
+                    data = enumerator.Current;
 
                     if (!executing) // Stop execution
                     {
