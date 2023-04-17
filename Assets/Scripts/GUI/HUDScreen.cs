@@ -7,7 +7,7 @@ namespace MarkovBlocks
     {
         public override void ScreenUpdate(ScreenManager manager)
         {
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.E))
             {
                 manager.SetActiveScreenByType<ModelEditorScreen>();
             }

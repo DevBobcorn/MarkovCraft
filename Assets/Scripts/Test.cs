@@ -175,6 +175,9 @@ namespace MarkovBlocks
             loadInfo.Loading = true;
             loadInfo.InfoText = $"Loading configured model [{confModelFile}]...";
 
+            ExecuteButton!.interactable = false;
+            ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Loading...";
+
             ClearUpScene();
 
             string fileName = PathHelper.GetExtraDataFile($"models/{confModel.Model}.xml");
@@ -278,12 +281,19 @@ namespace MarkovBlocks
 
             loadInfo.Loading = false;
 
+            ExecuteButton!.interactable = true;
+            ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Start Execution";
+            ExecuteButton.onClick.RemoveAllListeners();
+            ExecuteButton.onClick.AddListener(StartExecution);
+
             GenerationText!.text = $"[{confModelFile}] loaded";
         }
 
         private IEnumerator LoadMCData(string dataVersion, string[] packs, Action? callback = null)
         {
             loadInfo.Loading = true;
+            ExecuteButton!.interactable = false;
+            ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Loading Res...";
 
             // First load all possible Block States...
             var loadFlag = new DataLoadFlag();
@@ -393,7 +403,6 @@ namespace MarkovBlocks
                         break;
                     }
 
-                    
                     float tick = 1F / playbackSpeed;
 
                     if (model.Animated) // Visualize this frame
@@ -461,13 +470,6 @@ namespace MarkovBlocks
                     {
                         ExportButton.onClick.RemoveAllListeners();
                         ExportButton.onClick.AddListener(() => GetComponent<ScreenManager>().SetActiveScreenByType<ExporterScreen>() );
-                    }
-
-                    if (ExecuteButton != null)
-                    {
-                        ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Start Execution";
-                        ExecuteButton.onClick.RemoveAllListeners();
-                        ExecuteButton.onClick.AddListener(StartExecution);
                     }
 
                     var dir = PathHelper.GetExtraDataFile("configured_models");
