@@ -22,6 +22,7 @@ namespace MarkovCraft
     public class Test : MonoBehaviour
     {
         public const int WINDOWED_APP_WIDTH = 1600, WINDOWED_APP_HEIGHT = 900;
+        [SerializeField] public VersionHolder? VersionHolder;
 
         [SerializeField] public CameraController? CamController;
         [SerializeField] public LayerMask VolumeLayerMask;
@@ -453,8 +454,10 @@ namespace MarkovCraft
         void Start()
         {
             // First load Minecraft data & resources
-            StartCoroutine(LoadMCData("1.16", new string[] {
-                    "vanilla-1.16.5", "vanilla_fix", "default"
+            var ver = VersionHolder!.Versions[VersionHolder.SelectedVersion];
+
+            StartCoroutine(LoadMCData(ver.DataVersion, new string[] {
+                    $"vanilla-{ver.ResourceVersion}", "vanilla_fix", "default"
                 }, () => {
                     if (PlaybackSpeedSlider != null)
                     {

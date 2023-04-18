@@ -10837,6 +10837,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9496ae6a463be243b18a27185073a43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  VersionHolder: {fileID: 11400000, guid: bc823ebabdbef7e4c983fa336ef998ad, type: 2}
   CamController: {fileID: 330585548}
   VolumeLayerMask:
     serializedVersion: 2
