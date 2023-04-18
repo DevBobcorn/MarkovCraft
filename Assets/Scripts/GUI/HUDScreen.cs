@@ -19,7 +19,11 @@ namespace MarkovCraft
                 if (!game!.Loading)
                     manager.SetActiveScreenByType<ModelEditorScreen>();
             }
-
+            else if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                if (!game!.Loading)
+                    manager.SetActiveScreenByType<PauseScreen>();
+            }
         }
     }
 }
