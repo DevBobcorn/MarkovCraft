@@ -30,6 +30,8 @@ namespace MarkovBlocks
         // Mapping Items Panel
         [SerializeField] public RectTransform? GridTransform;
         [SerializeField] public GameObject? MappingItemPrefab;
+        // BlockState Preview
+        [SerializeField] public BlockStatePreview? BlockStatePreview;
 
         private readonly List<MappingEditorItem> mappingItems = new();
         private bool working = false, properlyLoaded = false;
@@ -150,7 +152,7 @@ namespace MarkovBlocks
 
                 var custom = customMapping.ContainsKey(ch);
                 newItem.InitializeData(ch, defoColor, custom ? ColorConvert.GetRGB(customMapping[ch].Color)
-                        : defoColor, custom ? customMapping[ch].BlockState : string.Empty);
+                        : defoColor, custom ? customMapping[ch].BlockState : string.Empty, BlockStatePreview!);
 
                 newItem.transform.SetParent(GridTransform);
                 newItem.transform.localScale = Vector3.one;
@@ -226,8 +228,8 @@ namespace MarkovBlocks
             
             confModelFile = Test.Instance.ConfiguredModelFile;
             
-            if (ModelDropdown == null || SizeXInput == null || SizeYInput == null || SizeZInput == null ||SaveButton == null ||
-                    AmountInput == null || StepsInput == null || SeedsInput == null || AnimatedToggle == null || GridTransform == null)
+            if (ModelDropdown == null || SizeXInput == null || SizeYInput == null || SizeZInput == null ||SaveButton == null || AmountInput == null ||
+                    StepsInput == null || SeedsInput == null || AnimatedToggle == null || GridTransform == null || BlockStatePreview == null)
             {
                 Debug.LogWarning("Editor is not properly loaded!");
 

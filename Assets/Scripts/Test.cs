@@ -48,6 +48,8 @@ namespace MarkovBlocks
 
         // Palettes and meshes
         private readonly ResourcePackManager packManager = new();
+        public ResourcePackManager PackManager => packManager;
+        public readonly World DummyWorld = new();
         private Mesh[] blockMeshes = { };
         private BlockGeometry?[] blockGeometries = { };
         private float3[] blockTints = { };
@@ -131,7 +133,6 @@ namespace MarkovBlocks
             // #0 is default cube mesh
             CubeGeometry.Build(ref buffers[0], AtlasManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
 
-            var dummyWorld = new MarkovBlocks.Mapping.World();
             var modelTable = packManager.StateModelTable;
             
             foreach (var pair in stateId2Mesh) // StateId => Mesh index
@@ -141,7 +142,7 @@ namespace MarkovBlocks
                 if (modelTable.ContainsKey(stateId))
                 {
                     var blockGeometry = modelTable[stateId].Geometries[0];
-                    var blockTint = statePalette.GetBlockColor(stateId, dummyWorld, Location.Zero, statePalette.FromId(stateId));
+                    var blockTint = statePalette.GetBlockColor(stateId, DummyWorld, Location.Zero, statePalette.FromId(stateId));
 
                     blockGeometry.Build(ref buffers[pair.Value], float3.zero, 0b111111, blockTint);
                     

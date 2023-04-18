@@ -19,6 +19,8 @@ namespace MarkovBlocks
         // Mapping Items Panel
         [SerializeField] public RectTransform? GridTransform;
         [SerializeField] public GameObject? MappingItemPrefab;
+        // BlockState Preview
+        [SerializeField] public BlockStatePreview? BlockStatePreview;
 
         private (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ)? exportData;
         private Dictionary<char, CustomMappingItem>? exportPalette;
@@ -33,9 +35,10 @@ namespace MarkovBlocks
 
         private IEnumerator InitializeScreen(HashSet<char> minimumCharSet)
         {
-            if (exportData is null || exportPalette is null || ExportFolderInput == null || ExportButton == null || OpenExplorerButton == null)
+            if (exportData is null || exportPalette is null || ExportFolderInput == null || ExportButton == null ||
+                    OpenExplorerButton == null || BlockStatePreview == null)
             {
-                Debug.LogWarning($"ERROR: Export data is not complete!");
+                Debug.LogWarning($"ERROR: Export screen not correctly initialized!");
                 working = false;
                 properlyLoaded = false;
                 yield break;
@@ -68,7 +71,7 @@ namespace MarkovBlocks
                 var itemVal = exportPalette[ch];
                 var rgb = ColorConvert.GetRGB(itemVal.Color);
 
-                newItem.InitializeData(ch, rgb, rgb, itemVal.BlockState);
+                newItem.InitializeData(ch, rgb, rgb, itemVal.BlockState, BlockStatePreview);
 
                 newItem.transform.SetParent(GridTransform);
                 newItem.transform.localScale = Vector3.one;

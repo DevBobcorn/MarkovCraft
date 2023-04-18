@@ -35,7 +35,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 20, y: -20}
+  m_AnchoredPosition: {x: 20, y: -10}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &5942543809384838495
@@ -84,6 +84,8 @@ GameObject:
   - component: {fileID: 9212314395216512892}
   - component: {fileID: 583527864381286196}
   - component: {fileID: 4374118781749680945}
+  - component: {fileID: 4845471926987342840}
+  - component: {fileID: 8048162740763475121}
   m_Layer: 5
   m_Name: BlockState Preview
   m_TagString: Untagged
@@ -151,6 +153,32 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &4845471926987342840
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5767212514299493187}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
+--- !u!114 &8048162740763475121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5767212514299493187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e869292895704e44bfa75c159d9e6bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentStateId: -1
+  previewObject: {fileID: 0}
 --- !u!1 &6636241506036453415
 GameObject:
   m_ObjectHideFlags: 0

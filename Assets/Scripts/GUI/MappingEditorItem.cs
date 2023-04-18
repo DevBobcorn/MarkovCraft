@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+using MarkovBlocks.Mapping;
+
 namespace MarkovBlocks
 {
     public class MappingEditorItem : MonoBehaviour
@@ -19,6 +21,7 @@ namespace MarkovBlocks
 
         [SerializeField] Button? RevertOverrideButton;
 
+        private BlockStatePreview? blockStatePreview;
         private bool overridesPaletteColor = false;
 
         // RGB color of this item in the base palette
@@ -27,7 +30,7 @@ namespace MarkovBlocks
         private char character;
         public char Character => character;
 
-        public void InitializeData(char character, int defoRgb, int rgb, string blockState)
+        public void InitializeData(char character, int defoRgb, int rgb, string blockState, BlockStatePreview blockStatePreview)
         {
             if (ColorPreviewImage == null || CharacterText == null || ColorCodeInput == null || BlockStateInput == null
                     || MarkCornerImage == null || RevertOverrideButton == null)
@@ -38,6 +41,9 @@ namespace MarkovBlocks
 
             this.character = character;
             defaultRgb = defoRgb & 0xFFFFFF; // Remove alpha channel if presents
+
+            // BlockState Preview
+            this.blockStatePreview = blockStatePreview;
 
             // Character input
             CharacterText.text = character.ToString();
@@ -53,7 +59,10 @@ namespace MarkovBlocks
             RevertOverrideButton.onClick.AddListener(RevertColorToBaseValue);
             ColorCodeInput.onValueChanged.AddListener(UpdateColorCode);
             ColorCodeInput.onEndEdit.AddListener(ValidateColorCode);
-            
+
+            BlockStateInput.onSelect.AddListener(UpdateBlockStateText);
+            BlockStateInput.onValueChanged.AddListener(UpdateBlockStateText);
+            BlockStateInput.onEndEdit.AddListener(ValidateBlockStateText);
         }
 
         public void UpdateColorCode(string colorHex)
@@ -70,6 +79,21 @@ namespace MarkovBlocks
         public void ValidateColorCode(string colorHex)
         {
             ColorCodeInput!.text = colorHex.PadRight(6, '0').ToUpper();
+
+        }
+
+        public void UpdateBlockStateText(string blockState)
+        {
+            var stateId = BlockStateHelper.GetStateIdFromString(blockState);
+
+            blockStatePreview!.UpdatePreview(stateId);
+
+        }
+
+        public void ValidateBlockStateText(string blockState)
+        {
+            // Hide preview
+            blockStatePreview!.UpdatePreview(BlockStateHelper.INVALID_BLOCKSTATE);
 
         }
 

@@ -31,7 +31,7 @@ namespace MarkovBlocks.Mapping
                 }
                 else
                 {
-                    Debug.Log($"Invalid prop condition: <{src}>");
+                    //Debug.Log($"Invalid prop condition: <{src}>");
                 }
             }
             return new BlockStatePredicate(conditions);

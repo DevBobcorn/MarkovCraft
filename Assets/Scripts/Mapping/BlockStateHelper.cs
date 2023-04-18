@@ -21,7 +21,7 @@ namespace MarkovBlocks.Mapping
                     return palette.StateListTable[blockId].First();
                 else
                 {
-                    Debug.LogWarning($"Block with id {blockId} is not present");
+                    //Debug.LogWarning($"Block with id {blockId} is not present");
                     return INVALID_BLOCKSTATE;
                 }
             }
@@ -40,18 +40,18 @@ namespace MarkovBlocks.Mapping
                             return stateId;
                     }
 
-                    Debug.LogWarning($"Block with id {blockId} is present, but no state matches predicate [{filter}]. Using first state instead");
+                    //Debug.LogWarning($"Block with id {blockId} is present, but no state matches predicate [{filter}]. Using first state instead");
                     return palette.StateListTable[blockId].First();
                 }
                 else
                 {
-                    Debug.LogWarning($"Block with id {blockId} is not present");
+                    //Debug.LogWarning($"Block with id {blockId} is not present");
                     return INVALID_BLOCKSTATE;
                 }
             }
             else
             {
-                Debug.LogWarning($"Malformed block state string: {state}");
+                //Debug.LogWarning($"Malformed block state string: {state}");
                 return INVALID_BLOCKSTATE;
             }
             
