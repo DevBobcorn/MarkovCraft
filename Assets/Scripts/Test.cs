@@ -58,6 +58,7 @@ namespace MarkovBlocks
         private Material? blockMaterial;
 
         private readonly LoadStateInfo loadInfo = new();
+        public bool Loading => loadInfo.Loading;
 
         private static Test? instance;
         public static Test Instance

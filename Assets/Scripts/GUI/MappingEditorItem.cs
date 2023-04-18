@@ -9,11 +9,7 @@ namespace MarkovBlocks
 {
     public class MappingEditorItem : MonoBehaviour
     {
-        [SerializeField] Color32 ActiveTagColor;
-        [SerializeField] Color32 LockedTagColor;
-
-        [SerializeField] Color32 MappingColor;
-
+        [SerializeField] Color32 SpecialTagColor;
         [SerializeField] Image? ColorPreviewImage, MarkCornerImage;
         [SerializeField] TMP_Text? CharacterText;
         [SerializeField] TMP_InputField? ColorCodeInput;
@@ -109,19 +105,13 @@ namespace MarkovBlocks
             return blockState;
         }
 
-        public void TagAsActive()
+        public void TagAsSpecial(string blockState)
         {
-            MarkCornerImage!.gameObject.SetActive(true);
-            MarkCornerImage!.color = ActiveTagColor;
-        }
-
-        public void TagAsLocked(string blockState)
-        {
-            BlockStateInput!.text = blockState;
+            BlockStateInput!.SetTextWithoutNotify(blockState); // Avoid updating block preview
             BlockStateInput.interactable = false;
 
             MarkCornerImage!.gameObject.SetActive(true);
-            MarkCornerImage!.color = LockedTagColor;
+            MarkCornerImage!.color = SpecialTagColor;
         }
 
         public void SetOverridesPaletteColor(bool o)

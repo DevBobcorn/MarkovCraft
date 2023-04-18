@@ -61,7 +61,7 @@ namespace MarkovBlocks
             ExportButton.onClick.AddListener(Export);
             // Initialize mappings panel
             // Populate mapping item grid
-            foreach (var ch in exportPalette.Keys)
+            foreach (var ch in minimumCharSet)
             {
                 var newItemObj = GameObject.Instantiate(MappingItemPrefab);
                 var newItem = newItemObj!.GetComponent<MappingEditorItem>();
@@ -87,12 +87,8 @@ namespace MarkovBlocks
                 if (!is2d && item.Character == airCharacter)
                 {
                     item.gameObject.transform.SetAsLastSibling();
-                    item.TagAsLocked("minecraft:air");
+                    item.TagAsSpecial("minecraft:air");
                 }
-                else if (minimumCharSet.Contains(item.Character))
-                    item.TagAsActive();
-                else // Move it to the end
-                    item.gameObject.transform.SetAsLastSibling();
             }
 
             working = false;

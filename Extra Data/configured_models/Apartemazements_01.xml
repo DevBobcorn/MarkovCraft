@@ -7,6 +7,6 @@
     <Item Character="A" Color="FFCBCB" BlockState="minecraft:quartz_block" />
     <Item Character="W" Color="FFFFFF" BlockState="minecraft:quartz_block" />
     <Item Character="R" Color="E7BB8C" BlockState="white_terracotta" />
-    <Item Character="C" Color="00E1FF" BlockState="minecraft:sea_lantern" />
+    <Item Character="C" Color="00E1FF" BlockState="minecraft:beacon" />
   </CustomMapping>
 </ConfiguredModel>
