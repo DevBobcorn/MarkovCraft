@@ -10,7 +10,7 @@ using System.Xml.Linq;
 
 using MarkovJunior;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public class ModelEditorScreen : BaseScreen
     {

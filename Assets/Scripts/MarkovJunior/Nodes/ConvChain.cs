@@ -3,7 +3,7 @@
 using System;
 using System.Xml.Linq;
 
-using MarkovBlocks;
+using MarkovCraft;
 
 namespace MarkovJunior
 {

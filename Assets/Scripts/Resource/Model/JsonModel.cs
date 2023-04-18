@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using MarkovBlocks;
+using MarkovCraft;
 using UnityEngine;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public class JsonModel
     {

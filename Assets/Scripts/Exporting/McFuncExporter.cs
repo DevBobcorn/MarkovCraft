@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public static class McFuncExporter
     {

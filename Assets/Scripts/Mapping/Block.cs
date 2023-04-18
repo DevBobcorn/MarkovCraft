@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MarkovBlocks.Mapping
+namespace MarkovCraft.Mapping
 {
     /// <summary>
     /// Represents a Minecraft Block State

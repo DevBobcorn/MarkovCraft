@@ -8,7 +8,7 @@ using System.Text;
 using UnityEngine;
 using Unity.Mathematics;
 
-namespace MarkovBlocks.Mapping
+namespace MarkovCraft.Mapping
 {
     public class BlockStatePalette
     {

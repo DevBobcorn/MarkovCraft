@@ -8,7 +8,7 @@ using Unity.Rendering;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public static class BlockInstanceSpawner
     {

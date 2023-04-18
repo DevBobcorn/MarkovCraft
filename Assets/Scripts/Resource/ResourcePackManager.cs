@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using MarkovBlocks.Mapping;
+using MarkovCraft.Mapping;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public class ResourcePackManager
     {

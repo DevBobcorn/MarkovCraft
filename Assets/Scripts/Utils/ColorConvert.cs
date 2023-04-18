@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public static class ColorConvert
     {

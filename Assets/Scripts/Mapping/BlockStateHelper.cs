@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace MarkovBlocks.Mapping
+namespace MarkovCraft.Mapping
 {
     public static class BlockStateHelper
     {

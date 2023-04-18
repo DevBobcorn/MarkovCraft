@@ -2,12 +2,12 @@
 using UnityEngine;
 using TMPro;
 
-using MarkovBlocks.Mapping;
+using MarkovCraft.Mapping;
 using Unity.Collections;
 using UnityEngine.Rendering;
 using Unity.Mathematics;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     [RequireComponent(typeof (CanvasGroup))]
     public class BlockStatePreview : MonoBehaviour

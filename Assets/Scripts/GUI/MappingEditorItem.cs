@@ -3,9 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-using MarkovBlocks.Mapping;
+using MarkovCraft.Mapping;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public class MappingEditorItem : MonoBehaviour
     {

@@ -6,7 +6,7 @@ using System.Xml.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
-using MarkovBlocks;
+using MarkovCraft;
 
 namespace MarkovJunior
 {

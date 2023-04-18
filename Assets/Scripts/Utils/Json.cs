@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     /// <summary>
     /// This class parses JSON data and returns an object describing that data.

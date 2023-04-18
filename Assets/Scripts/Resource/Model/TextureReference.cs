@@ -1,4 +1,4 @@
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public struct TextureReference
     {

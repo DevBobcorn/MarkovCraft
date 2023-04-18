@@ -2,7 +2,7 @@
 using UnityEngine;
 using TMPro;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     [RequireComponent(typeof (TMP_InputField))]
     public class IntegerInputValidator : MonoBehaviour

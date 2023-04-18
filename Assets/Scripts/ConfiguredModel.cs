@@ -6,7 +6,7 @@ using UnityEngine;
 
 using MarkovJunior;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     [Serializable]
     public struct CustomMappingItem
@@ -16,7 +16,7 @@ namespace MarkovBlocks
         public Color32 Color;
     }
 
-    [CreateAssetMenu(fileName = "ConfiguredModel", menuName = "Markov Blocks/Configured Model")]
+    [CreateAssetMenu(fileName = "ConfiguredModel", menuName = "MarkovCraft/Configured Model")]
     public class ConfiguredModel : ScriptableObject
     {
         [SerializeField] public string Model = "Apartemazements";

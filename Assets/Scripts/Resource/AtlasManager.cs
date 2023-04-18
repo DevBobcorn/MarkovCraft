@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using Unity.Mathematics;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public static class AtlasManager
     {

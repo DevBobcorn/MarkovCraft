@@ -4,7 +4,7 @@ using UnityEngine.Rendering;
 using Unity.Collections;
 using Unity.Mathematics;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public static class BlockMeshGenerator
     {

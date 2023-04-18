@@ -2,7 +2,7 @@
 using Unity.Entities;
 using Unity.Mathematics;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public struct BlockInstanceComponent : IComponentData
     {

@@ -1,7 +1,7 @@
 #nullable enable
 using UnityEngine;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public class VolumeSelection : MonoBehaviour
     {

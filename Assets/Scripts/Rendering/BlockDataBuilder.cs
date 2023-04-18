@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Unity.Mathematics;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public static class BlockDataBuilder
     {

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 using Unity.Mathematics;
 
-using MarkovBlocks;
+using MarkovCraft;
 
 namespace MarkovJunior
 {

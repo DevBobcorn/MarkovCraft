@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MarkovBlocks.Mapping
+namespace MarkovCraft.Mapping
 {
     public class BlockState
     {

@@ -13,10 +13,10 @@ using Unity.Mathematics;
 using TMPro;
 
 using MarkovJunior;
-using MarkovBlocks.Mapping;
+using MarkovCraft.Mapping;
 using System.Threading.Tasks;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     [RequireComponent(typeof (ScreenManager))]
     public class Test : MonoBehaviour

@@ -1,7 +1,7 @@
 #nullable enable
 using UnityEngine;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     [RequireComponent(typeof (Camera))]
     public class CameraController : MonoBehaviour

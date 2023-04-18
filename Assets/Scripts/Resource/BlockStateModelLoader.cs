@@ -3,10 +3,10 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-using MarkovBlocks;
-using MarkovBlocks.Mapping;
+using MarkovCraft;
+using MarkovCraft.Mapping;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public class BlockStateModelLoader
     {

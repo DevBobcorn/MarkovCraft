@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using Unity.Mathematics;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public class JsonModelElement // a cuboid element
     {

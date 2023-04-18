@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.Mathematics;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public static class VectorUtil
     {

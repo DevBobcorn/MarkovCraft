@@ -6,7 +6,7 @@ using Unity.Mathematics;
 using Unity.Rendering;
 using Unity.Transforms;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     [GenerateTestsForBurstCompatibility]
     public struct SpawnJob : IJobParallelFor

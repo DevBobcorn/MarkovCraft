@@ -1,6 +1,6 @@
 using Unity.Mathematics;
 
-namespace MarkovBlocks.Mapping
+namespace MarkovCraft.Mapping
 {
     /// <summary>
     /// Represents a Minecraft World

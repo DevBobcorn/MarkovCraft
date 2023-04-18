@@ -1,7 +1,7 @@
 using Unity.Burst;
 using Unity.Entities;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public partial struct ClearUpSystem : ISystem
     {

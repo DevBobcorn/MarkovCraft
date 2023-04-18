@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public class ExporterScreen : BaseScreen
     {

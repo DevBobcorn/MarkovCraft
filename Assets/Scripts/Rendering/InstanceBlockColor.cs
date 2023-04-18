@@ -2,7 +2,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Rendering;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     [MaterialProperty("_InstanceBlockColor")]
     public struct InstanceBlockColor : IComponentData

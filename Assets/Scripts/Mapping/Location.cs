@@ -1,6 +1,6 @@
 using System;
 
-namespace MarkovBlocks.Mapping
+namespace MarkovCraft.Mapping
 {
     /// <summary>
     /// Represents a location into a Minecraft world

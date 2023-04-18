@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public static class MaterialManager {
         private static Dictionary<RenderType, Material> blockMaterials = new();

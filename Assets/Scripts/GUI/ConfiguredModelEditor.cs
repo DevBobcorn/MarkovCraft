@@ -4,7 +4,7 @@ using UnityEditor;
 using System.IO;
 using System.Xml.Linq;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     [CustomEditor(typeof (ConfiguredModel))]
     public class ConfiguredModelEditor : Editor

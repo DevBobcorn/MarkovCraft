@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using Unity.Mathematics;
 
-namespace MarkovBlocks
+namespace MarkovCraft
 {
     public class BlockGeometry
     {
