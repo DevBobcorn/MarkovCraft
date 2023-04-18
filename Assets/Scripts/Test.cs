@@ -457,7 +457,7 @@ namespace MarkovCraft
             var ver = VersionHolder!.Versions[VersionHolder.SelectedVersion];
 
             StartCoroutine(LoadMCData(ver.DataVersion, new string[] {
-                    $"vanilla-{ver.ResourceVersion}", "vanilla_fix", "default"
+                    $"vanilla-{ver.ResourceVersion}", "default"
                 }, () => {
                     if (PlaybackSpeedSlider != null)
                     {

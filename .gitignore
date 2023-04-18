@@ -10,6 +10,7 @@
 
 # CornModel resources
 /[Rr]esource [Pp]acks/*/
+!/[Rr]esource [Pp]acks/default/
 /[Ll]ang/
 /*.ini
 
