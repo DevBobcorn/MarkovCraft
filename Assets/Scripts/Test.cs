@@ -333,6 +333,9 @@ namespace MarkovCraft
                 yield break;
             }
 
+            // Clear loaded things
+            MaterialManager.ClearInitializedFlag();
+
             MaterialManager.EnsureInitialized();
             blockMaterial = MaterialManager.GetAtlasMaterial(RenderType.SOLID);
 
