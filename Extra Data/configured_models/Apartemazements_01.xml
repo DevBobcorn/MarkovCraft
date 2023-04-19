@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ConfiguredModel Model="Apartemazements" SizeX="6" SizeY="7" SizeZ="8" Amount="1" Steps="1000" Animated="true">
+<ConfiguredModel Model="Apartemazements" SizeX="6" SizeY="7" SizeZ="8" Amount="1" Steps="1000" Animated="false">
   <CustomMapping>
     <Item Character="P" Color="FF9988" />
     <Item Character="E" Color="67CC00" BlockState="minecraft:grass_block[snowy=false]" />

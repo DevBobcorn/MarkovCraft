@@ -413,7 +413,7 @@ namespace MarkovCraft
                         // Update generation text
                         GenerationText.text = $"Iteration: #{k}\nFrame: {frameCount++} ({(int)(tick * 1000)}ms/frame)";
 
-                        var pos = new int3(xCount * (data.FX + 2), 0, zCount * (data.FY + 2));
+                        var pos = new int3(2 + xCount * (data.FX + 2), 0, 2 + zCount * (data.FY + 2));
                         result.UpdateVolume(pos, new(data.FX, data.FZ, data.FY));
 
                         var instanceData = BlockDataBuilder.GetInstanceData(data.state!, data.FX, data.FY, data.FZ, pos, data.legend.Select(ch => palette[ch]).ToArray());
@@ -425,7 +425,7 @@ namespace MarkovCraft
 
                 if (executing) // Visualize final state (last frame)
                 {
-                    var pos = new int3(xCount * (data.FX + 2), 0, zCount * (data.FY + 2));
+                    var pos = new int3(2 + xCount * (data.FX + 2), 0, 2 + zCount * (data.FY + 2));
                     result.UpdateVolume(pos, new(data.FX, data.FZ, data.FY));
 
                     var instanceData = BlockDataBuilder.GetInstanceData(data.state!, data.FX, data.FY, data.FZ, pos,

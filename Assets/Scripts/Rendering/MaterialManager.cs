@@ -30,45 +30,16 @@ namespace MarkovCraft
         {
             blockMaterials.Clear();
 
-            /*
-            // Solid
-            var solid = Resources.Load<Material>("Materials/Block/Block Solid");
-            solid.SetTexture("_BaseMap", AtlasManager.GetAtlasArray(RenderType.SOLID));
-            blockMaterials.Add(RenderType.SOLID, solid);
+            var material = Resources.Load<Material>("Materials/BlockMaterial");
+            material.SetTexture("_BaseMap", AtlasManager.GetAtlasArray(RenderType.SOLID));
 
-            defaultMaterial = solid;
+            blockMaterials.Add(RenderType.SOLID, material);
+            blockMaterials.Add(RenderType.CUTOUT, material);
+            blockMaterials.Add(RenderType.CUTOUT_MIPPED, material);
+            blockMaterials.Add(RenderType.TRANSLUCENT, material);
+            blockMaterials.Add(RenderType.WATER, material);
 
-            // Cutout & Cutout Mipped
-            var cutout = Resources.Load<Material>("Materials/Block/Block Cutout");
-            cutout.SetTexture("_BaseMap", AtlasManager.GetAtlasArray(RenderType.CUTOUT));
-            blockMaterials.Add(RenderType.CUTOUT, cutout);
-
-            var cutoutMipped = Resources.Load<Material>("Materials/Block/Block Cutout Mipped");
-            cutoutMipped.SetTexture("_BaseMap", AtlasManager.GetAtlasArray(RenderType.CUTOUT_MIPPED));
-            blockMaterials.Add(RenderType.CUTOUT_MIPPED, cutoutMipped);
-
-            // Translucent
-            var translucent = Resources.Load<Material>("Materials/Block/Block Transparent");
-            translucent.SetTexture("_BaseMap", AtlasManager.GetAtlasArray(RenderType.TRANSLUCENT));
-            blockMaterials.Add(RenderType.TRANSLUCENT, translucent);
-
-            // Also add water as translucent
-            // TODO Sync with main project if necessary
-            blockMaterials.Add(RenderType.WATER, translucent);
-            */
-
-            // All
-            var solid = Resources.Load<Material>("Materials/BlockSolid");
-            solid.SetTexture("_BaseMap", AtlasManager.GetAtlasArray(RenderType.SOLID));
-            blockMaterials.Add(RenderType.SOLID, solid);
-            blockMaterials.Add(RenderType.CUTOUT, solid);
-            blockMaterials.Add(RenderType.CUTOUT_MIPPED, solid);
-            blockMaterials.Add(RenderType.TRANSLUCENT, solid);
-            blockMaterials.Add(RenderType.WATER, solid);
-
-            defaultMaterial = solid;
-
-
+            defaultMaterial = material;
 
             initialized = true;
 
