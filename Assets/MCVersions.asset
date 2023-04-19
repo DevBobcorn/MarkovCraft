@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: MCVersions
   m_EditorClassIdentifier: 
   Versions:
+  - Name: MC [LITE]
+    DataVersion: lite
+    ResourceVersion: dummy
   - Name: MC 1.16.5
     DataVersion: 1.16
     ResourceVersion: 1.16.5

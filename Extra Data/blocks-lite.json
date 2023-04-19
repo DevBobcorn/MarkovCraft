@@ -1,0 +1,10 @@
+{
+    "minecraft:air": {
+      "states": [
+        {
+          "id": 0,
+          "default": true
+        }
+      ]
+    }
+}
