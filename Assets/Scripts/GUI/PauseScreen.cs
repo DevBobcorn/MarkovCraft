@@ -25,7 +25,8 @@ namespace MarkovCraft
 
         public void ReturnToMenu()
         {
-
+            game!.ReturnToMenu();
+            
         }
 
         public void BackToGame()

@@ -1,14 +1,17 @@
 #nullable enable
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 
 namespace MarkovCraft
 {
+    [RequireComponent(typeof (Animator))]
     public class Welcome : MonoBehaviour
     {
         [SerializeField] TMP_Text? VersionText;
         [SerializeField] VersionHolder? VersionHolder;
+        [SerializeField] Animator? CubeAnimator;
 
         private void UpdateVersionText()
         {
@@ -42,6 +45,8 @@ namespace MarkovCraft
                 VersionHolder.SelectedVersion = (VersionHolder.SelectedVersion - 1 + count) % count;
             
             UpdateVersionText();
+
+            CubeAnimator?.SetTrigger("Left");
         }
 
         public void NextVersion()
@@ -54,12 +59,25 @@ namespace MarkovCraft
                 VersionHolder.SelectedVersion = (VersionHolder.SelectedVersion + 1) % count;
             
             UpdateVersionText();
+
+            CubeAnimator?.SetTrigger("Right");
+        }
+
+        private IEnumerator MarkovCoroutine()
+        {
+            GetComponent<Animator>().SetTrigger("Enter");
+
+            yield return new WaitForSecondsRealtime(0.32F);
+
+            var op = SceneManager.LoadSceneAsync("Scenes/Markov", LoadSceneMode.Single);
+
+            while (op.progress < 0.9F)
+                yield return null;
         }
 
         public void EnterMarkov()
         {
-            SceneManager.LoadScene("Scenes/Markov", LoadSceneMode.Single);
-
+            StartCoroutine(MarkovCoroutine());
         }
     }
 }

@@ -4,17 +4,19 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using Unity.Mathematics;
 using TMPro;
 
 using MarkovJunior;
 using MarkovCraft.Mapping;
-using System.Threading.Tasks;
+
 
 namespace MarkovCraft
 {
@@ -297,6 +299,9 @@ namespace MarkovCraft
             loadInfo.Loading = true;
             ExecuteButton!.interactable = false;
             ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Loading Res...";
+
+            // Wait for splash animation to complete...
+            yield return new WaitForSecondsRealtime(0.8F);
 
             // First load all possible Block States...
             var loadFlag = new DataLoadFlag();
@@ -683,6 +688,19 @@ namespace MarkovCraft
                 ExecuteButton.onClick.RemoveAllListeners();
                 ExecuteButton.onClick.AddListener(StartExecution);
             }
+        }
+
+        public void ReturnToMenu()
+        {
+            if (executing)
+                StopExecution();
+            
+            ClearUpScene();
+
+            // Unpause game to restore time scale
+            IsPaused = false;
+
+            SceneManager.LoadScene("Scenes/Welcome", LoadSceneMode.Single);
         }
 
     }
