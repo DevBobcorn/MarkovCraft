@@ -74,6 +74,13 @@ namespace MarkovCraft
             }
         }
 
+        // Runs before a scene gets loaded
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void InitializeApp()
+        {
+            Loom.Initialize();
+        }
+
         private bool isPaused = true;
         public bool IsPaused
         {
@@ -305,7 +312,10 @@ namespace MarkovCraft
 
             // First load all possible Block States...
             var loadFlag = new DataLoadFlag();
-            StartCoroutine(BlockStatePalette.INSTANCE.PrepareData(dataVersion, loadFlag, loadInfo));
+
+            Task.Run(() => {
+                BlockStatePalette.INSTANCE.PrepareData(dataVersion, loadFlag, loadInfo);
+            });
 
             while (!loadFlag.Finished)
                 yield return null;
@@ -320,7 +330,10 @@ namespace MarkovCraft
                 packManager.AddPack(new(packName));
             // Load valid packs...
             loadFlag.Finished = false;
-            StartCoroutine(packManager.LoadPacks(this, loadFlag, loadInfo));
+
+            var packTask = Task.Run(() => {
+                packManager.LoadPacks(loadFlag, loadInfo);
+            });
 
             while (!loadFlag.Finished)
                 yield return null;

@@ -99,7 +99,7 @@ namespace MarkovCraft
 
         public static readonly ResourceLocation HAKU = new("markov", "haku");
         
-        public static IEnumerator Generate(ResourcePackManager packManager, LoadStateInfo loadStateInfo)
+        public static IEnumerator Generate(ResourcePackManager packManager, LoadStateInfo loadStateInfo, DataLoadFlag atlasFlag)
         {
             texAtlasTable.Clear(); // Clear previously loaded table...
 
@@ -278,6 +278,7 @@ namespace MarkovCraft
             atlasArrays[0] = atlasArray0;
             atlasArrays[1] = atlasArray1;
 
+            atlasFlag.Finished = true;
         }
 
     }

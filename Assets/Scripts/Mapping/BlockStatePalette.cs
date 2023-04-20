@@ -49,7 +49,7 @@ namespace MarkovCraft.Mapping
             return BlockGeometry.DEFAULT_COLOR;
         } 
 
-        public IEnumerator PrepareData(string dataVersion, DataLoadFlag flag, LoadStateInfo loadStateInfo)
+        public void PrepareData(string dataVersion, DataLoadFlag flag, LoadStateInfo loadStateInfo)
         {
             // Clean up first...
             statesTable.Clear();
@@ -70,7 +70,7 @@ namespace MarkovCraft.Mapping
                 loadStateInfo.InfoText = "Block data not complete!";
                 flag.Finished = true;
                 flag.Failed = true;
-                yield break;
+                return;
             }
 
             // First read special block lists...
@@ -84,19 +84,12 @@ namespace MarkovCraft.Mapping
             Json.JSONData spLists = Json.ParseJson(File.ReadAllText(listsPath, Encoding.UTF8));
             loadStateInfo.InfoText = $"Reading special lists from {listsPath}";
 
-            int count = 0, yieldCount = 200;
-
             foreach (var pair in lists)
             {
                 if (spLists.Properties.ContainsKey(pair.Key))
                 {
                     foreach (var block in spLists.Properties[pair.Key].DataArray)
-                    {
                         pair.Value.Add(ResourceLocation.fromString(block.StringValue));
-                        count++;
-                        if (count % yieldCount == 0)
-                            yield return null;
-                    }
                 }
             }
 
@@ -111,7 +104,8 @@ namespace MarkovCraft.Mapping
             // Then read block states...
             Json.JSONData palette = Json.ParseJson(File.ReadAllText(statesPath, Encoding.UTF8));
             Debug.Log("Reading block states from " + statesPath);
-            count = 0;
+            loadStateInfo.InfoText = $"Loading block states";
+
             foreach (KeyValuePair<string, Json.JSONData> item in palette.Properties)
             {
                 ResourceLocation blockId = ResourceLocation.fromString(item.Key);
@@ -171,15 +165,6 @@ namespace MarkovCraft.Mapping
                             FullSolid = (!noOcclusion.Contains(blockId)) && alwaysFulls.Contains(blockId)
                         };
                     }
-
-                    // Count per state so that loading time can be more evenly distributed
-                    count++;
-                    if (count % 10 == 0)
-                    {
-                        loadStateInfo.InfoText = $"Loading states of block {item.Key}";
-                        yield return null;
-                    }
-
                 }
             }
 
@@ -187,7 +172,6 @@ namespace MarkovCraft.Mapping
 
             // Load block color rules...
             loadStateInfo.InfoText = $"Loading block color rules";
-            yield return null;
 
             Json.JSONData colorRules = Json.ParseJson(File.ReadAllText(colorsPath, Encoding.UTF8));
 
@@ -223,10 +207,6 @@ namespace MarkovCraft.Mapping
                         }
                         //else
                         //    Debug.LogWarning($"Applying dynamic color rules to undefined block {blockId}!");
-                        
-                        count++;
-                        if (count % yieldCount == 0)
-                            yield return null;
                     }
                 }
             }
@@ -246,21 +226,15 @@ namespace MarkovCraft.Mapping
                         {
                             if (!blockColorRules.TryAdd(stateId, ruleFunc))
                                 Debug.LogWarning($"Failed to apply fixed color rules to {blockId} ({stateId})!");
-                            count++;
-                            if (count % yieldCount == 0)
-                                yield return null;
                         }
                     }
                     //else
                     //    Debug.LogWarning($"Applying fixed color rules to undefined block {blockId}!");
                 }
             }
-
-            yield return null;
             
             // Load and apply block render types...
             loadStateInfo.InfoText = $"Loading block render types";
-            yield return null;
 
             try
             {

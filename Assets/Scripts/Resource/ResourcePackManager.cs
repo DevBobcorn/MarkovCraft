@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -51,22 +50,27 @@ namespace MarkovCraft
             StateModelTable.Clear();
         }
 
-        public IEnumerator LoadPacks(MonoBehaviour loader, DataLoadFlag flag, LoadStateInfo loadStateInfo)
+        public void LoadPacks(DataLoadFlag flag, LoadStateInfo loadStateInfo)
         {
-            float startTime = Time.realtimeSinceStartup;
+            System.Diagnostics.Stopwatch sw = new();
+            sw.Start();
 
             // Gather all textures and model files
             foreach (var pack in packs)
             {
                 if (pack.IsValid)
-                {
-                    yield return pack.GatherResources(this, loadStateInfo);
-                }
+                    pack.GatherResources(this, loadStateInfo);
                 
             }
 
-            // Load texture atlas...
-            yield return AtlasManager.Generate(this, loadStateInfo);
+            var atlasFlag = new DataLoadFlag();
+
+            // Load texture atlas (on main thread)...
+            Loom.QueueOnMainThread(() => {
+                Test.Instance.StartCoroutine(AtlasManager.Generate(this, loadStateInfo, atlasFlag));
+            });
+            
+            while (!atlasFlag.Finished) { /* Wait */ }
 
             // Load block models...
             foreach (var blockModelId in BlockModelFileTable.Keys)
@@ -79,9 +83,7 @@ namespace MarkovCraft
             // Load item models...
             // [Code removed]
 
-            yield return BuildStateGeometries(loadStateInfo);
-
-            //yield return BuildItemGeometries(loadStateInfo);
+            BuildStateGeometries(loadStateInfo);
             // [Code removed]
 
             // Perform integrity check...
@@ -97,18 +99,17 @@ namespace MarkovCraft
 
             loadStateInfo.InfoText = string.Empty;
 
-            Debug.Log($"Resource packs loaded in {Time.realtimeSinceStartup - startTime} seconds.");
+            Debug.Log($"Resource packs loaded in {sw.ElapsedMilliseconds} ms.");
             Debug.Log($"Built {StateModelTable.Count} block state geometry lists.");
 
             flag.Finished = true;
-
         }
 
-        public IEnumerator BuildStateGeometries(LoadStateInfo loadStateInfo)
+        public void BuildStateGeometries(LoadStateInfo loadStateInfo)
         {
-            // Load all blockstate files and build their block meshes...
-            int count = 0;
+            loadStateInfo.InfoText = $"Building block state geometries";
 
+            // Load all blockstate files and build their block meshes...
             foreach (var blockPair in BlockStatePalette.INSTANCE.StateListTable)
             {
                 var blockId = blockPair.Key;
@@ -119,13 +120,6 @@ namespace MarkovCraft
                         BlockStatePalette.INSTANCE.RenderTypeTable.GetValueOrDefault(blockId, RenderType.SOLID);
 
                     StateModelLoader.LoadBlockStateModel(this, blockId, BlockStateFileTable[blockId], renderType);
-                    count++;
-                    if (count % 10 == 0)
-                    {
-                        loadStateInfo.InfoText = $"Building model for block {blockId}";
-                        yield return null;
-                    }
-                    
                 }
                 else
                     Debug.LogWarning($"Block state model definition not assigned for {blockId}!");
