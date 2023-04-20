@@ -301,7 +301,7 @@ namespace MarkovCraft
             ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Loading Res...";
 
             // Wait for splash animation to complete...
-            yield return new WaitForSecondsRealtime(0.8F);
+            yield return new WaitForSecondsRealtime(0.5F);
 
             // First load all possible Block States...
             var loadFlag = new DataLoadFlag();

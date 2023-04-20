@@ -11,7 +11,6 @@
 # MarkovCraft resources
 /[Rr]esource [Pp]acks/*/
 !/[Rr]esource [Pp]acks/default/
-!/[Rr]esource [Pp]acks/vanilla-dummy/
 /[Ll]ang/
 /*.ini
 
