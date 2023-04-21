@@ -56,9 +56,9 @@ namespace MarkovCraft
             ColorCodeInput.onValueChanged.AddListener(UpdateColorCode);
             ColorCodeInput.onEndEdit.AddListener(ValidateColorCode);
 
-            BlockStateInput.onSelect.AddListener(UpdateBlockStateText);
+            BlockStateInput.onSelect.AddListener(ShowBlockStatePreview);
             BlockStateInput.onValueChanged.AddListener(UpdateBlockStateText);
-            BlockStateInput.onEndEdit.AddListener(ValidateBlockStateText);
+            BlockStateInput.onEndEdit.AddListener(HideBlockStatePreview);
         }
 
         public void UpdateColorCode(string colorHex)
@@ -78,15 +78,24 @@ namespace MarkovCraft
 
         }
 
-        public void UpdateBlockStateText(string blockState)
+        public void ShowBlockStatePreview(string blockState)
         {
             var stateId = BlockStateHelper.GetStateIdFromString(blockState);
 
             blockStatePreview!.UpdatePreview(stateId);
-
         }
 
-        public void ValidateBlockStateText(string blockState)
+        public void UpdateBlockStateText(string blockState)
+        {
+            var stateId = BlockStateHelper.GetStateIdFromString(blockState);
+
+            if (stateId != BlockStateHelper.INVALID_BLOCKSTATE)
+                blockStatePreview!.UpdatePreview(stateId);
+            else
+                blockStatePreview!.UpdateHint(blockState);
+        }
+
+        public void HideBlockStatePreview(string blockState)
         {
             // Hide preview
             blockStatePreview!.UpdatePreview(BlockStateHelper.INVALID_BLOCKSTATE);

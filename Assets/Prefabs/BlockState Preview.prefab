@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4346661146918236035}
   - component: {fileID: 5942543809384838495}
   - component: {fileID: 8334666930310723146}
+  - component: {fileID: 2856784155062439669}
   m_Layer: 5
   m_Name: UI3D Preview
   m_TagString: Untagged
@@ -73,6 +74,18 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
+--- !u!225 &2856784155062439669
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1007555060574933896}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &5767212514299493187
 GameObject:
   m_ObjectHideFlags: 0
@@ -161,7 +174,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5767212514299493187}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
@@ -179,6 +192,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentStateId: -1
   previewObject: {fileID: 0}
+  imageCanvasGroup: {fileID: 2856784155062439669}
 --- !u!1 &6636241506036453415
 GameObject:
   m_ObjectHideFlags: 0

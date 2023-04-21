@@ -56,5 +56,11 @@ namespace MarkovCraft.Mapping
             }
             
         }
+
+        public static ResourceLocation[] GetBlockIdCandidates(ResourceLocation incompleteBlockId)
+        {
+            return BlockStatePalette.INSTANCE.StateListTable.Keys.Where(
+                    x => x.Namespace == incompleteBlockId.Namespace && x.Path.StartsWith(incompleteBlockId.Path)).Take(3).ToArray();
+        }
     }
 }

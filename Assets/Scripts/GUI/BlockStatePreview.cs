@@ -1,11 +1,12 @@
 #nullable enable
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
+using Unity.Collections;
+using Unity.Mathematics;
 using TMPro;
 
 using MarkovCraft.Mapping;
-using Unity.Collections;
-using UnityEngine.Rendering;
-using Unity.Mathematics;
 
 namespace MarkovCraft
 {
@@ -16,6 +17,7 @@ namespace MarkovCraft
 
         [HideInInspector] public int currentStateId = -1;
         [SerializeField] public GameObject? previewObject;
+        [SerializeField] public CanvasGroup? imageCanvasGroup;
 
         private Test? game;
 
@@ -28,6 +30,8 @@ namespace MarkovCraft
 
             canvasGroup = GetComponent<CanvasGroup>();
             descText = GetComponentInChildren<TMP_Text>();
+
+            canvasGroup.alpha = 0F; // Hide on start
 
             if (previewObject == null)
                 Debug.LogWarning("Preview Object of BlockState Preview not assigned!");
@@ -95,11 +99,41 @@ namespace MarkovCraft
             return mesh;
         }
 
+        public void UpdateHint(string incompleteState)
+        {
+            var incompleteBlockId = ResourceLocation.fromString(incompleteState.Split('[')[0]);
+            if (string.IsNullOrEmpty(incompleteBlockId.Path))
+            {
+                canvasGroup!.alpha = 0F;
+                return;
+            }
+
+            canvasGroup!.alpha = 1F;
+
+            var candidates = BlockStateHelper.GetBlockIdCandidates(incompleteBlockId);
+
+            if (candidates.Length > 0) // Display candidates
+            {
+                var typedLength = incompleteBlockId.ToString().Length;
+
+                descText!.text = string.Join('\n', candidates.Select(x =>
+                        $"<color=yellow>{x.ToString()[0..typedLength]}</color>{x.ToString()[typedLength..]}"));
+
+                var palette = BlockStatePalette.INSTANCE;
+                var stateId = palette.StateListTable[candidates[0]].First();
+                UpdatePreviewObject(stateId, palette.StatesTable[stateId]);
+                
+                imageCanvasGroup!.alpha = 1F;
+            }
+            else
+            {
+                imageCanvasGroup!.alpha = 0F;
+                descText!.text = "<No Candidates>";
+            }
+        }
+
         public void UpdatePreview(int stateId)
         {
-            if (stateId == currentStateId)
-                return; // No need to update
-            
             if (stateId == BlockStateHelper.INVALID_BLOCKSTATE) // Hide away
             {
                 canvasGroup!.alpha = 0F;
@@ -113,18 +147,28 @@ namespace MarkovCraft
                 var blockName = "Block";
 
                 descText!.text = $"[{stateId}] {blockName}\n{newState}";
+                UpdatePreviewObject(stateId, newState);
 
-                // Update block mesh
-                if (previewObject != null)
-                {
-                    var visualBuffer = new VertexBuffer();
+                imageCanvasGroup!.alpha = 1F;
+            }
 
-                    var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, game!.DummyWorld, Location.Zero, newState);
-                    game!.PackManager.StateModelTable[stateId].Geometries[0].Build(ref visualBuffer, float3.zero, PREVIEW_CULLFLAG, blockTint);
+            
+        }
 
-                    previewObject.GetComponent<MeshFilter>().sharedMesh = BuildMesh(visualBuffer);
-                }
+        private void UpdatePreviewObject(int stateId, BlockState newState)
+        {
+            if (stateId == currentStateId)
+                return; // No need to update
+            
+            // Update block mesh
+            if (previewObject != null)
+            {
+                var visualBuffer = new VertexBuffer();
 
+                var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, game!.DummyWorld, Location.Zero, newState);
+                game!.PackManager.StateModelTable[stateId].Geometries[0].Build(ref visualBuffer, float3.zero, PREVIEW_CULLFLAG, blockTint);
+
+                previewObject.GetComponent<MeshFilter>().sharedMesh = BuildMesh(visualBuffer);
             }
 
             currentStateId = stateId;

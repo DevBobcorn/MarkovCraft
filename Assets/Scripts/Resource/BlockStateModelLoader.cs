@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-using MarkovCraft;
 using MarkovCraft.Mapping;
 
 namespace MarkovCraft

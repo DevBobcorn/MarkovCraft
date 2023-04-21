@@ -2,7 +2,7 @@
 <ConfiguredModel Model="Apartemazements" SizeX="6" SizeY="7" SizeZ="8" Amount="1" Steps="1000" Animated="false">
   <CustomMapping>
     <Item Character="P" Color="FF9988" />
-    <Item Character="E" Color="67CC00" BlockState="cherry_leaves" />
+    <Item Character="E" Color="67CC00" BlockState="grass_block[snowy=false]" />
     <Item Character="N" Color="AB5236" BlockState="minecraft:dirt" />
     <Item Character="A" Color="FFCBCB" BlockState="minecraft:quartz_block" />
     <Item Character="W" Color="FFFFFF" BlockState="minecraft:quartz_block" />
