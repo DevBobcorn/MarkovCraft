@@ -62,11 +62,14 @@ namespace MarkovCraft
             var atlasGenFlag = new DataLoadFlag();
 
             // Load texture atlas (on main thread)...
+            loadStateInfo.InfoText = $"Creating textures";
             Loom.QueueOnMainThread(() => {
                 Loom.Current.StartCoroutine(AtlasManager.Generate(this, atlasGenFlag));
             });
             
             while (!atlasGenFlag.Finished) { /* Wait */ }
+
+            loadStateInfo.InfoText = $"Loading models";
 
             // Load block models...
             foreach (var blockModelId in BlockModelFileTable.Keys)
@@ -79,6 +82,7 @@ namespace MarkovCraft
             // Load item models...
             // [Code removed]
 
+            loadStateInfo.InfoText = $"Building block state geometries";
             BuildStateGeometries(loadStateInfo);
             // [Code removed]
 
