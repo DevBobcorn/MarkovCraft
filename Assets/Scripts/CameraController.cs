@@ -1,5 +1,6 @@
 #nullable enable
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace MarkovCraft
 {
@@ -12,6 +13,9 @@ namespace MarkovCraft
         private Camera? viewCamera;
         public Camera? ViewCamera => viewCamera;
 
+        private bool dragging = false;
+        private Vector3 lastDragPos = Vector2.zero;
+
         void Start()
         {
             // Get camera component
@@ -22,7 +26,33 @@ namespace MarkovCraft
         void Update()
         {
             if (Test.Instance.IsPaused)
+            {
+                dragging = false;
                 return;
+            }
+
+            if (dragging) // Perform dragging
+            {
+                if (Input.GetMouseButton(1))
+                {
+                    var curDragPos = Input.mousePosition;
+                    var dragOffset = curDragPos - lastDragPos;
+                    transform.position -= transform.right * dragOffset.x * 0.2F + transform.up * dragOffset.y * 0.2F;
+
+                    lastDragPos = curDragPos;
+                }
+                else
+                    dragging = false;
+            }
+            else // Check start dragging
+            {
+                if (Input.GetMouseButton(1) && !EventSystem.current.IsPointerOverGameObject())
+                {
+                    dragging = true;
+                    lastDragPos = Input.mousePosition;
+                }
+
+            }
 
             float hor = Input.GetAxis("Horizontal");
             float ver = Input.GetAxis("Vertical");
