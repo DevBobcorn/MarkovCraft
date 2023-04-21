@@ -51,6 +51,9 @@ namespace MarkovCraft
                     else
                         Debug.LogWarning($"File not found at {path}");
                 }
+
+                EditorUtility.SetDirty(modelObj);
+                AssetDatabase.SaveAssetIfDirty(modelObj);
             }
 
             // XDoc export button

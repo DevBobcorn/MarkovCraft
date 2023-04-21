@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: Apartemazements_01
   m_EditorClassIdentifier: 
   Model: Apartemazements
-  SizeX: 5
-  SizeY: 6
-  SizeZ: 7
+  SizeX: 6
+  SizeY: 7
+  SizeZ: 8
   Amount: 1
   Steps: 1000
-  Animated: 0
+  Animated: 1
   Seeds: 
   CustomMapping:
   - Character: 80
@@ -27,7 +27,7 @@ MonoBehaviour:
       serializedVersion: 2
       rgba: 4287142399
   - Character: 69
-    BlockState: minecraft:grass_block[snowy=false]
+    BlockState: grass_block[snowy=false]
     Color:
       serializedVersion: 2
       rgba: 4278242407
@@ -52,7 +52,7 @@ MonoBehaviour:
       serializedVersion: 2
       rgba: 4287413223
   - Character: 67
-    BlockState: minecraft:sea_lantern
+    BlockState: sea_lantern
     Color:
       serializedVersion: 2
       rgba: 4294959360
