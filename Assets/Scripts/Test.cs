@@ -60,8 +60,8 @@ namespace MarkovCraft
         private readonly Dictionary<char, int2> palette = new();
         private Material? blockMaterial;
 
-        private readonly LoadStateInfo loadInfo = new();
-        public bool Loading => loadInfo.Loading;
+        private readonly LoadStateInfo loadStateInfo = new();
+        public bool Loading => loadStateInfo.Loading;
 
         private static Test? instance;
         public static Test Instance
@@ -173,7 +173,7 @@ namespace MarkovCraft
 
         public Dictionary<char, CustomMappingItem>? GetExportPalette(HashSet<char> charSet)
         {
-            if (currentConfModel is null || loadInfo.Loading)
+            if (currentConfModel is null || loadStateInfo.Loading)
                 return null;
             
             var mapAsDict = currentConfModel.CustomMapping.ToDictionary(x => x.Character, x => x);
@@ -184,8 +184,8 @@ namespace MarkovCraft
 
         public IEnumerator UpdateConfiguredModel(string confModelFile, ConfiguredModel confModel)
         {
-            loadInfo.Loading = true;
-            loadInfo.InfoText = $"Loading configured model [{confModelFile}]...";
+            loadStateInfo.Loading = true;
+            loadStateInfo.InfoText = $"Loading configured model [{confModelFile}]...";
 
             ExecuteButton!.interactable = false;
             ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Loading...";
@@ -215,7 +215,7 @@ namespace MarkovCraft
             if (modelDoc is null)
             {
                 Debug.LogWarning($"ERROR: Couldn't open xml file at {fileName}");
-                loadInfo.Loading = false;
+                loadStateInfo.Loading = false;
                 GenerationText!.text = $"Couldn't open xml file at {fileName}";
                 yield break;
             }
@@ -237,7 +237,7 @@ namespace MarkovCraft
             if (interpreter == null)
             {
                 Debug.LogWarning("ERROR: Failed to create model interpreter");
-                loadInfo.Loading = false;
+                loadStateInfo.Loading = false;
                 GenerationText!.text = "Failed to create model interpreter";
                 yield break;
             }
@@ -291,7 +291,7 @@ namespace MarkovCraft
 
             yield return null;
 
-            loadInfo.Loading = false;
+            loadStateInfo.Loading = false;
 
             ExecuteButton!.interactable = true;
             ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Start Execution";
@@ -303,7 +303,7 @@ namespace MarkovCraft
 
         private IEnumerator LoadMCData(string dataVersion, string[] packs, Action? callback = null)
         {
-            loadInfo.Loading = true;
+            loadStateInfo.Loading = true;
             ExecuteButton!.interactable = false;
             ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Loading Res...";
 
@@ -312,13 +312,8 @@ namespace MarkovCraft
 
             // First load all possible Block States...
             var loadFlag = new DataLoadFlag();
-
-            Task.Run(() => {
-                BlockStatePalette.INSTANCE.PrepareData(dataVersion, loadFlag, loadInfo);
-            });
-
-            while (!loadFlag.Finished)
-                yield return null;
+            Task.Run(() => BlockStatePalette.INSTANCE.PrepareData(dataVersion, loadFlag));
+            while (!loadFlag.Finished) yield return null;
             
             // Then load all Items...
             // [Code removed]
@@ -330,15 +325,10 @@ namespace MarkovCraft
                 packManager.AddPack(new(packName));
             // Load valid packs...
             loadFlag.Finished = false;
-
-            var packTask = Task.Run(() => {
-                packManager.LoadPacks(loadFlag, loadInfo);
-            });
-
-            while (!loadFlag.Finished)
-                yield return null;
+            Task.Run(() => packManager.LoadPacks(loadFlag, loadStateInfo));
+            while (!loadFlag.Finished) yield return null;
             
-            loadInfo.Loading = false;
+            loadStateInfo.Loading = false;
 
             if (loadFlag.Failed)
             {
@@ -346,11 +336,8 @@ namespace MarkovCraft
                 yield break;
             }
 
-            // Clear loaded things
-            MaterialManager.ClearInitializedFlag();
-
-            MaterialManager.EnsureInitialized();
-            blockMaterial = MaterialManager.GetAtlasMaterial(RenderType.SOLID);
+            blockMaterial = Resources.Load<Material>("Materials/BlockMaterial");
+            blockMaterial.SetTexture("_BaseMap", AtlasManager.GetAtlasArray(RenderType.SOLID));
 
             if (callback is not null)
                 callback.Invoke();
@@ -540,8 +527,8 @@ namespace MarkovCraft
                 
             }
 
-            if (loadInfo.Loading && GenerationText != null)
-                GenerationText.text = loadInfo.InfoText;
+            if (loadStateInfo.Loading && GenerationText != null)
+                GenerationText.text = loadStateInfo.InfoText;
             
             if (FPSText != null)
                 FPSText.text = $"FPS:{((int)(1 / Time.unscaledDeltaTime)).ToString().PadLeft(4, ' ')}";
@@ -666,13 +653,13 @@ namespace MarkovCraft
             // Assign new configured model
             currentConfModel = newConfModel;
 
-            if (!loadInfo.Loading)
+            if (!loadStateInfo.Loading)
                 StartCoroutine(UpdateConfiguredModel(newConfModelFile, newConfModel));
         }
 
         public void StartExecution()
         {
-            if (loadInfo.Loading || executing)
+            if (loadStateInfo.Loading || executing)
             {
                 Debug.LogWarning("Execution cannot be started.");
                 return;
@@ -690,7 +677,7 @@ namespace MarkovCraft
 
         public void StopExecution()
         {
-            if (loadInfo.Loading)
+            if (loadStateInfo.Loading)
             {
                 Debug.LogWarning("Execution cannot be stopped.");
                 return;

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.IO;
 using UnityEngine;
 
@@ -51,12 +50,10 @@ namespace MarkovCraft
 
         }
 
-        public void GatherResources(ResourcePackManager manager, LoadStateInfo loadStateInfo)
+        public void GatherResources(ResourcePackManager manager)
         {
             if (isValid)
             {
-                loadStateInfo.InfoText = $"Gathering resources from {packName}";
-                
                 // Assets folder...
                 var assetsDir = new DirectoryInfo(PathHelper.GetPackDirectoryNamed($"{packName}/assets"));
                 if (assetsDir.Exists)
@@ -119,6 +116,8 @@ namespace MarkovCraft
                                     manager.BlockModelFileTable[identifier] = modelFile.FullName.Replace('\\', '/');
                             }
                         }
+
+                        // [Code removed]
 
                         // Load and store all blockstate files...
                         var blockstatesDir = new DirectoryInfo($"{nameSpaceDir}/blockstates/");

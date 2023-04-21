@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -49,7 +48,7 @@ namespace MarkovCraft.Mapping
             return BlockGeometry.DEFAULT_COLOR;
         } 
 
-        public void PrepareData(string dataVersion, DataLoadFlag flag, LoadStateInfo loadStateInfo)
+        public void PrepareData(string dataVersion, DataLoadFlag flag)
         {
             // Clean up first...
             statesTable.Clear();
@@ -67,7 +66,7 @@ namespace MarkovCraft.Mapping
 
             if (!File.Exists(statesPath) || !File.Exists(listsPath) || !File.Exists(colorsPath) || !File.Exists(renderTypePath))
             {
-                loadStateInfo.InfoText = "Block data not complete!";
+                Debug.LogWarning("Block data not complete!");
                 flag.Finished = true;
                 flag.Failed = true;
                 return;
@@ -82,8 +81,6 @@ namespace MarkovCraft.Mapping
             lists.Add("empty_blocks", new());
 
             Json.JSONData spLists = Json.ParseJson(File.ReadAllText(listsPath, Encoding.UTF8));
-            loadStateInfo.InfoText = $"Reading special lists from {listsPath}";
-
             foreach (var pair in lists)
             {
                 if (spLists.Properties.ContainsKey(pair.Key))
@@ -104,7 +101,6 @@ namespace MarkovCraft.Mapping
             // Then read block states...
             Json.JSONData palette = Json.ParseJson(File.ReadAllText(statesPath, Encoding.UTF8));
             Debug.Log("Reading block states from " + statesPath);
-            loadStateInfo.InfoText = $"Loading block states";
 
             foreach (KeyValuePair<string, Json.JSONData> item in palette.Properties)
             {
@@ -171,8 +167,6 @@ namespace MarkovCraft.Mapping
             Debug.Log($"{statesTable.Count} block states loaded.");
 
             // Load block color rules...
-            loadStateInfo.InfoText = $"Loading block color rules";
-
             Json.JSONData colorRules = Json.ParseJson(File.ReadAllText(colorsPath, Encoding.UTF8));
 
             if (colorRules.Properties.ContainsKey("dynamic"))
@@ -234,8 +228,6 @@ namespace MarkovCraft.Mapping
             }
             
             // Load and apply block render types...
-            loadStateInfo.InfoText = $"Loading block render types";
-
             try
             {
                 var renderTypeText = File.ReadAllText(renderTypePath);
@@ -275,7 +267,6 @@ namespace MarkovCraft.Mapping
             catch (IOException e)
             {
                 Debug.LogWarning($"Failed to load block render types: {e.Message}");
-                loadStateInfo.InfoText = $"Failed to load block render types: {e.Message}";
                 flag.Failed = true;
             }
 
