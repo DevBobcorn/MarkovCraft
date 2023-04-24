@@ -123,6 +123,30 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &117481954 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1931180883653321584, guid: 33105145763f4f147b9f08660c15fd9d,
+    type: 3}
+  m_PrefabInstance: {fileID: 6299917438348916158}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &282810552 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5323106209178866763, guid: 33105145763f4f147b9f08660c15fd9d,
+    type: 3}
+  m_PrefabInstance: {fileID: 6299917438348916158}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &442094404
 GameObject:
   m_ObjectHideFlags: 0
@@ -282,6 +306,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -379,6 +404,8 @@ MonoBehaviour:
   VersionText: {fileID: 1100517003}
   VersionHolder: {fileID: 11400000, guid: bc823ebabdbef7e4c983fa336ef998ad, type: 2}
   CubeAnimator: {fileID: 2053219743}
+  EnterButton: {fileID: 117481954}
+  DownloadButton: {fileID: 282810552}
 --- !u!114 &1100517003 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4424970093121014503, guid: 33105145763f4f147b9f08660c15fd9d,
@@ -782,6 +809,11 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 984736394}
+    - target: {fileID: 2287853044655277164, guid: 33105145763f4f147b9f08660c15fd9d,
+        type: 3}
+      propertyPath: m_text
+      value: '>_<'
+      objectReference: {fileID: 0}
     - target: {fileID: 2397633765364309885, guid: 33105145763f4f147b9f08660c15fd9d,
         type: 3}
       propertyPath: m_Pivot.x
@@ -897,6 +929,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Welcome Panel
       objectReference: {fileID: 0}
+    - target: {fileID: 5323106209178866763, guid: 33105145763f4f147b9f08660c15fd9d,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 984736394}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
