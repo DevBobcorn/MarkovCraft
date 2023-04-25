@@ -16,7 +16,7 @@ namespace MarkovCraft
     [RequireComponent(typeof (Animator))]
     public class Welcome : MonoBehaviour
     {
-        [SerializeField] TMP_Text? VersionText;
+        [SerializeField] TMP_Text? VersionText, DownloadInfoText;
         [SerializeField] VersionHolder? VersionHolder;
         [SerializeField] Animator? CubeAnimator;
         [SerializeField] Button? EnterButton, DownloadButton;
@@ -45,11 +45,13 @@ namespace MarkovCraft
 
         void Start()
         {
-            if (VersionHolder == null || DownloadButton == null) return;
+            if (VersionHolder == null || DownloadButton == null || DownloadInfoText == null) return;
 
             downloadButtonAnimator = DownloadButton.GetComponent<Animator>();
             var buttonText = DownloadButton.GetComponentInChildren<TMP_Text>();
             buttonText.text = "Download";
+
+            DownloadInfoText.text = string.Empty;
 
             if (VersionHolder.Versions.Length <= 0)
                 return;
@@ -126,11 +128,14 @@ namespace MarkovCraft
 
             yield return null;
 
+            bool succeeded = false;
+
             Task<string>? downloadTask = null;
             var webClient = new WebClient();
 
             // Download version manifest
             downloadTask = webClient.DownloadStringTaskAsync("https://launchermeta.mojang.com/mc/game/version_manifest.json");
+            DownloadInfoText!.text = "Downloading version manifest...";
             while (!downloadTask.IsCompleted) yield return null;
 
             if (downloadTask.IsCompletedSuccessfully) // Proceed to resource downloading
@@ -143,6 +148,7 @@ namespace MarkovCraft
                 {
                     var versionInfoUri = versionTargets.First().Properties["url"].StringValue;
                     downloadTask = webClient.DownloadStringTaskAsync(versionInfoUri);
+                    DownloadInfoText!.text = $"Downloading {resVersion} version info...";
                     while (!downloadTask.IsCompleted) yield return null;
 
                     if (downloadTask.IsCompletedSuccessfully)
@@ -151,16 +157,16 @@ namespace MarkovCraft
                         var clientJarInfo = infoJson.Properties["downloads"].Properties["client"];
 
                         var jarUri = clientJarInfo.Properties["url"].StringValue;
-                        Debug.Log($"Client jar url: {jarUri}");
                         // Download jar file
                         var tempJarPath = PathHelper.GetPackDirectoryNamed("temp.jar");
                         var jardownloadTask = webClient.DownloadFileTaskAsync(jarUri, tempJarPath);
+                        DownloadInfoText!.text = $"Downloading client jar from {jarUri}...";
                         while (!jardownloadTask.IsCompleted) yield return null;
                         if (jardownloadTask.IsCompletedSuccessfully) // Jar downloaded, unzip it
                         {
                             var targetFolder = PathHelper.GetPackDirectoryNamed($"vanilla-{resVersion}");
                             var zipFile = ZipFile.OpenRead(tempJarPath);
-
+                            DownloadInfoText!.text = $"Extracting asset files...";
                             // Extract asset files
                             foreach (var entry in zipFile.Entries.Where(x => x.FullName.StartsWith("assets")))
                             {
@@ -184,6 +190,8 @@ namespace MarkovCraft
                             zipFile.Dispose();
                             if (File.Exists(tempJarPath))
                                 File.Delete(tempJarPath);
+                            
+                            succeeded = true;
                         }
                         else
                             Debug.LogWarning($"Failed to download client jar: {jardownloadTask.Exception}");
@@ -196,15 +204,16 @@ namespace MarkovCraft
                     Debug.LogWarning($"Version [{resVersion}] is not found in manifest!");
             }
             else
-                Debug.Log("Failed to download version manifest.");
+                Debug.LogWarning("Failed to download version manifest.");
             
             // Dispose web client
             webClient.Dispose();
-
             yield return null;
 
             buttonText.text = "Download";
             downloadingRes = false;
+
+            DownloadInfoText!.text = succeeded ? string.Empty : $"Failed to download resources for {resVersion}. Please try again.";
 
             // Refresh buttons
             UpdateSelectedVersion();
