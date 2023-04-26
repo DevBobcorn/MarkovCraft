@@ -199,6 +199,9 @@ namespace MarkovCraft
                     case 1: // mcfunction
                         McFuncExporter.Export(data.info, data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo);
                         break;
+                    case 2: // vox model
+                        VoxModelExporter.Export(data.info, data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo);
+                        break;
                 }
                 
                 

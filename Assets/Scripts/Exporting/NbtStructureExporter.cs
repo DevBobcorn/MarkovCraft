@@ -86,7 +86,7 @@ namespace MarkovCraft
             var filePath = $"{dirInfo.FullName}{SP}{fileName}";
 
             // Compress nbt blob and save it
-            using (var compressedStream = File.Create(filePath))
+            using (var compressedStream = File.Open(fileName, FileMode.Create))
                 using (var zipStream = new GZipStream(compressedStream, CompressionMode.Compress))
                     using (var blobStream = new MemoryStream(nbtBlob))
                     {
