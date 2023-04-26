@@ -73,14 +73,14 @@ namespace MarkovJunior
 
         static void WriteString(this BinaryWriter stream, string s) { foreach (char c in s) stream.Write(c); }
 
-        public static void SaveVox(byte[] state, byte MX, byte MY, byte MZ, int[] palette, string filename)
+        public static void SaveVox(byte[] state, byte MX, byte MY, byte MZ, bool zeroAsAir, int[] palette, string filename)
         {
             List<(byte, byte, byte, byte)> voxels = new();
             for (byte z = 0; z < MZ; z++) for (byte y = 0; y < MY; y++) for (byte x = 0; x < MX; x++)
             {
                 int i = x + y * MX + z * MX * MY;
                 byte v = state[i];
-                if (v != 0) voxels.Add((x, y, z, (byte)(v + 1)));
+                if (!zeroAsAir || v != 0) voxels.Add((x, y, z, (byte)(v + 1)));
             }
 
             FileStream file = File.Open(filename, FileMode.Create);

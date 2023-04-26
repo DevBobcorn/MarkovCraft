@@ -28,9 +28,9 @@ namespace MarkovCraft
             var filePath = $"{dirInfo.FullName}{SP}{fileName}";
 
             var voxPalette = legend.Select(ch => ColorConvert.GetRGB(exportPalette[ch].Color)).ToArray();
-            VoxHelper.SaveVox(state, (byte) FX, (byte) FY, (byte) FZ, voxPalette, filePath);
+            VoxHelper.SaveVox(state, (byte) FX, (byte) FY, (byte) FZ, FZ != 1, voxPalette, filePath);
 
-            Debug.Log($"McFunction file exported to {filePath}");
+            Debug.Log($"Vox model file exported to {filePath}");
 
         }
     }

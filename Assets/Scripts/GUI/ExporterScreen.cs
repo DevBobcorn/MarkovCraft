@@ -66,6 +66,8 @@ namespace MarkovCraft
             ExportButton.onClick.AddListener(Export);
             ExportFormatDropdown.ClearOptions();
             ExportFormatDropdown.AddOptions(EXPORT_FORMATS.Select(x => new TMP_Dropdown.OptionData(x)).ToList());
+            var lastUsedFormatIndex = PlayerPrefs.GetInt(EXPORT_FORMAT_KEY, 0);
+            ExportFormatDropdown.value = lastUsedFormatIndex;
             // Initialize mappings panel
             // Populate mapping item grid
             foreach (var ch in minimumCharSet)
@@ -191,7 +193,12 @@ namespace MarkovCraft
                 // SavePath is vaild, save it
                 PlayerPrefs.SetString(EXPORT_PATH_KEY, dirInfo.FullName);
 
-                switch (ExportFormatDropdown!.value)
+                var formatIndex = ExportFormatDropdown!.value;
+
+                // Save last used export format
+                PlayerPrefs.SetInt(EXPORT_FORMAT_KEY, formatIndex);
+
+                switch (formatIndex)
                 {
                     case 0: // nbt structure
                         NbtStructureExporter.Export(data.info, data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, 2586);
