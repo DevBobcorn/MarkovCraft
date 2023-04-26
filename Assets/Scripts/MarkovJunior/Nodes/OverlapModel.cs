@@ -1,6 +1,7 @@
 ﻿// Copyright (C) 2022 Maxim Gumin, The MIT License (MIT)
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace MarkovJunior
 {
     class OverlapNode : WFCNode
     {
+        private static readonly char SP = Path.DirectorySeparatorChar;
         byte[][] patterns;
 
         override protected bool Load(XElement xelem, bool[] parentSymmetry, Grid grid)
@@ -38,7 +40,7 @@ namespace MarkovJunior
             periodic = true;
 
             name = xelem.Get<string>("sample");
-            (int[] bitmap, int SMX, int SMY, _) = Graphics.LoadBitmap(PathHelper.GetExtraDataFile($"samples/{name}.png"));
+            (int[] bitmap, int SMX, int SMY, _) = Graphics.LoadBitmap(PathHelper.GetExtraDataFile($"samples{SP}{name}.png"));
             if (bitmap == null)
             {
                 Interpreter.WriteLine($"couldn't read sample {name}");

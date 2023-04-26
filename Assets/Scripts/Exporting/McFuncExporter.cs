@@ -8,6 +8,7 @@ namespace MarkovCraft
 {
     public static class McFuncExporter
     {
+        private static readonly char SP = Path.DirectorySeparatorChar;
         // Unity     X  Y  Z
         // Markov    X  Z  Y
         // Minecraft Z  Y  X
@@ -39,7 +40,7 @@ namespace MarkovCraft
             }
 
             var fileName = $"{info[0][0..^4].ToLower()}_{info[1]}.mcfunction";
-            var filePath = $"{dirInfo.FullName}/{fileName}";
+            var filePath = $"{dirInfo.FullName}{SP}{fileName}";
             
             File.WriteAllText(filePath, funcText.ToString());
 

@@ -24,6 +24,8 @@ namespace MarkovCraft
     public class Test : MonoBehaviour
     {
         public const int WINDOWED_APP_WIDTH = 1600, WINDOWED_APP_HEIGHT = 900;
+        private static readonly char SP = Path.DirectorySeparatorChar;
+
         [SerializeField] public VersionHolder? VersionHolder;
 
         [SerializeField] public CameraController? CamController;
@@ -192,7 +194,7 @@ namespace MarkovCraft
 
             ClearUpScene();
 
-            string fileName = PathHelper.GetExtraDataFile($"models/{confModel.Model}.xml");
+            string fileName = PathHelper.GetExtraDataFile($"models{SP}{confModel.Model}.xml");
             Debug.Log($"{confModel.Model} > {fileName}");
 
             XDocument? modelDoc = null;

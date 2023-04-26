@@ -1,6 +1,7 @@
 ﻿// Copyright (C) 2022 Maxim Gumin, The MIT License (MIT)
 
 using System;
+using System.IO;
 using System.Xml.Linq;
 
 using MarkovCraft;
@@ -9,6 +10,8 @@ namespace MarkovJunior
 {
     class ConvChainNode : Node
     {
+        private static readonly char SP = Path.DirectorySeparatorChar;
+
         int N;
         double temperature;
         double[] weights;
@@ -30,7 +33,7 @@ namespace MarkovJunior
             }
 
             string name = xelem.Get<string>("sample");
-            string filename = PathHelper.GetExtraDataFile($"samples/{name}.png");
+            string filename = PathHelper.GetExtraDataFile($"samples{SP}{name}.png");
             int[] bitmap;
             (bitmap, SMX, SMY, _) = Graphics.LoadBitmap(filename);
             if (bitmap == null)

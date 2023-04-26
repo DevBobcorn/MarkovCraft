@@ -9,6 +9,7 @@ namespace MarkovCraft
     [CustomEditor(typeof (ConfiguredModel))]
     public class ConfiguredModelEditor : Editor
     {
+        private static readonly char SP = Path.DirectorySeparatorChar;
         private const string PLACE_HOLDER = "<model/path/here>";
         private const string MODEL_FOLDER = "configured_models";
 
@@ -40,7 +41,7 @@ namespace MarkovCraft
 
                 if (modelObj is not null)
                 {
-                    var path = PathHelper.GetExtraDataFile($"{MODEL_FOLDER}/{XDocFileName}");
+                    var path = PathHelper.GetExtraDataFile($"{MODEL_FOLDER}{SP}{XDocFileName}");
                     
                     if (File.Exists(path))
                     {
@@ -63,7 +64,7 @@ namespace MarkovCraft
 
                 if (modelObj is not null)
                 {
-                    var path = PathHelper.GetExtraDataFile($"{MODEL_FOLDER}/{XDocFileName}");
+                    var path = PathHelper.GetExtraDataFile($"{MODEL_FOLDER}{SP}{XDocFileName}");
                     var xdoc = ConfiguredModel.GetXMLDoc(modelObj);
                     xdoc.Save(path);
 

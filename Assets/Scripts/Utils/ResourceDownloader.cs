@@ -14,6 +14,8 @@ namespace MarkovCraft
 {
     public static class ResourceDownloader
     {
+        private static readonly char SP = Path.DirectorySeparatorChar;
+
         public static IEnumerator DownloadResource(string resVersion, TMP_Text infoText, Action start, Action<bool> complete)
         {
             Debug.Log($"Downloading resource [{resVersion}]");
@@ -64,18 +66,18 @@ namespace MarkovCraft
                             // Extract asset files
                             foreach (var entry in zipFile.Entries.Where(x => x.FullName.StartsWith("assets")))
                             {
-                                var entryPath = new FileInfo($@"{targetFolder}\{entry.FullName}");
+                                var entryPath = new FileInfo($"{targetFolder}{SP}{entry.FullName}");
                                 if (!entryPath.Directory.Exists) // Create the folder if not present
                                     entryPath.Directory.Create();
                                 entry.ExtractToFile(entryPath.FullName);
                             }
                             
                             if (zipFile.GetEntry("pack.mcmeta") is not null) // Extract pack.mcmeta
-                                zipFile.GetEntry("pack.mcmeta").ExtractToFile($@"{targetFolder}\pack.mcmeta");
+                                zipFile.GetEntry("pack.mcmeta").ExtractToFile($"{targetFolder}{SP}pack.mcmeta");
                             else // Create pack.mcmeta
                             {
                                 var metaText = "{ \"pack\": { \"description\": \"Meow~\", \"pack_format\": 4 } }";
-                                File.WriteAllText($@"{targetFolder}\pack.mcmeta", metaText);
+                                File.WriteAllText($"{targetFolder}{SP}pack.mcmeta", metaText);
                             }
 
                             Debug.Log("Extracted resource files from jar.");

@@ -14,6 +14,7 @@ namespace MarkovCraft
 {
     public class ModelEditorScreen : BaseScreen
     {
+        private static readonly char SP = Path.DirectorySeparatorChar;
         private const string MODEL_FOLDER = "configured_models";
 
         [SerializeField] public TMP_Text? ScreenHeader;
@@ -91,7 +92,7 @@ namespace MarkovCraft
             XDocument? paletteDoc = null, confModelDoc = null;
 
             string paletteFileName = PathHelper.GetExtraDataFile($"palette.xml");
-            string modelFileName = PathHelper.GetExtraDataFile($"models/{confModel.Model}.xml");
+            string modelFileName = PathHelper.GetExtraDataFile($"models{SP}{confModel.Model}.xml");
 
             if (File.Exists(paletteFileName) && File.Exists(modelFileName))
             {
@@ -213,7 +214,7 @@ namespace MarkovCraft
             var confModelModel = ModelDropdown?.options[newValue].text;
             if (confModelModel is null) return;
 
-            string modelFileName = PathHelper.GetExtraDataFile($"models/{confModelModel}.xml");
+            string modelFileName = PathHelper.GetExtraDataFile($"models{SP}{confModelModel}.xml");
             StartCoroutine(UpdateActiveCharSetFromModel(modelFileName));
         }
 

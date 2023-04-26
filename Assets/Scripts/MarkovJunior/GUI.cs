@@ -1,6 +1,7 @@
 ﻿// Copyright (C) 2022 Maxim Gumin, The MIT License (MIT)
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace MarkovJunior
 {
     static class GUI
     {
+        private static readonly char SP = Path.DirectorySeparatorChar;
         static readonly int S, SMALL, MAXWIDTH, ZSHIFT, HINDENT, HGAP, HARROW, HLINE, VSKIP, SMALLVSKIP, FONTSHIFT, AFTERFONT;
         static readonly bool DENSE, D3;
         public static readonly int BACKGROUND, INACTIVE, ACTIVE;
@@ -28,12 +30,12 @@ namespace MarkovJunior
             for (int i = 0; i < legend.Length; i++) map.Add(legend[i], (byte)i);
             fonts = new (bool[], int, int)[2];
 
-            (int[] bitmap, int width, int height, _) = Graphics.LoadBitmap(PathHelper.GetExtraDataFile($"fonts/{FONT}.png"));
+            (int[] bitmap, int width, int height, _) = Graphics.LoadBitmap(PathHelper.GetExtraDataFile($"fonts{SP}{FONT}.png"));
             int b0 = bitmap[0];
             int b1 = bitmap[width - 1];
             fonts[0] = (bitmap.Select(argb => argb != b0 && argb != b1).ToArray(), width / 32, height / 3);
             
-            (bitmap, width, height, _) = Graphics.LoadBitmap(PathHelper.GetExtraDataFile($"fonts/{TITLEFONT}.png"));
+            (bitmap, width, height, _) = Graphics.LoadBitmap(PathHelper.GetExtraDataFile($"fonts{SP}{TITLEFONT}.png"));
             b0 = bitmap[0];
             b1 = bitmap[width - 1];
             fonts[1] = (bitmap.Select(argb => argb != b0 && argb != b1).ToArray(), width / 32, height / 3);

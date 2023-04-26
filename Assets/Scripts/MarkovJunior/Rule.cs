@@ -1,5 +1,6 @@
 ﻿// Copyright (C) 2022 Maxim Gumin, The MIT License (MIT)
 
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using System.Collections.Generic;
@@ -10,6 +11,8 @@ namespace MarkovJunior
 {
     class Rule
     {
+        private static readonly char SP = Path.DirectorySeparatorChar;
+
         public int IMX, IMY, IMZ, OMX, OMY, OMZ;
         public int[] input;
         public byte[] output, binput;
@@ -193,8 +196,8 @@ namespace MarkovJunior
 
             string filepath(string name)
             {
-                string result = PathHelper.GetExtraDataFile("rules/");
-                if (gout.folder != null) result += gout.folder + "/";
+                string result = PathHelper.GetExtraDataFile($"rules{SP}");
+                if (gout.folder != null) result += $"{gout.folder}{SP}";
                 result += name;
                 result += gin.MZ == 1 ? ".png" : ".vox";
                 return result;
