@@ -12,10 +12,15 @@ namespace MarkovCraft
     public class ExporterScreen : BaseScreen
     {
         private const string EXPORT_PATH_KEY = "ExportPath";
+        private const string EXPORT_FORMAT_KEY = "ExportFormat";
+
+        private static readonly string[] EXPORT_FORMATS = { "nbt structure", "mcfunction", "vox file" };
+
         [SerializeField] public TMP_Text? ScreenHeader, InfoText;
         // Settings Panel
         [SerializeField] public TMP_InputField? ExportFolderInput;
         [SerializeField] public Button? ExportButton, OpenExplorerButton;
+        [SerializeField] public TMP_Dropdown? ExportFormatDropdown;
         // Mapping Items Panel
         [SerializeField] public RectTransform? GridTransform;
         [SerializeField] public GameObject? MappingItemPrefab;
@@ -36,7 +41,7 @@ namespace MarkovCraft
         private IEnumerator InitializeScreen(HashSet<char> minimumCharSet)
         {
             if (exportData is null || exportPalette is null || ExportFolderInput == null || ExportButton == null ||
-                    OpenExplorerButton == null || BlockStatePreview == null)
+                    ExportFormatDropdown == null || OpenExplorerButton == null || BlockStatePreview == null)
             {
                 Debug.LogWarning($"ERROR: Export screen not correctly initialized!");
                 working = false;
@@ -59,6 +64,8 @@ namespace MarkovCraft
                 OpenExplorerButton.gameObject.SetActive(false);
             ExportButton.onClick.RemoveAllListeners();
             ExportButton.onClick.AddListener(Export);
+            ExportFormatDropdown.ClearOptions();
+            ExportFormatDropdown.AddOptions(EXPORT_FORMATS.Select(x => new TMP_Dropdown.OptionData(x)).ToList());
             // Initialize mappings panel
             // Populate mapping item grid
             foreach (var ch in minimumCharSet)
@@ -184,8 +191,16 @@ namespace MarkovCraft
                 // SavePath is vaild, save it
                 PlayerPrefs.SetString(EXPORT_PATH_KEY, dirInfo.FullName);
 
-                // Both field shouldn't be null if exporter laods properly
-                McFuncExporter.Export(data.info, data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo);
+                switch (ExportFormatDropdown!.value)
+                {
+                    case 0: // nbt structure
+                        NbtStructureExporter.Export(data.info, data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, 2586);
+                        break;
+                    case 1: // mcfunction
+                        McFuncExporter.Export(data.info, data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo);
+                        break;
+                }
+                
                 
                 working = false;
 

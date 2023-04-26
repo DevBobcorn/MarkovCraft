@@ -19,23 +19,24 @@ namespace MarkovCraft
                 Dictionary<char, CustomMappingItem> exportPalette, DirectoryInfo dirInfo)
         {
             var funcText = new StringBuilder();
+            int mcSizeX = FY, mcSizeY = FZ, mcSizeZ = FX;
 
-            for (int z = 0; z < FZ; z++) for (int y = 0; y < FY; y++) for (int x = 0; x < FX; x++)
+            for (int mcy = 0; mcy < mcSizeY; mcy++) for (int mcx = 0; mcx < mcSizeX; mcx++) for (int mcz = 0; mcz < mcSizeZ; mcz++)
             {
-                byte v = state[x + y * FX + z * FX * FY];
+                byte v = state[mcz + mcx * mcSizeZ + mcy * mcSizeZ * mcSizeX];
                 char ch = legend[v];
                 
                 if (FZ == 1) // 2d mode, byte 0 is not air
                 {
                     //posData.Add(new int3(x, z, y) + pos);
                     //meshData.Add(palette[v]);
-                    funcText.AppendLine($"setblock ~{(y == 0 ? null : y)} ~{(z == 0 ? null : z)} ~{(x == 0 ? null : x)} {exportPalette[ch].BlockState}");
+                    funcText.AppendLine($"setblock ~{(mcx == 0 ? null : mcx)} ~{(mcy == 0 ? null : mcy)} ~{(mcz == 0 ? null : mcz)} {exportPalette[ch].BlockState}");
                 }
                 else if (!checkAir3d(v)) // 3d mode, byte 0 is air
                 {
                     //posData.Add(new int3(x, z, y) + pos);
                     //meshData.Add(palette[v]);
-                    funcText.AppendLine($"setblock ~{(y == 0 ? null : y)} ~{(z == 0 ? null : z)} ~{(x == 0 ? null : x)} {exportPalette[ch].BlockState}");
+                    funcText.AppendLine($"setblock ~{(mcx == 0 ? null : mcx)} ~{(mcy == 0 ? null : mcy)} ~{(mcz == 0 ? null : mcz)} {exportPalette[ch].BlockState}");
                 }
             }
 
