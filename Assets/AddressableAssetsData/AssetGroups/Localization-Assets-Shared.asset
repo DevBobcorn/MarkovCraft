@@ -17,8 +17,8 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 9da30d664f60ad34d99c51fd3bfbd482
   m_SerializeEntries:
-  - m_GUID: 0a93dd32c01b1ea44910f00f6c2204e8
-    m_Address: Assets/Locales/zh_cn Shared Data.asset
+  - m_GUID: ca01ff9c1eb86df4c93c853003cc7ed6
+    m_Address: Assets/Locales/String Table Shared Data.asset
     m_ReadOnly: 1
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

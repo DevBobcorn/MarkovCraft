@@ -17,7 +17,99 @@ MonoBehaviour:
   m_SharedData: {fileID: 11400000, guid: ca01ff9c1eb86df4c93c853003cc7ed6, type: 2}
   m_Metadata:
     m_Items: []
-  m_TableData: []
+  m_TableData:
+  - m_Id: 19820093440
+    m_Localized: Downloading version manifest...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1530738417664
+    m_Localized: Downloading version info {0}...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3794756608000
+    m_Localized: Extracting asset files...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8892069093376
+    m_Localized: 'Playback Speed:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9348711358464
+    m_Localized: Export
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8361141510144
+    m_Localized: 'Selected Model:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9929253363712
+    m_Localized: Model
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10017107255296
+    m_Localized: Size
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10133750849536
+    m_Localized: Amount
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10240953065472
+    m_Localized: Steps
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10292408786944
+    m_Localized: Seeds <size=28>(optional)</size>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10613512118272
+    m_Localized: Animate Generation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10715106549760
+    m_Localized: Save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12964658585600
+    m_Localized: separate with ' '
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15394976735232
+    m_Localized: 'Export As:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15436202549248
+    m_Localized: 'Export Path:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15468838428672
+    m_Localized: Export
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15521091067904
+    m_Localized: Type export path here...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15596202663936
+    m_Localized: Open
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16395049803776
+    m_Localized: Game Paused
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16506534404096
+    m_Localized: Back to Game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16585508954112
+    m_Localized: Return to Main Menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21468953878528
+    m_Localized: Enter blockstate here
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
