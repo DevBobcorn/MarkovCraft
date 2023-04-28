@@ -15,18 +15,6 @@ MonoBehaviour:
   m_TableCollectionName: String Table
   m_TableCollectionNameGuidString: ca01ff9c1eb86df4c93c853003cc7ed6
   m_Entries:
-  - m_Id: 19820093440
-    m_Key: resource.download.manifest
-    m_Metadata:
-      m_Items: []
-  - m_Id: 1530738417664
-    m_Key: resource.download.version_info
-    m_Metadata:
-      m_Items: []
-  - m_Id: 3794756608000
-    m_Key: resource.download.extract
-    m_Metadata:
-      m_Items: []
   - m_Id: 8361141510144
     m_Key: hud.text.selected_model
     m_Metadata:
@@ -105,6 +93,74 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 21468953878528
     m_Key: mapping_item.text.blockstate_hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355866240786432
+    m_Key: welcome.text.download_res
+    m_Metadata:
+      m_Items: []
+  - m_Id: 367166845001728
+    m_Key: status.info.load_conf_model
+    m_Metadata:
+      m_Items: []
+  - m_Id: 367971987791872
+    m_Key: status.error.open_xml_failure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 368531084320768
+    m_Key: status.error.model_interpreter_failure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 370218561871872
+    m_Key: status.info.loaded_conf_model
+    m_Metadata:
+      m_Items: []
+  - m_Id: 371970807865344
+    m_Key: status.info.gather_resource
+    m_Metadata:
+      m_Items: []
+  - m_Id: 372130187223040
+    m_Key: status.info.create_texture
+    m_Metadata:
+      m_Items: []
+  - m_Id: 372310307414016
+    m_Key: status.info.load_block_model
+    m_Metadata:
+      m_Items: []
+  - m_Id: 373039294226432
+    m_Key: status.info.build_blockstate_geometry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 380477099646976
+    m_Key: status.info.generation_start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 380619232026624
+    m_Key: status.info.generation_frame
+    m_Metadata:
+      m_Items: []
+  - m_Id: 380621543088128
+    m_Key: status.info.generation_complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 387295406366720
+    m_Key: status.info.download_manifest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 387306810679296
+    m_Key: status.info.get_version_info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 387367691001856
+    m_Key: status.info.download_jar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 394586876715008
+    m_Key: status.info.extract_asset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 395821373628416
+    m_Key: status.error.download_resource_failure
     m_Metadata:
       m_Items: []
   m_Metadata:

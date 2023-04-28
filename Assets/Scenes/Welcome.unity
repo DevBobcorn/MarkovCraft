@@ -516,6 +516,9 @@ MonoBehaviour:
   VersionText: {fileID: 7639630346277355353}
   DownloadInfoText: {fileID: 833788496}
   VersionHolder: {fileID: 11400000, guid: bc823ebabdbef7e4c983fa336ef998ad, type: 2}
+  L10nTable:
+    m_TableReference:
+      m_TableCollectionName: GUID:ca01ff9c1eb86df4c93c853003cc7ed6
   CubeAnimator: {fileID: 2053219743}
   EnterButton: {fileID: 5593790970026858190}
   DownloadButton: {fileID: 2212029845823234549}
@@ -1396,6 +1399,7 @@ GameObject:
   - component: {fileID: 5882706436214284957}
   - component: {fileID: 5380029587702413708}
   - component: {fileID: 5237083494352040402}
+  - component: {fileID: 5882706436214284958}
   m_Layer: 5
   m_Name: Download Text
   m_TagString: Untagged
@@ -1628,7 +1632,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '>_<'
+  m_text: Download Resource
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9baf05edbcb5b8a4caaa1987e9d8cb2a, type: 2}
   m_sharedMaterial: {fileID: -8751252669686695664, guid: 9baf05edbcb5b8a4caaa1987e9d8cb2a,
@@ -1806,6 +1810,46 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 600, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &5882706436214284958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3569627963259395355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69beb381e244f92449b8c4cf954630e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TrackedObjects:
+  - rid: 4887730047016501250
+  references:
+    version: 2
+    RefIds:
+    - rid: 4887730047016501250
+      type: {class: TrackedUGuiGraphic, ns: UnityEngine.Localization.PropertyVariants.TrackedObjects,
+        asm: Unity.Localization}
+      data:
+        m_Target: {fileID: 5237083494352040402}
+        m_TrackedProperties:
+          items:
+          - rid: 4887730047016501251
+        m_UpdateType: 0
+    - rid: 4887730047016501251
+      type: {class: LocalizedStringProperty, ns: UnityEngine.Localization.PropertyVariants.TrackedProperties,
+        asm: Unity.Localization}
+      data:
+        m_Localized:
+          m_TableReference:
+            m_TableCollectionName: GUID:ca01ff9c1eb86df4c93c853003cc7ed6
+          m_TableEntryReference:
+            m_KeyId: 355866240786432
+            m_Key: 
+          m_FallbackState: 0
+          m_WaitForCompletion: 0
+          m_LocalVariables: []
+        m_PropertyPath: m_text
 --- !u!222 &5936777165026608485
 CanvasRenderer:
   m_ObjectHideFlags: 0

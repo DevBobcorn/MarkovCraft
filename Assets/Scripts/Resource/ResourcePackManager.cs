@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -50,26 +51,26 @@ namespace MarkovCraft
             StateModelTable.Clear();
         }
 
-        public void LoadPacks(DataLoadFlag flag, LoadStateInfo loadStateInfo)
+        public void LoadPacks(DataLoadFlag flag, Action<string> updateStatus, LoadStateInfo loadStateInfo)
         {
             System.Diagnostics.Stopwatch sw = new();
             sw.Start();
 
             // Gather all textures and model files
-            loadStateInfo.InfoText = $"Gathering resources";
+            updateStatus("status.info.gather_resource");
             foreach (var pack in packs) pack.GatherResources(this);
 
             var atlasGenFlag = new DataLoadFlag();
 
             // Load texture atlas (on main thread)...
-            loadStateInfo.InfoText = $"Creating textures";
+            updateStatus("status.info.create_texture");
             Loom.QueueOnMainThread(() => {
                 Loom.Current.StartCoroutine(AtlasManager.Generate(this, atlasGenFlag));
             });
             
             while (!atlasGenFlag.Finished) { /* Wait */ }
 
-            loadStateInfo.InfoText = $"Loading models";
+            updateStatus("status.info.load_block_model");
 
             // Load block models...
             foreach (var blockModelId in BlockModelFileTable.Keys)
@@ -82,7 +83,7 @@ namespace MarkovCraft
             // Load item models...
             // [Code removed]
 
-            loadStateInfo.InfoText = $"Building block state geometries";
+            updateStatus("status.info.build_blockstate_geometry");
             BuildStateGeometries(loadStateInfo);
             // [Code removed]
 
@@ -96,8 +97,6 @@ namespace MarkovCraft
                     Debug.LogWarning($"Model for {stateItem.Value}(state Id {stateItem.Key}) not loaded!");
                 }
             }
-
-            loadStateInfo.InfoText = string.Empty;
 
             Debug.Log($"Resource packs loaded in {sw.ElapsedMilliseconds} ms.");
             Debug.Log($"Built {StateModelTable.Count} block state geometry lists.");

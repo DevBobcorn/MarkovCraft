@@ -4,6 +4,7 @@ using System.IO;
 
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Localization;
 using UnityEngine.SceneManagement;
 using TMPro;
 
@@ -13,12 +14,27 @@ namespace MarkovCraft
     public class Welcome : MonoBehaviour
     {
         [SerializeField] TMP_Text? VersionText, DownloadInfoText;
-        [SerializeField] VersionHolder? VersionHolder;
+        [SerializeField] private VersionHolder? VersionHolder;
+        [SerializeField] private LocalizedStringTable? L10nTable;
         [SerializeField] Animator? CubeAnimator;
         [SerializeField] Button? EnterButton, DownloadButton;
 
         private Animator? downloadButtonAnimator;
         private bool downloadingRes = false;
+
+        // Runs before a scene gets loaded
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void InitializeApp()
+        {
+            Loom.Initialize();
+        }
+
+        private string GetL10nString(string key, params object[] p)
+        {
+            var str = L10nTable?.GetTable().GetEntry(key);
+            if (str is null) return $"<{key}>";
+            return string.Format(str.Value, p);
+        }
 
         private void UpdateSelectedVersion()
         {
@@ -44,9 +60,6 @@ namespace MarkovCraft
             if (VersionHolder == null || DownloadButton == null || DownloadInfoText == null) return;
 
             downloadButtonAnimator = DownloadButton.GetComponent<Animator>();
-            var buttonText = DownloadButton.GetComponentInChildren<TMP_Text>();
-            buttonText.text = "Download";
-
             DownloadInfoText.text = string.Empty;
 
             if (VersionHolder.Versions.Length <= 0)
@@ -93,14 +106,15 @@ namespace MarkovCraft
             var version = VersionHolder.Versions[verIndex];
 
             downloadingRes = true;
-            StartCoroutine(ResourceDownloader.DownloadResource(version.ResourceVersion, DownloadInfoText!,
-                    () => DownloadButton!.GetComponentInChildren<TMP_Text>().text = "Downloading...",
+            StartCoroutine(ResourceDownloader.DownloadResource(version.ResourceVersion,
+                    (status) => DownloadInfoText!.text = GetL10nString(status),
+                    () => downloadButtonAnimator?.SetBool("Hidden", true),
                     (succeeded) => {
-                        DownloadButton!.GetComponentInChildren<TMP_Text>().text = "Download";
+                        downloadButtonAnimator?.SetBool("Hidden", succeeded);
                         downloadingRes = false;
 
                         DownloadInfoText!.text = succeeded ? string.Empty :
-                                $"Failed to download resources for {version.ResourceVersion}. Please try again.";
+                                GetL10nString("status.error.download_resource_failure", version.ResourceVersion);
 
                         // Refresh buttons
                         UpdateSelectedVersion();

@@ -6,9 +6,7 @@ using System.Net;
 using System.IO.Compression;
 using System.IO;
 using System.Linq;
-
 using UnityEngine;
-using TMPro;
 
 namespace MarkovCraft
 {
@@ -16,7 +14,7 @@ namespace MarkovCraft
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
 
-        public static IEnumerator DownloadResource(string resVersion, TMP_Text infoText, Action start, Action<bool> complete)
+        public static IEnumerator DownloadResource(string resVersion, Action<string> updateStatus, Action start, Action<bool> complete)
         {
             Debug.Log($"Downloading resource [{resVersion}]");
 
@@ -31,7 +29,7 @@ namespace MarkovCraft
 
             // Download version manifest
             downloadTask = webClient.DownloadStringTaskAsync("https://launchermeta.mojang.com/mc/game/version_manifest.json");
-            infoText.text = "Downloading version manifest...";
+            updateStatus("status.info.download_manifest");
             while (!downloadTask.IsCompleted) yield return null;
 
             if (downloadTask.IsCompletedSuccessfully) // Proceed to resource downloading
@@ -44,7 +42,7 @@ namespace MarkovCraft
                 {
                     var versionInfoUri = versionTargets.First().Properties["url"].StringValue;
                     downloadTask = webClient.DownloadStringTaskAsync(versionInfoUri);
-                    infoText.text = $"Downloading {resVersion} version info...";
+                    updateStatus("status.info.get_version_info");
                     while (!downloadTask.IsCompleted) yield return null;
 
                     if (downloadTask.IsCompletedSuccessfully)
@@ -56,13 +54,13 @@ namespace MarkovCraft
                         // Download jar file
                         var tempJarPath = PathHelper.GetPackDirectoryNamed("temp.jar");
                         var jardownloadTask = webClient.DownloadFileTaskAsync(jarUri, tempJarPath);
-                        infoText.text = $"Downloading client jar from {jarUri}...";
+                        updateStatus("status.info.download_jar");
                         while (!jardownloadTask.IsCompleted) yield return null;
                         if (jardownloadTask.IsCompletedSuccessfully) // Jar downloaded, unzip it
                         {
                             var targetFolder = PathHelper.GetPackDirectoryNamed($"vanilla-{resVersion}");
                             var zipFile = ZipFile.OpenRead(tempJarPath);
-                            infoText.text = $"Extracting asset files...";
+                            updateStatus("status.info.extract_asset");
                             // Extract asset files
                             foreach (var entry in zipFile.Entries.Where(x => x.FullName.StartsWith("assets")))
                             {
@@ -80,7 +78,7 @@ namespace MarkovCraft
                                 File.WriteAllText($"{targetFolder}{SP}pack.mcmeta", metaText);
                             }
 
-                            Debug.Log("Extracted resource files from jar.");
+                            Debug.Log("Resources successfully downloaded.");
 
                             // Dispose zip file and clean up
                             zipFile.Dispose();

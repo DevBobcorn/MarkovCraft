@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.Localization;
 using UnityEngine.SceneManagement;
 using Unity.Mathematics;
 using TMPro;
@@ -26,7 +27,8 @@ namespace MarkovCraft
         public const int WINDOWED_APP_WIDTH = 1600, WINDOWED_APP_HEIGHT = 900;
         private static readonly char SP = Path.DirectorySeparatorChar;
 
-        [SerializeField] public VersionHolder? VersionHolder;
+        [SerializeField] private VersionHolder? VersionHolder;
+        [SerializeField] private LocalizedStringTable? L10nTable;
 
         [SerializeField] public CameraController? CamController;
         [SerializeField] public LayerMask VolumeLayerMask;
@@ -76,13 +78,6 @@ namespace MarkovCraft
             }
         }
 
-        // Runs before a scene gets loaded
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void InitializeApp()
-        {
-            Loom.Initialize();
-        }
-
         private bool isPaused = true;
         public bool IsPaused
         {
@@ -97,6 +92,13 @@ namespace MarkovCraft
                     Time.timeScale = 1F;
 
             }
+        }
+
+        private string GetL10nString(string key, params object[] p)
+        {
+            var str = L10nTable?.GetTable().GetEntry(key);
+            if (str is null) return $"<{key}>";
+            return string.Format(str.Value, p);
         }
 
         private void RedrawProcedureGraph(ConfiguredModel confModel)
@@ -187,7 +189,7 @@ namespace MarkovCraft
         public IEnumerator UpdateConfiguredModel(string confModelFile, ConfiguredModel confModel)
         {
             loadStateInfo.Loading = true;
-            loadStateInfo.InfoText = $"Loading configured model [{confModelFile}]...";
+            GenerationText!.text = GetL10nString("status.info.load_conf_model", confModelFile);
 
             ExecuteButton!.interactable = false;
             ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Loading...";
@@ -218,7 +220,7 @@ namespace MarkovCraft
             {
                 Debug.LogWarning($"ERROR: Couldn't open xml file at {fileName}");
                 loadStateInfo.Loading = false;
-                GenerationText!.text = $"Couldn't open xml file at {fileName}";
+                GenerationText!.text = GetL10nString("status.error.open_xml_failure", fileName);
                 yield break;
             }
 
@@ -240,7 +242,7 @@ namespace MarkovCraft
             {
                 Debug.LogWarning("ERROR: Failed to create model interpreter");
                 loadStateInfo.Loading = false;
-                GenerationText!.text = "Failed to create model interpreter";
+                GenerationText!.text = GetL10nString("status.error.model_interpreter_failure");
                 yield break;
             }
 
@@ -300,7 +302,7 @@ namespace MarkovCraft
             ExecuteButton.onClick.RemoveAllListeners();
             ExecuteButton.onClick.AddListener(StartExecution);
 
-            GenerationText!.text = $"[{confModelFile}] loaded";
+            GenerationText!.text = GetL10nString("status.info.loaded_conf_model", confModelFile);
         }
 
         private IEnumerator LoadMCData(string dataVersion, string[] packs, Action? callback = null)
@@ -327,7 +329,8 @@ namespace MarkovCraft
                 packManager.AddPack(new(packName));
             // Load valid packs...
             loadFlag.Finished = false;
-            Task.Run(() => packManager.LoadPacks(loadFlag, loadStateInfo));
+            Task.Run(() => packManager.LoadPacks(loadFlag, (status) =>
+                    Loom.QueueOnMainThread(() => GenerationText!.text = GetL10nString(status)), loadStateInfo));
             while (!loadFlag.Finished) yield return null;
             
             loadStateInfo.Loading = false;
@@ -385,7 +388,7 @@ namespace MarkovCraft
 
                 results.Add(result);
                 
-                GenerationText.text = $"Iteration: #{k}\nWorking...";
+                GenerationText.text = GetL10nString("status.info.generation_start", k);
                 int frameCount = 1;
 
                 (byte[] state, char[] legend, int FX, int FY, int FZ) data = new();
@@ -421,7 +424,7 @@ namespace MarkovCraft
                     if (model.Animated) // Visualize this frame
                     {
                         // Update generation text
-                        GenerationText.text = $"Iteration: #{k}\nFrame: {frameCount++} ({(int)(tick * 1000)}ms/frame)";
+                        GenerationText.text = GetL10nString("status.info.generation_frame", k, frameCount++, (int)(tick * 1000));
 
                         var pos = new int3(2 + xCount * (data.FX + 2), 0, 2 + zCount * (data.FY + 2));
                         result.UpdateVolume(pos, new(data.FX, data.FZ, data.FY));
@@ -453,7 +456,7 @@ namespace MarkovCraft
                     result.SetData((new[] { confModelFile, $"{seed}" }, stateClone, legendClone, data.FX, data.FY, data.FZ));
 
                     Debug.Log($"Iteration #{k} complete. Frame Count: {frameCount}");
-                    GenerationText.text = $"Iteration: #{k}\nGeneration Complete";
+                    GenerationText.text = GetL10nString("status.info.generation_complete", k);
                 }
             }
 
@@ -465,6 +468,8 @@ namespace MarkovCraft
         {
             // First load Minecraft data & resources
             var ver = VersionHolder!.Versions[VersionHolder.SelectedVersion];
+
+            //
 
             StartCoroutine(LoadMCData(ver.DataVersion, new string[] {
                     $"vanilla-{ver.ResourceVersion}", "default"
@@ -528,9 +533,6 @@ namespace MarkovCraft
                 }
                 
             }
-
-            if (loadStateInfo.Loading && GenerationText != null)
-                GenerationText.text = loadStateInfo.InfoText;
             
             if (FPSText != null)
                 FPSText.text = $"FPS:{((int)(1 / Time.unscaledDeltaTime)).ToString().PadLeft(4, ' ')}";

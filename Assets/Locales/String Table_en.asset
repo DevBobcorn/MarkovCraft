@@ -18,15 +18,7 @@ MonoBehaviour:
   m_Metadata:
     m_Items: []
   m_TableData:
-  - m_Id: 19820093440
-    m_Localized: Downloading version manifest...
-    m_Metadata:
-      m_Items: []
-  - m_Id: 1530738417664
-    m_Localized: Downloading version info {0}...
-    m_Metadata:
-      m_Items: []
-  - m_Id: 3794756608000
+  - m_Id: 394586876715008
     m_Localized: Extracting asset files...
     m_Metadata:
       m_Items: []
@@ -108,6 +100,76 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 21468953878528
     m_Localized: Enter blockstate here
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355866240786432
+    m_Localized: Download Res
+    m_Metadata:
+      m_Items: []
+  - m_Id: 367166845001728
+    m_Localized: Loading configured model [{0}]...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 367971987791872
+    m_Localized: Couldn't open xml file at {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 368531084320768
+    m_Localized: Failed to create model interpreter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 370218561871872
+    m_Localized: '[{0}] loaded'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 371970807865344
+    m_Localized: Gathering resources...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 372130187223040
+    m_Localized: Creating textures...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 372310307414016
+    m_Localized: Loading block models...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 373039294226432
+    m_Localized: Building block state geometries...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 380477099646976
+    m_Localized: 'Iteration: #{0}
+
+      Working...'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 380619232026624
+    m_Localized: 'Iteration: #{0}
+
+      Frame: {1} ({2}ms/frame)'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 380621543088128
+    m_Localized: 'Iteration: #{0}
+
+      Generation Complete'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 387295406366720
+    m_Localized: Downloading version manifest...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 387306810679296
+    m_Localized: Getting version info...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 387367691001856
+    m_Localized: Downloading client jar...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 395821373628416
+    m_Localized: Failed to download resources for {0}. Please try again.
     m_Metadata:
       m_Items: []
   references:
