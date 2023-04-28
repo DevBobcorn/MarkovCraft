@@ -14,7 +14,11 @@ namespace MarkovCraft
         private const string EXPORT_PATH_KEY = "ExportPath";
         private const string EXPORT_FORMAT_KEY = "ExportFormat";
 
-        private static readonly string[] EXPORT_FORMATS = { "nbt structure", "mcfunction", "vox file" };
+        private static readonly string[] EXPORT_FORMAT_KEYS = {
+            "exporter.format.nbt_structure",
+            "exporter.format.mcfunction",
+            "exporter.format.vox_model"
+        };
 
         [SerializeField] public TMP_Text? ScreenHeader, InfoText;
         // Settings Panel
@@ -65,7 +69,8 @@ namespace MarkovCraft
             ExportButton.onClick.RemoveAllListeners();
             ExportButton.onClick.AddListener(Export);
             ExportFormatDropdown.ClearOptions();
-            ExportFormatDropdown.AddOptions(EXPORT_FORMATS.Select(x => new TMP_Dropdown.OptionData(x)).ToList());
+            ExportFormatDropdown.AddOptions(EXPORT_FORMAT_KEYS.Select(x =>
+                    new TMP_Dropdown.OptionData(Test.GetL10nString(x))).ToList());
             var lastUsedFormatIndex = PlayerPrefs.GetInt(EXPORT_FORMAT_KEY, 0);
             ExportFormatDropdown.value = lastUsedFormatIndex;
             // Initialize mappings panel
@@ -104,10 +109,10 @@ namespace MarkovCraft
             properlyLoaded = true;
 
             if (ScreenHeader != null)
-                ScreenHeader.text = $"Exporting generation result of {data.info[0]}";
+                ScreenHeader.text = Test.GetL10nString("exporter.text.loaded", data.info[0]);
             
             if (InfoText != null)
-                InfoText.text = $"Configured Model:\n<u>{data.info[0]}</u>\n\nSeed:\n<u>{data.info[1]}</u>\n\nSize:\n<u>{data.FX}x{data.FZ}x{data.FY}</u>";
+                InfoText.text = Test.GetL10nString("export.text.result_info", data.info[0], data.info[1], data.FX, data.FZ, data.FY);
             
         }
 
@@ -118,7 +123,7 @@ namespace MarkovCraft
             properlyLoaded = false;
 
             if (ScreenHeader != null)
-                ScreenHeader.text = "Loading...";
+                ScreenHeader.text = Test.GetL10nString("exporter.text.loading");
             
             var game = Test.Instance;
             
@@ -144,7 +149,7 @@ namespace MarkovCraft
                 Debug.LogWarning("Exporter is not properly loaded!");
 
                 if (ScreenHeader != null)
-                    ScreenHeader.text = "0.0 Exporter not loaded";
+                    ScreenHeader.text = Test.GetL10nString("exporter.text.load_failure");
 
                 working = false;
                 return;

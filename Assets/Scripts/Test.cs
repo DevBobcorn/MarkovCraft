@@ -94,9 +94,9 @@ namespace MarkovCraft
             }
         }
 
-        private string GetL10nString(string key, params object[] p)
+        public static string GetL10nString(string key, params object[] p)
         {
-            var str = L10nTable?.GetTable().GetEntry(key);
+            var str = Instance.L10nTable?.GetTable().GetEntry(key);
             if (str is null) return $"<{key}>";
             return string.Format(str.Value, p);
         }
@@ -192,7 +192,7 @@ namespace MarkovCraft
             GenerationText!.text = GetL10nString("status.info.load_conf_model", confModelFile);
 
             ExecuteButton!.interactable = false;
-            ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Loading...";
+            ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.load_conf_model");
 
             ClearUpScene();
 
@@ -298,7 +298,7 @@ namespace MarkovCraft
             loadStateInfo.Loading = false;
 
             ExecuteButton!.interactable = true;
-            ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Start Execution";
+            ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.start_execution");
             ExecuteButton.onClick.RemoveAllListeners();
             ExecuteButton.onClick.AddListener(StartExecution);
 
@@ -309,7 +309,7 @@ namespace MarkovCraft
         {
             loadStateInfo.Loading = true;
             ExecuteButton!.interactable = false;
-            ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Loading Res...";
+            ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.load_resource");
 
             // Wait for splash animation to complete...
             yield return new WaitForSecondsRealtime(0.5F);
@@ -673,7 +673,7 @@ namespace MarkovCraft
 
             if (ExecuteButton != null)
             {
-                ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Stop Execution";
+                ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.stop_execution");
                 ExecuteButton.onClick.RemoveAllListeners();
                 ExecuteButton.onClick.AddListener(StopExecution);
             }
@@ -691,7 +691,7 @@ namespace MarkovCraft
 
             if (ExecuteButton != null)
             {
-                ExecuteButton.GetComponentInChildren<TMP_Text>().text = "Start Execution";
+                ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.start_execution");
                 ExecuteButton.onClick.RemoveAllListeners();
                 ExecuteButton.onClick.AddListener(StartExecution);
             }

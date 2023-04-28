@@ -163,6 +163,62 @@ MonoBehaviour:
     m_Key: status.error.download_resource_failure
     m_Metadata:
       m_Items: []
+  - m_Id: 403452238667776
+    m_Key: hud.text.load_resource
+    m_Metadata:
+      m_Items: []
+  - m_Id: 403667049947136
+    m_Key: hud.text.start_execution
+    m_Metadata:
+      m_Items: []
+  - m_Id: 403753582632960
+    m_Key: hud.text.stop_execution
+    m_Metadata:
+      m_Items: []
+  - m_Id: 403911460429824
+    m_Key: hud.text.load_conf_model
+    m_Metadata:
+      m_Items: []
+  - m_Id: 500646488743936
+    m_Key: editor.text.loading
+    m_Metadata:
+      m_Items: []
+  - m_Id: 500808737005568
+    m_Key: editor.text.load_failure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 501063469670400
+    m_Key: editor.text.loaded
+    m_Metadata:
+      m_Items: []
+  - m_Id: 502887979327488
+    m_Key: exporter.text.loading
+    m_Metadata:
+      m_Items: []
+  - m_Id: 503093638635520
+    m_Key: exporter.text.load_failure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 503485516652544
+    m_Key: exporter.text.loaded
+    m_Metadata:
+      m_Items: []
+  - m_Id: 504846685741056
+    m_Key: export.text.result_info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 506227605807104
+    m_Key: exporter.format.nbt_structure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 506229719736320
+    m_Key: exporter.format.mcfunction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 506629864726528
+    m_Key: exporter.format.vox_model
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

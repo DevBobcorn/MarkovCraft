@@ -165,7 +165,7 @@ namespace MarkovCraft
             properlyLoaded = true;
 
             if (ScreenHeader != null)
-                ScreenHeader.text = $"Editing {confModelFile}";
+                ScreenHeader.text = Test.GetL10nString("editor.text.loaded", confModelFile);
         }
 
         private IEnumerator UpdateActiveCharSetFromModel(string modelFileName)
@@ -225,7 +225,7 @@ namespace MarkovCraft
             properlyLoaded = false;
 
             if (ScreenHeader != null)
-                ScreenHeader.text = "Loading...";
+                ScreenHeader.text = Test.GetL10nString("editor.text.loading");
             
             confModelFile = Test.Instance.ConfiguredModelFile;
             
@@ -235,7 +235,7 @@ namespace MarkovCraft
                 Debug.LogWarning("Editor is not properly loaded!");
 
                 if (ScreenHeader != null)
-                    ScreenHeader.text = "0.0 Editor not loaded";
+                    ScreenHeader.text = Test.GetL10nString("editor.text.load_failure");
 
                 working = false;
                 return;
