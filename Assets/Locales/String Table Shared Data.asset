@@ -232,7 +232,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 752739912949760
-    m_Key: status.info.download_lang_json
+    m_Key: status.info.download_lang_text
     m_Metadata:
       m_Items: []
   m_Metadata:
