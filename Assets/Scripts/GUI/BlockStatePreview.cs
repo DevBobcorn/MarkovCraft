@@ -144,7 +144,7 @@ namespace MarkovCraft
                 canvasGroup!.alpha = 1F;
 
                 var newState = BlockStatePalette.INSTANCE.StatesTable[stateId];
-                var blockName = "Block";
+                var blockName = Test.GetL10nBlockName(newState.BlockId);
 
                 descText!.text = $"[{stateId}] {blockName}\n{newState}";
                 UpdatePreviewObject(stateId, newState);

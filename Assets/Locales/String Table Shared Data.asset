@@ -223,6 +223,18 @@ MonoBehaviour:
     m_Key: welcome.text.current_language
     m_Metadata:
       m_Items: []
+  - m_Id: 722967874936832
+    m_Key: hud.text.result_info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 749456838270976
+    m_Key: status.info.get_asset_index
+    m_Metadata:
+      m_Items: []
+  - m_Id: 752739912949760
+    m_Key: status.info.download_lang_json
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

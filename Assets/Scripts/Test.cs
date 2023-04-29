@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
 using UnityEngine.SceneManagement;
 using Unity.Mathematics;
 using TMPro;
@@ -52,7 +53,8 @@ namespace MarkovCraft
         private float playbackSpeed = 1F;
         private bool executing = false;
 
-        // Palettes and meshes
+        // Palettes and resources
+        private Dictionary<string, string> L10nBlockNameTable = new();
         private readonly ResourcePackManager packManager = new();
         public ResourcePackManager PackManager => packManager;
         public readonly World DummyWorld = new();
@@ -99,6 +101,10 @@ namespace MarkovCraft
             if (str is null) return $"<{key}>";
             return string.Format(str.Value, p);
         }
+
+
+        public static string GetL10nBlockName(ResourceLocation blockId) =>
+                Instance.L10nBlockNameTable.GetValueOrDefault($"block.{blockId.Namespace}.{blockId.Path}", $"block.{blockId.Namespace}.{blockId.Path}");
 
         private void RedrawProcedureGraph(ConfiguredModel confModel)
         {
@@ -304,7 +310,7 @@ namespace MarkovCraft
             GenerationText!.text = GetL10nString("status.info.loaded_conf_model", confModelFile);
         }
 
-        private IEnumerator LoadMCData(string dataVersion, string[] packs, Action? callback = null)
+        private IEnumerator LoadMCBlockData(string dataVersion, string resVersion, Action? callback = null)
         {
             loadStateInfo.Loading = true;
             ExecuteButton!.interactable = false;
@@ -324,12 +330,12 @@ namespace MarkovCraft
             // Load resource packs...
             packManager.ClearPacks();
             // Collect packs
-            foreach (var packName in packs)
+            foreach (var packName in new string[] { $"vanilla-{resVersion}", "default" })
                 packManager.AddPack(new(packName));
             // Load valid packs...
             loadFlag.Finished = false;
-            Task.Run(() => packManager.LoadPacks(loadFlag, (status) =>
-                    Loom.QueueOnMainThread(() => GenerationText!.text = GetL10nString(status)), loadStateInfo));
+            Task.Run(() => packManager.LoadPacks(loadFlag,
+                    (status) => Loom.QueueOnMainThread(() => GenerationText!.text = GetL10nString(status)), loadStateInfo));
             while (!loadFlag.Finished) yield return null;
             
             loadStateInfo.Loading = false;
@@ -342,6 +348,39 @@ namespace MarkovCraft
 
             blockMaterial = Resources.Load<Material>("Materials/BlockMaterial");
             blockMaterial.SetTexture("_BaseMap", AtlasManager.GetAtlasArray(RenderType.SOLID));
+
+            yield return null;
+
+            var mcLang = LocalizationSettings.SelectedLocale.Identifier.Code.ToLower() switch
+            {
+                "zh-hans" => "zh_cn",
+
+                _         => "en_us"
+            };
+
+            var langPath = PathHelper.GetPackDirectoryNamed(
+                    $"vanilla-{resVersion}{SP}assets{SP}minecraft{SP}lang{SP}{mcLang}.json");
+
+            // Load translated block names
+            L10nBlockNameTable.Clear();
+
+            if (File.Exists(langPath)) // Json file present, just load it
+            {
+                foreach (var entry in Json.ParseJson(File.ReadAllText(langPath)).Properties.Where(x => x.Key.StartsWith("block.")))
+                    L10nBlockNameTable.Add(entry.Key, entry.Value.StringValue);
+            }
+            else // Not present yet, try downloading it
+            {
+                yield return StartCoroutine(ResourceDownloader.DownloadLanguageJson(resVersion, mcLang,
+                    (status) => Loom.QueueOnMainThread(() => GenerationText!.text = GetL10nString(status)),
+                    () => { }, (succeed) => {
+                        if (succeed) // Downloaded successfully, load it now
+                            foreach (var entry in Json.ParseJson(File.ReadAllText(langPath)).Properties.Where(x => x.Key.StartsWith("block.")))
+                                L10nBlockNameTable.Add(entry.Key, entry.Value.StringValue);
+                        else
+                            Debug.LogWarning($"Language file not available at {langPath}, block names not loaded.");
+                    }));
+            }
 
             if (callback is not null)
                 callback.Invoke();
@@ -468,11 +507,7 @@ namespace MarkovCraft
             // First load Minecraft data & resources
             var ver = VersionHolder!.Versions[VersionHolder.SelectedVersion];
 
-            //
-
-            StartCoroutine(LoadMCData(ver.DataVersion, new string[] {
-                    $"vanilla-{ver.ResourceVersion}", "default"
-                }, () => {
+            StartCoroutine(LoadMCBlockData(ver.DataVersion, ver.ResourceVersion, () => {
                     if (PlaybackSpeedSlider != null)
                     {
                         PlaybackSpeedSlider.onValueChanged.AddListener(UpdatePlaybackSpeed);
@@ -569,7 +604,7 @@ namespace MarkovCraft
             {
                 var size = newResult.GenerationSize;
 
-                VolumeText!.text = $"Result #{newResult.Iteration} Seed: {newResult.GenerationSeed}\nSize: {size.x}x{size.y}x{size.z}";
+                VolumeText!.text = GetL10nString("hud.text.result_info", newResult.Iteration, newResult.GenerationSeed, size.x, size.y, size.z);
                 VolumeSelection!.UpdateVolume(newResult.GetVolumePosition(), newResult.GetVolumeSize());
             
                 selectedResult = newResult;
