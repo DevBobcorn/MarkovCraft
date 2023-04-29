@@ -65,8 +65,7 @@ namespace MarkovCraft
         private readonly Dictionary<char, int2> palette = new();
         private Material? blockMaterial;
 
-        private readonly LoadStateInfo loadStateInfo = new();
-        public bool Loading => loadStateInfo.Loading;
+        public bool Loading = false;
 
         private static Test? instance;
         public static Test Instance
@@ -182,7 +181,7 @@ namespace MarkovCraft
 
         public Dictionary<char, CustomMappingItem>? GetExportPalette(HashSet<char> charSet)
         {
-            if (currentConfModel is null || loadStateInfo.Loading)
+            if (currentConfModel is null || Loading)
                 return null;
             
             var mapAsDict = currentConfModel.CustomMapping.ToDictionary(x => x.Character, x => x);
@@ -193,7 +192,7 @@ namespace MarkovCraft
 
         public IEnumerator UpdateConfiguredModel(string confModelFile, ConfiguredModel confModel)
         {
-            loadStateInfo.Loading = true;
+            Loading = true;
             GenerationText!.text = GetL10nString("status.info.load_conf_model", confModelFile);
 
             ExecuteButton!.interactable = false;
@@ -224,7 +223,7 @@ namespace MarkovCraft
             if (modelDoc is null)
             {
                 Debug.LogWarning($"ERROR: Couldn't open xml file at {fileName}");
-                loadStateInfo.Loading = false;
+                Loading = false;
                 GenerationText!.text = GetL10nString("status.error.open_xml_failure", fileName);
                 yield break;
             }
@@ -246,7 +245,7 @@ namespace MarkovCraft
             if (interpreter == null)
             {
                 Debug.LogWarning("ERROR: Failed to create model interpreter");
-                loadStateInfo.Loading = false;
+                Loading = false;
                 GenerationText!.text = GetL10nString("status.error.model_interpreter_failure");
                 yield break;
             }
@@ -300,7 +299,7 @@ namespace MarkovCraft
 
             yield return null;
 
-            loadStateInfo.Loading = false;
+            Loading = false;
 
             ExecuteButton!.interactable = true;
             ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.start_execution");
@@ -312,7 +311,7 @@ namespace MarkovCraft
 
         private IEnumerator LoadMCBlockData(string dataVersion, string resVersion, Action? callback = null)
         {
-            loadStateInfo.Loading = true;
+            Loading = true;
             ExecuteButton!.interactable = false;
             ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.load_resource");
 
@@ -335,10 +334,10 @@ namespace MarkovCraft
             // Load valid packs...
             loadFlag.Finished = false;
             Task.Run(() => packManager.LoadPacks(loadFlag,
-                    (status) => Loom.QueueOnMainThread(() => GenerationText!.text = GetL10nString(status)), loadStateInfo));
+                    (status) => Loom.QueueOnMainThread(() => GenerationText!.text = GetL10nString(status))));
             while (!loadFlag.Finished) yield return null;
             
-            loadStateInfo.Loading = false;
+            Loading = false;
 
             if (loadFlag.Failed)
             {
@@ -675,13 +674,13 @@ namespace MarkovCraft
             // Assign new configured model
             currentConfModel = newConfModel;
 
-            if (!loadStateInfo.Loading)
+            if (!Loading)
                 StartCoroutine(UpdateConfiguredModel(newConfModelFile, newConfModel));
         }
 
         public void StartExecution()
         {
-            if (loadStateInfo.Loading || executing)
+            if (Loading || executing)
             {
                 Debug.LogWarning("Execution cannot be started.");
                 return;
@@ -699,7 +698,7 @@ namespace MarkovCraft
 
         public void StopExecution()
         {
-            if (loadStateInfo.Loading)
+            if (Loading)
             {
                 Debug.LogWarning("Execution cannot be stopped.");
                 return;

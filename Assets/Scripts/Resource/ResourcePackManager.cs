@@ -51,7 +51,7 @@ namespace MarkovCraft
             StateModelTable.Clear();
         }
 
-        public void LoadPacks(DataLoadFlag flag, Action<string> updateStatus, LoadStateInfo loadStateInfo)
+        public void LoadPacks(DataLoadFlag flag, Action<string> updateStatus)
         {
             System.Diagnostics.Stopwatch sw = new();
             sw.Start();
@@ -84,7 +84,7 @@ namespace MarkovCraft
             // [Code removed]
 
             updateStatus("status.info.build_blockstate_geometry");
-            BuildStateGeometries(loadStateInfo);
+            BuildStateGeometries();
             // [Code removed]
 
             // Perform integrity check...
@@ -104,7 +104,7 @@ namespace MarkovCraft
             flag.Finished = true;
         }
 
-        public void BuildStateGeometries(LoadStateInfo loadStateInfo)
+        public void BuildStateGeometries()
         {
             // Load all blockstate files and build their block meshes...
             foreach (var blockPair in BlockStatePalette.INSTANCE.StateListTable)
