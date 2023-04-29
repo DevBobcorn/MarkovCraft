@@ -5,6 +5,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
 using UnityEngine.SceneManagement;
 using TMPro;
 
@@ -17,17 +18,10 @@ namespace MarkovCraft
         [SerializeField] private VersionHolder? VersionHolder;
         [SerializeField] private LocalizedStringTable? L10nTable;
         [SerializeField] Animator? CubeAnimator;
-        [SerializeField] Button? EnterButton, DownloadButton;
+        [SerializeField] Button? EnterButton, DownloadButton, LanguageButton;
 
         private Animator? downloadButtonAnimator;
         private bool downloadingRes = false;
-
-        // Runs before a scene gets loaded
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void InitializeApp()
-        {
-            Loom.Initialize();
-        }
 
         private string GetL10nString(string key, params object[] p)
         {
@@ -98,6 +92,15 @@ namespace MarkovCraft
             CubeAnimator?.SetTrigger("Right");
         }
 
+        public void NextLanguage()
+        {
+            var locales = LocalizationSettings.AvailableLocales.Locales;
+            var selected = LocalizationSettings.SelectedLocale;
+            var selectedIndex = locales.IndexOf(selected);
+            if (selectedIndex >= 0)
+                LocalizationSettings.SelectedLocale = locales[(selectedIndex + 1) % locales.Count];
+        }
+
         public void DownloadResource()
         {
             if (VersionHolder == null || downloadingRes) return;
@@ -140,6 +143,9 @@ namespace MarkovCraft
             StartCoroutine(MarkovCoroutine());
         }
 
-
+        public void QuitApp()
+        {
+            Application.Quit();
+        }
     }
 }

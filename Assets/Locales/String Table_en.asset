@@ -241,6 +241,10 @@ MonoBehaviour:
     m_Localized: vox model
     m_Metadata:
       m_Items: []
+  - m_Id: 708494963417088
+    m_Localized: En
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

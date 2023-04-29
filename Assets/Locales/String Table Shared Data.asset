@@ -219,6 +219,10 @@ MonoBehaviour:
     m_Key: exporter.format.vox_model
     m_Metadata:
       m_Items: []
+  - m_Id: 708494963417088
+    m_Key: welcome.text.current_language
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
