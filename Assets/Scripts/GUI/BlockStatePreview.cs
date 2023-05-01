@@ -128,7 +128,7 @@ namespace MarkovCraft
             else
             {
                 imageCanvasGroup!.alpha = 0F;
-                descText!.text = "<No Candidates>";
+                descText!.text = Test.GetL10nString("blockstate_preview.info.no_candidates");
             }
         }
 

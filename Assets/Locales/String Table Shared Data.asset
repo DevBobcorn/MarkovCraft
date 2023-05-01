@@ -235,6 +235,10 @@ MonoBehaviour:
     m_Key: status.info.download_lang_text
     m_Metadata:
       m_Items: []
+  - m_Id: 1574500561838080
+    m_Key: blockstate_preview.info.no_candidates
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

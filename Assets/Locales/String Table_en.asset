@@ -259,6 +259,10 @@ MonoBehaviour:
     m_Localized: Downloading localization texts...
     m_Metadata:
       m_Items: []
+  - m_Id: 1574500561838080
+    m_Localized: <No Candidates>
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
