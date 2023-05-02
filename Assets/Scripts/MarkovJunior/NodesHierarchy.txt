@@ -1,0 +1,23 @@
+Markov Junior Nodes Hierarchy
+=============================
+
+Node
+|
+|--Branch
+|  |--MapNode               (map)
+|  |--SequenceNode          (sequence)
+|  |--MarkovNode            (markov)
+|  |--WFCNode               (wfc)
+|     |--OverlapNode           (+sample)
+|     |--TileNode              (+tileset)
+|
+|--RuleNode
+|  |--AllNode               (all)
+|  |--OneNode               (one)
+|  |--ParallelNode          (prl)
+|
+|--PathNode                 (path)
+|--ConvChainNode            (overlap)
+|--ConvolutionNode          (convolution)
+
+=============================

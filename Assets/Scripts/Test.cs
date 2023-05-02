@@ -19,7 +19,6 @@ using TMPro;
 using MarkovJunior;
 using MarkovCraft.Mapping;
 
-
 namespace MarkovCraft
 {
     [RequireComponent(typeof (ScreenManager))]
@@ -105,7 +104,8 @@ namespace MarkovCraft
         public static string GetL10nBlockName(ResourceLocation blockId) =>
                 Instance.L10nBlockNameTable.GetValueOrDefault($"block.{blockId.Namespace}.{blockId.Path}", $"block.{blockId.Namespace}.{blockId.Path}");
 
-        private void RedrawProcedureGraph(ConfiguredModel confModel)
+        // TODO Remove later
+        private void RedrawProcedureGraphAsImage(ConfiguredModel confModel)
         {
             if (interpreter != null && GraphImage != null)
             {
@@ -135,6 +135,10 @@ namespace MarkovCraft
             }
             else
                 GraphImage?.gameObject.SetActive(false);
+        }
+
+        private void GenerateProcedureGraph()
+        {
 
         }
 
@@ -290,7 +294,7 @@ namespace MarkovCraft
             }
 
             // Update procedure graph
-            RedrawProcedureGraph(confModel);
+            RedrawProcedureGraphAsImage(confModel);
 
             yield return null;
 
