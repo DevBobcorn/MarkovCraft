@@ -1,6 +1,5 @@
 ﻿// Copyright (C) 2022 Maxim Gumin, The MIT License (MIT)
 
-using System;
 using System.Xml.Linq;
 using System.Collections.Generic;
 

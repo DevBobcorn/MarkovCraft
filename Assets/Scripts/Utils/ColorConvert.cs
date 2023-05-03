@@ -21,6 +21,11 @@ namespace MarkovCraft
             return (255 << 24) + (color.r << 16) + (color.g << 8) + color.b;
         }
 
+        public static int GetOpqaueRGB(int rgb)
+        {
+            return (255 << 24) + (rgb & 0xFFFFFF);
+        }
+
         public static Color32 GetColor32(int rgba)
         {
             return new((byte)((rgba & 0xFF0000) >> 16), (byte)((rgba & 0xFF00) >> 8), (byte)(rgba & 0xFF), (byte)(rgba >> 24));

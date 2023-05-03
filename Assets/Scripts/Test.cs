@@ -38,6 +38,7 @@ namespace MarkovCraft
         [SerializeField] public Slider? PlaybackSpeedSlider;
         [SerializeField] public Button? ConfigButton, ExecuteButton, ExportButton;
         [SerializeField] public RawImage? GraphImage;
+        [SerializeField] public ModelGraph? ModelGraphUI;
 
         [SerializeField] public GameObject? GenerationResultPrefab;
         private readonly List<GenerationResult> generationResults = new();
@@ -105,14 +106,14 @@ namespace MarkovCraft
                 Instance.L10nBlockNameTable.GetValueOrDefault($"block.{blockId.Namespace}.{blockId.Path}", $"block.{blockId.Namespace}.{blockId.Path}");
 
         // TODO Remove later
-        private void RedrawProcedureGraphAsImage(ConfiguredModel confModel)
+        private void RedrawModelGraphAsImage(string modelName)
         {
             if (interpreter != null && GraphImage != null)
             {
                 int imageX = 200, imageY = 600;
                 var image = new int[imageX * imageY];
 
-                MarkovJunior.GUI.Draw(confModel.Model, interpreter.root, null, image, imageX, imageY, palette);
+                MarkovJunior.GUI.Draw(modelName, interpreter.root, null, image, imageX, imageY, palette);
                 
                 Texture2D texture = new(imageX, imageY);
                 texture.filterMode = FilterMode.Point;
@@ -137,8 +138,15 @@ namespace MarkovCraft
                 GraphImage?.gameObject.SetActive(false);
         }
 
-        private void GenerateProcedureGraph()
+        private void GenerateProcedureGraph(string modelName)
         {
+            if (interpreter != null && ModelGraphUI != null)
+            {
+                var graphPalette = palette.ToDictionary(x => x.Key, x => ColorConvert.GetOpaqueColor32(x.Value.y));
+                ModelGraphGenerator.GenerateGraph(ModelGraphUI, modelName, interpreter.root, graphPalette);
+            }
+            else
+                ModelGraphUI?.gameObject.SetActive(false);
 
         }
 
@@ -293,8 +301,9 @@ namespace MarkovCraft
                 yield return null;
             }
 
-            // Update procedure graph
-            RedrawProcedureGraphAsImage(confModel);
+            // Update model graph
+            //RedrawModelGraphAsImage(confModel.Model);
+            GenerateProcedureGraph(confModel.Model);
 
             yield return null;
 
