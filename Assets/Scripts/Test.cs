@@ -439,13 +439,10 @@ namespace MarkovCraft
                 results.Add(result);
                 
                 GenerationText.text = GetL10nString("status.info.generation_start", k);
-                int frameCount = 1;
 
-                (byte[] state, char[] legend, int FX, int FY, int FZ) data = new();
+                (byte[] state, char[] legend, int FX, int FY, int FZ, int stepCount) data = new();
 
-                int stepsPerFrame = model.Animated ? model.Steps : 50000;
-
-                var enumerator = interpreter.Run(seed, stepsPerFrame, model.Animated).GetEnumerator();
+                var enumerator = interpreter.Run(seed, model.Steps, model.Animated).GetEnumerator();
 
                 bool hasNext = true;
 
@@ -471,10 +468,10 @@ namespace MarkovCraft
 
                     float tick = 1F / playbackSpeed;
 
-                    if (model.Animated) // Visualize this frame
+                    if (model.Animated) // Visualize this step
                     {
                         // Update generation text
-                        GenerationText.text = GetL10nString("status.info.generation_frame", k, frameCount++, (int)(tick * 1000));
+                        GenerationText.text = GetL10nString("status.info.generation_step", k, data.stepCount, (int)(tick * 1000));
 
                         var pos = new int3(2 + xCount * (data.FX + 2), 0, 2 + zCount * (data.FY + 2));
                         result.UpdateVolume(pos, new(data.FX, data.FZ, data.FY));
@@ -486,7 +483,7 @@ namespace MarkovCraft
                     yield return new WaitForSeconds(tick);
                 }
 
-                if (executing) // Visualize final state (last frame)
+                if (executing) // Visualize final state (last step)
                 {
                     var pos = new int3(2 + xCount * (data.FX + 2), 0, 2 + zCount * (data.FY + 2));
                     result.UpdateVolume(pos, new(data.FX, data.FZ, data.FY));
@@ -503,9 +500,9 @@ namespace MarkovCraft
                     var legendClone = new char[data.legend!.Length];
                     Array.Copy(data.legend!, legendClone, legendClone.Length);
 
-                    result.SetData((new[] { confModelFile, $"{seed}" }, stateClone, legendClone, data.FX, data.FY, data.FZ));
+                    result.SetData((new[] { confModelFile, $"{seed}" }, stateClone, legendClone, data.FX, data.FY, data.FZ, data.stepCount));
 
-                    Debug.Log($"Iteration #{k} complete. Frame Count: {frameCount}");
+                    Debug.Log($"Iteration #{k} complete. Steps: {data.stepCount}");
                     GenerationText.text = GetL10nString("status.info.generation_complete", k);
                 }
             }
@@ -615,8 +612,10 @@ namespace MarkovCraft
             if (newResult != null && newResult.Valid) // Valid
             {
                 var size = newResult.GenerationSize;
+                var fsc = newResult.FinalStepCount;
 
-                VolumeText!.text = GetL10nString("hud.text.result_info", newResult.Iteration, newResult.GenerationSeed, size.x, size.y, size.z);
+                VolumeText!.text = GetL10nString("hud.text.result_info", newResult.Iteration, newResult.GenerationSeed,
+                        size.x, size.y, size.z, fsc == 0 ? "-" : fsc.ToString());
                 VolumeSelection!.UpdateVolume(newResult.GetVolumePosition(), newResult.GetVolumeSize());
             
                 selectedResult = newResult;
@@ -633,7 +632,7 @@ namespace MarkovCraft
             }
         }
 
-        public (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ)? GetSelectedResultData()
+        public (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ, int steps)? GetSelectedResultData()
         {
             if (selectedResult == null || !selectedResult.Valid || !selectedResult.Completed)
                 return null;

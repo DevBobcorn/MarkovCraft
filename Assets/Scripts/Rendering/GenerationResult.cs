@@ -13,14 +13,16 @@ namespace MarkovCraft
 
         [HideInInspector] public bool Valid = true;
 
+        public int FinalStepCount => Data?.stepCount ?? 0;
+
         [SerializeField] public float Margin = 0.5F;
 
         private bool completed = false;
         public bool Completed => completed;
-        private (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ)? data = null;
-        public (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ)? Data => data;
+        private (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ, int stepCount)? data = null;
+        public (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ, int stepCount)? Data => data;
 
-        public void SetData((string[] info, byte[] state, char[] legend, int FX, int FY, int FZ) data)
+        public void SetData((string[] info, byte[] state, char[] legend, int FX, int FY, int FZ, int stepCount) data)
         {
             this.data = data;
 

@@ -136,7 +136,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 380619232026624
-    m_Key: status.info.generation_frame
+    m_Key: status.info.generation_step
     m_Metadata:
       m_Items: []
   - m_Id: 380621543088128

@@ -47,7 +47,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 10240953065472
-    m_Localized: Steps
+    m_Localized: Max Steps
     m_Metadata:
       m_Items: []
   - m_Id: 10292408786944
@@ -147,7 +147,7 @@ MonoBehaviour:
   - m_Id: 380619232026624
     m_Localized: 'Iteration: #{0}
 
-      Frame: {1} ({2}ms/frame)'
+      Step: {1} ({2}ms/step)'
     m_Metadata:
       m_Items: []
   - m_Id: 380621543088128
@@ -223,7 +223,7 @@ MonoBehaviour:
       <u>{1}</u>
 
 
-      Actual
+      Final
       Size:
 
       <u>{2}x{3}x{4}</u>'
@@ -248,7 +248,8 @@ MonoBehaviour:
   - m_Id: 722967874936832
     m_Localized: 'Result #{0} Seed: {1}
 
-      Actual Size: {2}x{3}x{4}'
+      Final Size: {2}x{3}x{4} Final Steps:
+      {5}'
     m_Metadata:
       m_Items: []
   - m_Id: 749456838270976

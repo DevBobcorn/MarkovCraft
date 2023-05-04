@@ -31,7 +31,7 @@ namespace MarkovCraft
         // BlockState Preview
         [SerializeField] public BlockStatePreview? BlockStatePreview;
 
-        private (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ)? exportData;
+        private (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ, int steps)? exportData;
         private Dictionary<char, CustomMappingItem>? exportPalette;
 
         private readonly List<MappingEditorItem> mappingItems = new();

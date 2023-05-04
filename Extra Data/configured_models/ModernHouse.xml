@@ -1,2 +1,2 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ConfiguredModel Model="Apartemazements" SizeX="8" SizeY="8" SizeZ="8" Amount="1" Steps="1000" Animated="true" />
+<ConfiguredModel Model="ModernHouse" SizeX="8" SizeY="8" SizeZ="5" Amount="5" Steps="1000" Animated="false" />

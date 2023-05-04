@@ -52,7 +52,7 @@ namespace MarkovJunior
             return ip;
         }
 
-        public IEnumerable<(byte[], char[], int, int, int)> Run(int seed, int steps, bool animated)
+        public IEnumerable<(byte[], char[], int, int, int, int)> Run(int seed, int steps, bool animated)
         {
             random = new System.Random(seed);
             grid = startgrid;
@@ -71,14 +71,14 @@ namespace MarkovJunior
             while (current != null && (steps <= 0 || counter < steps))
             {
                 if (animated)
-                    yield return (grid.state, grid.characters, grid.MX, grid.MY, grid.MZ);
+                    yield return (grid.state, grid.characters, grid.MX, grid.MY, grid.MZ, counter);
 
                 current.Go();
                 counter++;
                 first.Add(changes.Count);
             }
 
-            yield return (grid.state, grid.characters, grid.MX, grid.MY, grid.MZ);
+            yield return (grid.state, grid.characters, grid.MX, grid.MY, grid.MZ, counter);
         }
 
         public static void WriteLine(string s) => Debug.Log(s);
