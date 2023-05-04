@@ -210,7 +210,11 @@ namespace MarkovCraft
             ExecuteButton!.interactable = false;
             ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.load_conf_model");
 
+            // Clear up scene
             ClearUpScene();
+
+            // Clear up current model graph
+            ModelGraphUI?.ClearUp();
 
             string fileName = PathHelper.GetExtraDataFile($"models{SP}{confModel.Model}.xml");
             Debug.Log($"{confModel.Model} > {fileName}");

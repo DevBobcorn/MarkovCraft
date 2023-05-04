@@ -9,17 +9,52 @@ using MarkovJunior;
 
 namespace MarkovCraft
 {
+    [RequireComponent(typeof (RectTransform))]
     public class ModelGraph : MonoBehaviour
     {
         [SerializeField] public TMP_Text? ModelNameText;
         [SerializeField] public GameObject? ScopeGraphNodePrefab;
         [SerializeField] public GameObject? RuleGraphNodePrefab;
 
-        public RectTransform? GraphContentTransform;
+        [SerializeField] public RectTransform? GraphContentTransform;
 
+        private bool adjustingWidth = false;
+        private RectTransform? ownTransform;
+
+        public void AdjustWidth() => adjustingWidth = true;
+
+        public void ClearUp()
+        {
+            foreach (Transform child in GraphContentTransform!)
+                GameObject.Destroy(child.gameObject);
+            
+            GraphContentTransform!.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 0F);
+            
+            AdjustWidth();
+        }
+
+        void Start() => ownTransform = GetComponent<RectTransform>();
+
+        void Update()
+        {
+            if (!adjustingWidth) return;
+
+            if (GraphContentTransform != null && ownTransform != null)
+            {
+                var target = GraphContentTransform.rect.width;
+
+                //var ownWidth = Mathf.MoveTowards(ownTransform.rect.width, target, Time.unscaledDeltaTime * 500F);
+                var ownWidth = Mathf.Lerp(ownTransform.rect.width, target, 0.2F);
+
+                ownTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, ownWidth);
+
+                if (Mathf.Abs(target - ownWidth) < 1F) adjustingWidth = false;
+            }
+            else
+                adjustingWidth = false;
+        }
     }
 
-    
     static class ModelGraphGenerator
     {
         static readonly bool D3;
@@ -39,8 +74,7 @@ namespace MarkovCraft
             const int TILE_SIZE = 16;
 
             // Clear up model graph first
-            foreach (Transform child in graph.GraphContentTransform!)
-                GameObject.Destroy(child.gameObject);
+            graph.ClearUp();
             
             graph.ModelNameText!.text = modelName;
             Color32 BACKGROUND = new(0, 0, 0, 0);
@@ -113,8 +147,10 @@ namespace MarkovCraft
             };
             
             // Start generation
-            generate(graph, root, graph.GraphContentTransform);
+            generate(graph, root, graph.GraphContentTransform!);
 
+            // Adjust own width to fit graph content
+            graph.AdjustWidth();
         }
 
         private static Dictionary<Type, string> NodeNameDict = new()
