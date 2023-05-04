@@ -31,6 +31,8 @@ namespace MarkovCraft
                 return;
             }
 
+            var pointerOverUI = EventSystem.current.IsPointerOverGameObject();
+
             if (dragging) // Perform dragging
             {
                 if (Input.GetMouseButton(1))
@@ -46,7 +48,8 @@ namespace MarkovCraft
             }
             else // Check start dragging
             {
-                if (Input.GetMouseButton(1) && !EventSystem.current.IsPointerOverGameObject())
+
+                if (Input.GetMouseButton(1) && !pointerOverUI)
                 {
                     dragging = true;
                     lastDragPos = Input.mousePosition;
@@ -57,7 +60,7 @@ namespace MarkovCraft
             float hor = Input.GetAxis("Horizontal");
             float ver = Input.GetAxis("Vertical");
 
-            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            float scroll = pointerOverUI ? 0F : Input.GetAxis("Mouse ScrollWheel");
 
             if (hor != 0F)
             {
