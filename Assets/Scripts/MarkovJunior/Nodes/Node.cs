@@ -15,6 +15,9 @@ namespace MarkovJunior
         protected Interpreter ip;
         public Grid grid;
 
+        public int numId;
+        public string comment = string.Empty;
+
         public static Node Factory(XElement xelem, bool[] symmetry, Interpreter ip, Grid grid)
         {
             if (!nodenames.Contains(xelem.Name.LocalName))
@@ -38,6 +41,10 @@ namespace MarkovJunior
                 "wfc" when xelem.Get<string>("tileset", null) != null => new TileNode(),
                 _ => null
             };
+
+            // Assign a numeral id to this node for later reference
+            result.numId = ip.numId++;
+            //UnityEngine.Debug.Log($"Creating Node #{result.numId} {result}");
 
             result.ip = ip;
             result.grid = grid;
@@ -68,6 +75,7 @@ namespace MarkovJunior
 
             XElement[] xchildren = xelem.Elements(nodenames).ToArray();
             nodes = new Node[xchildren.Length];
+
             for (int c = 0; c < xchildren.Length; c++)
             {
                 var child = Factory(xchildren[c], symmetry, ip, grid);

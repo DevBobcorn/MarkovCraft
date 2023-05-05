@@ -18,13 +18,33 @@ namespace MarkovCraft
 
         [SerializeField] public RectTransform? GraphContentTransform;
 
+        public readonly Dictionary<int, BaseGraphNode> GraphNodes = new();
+        private BaseGraphNode? activeNode = null;
+        public BaseGraphNode? ActiveNode => activeNode;
+
         private bool adjustingWidth = false;
         private RectTransform? ownTransform;
 
         public void AdjustWidth() => adjustingWidth = true;
 
+        public void SetActiveNode(int nodeNumId)
+        {
+            if (activeNode != null) // Deselect previously selected node
+            {
+                activeNode.SetNodeActive(false);
+                activeNode = null;
+            }
+
+            if (GraphNodes.TryGetValue(nodeNumId, out activeNode) && activeNode != null)
+                activeNode.SetNodeActive(true);
+            
+        }
+
         public void ClearUp()
         {
+            GraphNodes.Clear();
+            activeNode = null;
+
             foreach (Transform child in GraphContentTransform!)
                 GameObject.Destroy(child.gameObject);
             
@@ -114,36 +134,52 @@ namespace MarkovCraft
             void generate(ModelGraph graph, Node node, Transform transform)
             {
                 var nodeName = Test.GetL10nString(GetNodeNameKey(node));
+                var nodeNumId = node.numId;
                 char[] characters = node.grid.characters;
+
+                BaseGraphNode nodeCmp;
 
                 if (node is Branch branch)
                 {
                     var nodeObj = GameObject.Instantiate(graph.ScopeGraphNodePrefab, transform);
-                    var nodeCmp = nodeObj!.GetComponent<ScopeGraphNode>();
+                    nodeCmp = nodeObj!.GetComponent<ScopeGraphNode>();
 
-                    nodeCmp.SetNodeName(nodeName);
-
-                    foreach (var child in branch.nodes)
+                    foreach (var child in branch.nodes) // Generate child nodes
                         generate(graph, child, nodeObj.transform);
                 }
                 else if (node is RuleNode ruleNode)
                 {
                     var nodeObj = GameObject.Instantiate(graph.RuleGraphNodePrefab, transform);
-                    var nodeCmp = nodeObj!.GetComponent<RuleGraphNode>();
+                    nodeCmp = nodeObj!.GetComponent<RuleGraphNode>();
 
-                    nodeCmp.SetNodeName(nodeName);
-
-                    for (int r = 0; r < ruleNode.rules.Length && r < 40; r++)
+                    for (int r = 0; r < ruleNode.rules.Length; r++)
                     {
                         Rule rule = ruleNode.rules[r];
+                        rule.ruleIndex = r;
                         if (!rule.original) continue;
 
                         var inPreview  = getPreview(rule.binput, rule.IMX, rule.IMY, rule.IMZ, characters, TILE_SIZE);
                         var outPreview = getPreview(rule.output, rule.OMX, rule.OMY, rule.OMZ, characters, TILE_SIZE);
 
-                        nodeCmp.AddRulePreview(inPreview, outPreview);
+                        (nodeCmp as RuleGraphNode)!.AddRulePreview(r, inPreview, outPreview);
                     }
+
+                    // Assign this graph node
+                    graph.GraphNodes.TryAdd(nodeNumId, nodeCmp);
+                    
                 }
+                else
+                {
+                    var nodeObj = GameObject.Instantiate(graph.RuleGraphNodePrefab, transform);
+                    nodeCmp = nodeObj!.GetComponent<BaseGraphNode>();
+                }
+
+                // Set node data
+                nodeCmp.SetNodeName($"{nodeName} <color=#888888>#{node.numId}</color>");
+                nodeCmp.SetNodeActive(false);
+
+                // Assign this graph node
+                graph.GraphNodes.TryAdd(nodeNumId, nodeCmp);
             };
             
             // Start generation
@@ -151,6 +187,30 @@ namespace MarkovCraft
 
             // Adjust own width to fit graph content
             graph.AdjustWidth();
+        }
+
+        public static void UpdateGraph(ModelGraph graph, Branch? current)
+        {
+            if (current is null)
+            {
+                graph.SetActiveNode(-1);
+                return;
+            }
+            
+            if (current.n < 0) // Set the whole branch as active
+            {
+                graph.SetActiveNode(current.numId);
+            }
+            else // Set the current child node as active
+            {
+                var currentNode = current.nodes[current.n];
+                graph.SetActiveNode(currentNode.numId);
+
+                if (currentNode is RuleNode ruleNode && graph.ActiveNode is RuleGraphNode ruleGraphNode) // Set active branch
+                {
+                    ruleGraphNode.SetActiveRules(GetActiveRules(ruleNode));
+                }
+            }
         }
 
         private static Dictionary<Type, string> NodeNameDict = new()
@@ -172,6 +232,32 @@ namespace MarkovCraft
         {
             //return node.GetType().ToString().Split('.')[^1];
             return "node.name." + NodeNameDict.GetValueOrDefault(node.GetType(), "unknown");
+        }
+
+        private static List<int> GetActiveRules(RuleNode node)
+        {
+            var result = new List<int>();
+            for (int index = 0;index < node.rules.Length;index++)
+            {
+                if (node.last[index])
+                {
+                    result.Add(index);
+                    break;
+                }
+
+                for (int r = index + 1; r < node.rules.Length; r++)
+                {
+                    Rule rule = node.rules[r];
+                    if (rule.original) break;
+                    if (node.last[r])
+                    {
+                        result.Add(index);
+                        break;
+                    }
+                }
+            }
+
+            return result;
         }
     }
 }

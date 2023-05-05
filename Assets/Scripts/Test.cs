@@ -482,6 +482,9 @@ namespace MarkovCraft
 
                         var instanceData = BlockDataBuilder.GetInstanceData(data.state!, data.FX, data.FY, data.FZ, pos, data.legend.Select(ch => palette[ch]).ToArray());
                         BlockInstanceSpawner.VisualizeState(instanceData, materials, blockMeshes, tick, 0.5F);
+
+                        // Update active node on graph
+                        ModelGraphGenerator.UpdateGraph(ModelGraphUI!, interpreter.current);
                     }
 
                     yield return new WaitForSeconds(tick);
@@ -507,6 +510,7 @@ namespace MarkovCraft
                     result.SetData((new[] { confModelFile, $"{seed}" }, stateClone, legendClone, data.FX, data.FY, data.FZ, data.stepCount));
 
                     Debug.Log($"Iteration #{k} complete. Steps: {data.stepCount}");
+                    ModelGraphUI!.SetActiveNode(-1); // Deselect active node
                     GenerationText.text = GetL10nString("status.info.generation_complete", k);
                 }
             }
@@ -721,6 +725,7 @@ namespace MarkovCraft
             }
 
             executing = false;
+            ModelGraphUI?.SetActiveNode(-1);
 
             if (ExecuteButton != null)
             {

@@ -21,6 +21,7 @@ namespace MarkovJunior
         public int counter;
         
         public bool animated;
+        public int numId = 0;
 
         Interpreter() { }
         public static Interpreter Load(XElement xelem, int MX, int MY, int MZ)

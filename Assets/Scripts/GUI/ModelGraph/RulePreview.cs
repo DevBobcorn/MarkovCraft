@@ -6,26 +6,29 @@ namespace MarkovCraft
 {
     public class RulePreview : MonoBehaviour
     {
-        [SerializeField] public RawImage? RuleInPreview;
-        [SerializeField] public RawImage? RuleOutPreview;
+        [SerializeField] GameObject? activeHint;
+        [SerializeField] RawImage? ruleInPreview;
+        [SerializeField] RawImage? ruleOutPreview;
+
+        public void SetRuleActive(bool active) => activeHint?.SetActive(active);
 
         public void SetPreviews(Texture2D inPrev, Texture2D outPrev)
         {
-            if (RuleInPreview != null)
+            if (ruleInPreview != null)
             {
-                RuleInPreview.GetComponent<LayoutElement>().minWidth = inPrev.width;
-                RuleInPreview.GetComponent<LayoutElement>().minHeight = inPrev.height;
+                ruleInPreview.GetComponent<LayoutElement>().minWidth = inPrev.width;
+                ruleInPreview.GetComponent<LayoutElement>().minHeight = inPrev.height;
 
-                RuleInPreview.texture = inPrev;
+                ruleInPreview.texture = inPrev;
             }
             
-            if (RuleOutPreview != null)
+            if (ruleOutPreview != null)
             {
-                RuleOutPreview.GetComponent<LayoutElement>().minWidth = outPrev.width;
-                RuleOutPreview.GetComponent<LayoutElement>().minHeight = outPrev.height;
+                ruleOutPreview.GetComponent<LayoutElement>().minWidth = outPrev.width;
+                ruleOutPreview.GetComponent<LayoutElement>().minHeight = outPrev.height;
 
-                RuleOutPreview.texture = outPrev;
-                RuleOutPreview.SetNativeSize();
+                ruleOutPreview.texture = outPrev;
+                ruleOutPreview.SetNativeSize();
             }
             
         }

@@ -21,6 +21,7 @@ namespace MarkovJunior
         public (int, int, int)[][] ishifts, oshifts;
 
         public bool original;
+        public int ruleIndex;
 
         public static int GetTrailingZeroCount(int number)
         {
