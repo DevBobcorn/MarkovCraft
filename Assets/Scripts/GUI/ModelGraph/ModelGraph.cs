@@ -113,7 +113,7 @@ namespace MarkovCraft
             };
             void generate(ModelGraph graph, Node node, Transform transform)
             {
-                var nodeName = GetNodeName(node);
+                var nodeName = Test.GetL10nString(GetNodeNameKey(node));
                 char[] characters = node.grid.characters;
 
                 if (node is Branch branch)
@@ -168,10 +168,10 @@ namespace MarkovCraft
             [typeof (TileNode)] =          "wfc_tile",
         };
 
-        private static string GetNodeName(Node node)
+        private static string GetNodeNameKey(Node node)
         {
             //return node.GetType().ToString().Split('.')[^1];
-            return NodeNameDict.GetValueOrDefault(node.GetType(), "unknown");
+            return "node.name." + NodeNameDict.GetValueOrDefault(node.GetType(), "unknown");
         }
     }
 }
