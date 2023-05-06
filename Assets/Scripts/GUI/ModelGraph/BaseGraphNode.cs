@@ -21,6 +21,11 @@ namespace MarkovCraft
             nameText!.color = active ? Color.black : Color.white;
         }
 
+        public void SetNodeNameVisible(bool visible)
+        {
+            nameText!.gameObject.SetActive(visible);
+        }
+
         public void SetNodeName(string name)
         {
             nameText!.text = name;

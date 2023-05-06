@@ -65,7 +65,7 @@ namespace MarkovCraft
         private readonly Dictionary<char, int2> palette = new();
         private Material? blockMaterial;
 
-        public bool Loading = false;
+        [HideInInspector] public bool Loading = false;
 
         private static Test? instance;
         public static Test Instance
@@ -113,7 +113,7 @@ namespace MarkovCraft
                 int imageX = 200, imageY = 600;
                 var image = new int[imageX * imageY];
 
-                MarkovJunior.GUI.Draw(modelName, interpreter.root, null, image, imageX, imageY, palette);
+                MarkovJunior.GUI.Draw(modelName, interpreter.root, interpreter.current, image, imageX, imageY, palette);
                 
                 Texture2D texture = new(imageX, imageY);
                 texture.filterMode = FilterMode.Point;
@@ -485,6 +485,7 @@ namespace MarkovCraft
 
                         // Update active node on graph
                         ModelGraphGenerator.UpdateGraph(ModelGraphUI!, interpreter.current);
+                        //RedrawModelGraphAsImage("Working...");
                     }
 
                     yield return new WaitForSeconds(tick);

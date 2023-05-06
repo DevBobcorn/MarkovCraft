@@ -22,7 +22,7 @@ namespace MarkovCraft
         private BaseGraphNode? activeNode = null;
         public BaseGraphNode? ActiveNode => activeNode;
 
-        private bool adjustingWidth = false;
+        private bool adjustingWidth = false, nodeNamesVisible = true;
         private RectTransform? ownTransform;
 
         public void AdjustWidth() => adjustingWidth = true;
@@ -38,6 +38,14 @@ namespace MarkovCraft
             if (GraphNodes.TryGetValue(nodeNumId, out activeNode) && activeNode != null)
                 activeNode.SetNodeActive(true);
             
+        }
+
+        public void ToggleNodeNamesVisibility()
+        {
+            nodeNamesVisible = !nodeNamesVisible;
+
+            foreach (var item in GraphNodes)
+                item.Value.SetNodeNameVisible(nodeNamesVisible);
         }
 
         public void ClearUp()
@@ -90,8 +98,8 @@ namespace MarkovCraft
 
         public static void GenerateGraph(ModelGraph graph, string modelName, Branch root, Dictionary<char, Color32> palette)
         {
-            const int ZSHIFT = 5;
-            const int TILE_SIZE = 16;
+            const int ZSHIFT = 4;
+            const int TILE_SIZE = 10;
 
             // Clear up model graph first
             graph.ClearUp();
@@ -207,9 +215,8 @@ namespace MarkovCraft
                 graph.SetActiveNode(currentNode.numId);
 
                 if (currentNode is RuleNode ruleNode && graph.ActiveNode is RuleGraphNode ruleGraphNode) // Set active branch
-                {
                     ruleGraphNode.SetActiveRules(GetActiveRules(ruleNode));
-                }
+                
             }
         }
 
