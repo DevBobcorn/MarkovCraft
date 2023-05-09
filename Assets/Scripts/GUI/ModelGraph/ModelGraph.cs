@@ -36,7 +36,33 @@ namespace MarkovCraft
             }
 
             if (GraphNodes.TryGetValue(nodeNumId, out activeNode) && activeNode != null)
+            {
                 activeNode.SetNodeActive(true);
+
+                // Perform auto scroll
+                var aTransform = activeNode.GetComponent<RectTransform>()!;
+
+                //var aPos = aTransform.anchoredPosition.y;
+                var aPos = GraphContentTransform!.InverseTransformPoint(aTransform.position).y;
+                var aHgt = aTransform.rect.height;
+
+                var vPos = GraphContentTransform!.anchoredPosition.y;
+                var vHgt = GraphContentTransform.parent.GetComponent<RectTransform>().rect.height;
+
+                aHgt = Mathf.Min(aHgt, vHgt);
+
+                if (vPos > -aPos)
+                {
+                    // Scroll to the active node (top aligned)
+                    GraphContentTransform.anchoredPosition = new(0, -aPos);
+                }
+                else if (vPos + vHgt < -aPos + aHgt)
+                {
+                    // Scroll to the active node (bottom aligned)
+                    GraphContentTransform.anchoredPosition = new(0, -aPos + aHgt - vHgt);
+                }
+                
+            }
             
         }
 
