@@ -1,5 +1,4 @@
-﻿// Copyright (C) 2022 Maxim Gumin, The MIT License (MIT)
-
+﻿#nullable enable
 using System;
 using System.IO;
 using UnityEngine;
@@ -10,25 +9,41 @@ namespace MarkovJunior
 {
     static class Graphics
     {
-        public static (int[], int, int, int) LoadBitmap(string filename)
+        public static (int[]?, int, int, int) LoadBitmap(string filename)
         {
             try
             {
-                var tex = new Texture2D(2, 2);
+                int width  = 2;
+                int height = 2;
+                int[]? result = null;
 
-                tex.LoadImage(File.ReadAllBytes(filename));
-                int width = tex.width;
-                int height = tex.height;
-                var result = new int[width * height];
-                var pixels = tex.GetPixels32();
+                bool completed = false;
 
-                for (int y = 0;y < height;y++)
-                    for (int x = 0;x < width;x++)
-                        result[(height - 1 - y) * width + x] = ColorConvert.GetRGB(pixels[y * width + x]);
+                Loom.QueueOnMainThread(() => {
+                    var tex = new Texture2D(2, 2);
+                    tex.LoadImage(File.ReadAllBytes(filename));
+
+                    width = tex.width;
+                    height = tex.height;
+
+                    var pixels = tex.GetPixels32();
+                    result = new int[width * height];
+
+                    for (int y = 0;y < height;y++)
+                        for (int x = 0;x < width;x++)
+                            result[(height - 1 - y) * width + x] = ColorConvert.GetRGB(pixels[y * width + x]);
+                    
+                    completed = true;
+                });
+
+                while (!completed) { /* Wait */ }
 
                 return (result, width, height, 1);
             }
-            catch (Exception) { return (null, -1, -1, -1); }
+            catch (Exception e) {
+                Debug.LogWarning($"An exception occurred: {e}");
+                return (null, -1, -1, -1);
+            }
             
         }
     }
