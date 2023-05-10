@@ -1,4 +1,5 @@
 #nullable enable
+using System.Threading;
 using UnityEngine;
 
 namespace MarkovCraft
@@ -7,11 +8,16 @@ namespace MarkovCraft
     {
         public const int WINDOWED_APP_WIDTH = 1600, WINDOWED_APP_HEIGHT = 900;
 
+        private static Thread? unityThread;
+        public static Thread UnityThread => unityThread!;
+
         // Runs before a scene gets loaded
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void InitializeApp()
         {
             Loom.Initialize();
+
+            unityThread = Thread.CurrentThread;
 
             var global = new GameObject("Markov Global");
             global.AddComponent<MarkovGlobal>();
