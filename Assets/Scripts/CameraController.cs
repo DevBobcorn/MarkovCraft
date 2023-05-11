@@ -9,6 +9,7 @@ namespace MarkovCraft
     {
         [SerializeField] public float moveSpeed   =  10F;
         [SerializeField] public float scrollSpeed = 500F;
+        [SerializeField] public float zPosLimit   = 320F;
 
         private Camera? viewCamera;
         public Camera? ViewCamera => viewCamera;
@@ -16,11 +17,14 @@ namespace MarkovCraft
         private bool dragging = false;
         private Vector3 lastDragPos = Vector2.zero;
 
+        private float zPosition = 0F;
+
         void Start()
         {
             // Get camera component
             viewCamera = GetComponent<Camera>();
 
+            zPosition = zPosLimit / 2F;
         }
 
         void Update()
@@ -39,7 +43,9 @@ namespace MarkovCraft
                 {
                     var curDragPos = Input.mousePosition;
                     var dragOffset = curDragPos - lastDragPos;
-                    transform.position -= transform.right * dragOffset.x * 0.2F + transform.up * dragOffset.y * 0.2F;
+
+                    var dragMultiplier = (zPosLimit * 1.1F - zPosition) * 0.1F / zPosLimit;
+                    transform.position -= dragMultiplier * (transform.right * dragOffset.x + transform.up * dragOffset.y);
 
                     lastDragPos = curDragPos;
                 }
@@ -74,7 +80,12 @@ namespace MarkovCraft
 
             if (scroll != 0F)
             {
-                transform.position += transform.forward * scroll * scrollSpeed;
+                var newZPosition = Mathf.Clamp(zPosition + scroll * scrollSpeed, zPosLimit / 4F, zPosLimit);
+                transform.position += transform.forward * (newZPosition - zPosition);
+
+                zPosition = newZPosition;
+
+                print(newZPosition);
             }
 
         }
