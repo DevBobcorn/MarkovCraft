@@ -306,8 +306,8 @@ namespace MarkovCraft
             }
 
             // Update model graph
-            //RedrawModelGraphAsImage(confModel.Model);
             GenerateProcedureGraph(confModel.Model);
+            //RedrawModelGraphAsImage(confModel.Model);
 
             yield return null;
 
