@@ -40,6 +40,8 @@ namespace MarkovCraft
         [SerializeField] public RawImage? GraphImage;
         [SerializeField] public ModelGraph? ModelGraphUI;
 
+        [SerializeField] public Material? BlockMaterial;
+
         [SerializeField] public GameObject? GenerationResultPrefab;
         private readonly List<GenerationResult> generationResults = new();
         private GenerationResult? selectedResult = null;
@@ -55,15 +57,12 @@ namespace MarkovCraft
 
         // Palettes and resources
         private Dictionary<string, string> L10nBlockNameTable = new();
-        private readonly ResourcePackManager packManager = new();
-        public ResourcePackManager PackManager => packManager;
         public readonly World DummyWorld = new();
         private Mesh[] blockMeshes = { };
         private BlockGeometry?[] blockGeometries = { };
         private float3[] blockTints = { };
         private int blockMeshCount = 0;
         private readonly Dictionary<char, int2> palette = new();
-        private Material? blockMaterial;
 
         [HideInInspector] public bool Loading = false;
 
@@ -164,7 +163,7 @@ namespace MarkovCraft
             // #0 is default cube mesh
             CubeGeometry.Build(ref buffers[0], AtlasManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
 
-            var modelTable = packManager.StateModelTable;
+            var modelTable = ResourcePackManager.Instance.StateModelTable;
             
             foreach (var pair in stateId2Mesh) // StateId => Mesh index
             {
@@ -343,6 +342,9 @@ namespace MarkovCraft
             // Then load all Items...
             // [Code removed]
 
+            // Get resource pack manager...
+            var packManager = ResourcePackManager.Instance;
+
             // Load resource packs...
             packManager.ClearPacks();
             // Collect packs
@@ -362,8 +364,7 @@ namespace MarkovCraft
                 yield break;
             }
 
-            blockMaterial = Resources.Load<Material>("Materials/BlockMaterial");
-            blockMaterial.SetTexture("_BaseMap", AtlasManager.GetAtlasArray(RenderType.SOLID));
+            BlockMaterial!.SetTexture("_BaseMap", AtlasManager.GetAtlasArray(RenderType.SOLID));
 
             yield return null;
 
@@ -404,7 +405,7 @@ namespace MarkovCraft
 
         private IEnumerator RunGeneration()
         {
-            if (executing || currentConfModel is null || interpreter is null || blockMaterial is null || GenerationText == null || GenerationResultPrefab is null)
+            if (executing || currentConfModel is null || interpreter is null || BlockMaterial is null || GenerationText == null || GenerationResultPrefab is null)
             {
                 Debug.LogWarning("Generation cannot be initiated");
                 StopExecution();
@@ -419,7 +420,7 @@ namespace MarkovCraft
             var resultPerLine = Mathf.CeilToInt(Mathf.Sqrt(model.Amount));
             resultPerLine = Mathf.Max(resultPerLine, 1);
             
-            Material[] materials = { blockMaterial };
+            Material[] materials = { BlockMaterial };
 
             System.Random rand = new();
             var seeds = model.Seeds;

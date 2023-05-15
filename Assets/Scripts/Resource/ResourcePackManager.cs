@@ -31,17 +31,16 @@ namespace MarkovCraft
 
         private readonly List<ResourcePack> packs = new List<ResourcePack>();
 
-        public ResourcePackManager()
+        public static readonly ResourcePackManager Instance = new();
+
+        private ResourcePackManager()
         {
             // Block model loaders
             BlockModelLoader = new BlockModelLoader(this);
             StateModelLoader = new BlockStateModelLoader(this);
         }
 
-        public void AddPack(ResourcePack pack)
-        {
-            packs.Add(pack);
-        }
+        public void AddPack(ResourcePack pack) => packs.Add(pack);
 
         public void ClearPacks()
         {

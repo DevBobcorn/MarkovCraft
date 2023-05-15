@@ -13218,6 +13218,7 @@ MonoBehaviour:
   ExportButton: {fileID: 967166046}
   GraphImage: {fileID: 401349594}
   ModelGraphUI: {fileID: 896529363}
+  BlockMaterial: {fileID: 2100000, guid: 7e3ea3dacd3f3c143805a48d2f20257c, type: 2}
   GenerationResultPrefab: {fileID: 4486798577887638714, guid: 4160e5a4c0a129040a739e80297eceda,
     type: 3}
   Loading: 0
@@ -14508,7 +14509,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 333209633}
   m_HandleRect: {fileID: 333209632}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -18144,7 +18145,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1968043859}
   m_HandleRect: {fileID: 1968043858}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

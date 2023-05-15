@@ -166,7 +166,7 @@ namespace MarkovCraft
                 var visualBuffer = new VertexBuffer();
 
                 var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, game!.DummyWorld, Location.Zero, newState);
-                game!.PackManager.StateModelTable[stateId].Geometries[0].Build(ref visualBuffer, float3.zero, PREVIEW_CULLFLAG, blockTint);
+                ResourcePackManager.Instance.StateModelTable[stateId].Geometries[0].Build(ref visualBuffer, float3.zero, PREVIEW_CULLFLAG, blockTint);
 
                 previewObject.GetComponent<MeshFilter>().sharedMesh = BuildMesh(visualBuffer);
             }
