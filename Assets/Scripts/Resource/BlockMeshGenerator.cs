@@ -10,7 +10,7 @@ namespace MarkovCraft
     {
         private static readonly Bounds cubeBounds = new Bounds(new(0.5F, 0.5F, 0.5F), new(1F, 1F, 1F));
 
-        public static Mesh[] GenerateMeshes(VertexBuffer[] buffers)
+        public static Mesh[] GenerateMeshes((float3[] vert, float3[] txuv, float3[] tint)[] buffers)
         {
             var meshDataArr = Mesh.AllocateWritableMeshData(buffers.Length);
 

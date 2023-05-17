@@ -8,7 +8,8 @@ namespace MarkovCraft
     {
         private static readonly Vector4 FULL = new(0, 0, 1, 1);
 
-        public static void Build(ref VertexBuffer buffer, ResourceLocation tex, int x, int y, int z, int cullFlags, float3 vertColor)
+        public static void Build(ref (float3[] vert, float3[] txuv, float3[] tint) buffer, ResourceLocation tex,
+                int x, int y, int z, int cullFlags, float3 vertColor)
         {
             // Unity                   Minecraft            Top Quad Vertices
             //  A +Z (East)             A +X (East)          v0---v1
@@ -32,7 +33,7 @@ namespace MarkovCraft
             for (int fti = vertOffset;fti < newLength;fti++)
                 tints[fti] = vertColor;
 
-            float3[] fullUVs = AtlasManager.GetUVs(tex, FULL, 0);
+            float3[] fullUVs = ResourcePackManager.Instance.GetUVs(tex, FULL, 0);
 
             if ((cullFlags & (1 << 0)) != 0) // Up
             {

@@ -31,7 +31,8 @@ namespace MarkovCraft
             return (h1 + h2 + h3 + h4) / 16F / cnt;
         }
 
-        public static void Build(ref VertexBuffer buffer, ResourceLocation liquid, int x, int y, int z, byte[] heights, int cullFlags, float3 fluidColor)
+        public static void Build(ref (float3[] vert, float3[] txuv, float3[] tint) buffer, ResourceLocation liquid,
+                int x, int y, int z, byte[] heights, int cullFlags, float3 fluidColor)
         {
             // Unity                   Minecraft            Top Quad Vertices     Height References
             //  A +Z (East)             A +X (East)          v0---v1               NE---SE
@@ -59,8 +60,8 @@ namespace MarkovCraft
             for (int fti = vertOffset;fti < newLength;fti++)
                 tints[fti] = fluidColor;
 
-            float3[] fullUVs = AtlasManager.GetUVs(liquid, FULL, 0);
-            //float3[] sideUVs = AtlasManager.GetUVs(liquid, new(0, 1 - h, 1, 1), 0);
+            float3[] fullUVs = ResourcePackManager.Instance.GetUVs(liquid, FULL, 0);
+            //float3[] sideUVs = ResourcePackManager.Instance.GetUVs(liquid, new(0, 1 - h, 1, 1), 0);
             float3[] sideUVs = fullUVs;
 
             if ((cullFlags & (1 << 0)) != 0) // Up

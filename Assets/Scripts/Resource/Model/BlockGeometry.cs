@@ -91,7 +91,7 @@ namespace MarkovCraft
             return vertexCount;
         }
 
-        public void Build(ref VertexBuffer buffer, float3 posOffset, int cullFlags, float3 blockTint)
+        public void Build(ref (float3[] vert, float3[] txuv, float3[] tint) buffer, float3 posOffset, int cullFlags, float3 blockTint)
         {
             // Compute value if absent
             int vertexCount = buffer.vert.Length + ((sizeCache.ContainsKey(cullFlags)) ? sizeCache[cullFlags] : (sizeCache[cullFlags] = CalculateArraySize(cullFlags)));
@@ -189,24 +189,25 @@ namespace MarkovCraft
 
         }
 
-        public void BuildWithCollider(ref VertexBuffer visualBuffer, ref float3[] colliderVerts, float3 posOffset, int cullFlags, float3 blockTint)
+        public void BuildWithCollider(ref (float3[] vert, float3[] txuv, float3[] tint) buffer,
+                ref float3[] colliderVerts, float3 posOffset, int cullFlags, float3 blockTint)
         {
             // Compute value if absent
             int extraVertCount  = sizeCache.ContainsKey(cullFlags) ? sizeCache[cullFlags] : (sizeCache[cullFlags] = CalculateArraySize(cullFlags));
-            int vVertexCount = visualBuffer.vert.Length + extraVertCount;
+            int vVertexCount = buffer.vert.Length + extraVertCount;
 
             var verts = new float3[vVertexCount];
             var txuvs = new float3[vVertexCount];
             var tints = new float3[vVertexCount];
 
-            visualBuffer.vert.CopyTo(verts, 0);
-            visualBuffer.txuv.CopyTo(txuvs, 0);
-            visualBuffer.tint.CopyTo(tints, 0);
+            buffer.vert.CopyTo(verts, 0);
+            buffer.txuv.CopyTo(txuvs, 0);
+            buffer.tint.CopyTo(tints, 0);
 
             var cVerts = new float3[colliderVerts.Length + extraVertCount];
             colliderVerts.CopyTo(cVerts, 0);
 
-            uint i, vertOffset = (uint)visualBuffer.vert.Length;
+            uint i, vertOffset = (uint)buffer.vert.Length;
             uint offsetAtStart = vertOffset;
 
             if (vertexArrs[CullDir.NONE].Length > 0)
@@ -289,9 +290,9 @@ namespace MarkovCraft
             // Copy from visual buffer to collider
             Array.Copy(verts, offsetAtStart, cVerts, colliderVerts.Length, extraVertCount);
 
-            visualBuffer.vert = verts;
-            visualBuffer.txuv = txuvs;
-            visualBuffer.tint = tints;
+            buffer.vert = verts;
+            buffer.txuv = txuvs;
+            buffer.tint = tints;
 
             colliderVerts = cVerts;
 
@@ -439,7 +440,7 @@ namespace MarkovCraft
                 // state rotation, and it rotates the area of texture which is used on the face
                 int uvAreaRot = stateRotated && uvlock ? uvlockMap[zyRot][facePair.Key] : 0;
 
-                float3[] remappedUVs = RemapUVs(face.uv / MC_UV_SCALE, texIdentifier, uvAreaRot);
+                float3[] remappedUVs = ResourcePackManager.Instance.GetUVs(texIdentifier, face.uv / MC_UV_SCALE, uvAreaRot);
 
                 // This rotation doesn't change the area of texture used...
                 // See https://minecraft.fandom.com/wiki/Model#Block_models
@@ -482,11 +483,6 @@ namespace MarkovCraft
                 vertIndexOffset[cullDir] += 4; // Four vertices per quad
             }
 
-        }
-
-        private static float3[] RemapUVs(float4 uvs, ResourceLocation source, int areaRot)
-        {
-            return AtlasManager.GetUVs(source, uvs, areaRot);
         }
 
         private static Dictionary<int2, Dictionary<FaceDir, int>> CreateUVLockMap()

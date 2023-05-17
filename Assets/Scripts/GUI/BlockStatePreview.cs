@@ -38,7 +38,7 @@ namespace MarkovCraft
 
         }
 
-        public static Mesh BuildMesh(VertexBuffer visualBuffer)
+        public static Mesh BuildMesh((float3[] vert, float3[] txuv, float3[] tint) visualBuffer)
         {
             int vertexCount = visualBuffer.vert.Length;
             int triIdxCount = (vertexCount / 2) * 3;
@@ -163,7 +163,7 @@ namespace MarkovCraft
             // Update block mesh
             if (previewObject != null)
             {
-                var visualBuffer = new VertexBuffer();
+                var visualBuffer = (vert: new float3[0], txuv: new float3[0], tint: new float3[0]);
 
                 var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, game!.DummyWorld, Location.Zero, newState);
                 ResourcePackManager.Instance.StateModelTable[stateId].Geometries[0].Build(ref visualBuffer, float3.zero, PREVIEW_CULLFLAG, blockTint);

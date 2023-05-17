@@ -152,16 +152,16 @@ namespace MarkovCraft
         private void GenerateBlockMeshes(Dictionary<int, int> stateId2Mesh) // StateId => Mesh index
         {
             var statePalette = BlockStatePalette.INSTANCE;
-            var buffers = new VertexBuffer[blockMeshCount];
+            var buffers = new (float3[] vert, float3[] txuv, float3[] tint)[blockMeshCount];
 
             blockGeometries = new BlockGeometry[blockMeshCount];
             blockTints = new float3[blockMeshCount];
             
             for (int i = 0;i < buffers.Length;i++)
-                buffers[i] = new VertexBuffer();
+                buffers[i] = (vert: new float3[0], txuv: new float3[0], tint: new float3[0]);
 
             // #0 is default cube mesh
-            CubeGeometry.Build(ref buffers[0], AtlasManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
+            CubeGeometry.Build(ref buffers[0], ResourcePackManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
 
             var modelTable = ResourcePackManager.Instance.StateModelTable;
             
@@ -182,7 +182,7 @@ namespace MarkovCraft
                 else
                 {
                     Debug.LogWarning($"Model for block state #{stateId} ({statePalette.FromId(stateId)}) is not available. Using cube model instead.");
-                    CubeGeometry.Build(ref buffers[pair.Value], AtlasManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
+                    CubeGeometry.Build(ref buffers[pair.Value], ResourcePackManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
                 }
             }
 
@@ -364,7 +364,7 @@ namespace MarkovCraft
                 yield break;
             }
 
-            BlockMaterial!.SetTexture("_BaseMap", AtlasManager.GetAtlasArray(RenderType.SOLID));
+            BlockMaterial!.SetTexture("_BaseMap", packManager.GetAtlasArray(RenderType.SOLID));
 
             yield return null;
 

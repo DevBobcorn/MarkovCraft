@@ -84,8 +84,6 @@ namespace MarkovCraft
                 transform.position += transform.forward * (newZPosition - zPosition);
 
                 zPosition = newZPosition;
-
-                print(newZPosition);
             }
 
         }
