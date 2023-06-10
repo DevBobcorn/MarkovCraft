@@ -54,12 +54,12 @@ namespace MarkovCraft
                 {
                     foreach (var wrapperData in variant.Value.DataArray)
                     {
-                        results.Add(new BlockGeometry(BlockModelWrapper.fromJson(manager, wrapperData)).Finalize());
+                        results.Add(new BlockGeometryBuilder(BlockModelWrapper.fromJson(manager, wrapperData)).Build());
                     }
                 }
                 else // Only a single item...
                 {
-                    results.Add(new BlockGeometry(BlockModelWrapper.fromJson(manager, variant.Value)).Finalize());
+                    results.Add(new BlockGeometryBuilder(BlockModelWrapper.fromJson(manager, variant.Value)).Build());
                 }
 
                 foreach (var stateId in BlockStatePalette.INSTANCE.StateListTable[blockId])
@@ -81,10 +81,10 @@ namespace MarkovCraft
 
         private void LoadMultipartFormat(List<Json.JSONData> parts, ResourceLocation blockId, RenderType renderType, ResourcePackManager manager)
         {
-            Dictionary<int, BlockGeometry> resultsList = new Dictionary<int, BlockGeometry>();
+            var buildersList = new Dictionary<int, BlockGeometryBuilder>();
             foreach (var stateId in BlockStatePalette.INSTANCE.StateListTable[blockId])
             {
-                resultsList.Add(stateId, new BlockGeometry());
+                buildersList.Add(stateId, new BlockGeometryBuilder());
             }
 
             foreach (var part in parts)
@@ -109,7 +109,7 @@ namespace MarkovCraft
                         Json.JSONData whenData = part.Properties["when"];
                         if (whenData.Properties.ContainsKey("OR"))
                         {   // 'when.OR' contains multiple predicates...
-                            foreach (var stateItem in resultsList) // For each state
+                            foreach (var stateItem in buildersList) // For each state
                             {
                                 int stateId = stateItem.Key;
                                 // Check and apply...
@@ -125,27 +125,27 @@ namespace MarkovCraft
                                 }
 
                                 if (apply) // Apply this part to the current state
-                                    resultsList[stateId].AppendWrapper(partWrapper);
+                                    buildersList[stateId].AppendWrapper(partWrapper);
 
                             }
 
                         }
                         else // 'when' is only a single predicate...
                         {
-                            foreach (var stateItem in resultsList) // For each state
+                            foreach (var stateItem in buildersList) // For each state
                             {
                                 int stateId = stateItem.Key;
                                 // Check and apply...
                                 if (BlockStatePredicate.fromJson(whenData).check(BlockStatePalette.INSTANCE.StatesTable[stateId]))
-                                    resultsList[stateId].AppendWrapper(partWrapper);
+                                    buildersList[stateId].AppendWrapper(partWrapper);
 
                             }
                         }
                     }
                     else // No predicate at all, apply anyway...
                     {
-                        foreach (var stateItem in resultsList) // For each state
-                            resultsList[stateItem.Key].AppendWrapper(partWrapper);
+                        foreach (var stateItem in buildersList) // For each state
+                            buildersList[stateItem.Key].AppendWrapper(partWrapper);
 
                     }
 
@@ -154,9 +154,9 @@ namespace MarkovCraft
             }
 
             // Get the table into manager...
-            foreach (var resultItem in resultsList)
+            foreach (var resultItem in buildersList)
             {
-                manager.StateModelTable.Add(resultItem.Key, new(new BlockGeometry[]{ resultItem.Value.Finalize() }.ToList(), renderType));
+                manager.StateModelTable.Add(resultItem.Key, new(new BlockGeometry[]{ resultItem.Value.Build() }.ToList(), renderType));
             }
 
         }

@@ -8,7 +8,7 @@ namespace MarkovCraft
     {
         private static readonly Vector4 FULL = new(0, 0, 1, 1);
 
-        public static void Build(ref (float3[] vert, float3[] txuv, float3[] tint) buffer, ResourceLocation tex,
+        public static void Build(ref VertexBuffer buffer, ResourceLocation tex,
                 int x, int y, int z, int cullFlags, float3 vertColor)
         {
             // Unity                   Minecraft            Top Quad Vertices
@@ -21,19 +21,20 @@ namespace MarkovCraft
 
             var verts = new float3[newLength];
             var txuvs = new float3[newLength];
+            var uvans = new float4[newLength];
             var tints = new float3[newLength];
 
-            if (vertOffset > 0)
-            {
-                buffer.vert.CopyTo(verts, 0);
-                buffer.txuv.CopyTo(txuvs, 0);
-                buffer.tint.CopyTo(tints, 0);
-            }
+            buffer.vert.CopyTo(verts, 0);
+            buffer.txuv.CopyTo(txuvs, 0);
+            buffer.uvan.CopyTo(uvans, 0);
+            buffer.tint.CopyTo(tints, 0);
 
             for (int fti = vertOffset;fti < newLength;fti++)
                 tints[fti] = vertColor;
 
-            float3[] fullUVs = ResourcePackManager.Instance.GetUVs(tex, FULL, 0);
+            var (fullUVs, anim) = ResourcePackManager.Instance.GetUVs(tex, FULL, 0);
+
+            float4[] uvAnims = { anim, anim, anim, anim };
 
             if ((cullFlags & (1 << 0)) != 0) // Up
             {
@@ -42,6 +43,7 @@ namespace MarkovCraft
                 verts[vertOffset + 2] = new(0 + x, 1 + y, 0 + z); // 3 => 1
                 verts[vertOffset + 3] = new(1 + x, 1 + y, 0 + z); // 2 => 0
                 fullUVs.CopyTo(txuvs, vertOffset);
+                uvAnims.CopyTo(uvans, vertOffset);
                 vertOffset += 4;
             }
 
@@ -52,6 +54,7 @@ namespace MarkovCraft
                 verts[vertOffset + 2] = new(0 + x, 0 + y, 1 + z); // 7 => 3
                 verts[vertOffset + 3] = new(1 + x, 0 + y, 1 + z); // 6 => 2
                 fullUVs.CopyTo(txuvs, vertOffset);
+                uvAnims.CopyTo(uvans, vertOffset);
                 vertOffset += 4;
             }
 
@@ -62,6 +65,7 @@ namespace MarkovCraft
                 verts[vertOffset + 2] = new(1 + x, 0 + y, 0 + z); // 1 => 0
                 verts[vertOffset + 3] = new(1 + x, 0 + y, 1 + z); // 6 => 3
                 fullUVs.CopyTo(txuvs, vertOffset);
+                uvAnims.CopyTo(uvans, vertOffset);
                 vertOffset += 4;
             }
 
@@ -72,6 +76,7 @@ namespace MarkovCraft
                 verts[vertOffset + 2] = new(0 + x, 0 + y, 1 + z); // 7 => 3
                 verts[vertOffset + 3] = new(0 + x, 0 + y, 0 + z); // 0 => 0
                 fullUVs.CopyTo(txuvs, vertOffset);
+                uvAnims.CopyTo(uvans, vertOffset);
                 vertOffset += 4;
             }
 
@@ -82,6 +87,7 @@ namespace MarkovCraft
                 verts[vertOffset + 2] = new(1 + x, 0 + y, 1 + z); // 6 => 2
                 verts[vertOffset + 3] = new(0 + x, 0 + y, 1 + z); // 7 => 3
                 fullUVs.CopyTo(txuvs, vertOffset);
+                uvAnims.CopyTo(uvans, vertOffset);
                 vertOffset += 4;
             }
 
@@ -92,11 +98,13 @@ namespace MarkovCraft
                 verts[vertOffset + 2] = new(0 + x, 0 + y, 0 + z); // 0 => 0
                 verts[vertOffset + 3] = new(1 + x, 0 + y, 0 + z); // 1 => 1
                 fullUVs.CopyTo(txuvs, vertOffset);
+                uvAnims.CopyTo(uvans, vertOffset);
                 // Not necessary vertOffset += 4;
             }
 
             buffer.vert = verts;
             buffer.txuv = txuvs;
+            buffer.uvan = uvans;
             buffer.tint = tints;
 
         }

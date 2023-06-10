@@ -152,13 +152,13 @@ namespace MarkovCraft
         private void GenerateBlockMeshes(Dictionary<int, int> stateId2Mesh) // StateId => Mesh index
         {
             var statePalette = BlockStatePalette.INSTANCE;
-            var buffers = new (float3[] vert, float3[] txuv, float3[] tint)[blockMeshCount];
+            var buffers = new VertexBuffer[blockMeshCount];
 
             blockGeometries = new BlockGeometry[blockMeshCount];
             blockTints = new float3[blockMeshCount];
             
             for (int i = 0;i < buffers.Length;i++)
-                buffers[i] = (vert: new float3[0], txuv: new float3[0], tint: new float3[0]);
+                buffers[i] = new();
 
             // #0 is default cube mesh
             CubeGeometry.Build(ref buffers[0], ResourcePackManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
