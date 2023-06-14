@@ -37,7 +37,6 @@ namespace MarkovCraft
         [SerializeField] public TMP_Dropdown? ConfiguredModelDropdown;
         [SerializeField] public Slider? PlaybackSpeedSlider;
         [SerializeField] public Button? ConfigButton, ExecuteButton, ExportButton;
-        [SerializeField] public RawImage? GraphImage;
         [SerializeField] public ModelGraph? ModelGraphUI;
 
         [SerializeField] public Material? BlockMaterial;
@@ -103,39 +102,6 @@ namespace MarkovCraft
 
         public static string GetL10nBlockName(ResourceLocation blockId) =>
                 Instance.L10nBlockNameTable.GetValueOrDefault($"block.{blockId.Namespace}.{blockId.Path}", $"block.{blockId.Namespace}.{blockId.Path}");
-
-        // TODO Remove later
-        private void RedrawModelGraphAsImage(string modelName)
-        {
-            if (interpreter != null && GraphImage != null)
-            {
-                int imageX = 200, imageY = 600;
-                var image = new int[imageX * imageY];
-
-                MarkovJunior.GUI.Draw(modelName, interpreter.root, interpreter.current, image, imageX, imageY, palette);
-                
-                Texture2D texture = new(imageX, imageY);
-                texture.filterMode = FilterMode.Point;
-
-                var color32s = new Color32[imageX * imageY];
-
-                for (int y = 0; y < imageY; y++) for (int x = 0; x < imageX; x++)
-                {
-                    int rgb = image[x + (imageY - 1 - y) * imageX];
-                    color32s[x + y * imageX] = ColorConvert.GetOpaqueColor32(rgb);
-                }
-
-                texture.SetPixels32(color32s);
-                texture.Apply(true, false);
-                
-                GraphImage.texture = texture;
-                GraphImage.SetNativeSize();
-
-                GraphImage.gameObject.SetActive(true);
-            }
-            else
-                GraphImage?.gameObject.SetActive(false);
-        }
 
         private void GenerateProcedureGraph(string modelName)
         {
