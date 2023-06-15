@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace MarkovCraft
+namespace MinecraftClient.Resource
 {
     public struct TextureInfo
     {

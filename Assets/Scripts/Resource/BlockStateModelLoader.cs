@@ -3,9 +3,9 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-using MarkovCraft.Mapping;
+using MinecraftClient.Mapping;
 
-namespace MarkovCraft
+namespace MinecraftClient.Resource
 {
     public class BlockStateModelLoader
     {
@@ -160,7 +160,6 @@ namespace MarkovCraft
             }
 
         }
-
     }
 
 }

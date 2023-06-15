@@ -1,11 +1,11 @@
 #nullable enable
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using UnityEngine;
 
-using MarkovCraft.Mapping;
-using System.IO.Compression;
+using MinecraftClient.Mapping;
 
 namespace MarkovCraft
 {

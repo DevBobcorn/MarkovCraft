@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace MarkovCraft.Mapping
+namespace MinecraftClient.Mapping
 {
     public class BlockStatePredicate
     {
@@ -31,7 +31,7 @@ namespace MarkovCraft.Mapping
                 }
                 else
                 {
-                    //Debug.Log($"Invalid prop condition: <{src}>");
+                    Debug.Log($"Invalid prop condition: <{src}>");
                 }
             }
             return new BlockStatePredicate(conditions);

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MarkovCraft
+namespace MinecraftClient.Resource
 {
     public class BlockStateModel
     {

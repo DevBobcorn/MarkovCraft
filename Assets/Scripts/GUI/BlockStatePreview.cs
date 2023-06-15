@@ -6,7 +6,9 @@ using Unity.Collections;
 using Unity.Mathematics;
 using TMPro;
 
-using MarkovCraft.Mapping;
+using MinecraftClient;
+using MinecraftClient.Mapping;
+using MinecraftClient.Resource;
 
 namespace MarkovCraft
 {

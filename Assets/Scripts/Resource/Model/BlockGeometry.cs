@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 
 using Unity.Mathematics;
 
-namespace MarkovCraft
+namespace MinecraftClient.Resource
 {
     public class BlockGeometry
     {

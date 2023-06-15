@@ -1,4 +1,4 @@
-namespace MarkovCraft
+namespace MinecraftClient
 {
     public class DataLoadFlag
     {

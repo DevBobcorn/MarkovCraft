@@ -16,8 +16,11 @@ using UnityEngine.SceneManagement;
 using Unity.Mathematics;
 using TMPro;
 
+using MinecraftClient;
+using MinecraftClient.Resource;
+using MinecraftClient.Mapping;
+
 using MarkovJunior;
-using MarkovCraft.Mapping;
 
 namespace MarkovCraft
 {
@@ -56,7 +59,10 @@ namespace MarkovCraft
 
         // Palettes and resources
         private Dictionary<string, string> L10nBlockNameTable = new();
+
+        public class World : AbstractWorld { }
         public readonly World DummyWorld = new();
+
         private Mesh[] blockMeshes = { };
         private BlockGeometry?[] blockGeometries = { };
         private float3[] blockTints = { };

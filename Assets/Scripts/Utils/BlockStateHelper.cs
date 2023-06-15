@@ -1,8 +1,9 @@
 #nullable enable
 using System.Linq;
-using UnityEngine;
+using MinecraftClient;
+using MinecraftClient.Mapping;
 
-namespace MarkovCraft.Mapping
+namespace MarkovCraft
 {
     public static class BlockStateHelper
     {

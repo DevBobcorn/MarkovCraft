@@ -1,4 +1,4 @@
-namespace MarkovCraft
+namespace MinecraftClient
 {
     public struct ResourceLocation
     {
@@ -54,10 +54,9 @@ namespace MarkovCraft
             return Namespace.GetHashCode() ^ Path.GetHashCode();
         }
 
-        public override string ToString()
-        {
-            return Namespace + ":" + Path;
-        }
+        public string GetTranslationKey(string category) => $"{category}.{Namespace}.{Path}";
+
+        public override string ToString() => $"{Namespace}:{Path}";
 
     }
 }

@@ -1,6 +1,6 @@
 using Unity.Mathematics;
 
-namespace MarkovCraft
+namespace MinecraftClient.Resource
 {
     public class VertexBuffer
     {

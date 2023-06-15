@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MarkovCraft
+namespace MinecraftClient.Resource
 {
     public class JsonModel
     {

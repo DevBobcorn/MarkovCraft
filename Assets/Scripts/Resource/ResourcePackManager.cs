@@ -7,9 +7,9 @@ using System.Linq;
 using UnityEngine;
 using Unity.Mathematics;
 
-using MarkovCraft.Mapping;
+using MinecraftClient.Mapping;
 
-namespace MarkovCraft
+namespace MinecraftClient.Resource
 {
     public class ResourcePackManager
     {
@@ -18,6 +18,9 @@ namespace MarkovCraft
 
         // Identidier -> Block json model file path
         public readonly Dictionary<ResourceLocation, string> BlockModelFileTable = new();
+
+        // Identidier -> Item json model file path
+        public readonly Dictionary<ResourceLocation, string> ItemModelFileTable = new();
 
         // Identidier -> BlockState json model file path
         public readonly Dictionary<ResourceLocation, string> BlockStateFileTable = new();
@@ -28,13 +31,23 @@ namespace MarkovCraft
         // Block state numeral id -> Block state geometries (One single block state may have a list of models to use randomly)
         public readonly Dictionary<int, BlockStateModel> StateModelTable = new();
 
+        // Identifier -> Raw item model
+        public readonly Dictionary<ResourceLocation, JsonModel> RawItemModelTable = new();
+
+        // Item numeral id -> Item model
+        public readonly Dictionary<int, ItemModel> ItemModelTable = new();
+
+        public readonly HashSet<ResourceLocation> GeneratedItemModels = new();
+
         public readonly BlockModelLoader BlockModelLoader;
         public readonly BlockStateModelLoader StateModelLoader;
+
+        public readonly ItemModelLoader ItemModelLoader;
 
         public int GeneratedItemModelPrecision { get; set; } = 16;
         public int GeneratedItemModelThickness { get; set; } =  1;
 
-        private readonly List<ResourcePack> packs = new List<ResourcePack>();
+        private readonly List<ResourcePack> packs = new();
 
         public static readonly ResourcePackManager Instance = new();
 
@@ -43,6 +56,9 @@ namespace MarkovCraft
             // Block model loaders
             BlockModelLoader = new BlockModelLoader(this);
             StateModelLoader = new BlockStateModelLoader(this);
+
+            // Item model loader
+            ItemModelLoader = new ItemModelLoader(this);
         }
 
         public void AddPack(ResourcePack pack) => packs.Add(pack);
@@ -53,6 +69,9 @@ namespace MarkovCraft
             TextureFileTable.Clear();
             BlockModelTable.Clear();
             StateModelTable.Clear();
+            RawItemModelTable.Clear();
+            ItemModelTable.Clear();
+            GeneratedItemModels.Clear();
         }
 
         public void LoadPacks(DataLoadFlag flag, Action<string> updateStatus)
@@ -85,11 +104,18 @@ namespace MarkovCraft
             }
 
             // Load item models...
-            // [Code removed]
+            foreach (var itemModelId in ItemModelFileTable.Keys)
+            {
+                // This model loader will load this model, its parent model(if not yet loaded),
+                // and then add them to the manager's model dictionary
+                ItemModelLoader.LoadItemModel(itemModelId);
+            }
 
             updateStatus("status.info.build_blockstate_geometry");
             BuildStateGeometries();
-            // [Code removed]
+
+            updateStatus("status.info.build_item_geometry");
+            BuildItemGeometries();
 
             // Perform integrity check...
             var statesTable = BlockStatePalette.INSTANCE.StatesTable;
@@ -129,6 +155,99 @@ namespace MarkovCraft
 
         }
 
+        public void BuildItemGeometries()
+        {
+            // Load all item model files and build their item meshes...
+            foreach (var numId in ItemPalette.INSTANCE.ItemsTable.Keys)
+            {
+                var item = ItemPalette.INSTANCE.ItemsTable[numId];
+                var itemId = item.ItemId;
+
+                var itemModelId = new ResourceLocation(itemId.Namespace, $"item/{itemId.Path}");
+
+                if (ItemModelFileTable.ContainsKey(itemModelId))
+                {
+                    if (RawItemModelTable.ContainsKey(itemModelId))
+                    {
+                        var rawModel = RawItemModelTable[itemModelId];
+                        var tintable = ItemPalette.INSTANCE.IsTintable(numId);
+                        var generated = GeneratedItemModels.Contains(itemModelId);
+
+                        if (generated) // This model should be generated
+                        {
+                            // Get layer count of this item model
+                            int layerCount = rawModel.Textures.Count;
+
+                            rawModel.Elements.AddRange(
+                                    ItemModelLoader.GetGeneratedItemModelElements(
+                                            layerCount, GeneratedItemModelPrecision,
+                                                    GeneratedItemModelThickness, tintable).ToArray());
+                            
+                            //Debug.Log($"Generating item model for {itemModelId} tintable: {tintable}");
+                        }
+
+                        var itemGeometry = new ItemGeometryBuilder(rawModel).Build(generated);
+
+                        RenderType renderType;
+
+                        if (GeneratedItemModels.Contains(itemModelId))
+                            renderType = RenderType.CUTOUT; // Set render type to cutout for all generated item models
+                        else
+                            renderType = BlockStatePalette.INSTANCE.RenderTypeTable.GetValueOrDefault(itemId, RenderType.SOLID);
+
+                        var itemModel = new ItemModel(itemGeometry, renderType);
+                        
+
+                        // Look for and append geometry overrides to the item model
+                        Json.JSONData modelData = Json.ParseJson(File.ReadAllText(ItemModelFileTable[itemModelId]));
+
+                        if (modelData.Properties.ContainsKey("overrides"))
+                        {
+                            var overrides = modelData.Properties["overrides"].DataArray;
+
+                            foreach (var o in overrides)
+                            {
+                                var overrideModelId = ResourceLocation.fromString(o.Properties["model"].StringValue);
+
+                                if (RawItemModelTable.ContainsKey(overrideModelId)) // Build this override
+                                {
+                                    var rawOverrideModel = RawItemModelTable[overrideModelId];
+                                    var overrideGenerated = GeneratedItemModels.Contains(overrideModelId);
+
+                                    if (overrideGenerated) // This model should be generated
+                                    {
+                                        // Get layer count of this item model
+                                        int layerCount = rawModel.Textures.Count;
+
+                                        rawOverrideModel.Elements.AddRange(
+                                                ItemModelLoader.GetGeneratedItemModelElements(
+                                                        layerCount, GeneratedItemModelPrecision,
+                                                                GeneratedItemModelThickness, tintable).ToArray());
+                                        
+                                        //Debug.Log($"Generating item model for {itemModelId} tintable: {tintable}");
+                                    }
+
+                                    var overrideGeometry = new ItemGeometryBuilder(rawOverrideModel).Build(overrideGenerated);
+                                    var predicate = ItemModelPredicate.fromJson(o.Properties["predicate"]);
+                                    
+                                    itemModel.AddOverride(predicate, overrideGeometry);
+                                }
+                                
+                            }
+                        }
+
+                        ItemModelTable.Add(numId, itemModel);
+                    }
+                    else
+                        Debug.LogWarning($"Item model for {itemId} not found at {itemModelId}!");
+                }
+                else
+                    Debug.LogWarning($"Item model not assigned for {itemModelId}");
+
+            }
+
+        }
+        
         public readonly TextureInfo DEFAULT_TEXTURE_INFO = new(new(), 0);
 
         private readonly Dictionary<ResourceLocation, TextureInfo> texAtlasTable = new();
@@ -193,7 +312,6 @@ namespace MarkovCraft
             };
         }
 
-        public static readonly ResourceLocation HAKU = new("markov", "haku");
         public const int ATLAS_SIZE = 1024;
 
         private record TextureAnimationInfo
@@ -295,7 +413,7 @@ namespace MarkovCraft
 
             // Collect referenced textures
             var modelFilePaths = BlockModelFileTable.Values.ToList();
-            // [Code removed]
+            modelFilePaths.AddRange(ItemModelFileTable.Values);
             
             foreach (var modelFile in modelFilePaths)
             {
@@ -322,13 +440,7 @@ namespace MarkovCraft
 
             // Append liquid textures, which are not referenced in model files, but will be used by fluid mesh
             foreach (var liquidTex in FluidGeometry.LiquidTextures)
-                if (texDict.ContainsKey(liquidTex))
-                    textureIdSet.Add(liquidTex);
-            
-            if (texDict.ContainsKey(HAKU))
-                textureIdSet.Add(HAKU);
-            else
-                Debug.LogWarning("Default texture file not found!");
+                textureIdSet.Add(liquidTex);
 
             var textureInfos = new (Texture2D, TextureAnimationInfo?)[textureIdSet.Count];
             var ids = new ResourceLocation[textureIdSet.Count];

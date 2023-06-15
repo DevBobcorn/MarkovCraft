@@ -1,6 +1,7 @@
-using System;
+﻿using System;
+using Unity.Mathematics;
 
-namespace MarkovCraft.Mapping
+namespace MinecraftClient.Mapping
 {
     /// <summary>
     /// Represents a location into a Minecraft world
@@ -41,6 +42,55 @@ namespace MarkovCraft.Mapping
             X = x;
             Y = y;
             Z = z;
+        }
+
+        /// <summary>
+        /// Round coordinates
+        /// </summary>
+        /// <returns>New location</returns>
+        public Location ToFloor()
+        {
+            return new Location(Math.Floor(this.X), Math.Floor(this.Y), Math.Floor(this.Z));
+        }
+
+        /// <summary>
+        /// Get the center coordinates
+        /// </summary>
+        /// <returns>New location</returns>
+        public Location ToCenter()
+        {
+            return new Location(Math.Floor(this.X) + 0.5, this.Y, Math.Floor(this.Z) + 0.5);
+        }
+
+        /// <summary>
+        /// Get a squared distance to the specified location
+        /// </summary>
+        /// <param name="location">Other location for computing distance</param>
+        /// <returns>Distance to the specified location, without using a square root</returns>
+        public double DistanceSquared(Location location)
+        {
+            return ((X - location.X) * (X - location.X))
+                 + ((Y - location.Y) * (Y - location.Y))
+                 + ((Z - location.Z) * (Z - location.Z));
+        }
+
+        /// <summary>
+        /// Get exact distance to the specified location
+        /// </summary>
+        /// <param name="location">Other location for computing distance</param>
+        /// <returns>Distance to the specified location, with square root so lower performances</returns>
+        public double Distance(Location location)
+        {
+            return Math.Sqrt(DistanceSquared(location));
+        }
+
+        /// <summary>
+        /// Considering the current location as Feet location, calculate Eyes location
+        /// </summary>
+        /// <returns>Player Eyes location</returns>
+        public Location EyesLocation()
+        {
+            return this + new Location(0, 1.62, 0);
         }
 
         /// <summary>
@@ -187,5 +237,58 @@ namespace MarkovCraft.Mapping
             return String.Format("X:{0:0.00} Y:{1:0.00} Z:{2:0.00}", X, Y, Z);
         }
 
+        public double DistanceTo(Location loc)
+        {
+            return Math.Sqrt(Math.Pow(this.X - loc.X, 2) + Math.Pow(this.Y - loc.Y, 2) + Math.Pow(this.Z - loc.Z, 2));
+        }
+
+        public double DistanceTo(int3 loc)
+        {
+            return Math.Sqrt(Math.Pow(this.X - loc.x, 2) + Math.Pow(this.Y - loc.y, 2) + Math.Pow(this.Z - loc.z, 2));
+        }
+
+        public double SqrDistanceTo(Location loc)
+        {
+            return Math.Pow(this.X - loc.X, 2) + Math.Pow(this.Y - loc.Y, 2) + Math.Pow(this.Z - loc.Z, 2);
+        }
+
+        public double SqrDistanceTo(int3 loc)
+        {
+            return Math.Pow(this.X - loc.x, 2) + Math.Pow(this.Y - loc.y, 2) + Math.Pow(this.Z - loc.z, 2);
+        }
+
+        public Location Up()
+        {
+            return this + new Location( 0, 1, 0);
+        }
+
+        public Location Down()
+        {
+            return this + new Location( 0,-1, 0);
+        }
+
+        // MC Z Neg
+        public Location North()
+        {
+            return this + new Location( 0, 0,-1);
+        }
+
+        // MC Z Pos
+        public Location South()
+        {
+            return this + new Location( 0, 0, 1);
+        }
+
+        // MC X Pos
+        public Location East()
+        {
+            return this + new Location( 1, 0, 0);
+        }
+
+        // MC X Neg
+        public Location West()
+        {
+            return this + new Location(-1, 0, 0);
+        }
     }
 }

@@ -1,4 +1,4 @@
-namespace MarkovCraft
+namespace MinecraftClient.Resource
 {
     public struct TextureReference
     {

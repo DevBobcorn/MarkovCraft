@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Mathematics;
 
-namespace MarkovCraft
+namespace MinecraftClient.Resource
 {
     public static class FluidGeometry
     {

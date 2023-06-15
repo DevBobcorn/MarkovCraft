@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-using MarkovCraft.Mapping;
+using MinecraftClient.Mapping;
 
 namespace MarkovCraft
 {

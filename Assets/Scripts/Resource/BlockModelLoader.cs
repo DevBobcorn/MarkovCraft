@@ -1,7 +1,7 @@
 using System.IO;
 using UnityEngine;
 
-namespace MarkovCraft
+namespace MinecraftClient.Resource
 {
     public class BlockModelLoader
     {

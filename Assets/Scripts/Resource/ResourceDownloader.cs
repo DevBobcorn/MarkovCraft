@@ -9,7 +9,7 @@ using System.Linq;
 using UnityEngine;
 using System.Text.RegularExpressions;
 
-namespace MarkovCraft
+namespace MinecraftClient.Resource
 {
     public static class ResourceDownloader
     {
