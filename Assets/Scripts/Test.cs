@@ -133,7 +133,7 @@ namespace MarkovCraft
                 buffers[i] = new();
 
             // #0 is default cube mesh
-            CubeGeometry.Build(ref buffers[0], ResourcePackManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
+            CubeGeometry.Build(ref buffers[0], ResourcePackManager.BLANK_TEXTURE, 0, 0, 0, 0b111111, new float3(1F));
 
             var modelTable = ResourcePackManager.Instance.StateModelTable;
             
@@ -154,7 +154,7 @@ namespace MarkovCraft
                 else
                 {
                     Debug.LogWarning($"Model for block state #{stateId} ({statePalette.FromId(stateId)}) is not available. Using cube model instead.");
-                    CubeGeometry.Build(ref buffers[pair.Value], ResourcePackManager.HAKU, 0, 0, 0, 0b111111, new float3(1F));
+                    CubeGeometry.Build(ref buffers[pair.Value], ResourcePackManager.BLANK_TEXTURE, 0, 0, 0, 0b111111, new float3(1F));
                 }
             }
 
@@ -320,8 +320,7 @@ namespace MarkovCraft
             // Load resource packs...
             packManager.ClearPacks();
             // Collect packs
-            foreach (var packName in new string[] { $"vanilla-{resVersion}", "default" })
-                packManager.AddPack(new(packName));
+            packManager.AddPack(new($"vanilla-{resVersion}"));
             // Load valid packs...
             loadFlag.Finished = false;
             Task.Run(() => packManager.LoadPacks(loadFlag,
