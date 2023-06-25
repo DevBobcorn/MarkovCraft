@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using Unity.Mathematics;
 
@@ -14,7 +15,8 @@ namespace MinecraftClient.Resource
     public class ResourcePackManager
     {
         public static readonly ResourceLocation BLANK_TEXTURE = new("builtin", "blank");
-        public static readonly ResourceLocation MISSING_TEXTURE = new("builtin", "missingno");
+        public static readonly ResourceLocation FOLIAGE_COLORMAP = new("colormap/foliage");
+        public static readonly ResourceLocation GRASS_COLORMAP = new("colormap/grass");
 
         // Identifier -> Texture file path
         public readonly Dictionary<ResourceLocation, string> TextureFileTable = new();
@@ -68,13 +70,21 @@ namespace MinecraftClient.Resource
 
         public void ClearPacks()
         {
+            // Clear up pack list
             packs.Clear();
+
+            // Clear up loaded tables
             TextureFileTable.Clear();
             BlockModelTable.Clear();
             StateModelTable.Clear();
             RawItemModelTable.Clear();
             ItemModelTable.Clear();
             GeneratedItemModels.Clear();
+
+            // And clear up colormap data
+            ColormapSize = 0;
+            GrassColormapPixels = new Color32[]{ };
+            FoliageColormapPixels = new Color32[]{ };
         }
 
         public void LoadPacks(DataLoadFlag flag, Action<string> updateStatus)
@@ -295,7 +305,8 @@ namespace MinecraftClient.Resource
             if (texAtlasTable.ContainsKey(identifier))
                 return texAtlasTable[identifier];
             
-            return texAtlasTable[MISSING_TEXTURE];
+            // Return missing no texture
+            return texAtlasTable[ResourceLocation.INVALID];
         }
 
         private readonly Texture2DArray?[] atlasArrays = new Texture2DArray?[2];
@@ -332,11 +343,7 @@ namespace MinecraftClient.Resource
 
         private (Texture2D, TextureAnimationInfo?) LoadSingleTexture(ResourceLocation texId, string texFilePath)
         {
-            Texture2D tex = new(2, 2)
-            {
-                name = texId.ToString()
-            };
-
+            Texture2D tex = new(2, 2);
             tex.LoadImage(File.ReadAllBytes(texFilePath));
 
             if (File.Exists($"{texFilePath}.mcmeta")) // Has animation info
@@ -444,6 +451,11 @@ namespace MinecraftClient.Resource
             return tex;
         }
 
+        public Color32[] FoliageColormapPixels { get; private set; } = { };
+        public Color32[] GrassColormapPixels { get; private set; } = { };
+
+        public int ColormapSize { get; private set; } = 0;
+
         private IEnumerator GenerateAtlas(DataLoadFlag atlasGenFlag)
         {
             texAtlasTable.Clear(); // Clear previously loaded table...
@@ -455,28 +467,32 @@ namespace MinecraftClient.Resource
             var modelFilePaths = BlockModelFileTable.Values.ToList();
             modelFilePaths.AddRange(ItemModelFileTable.Values);
             
-            foreach (var modelFile in modelFilePaths)
-            {
-                var model = Json.ParseJson(File.ReadAllText(modelFile));
-
-                if (model.Properties.ContainsKey("textures"))
+            var gatherTexturesTask = Task.Run(() => {
+                foreach (var modelFile in modelFilePaths)
                 {
-                    var texData = model.Properties["textures"].Properties;
-                    foreach (var texItem in texData)
-                    {
-                        if (!texItem.Value.StringValue.StartsWith('#'))
-                        {
-                            var texId = ResourceLocation.fromString(texItem.Value.StringValue);
+                    var model = Json.ParseJson(File.ReadAllText(modelFile));
 
-                            if (texDict.ContainsKey(texId))
-                                textureIdSet.Add(texId);
-                            //else
-                            //    Debug.LogWarning($"Texture {texId} not found in dictionary! (Referenced in {modelFile})");
+                    if (model.Properties.ContainsKey("textures"))
+                    {
+                        var texData = model.Properties["textures"].Properties;
+                        foreach (var texItem in texData)
+                        {
+                            if (!texItem.Value.StringValue.StartsWith('#'))
+                            {
+                                var texId = ResourceLocation.fromString(texItem.Value.StringValue);
+
+                                if (texDict.ContainsKey(texId))
+                                    textureIdSet.Add(texId);
+                                //else
+                                //    Debug.LogWarning($"Texture {texId} not found in dictionary! (Referenced in {modelFile})");
+                            }
+                                
                         }
-                            
                     }
                 }
-            }
+            });
+
+            while (!gatherTexturesTask.IsCompleted) yield return null;
 
             // Append liquid textures, which are not referenced in model files, but will be used by fluid mesh
             foreach (var texId in FluidGeometry.LiquidTextures)
@@ -499,7 +515,7 @@ namespace MinecraftClient.Resource
             count++;
 
             // Missing texture
-            ids[count] = MISSING_TEXTURE;
+            ids[count] = ResourceLocation.INVALID;
             textureInfos[count] = (GetMissingTexture(), null);
             count++;
 
@@ -624,6 +640,34 @@ namespace MinecraftClient.Resource
 
             atlasArrays[0] = atlasArray0;
             atlasArrays[1] = atlasArray1;
+
+            // Read biome colormaps from resource pack
+            if (texDict.ContainsKey(FOLIAGE_COLORMAP))
+            {
+                Debug.Log($"Loading foliage colormap from {texDict[FOLIAGE_COLORMAP]}");
+                var mapTex = new Texture2D(2, 2);
+                mapTex.LoadImage(File.ReadAllBytes(texDict[FOLIAGE_COLORMAP]));
+                
+                ColormapSize = mapTex.width;
+                if (mapTex.height != ColormapSize)
+                    Debug.LogWarning($"Colormap size inconsistency: expected {ColormapSize}, got {mapTex.height}");
+
+                FoliageColormapPixels = mapTex.GetPixels32();
+            }
+            
+            if (texDict.ContainsKey(GRASS_COLORMAP))
+            {
+                Debug.Log($"Loading grass colormap from {texDict[GRASS_COLORMAP]}");
+                var mapTex = new Texture2D(2, 2);
+                mapTex.LoadImage(File.ReadAllBytes(texDict[GRASS_COLORMAP]));
+                
+                if (mapTex.width != ColormapSize)
+                    Debug.LogWarning($"Colormap size inconsistency: expected {ColormapSize}, got {mapTex.width}");
+                if (mapTex.height != ColormapSize)
+                    Debug.LogWarning($"Colormap size inconsistency: expected {ColormapSize}, got {mapTex.height}");
+
+                GrassColormapPixels = mapTex.GetPixels32();
+            }
 
             atlasGenFlag.Finished = true;
         }
