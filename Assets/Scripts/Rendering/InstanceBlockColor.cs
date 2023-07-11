@@ -4,7 +4,7 @@ using Unity.Rendering;
 
 namespace MarkovCraft
 {
-    [MaterialProperty("_InstanceBlockColor")]
+    [MaterialProperty("_BaseColor")]
     public struct InstanceBlockColor : IComponentData
     {
         public float4 Value;
