@@ -37,7 +37,8 @@ namespace MarkovCraft
         private readonly List<MappingEditorItem> mappingItems = new();
         private bool working = false, properlyLoaded = false;
 
-        public override bool ShouldPause() => true;
+        // No pause for animated inventory
+        public override bool ShouldPause() => false;
 
         private bool CheckWindows() => Application.platform == RuntimePlatform.WindowsEditor ||
                 Application.platform == RuntimePlatform.WindowsPlayer;
