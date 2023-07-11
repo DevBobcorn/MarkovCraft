@@ -1,2 +1,2 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ConfiguredModel Model="Circuit" SizeX="64" SizeY="64" SizeZ="1" Amount="1" Steps="1500" Animated="true" />
+<ConfiguredModel Model="Circuit" SizeX="64" SizeY="64" SizeZ="1" Amount="4" Steps="1500" Animated="false" />
