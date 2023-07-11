@@ -71,7 +71,7 @@ namespace MarkovCraft
             ExportButton.onClick.AddListener(Export);
             ExportFormatDropdown.ClearOptions();
             ExportFormatDropdown.AddOptions(EXPORT_FORMAT_KEYS.Select(x =>
-                    new TMP_Dropdown.OptionData(Test.GetL10nString(x))).ToList());
+                    new TMP_Dropdown.OptionData(Markov.GetL10nString(x))).ToList());
             var lastUsedFormatIndex = PlayerPrefs.GetInt(EXPORT_FORMAT_KEY, 0);
             ExportFormatDropdown.value = lastUsedFormatIndex;
             // Initialize mappings panel
@@ -110,10 +110,10 @@ namespace MarkovCraft
             properlyLoaded = true;
 
             if (ScreenHeader != null)
-                ScreenHeader.text = Test.GetL10nString("exporter.text.loaded", data.info[0]);
+                ScreenHeader.text = Markov.GetL10nString("exporter.text.loaded", data.info[0]);
             
             if (InfoText != null)
-                InfoText.text = Test.GetL10nString("export.text.result_info", data.info[0], data.info[1], data.FX, data.FZ, data.FY);
+                InfoText.text = Markov.GetL10nString("export.text.result_info", data.info[0], data.info[1], data.FX, data.FZ, data.FY);
             
         }
 
@@ -124,9 +124,9 @@ namespace MarkovCraft
             properlyLoaded = false;
 
             if (ScreenHeader != null)
-                ScreenHeader.text = Test.GetL10nString("exporter.text.loading");
+                ScreenHeader.text = Markov.GetL10nString("exporter.text.loading");
             
-            var game = Test.Instance;
+            var game = Markov.Instance;
             
             // Get selected result data
             exportData = game.GetSelectedResultData();
@@ -150,7 +150,7 @@ namespace MarkovCraft
                 Debug.LogWarning("Exporter is not properly loaded!");
 
                 if (ScreenHeader != null)
-                    ScreenHeader.text = Test.GetL10nString("exporter.text.load_failure");
+                    ScreenHeader.text = Markov.GetL10nString("exporter.text.load_failure");
 
                 working = false;
                 return;

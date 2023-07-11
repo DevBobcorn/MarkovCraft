@@ -24,14 +24,14 @@ using MarkovJunior;
 
 namespace MarkovCraft
 {
-    [RequireComponent(typeof (ScreenManager))]
-    public class Test : MonoBehaviour
+    public class Markov : GameScene
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
 
         [SerializeField] private VersionHolder? VersionHolder;
         [SerializeField] private LocalizedStringTable? L10nTable;
 
+        [SerializeField] private ScreenManager? screenManager;
         [SerializeField] public CameraController? CamController;
         [SerializeField] public LayerMask VolumeLayerMask;
         [SerializeField] public VolumeSelection? VolumeSelection;
@@ -72,30 +72,14 @@ namespace MarkovCraft
 
         [HideInInspector] public bool Loading = false;
 
-        private static Test? instance;
-        public static Test Instance
+        private static Markov? instance;
+        public static Markov Instance
         {
             get {
                 if (instance == null)
-                    instance = Component.FindObjectOfType<Test>();
+                    instance = Component.FindObjectOfType<Markov>();
 
                 return instance!;
-            }
-        }
-
-        private bool isPaused = true;
-        public bool IsPaused
-        {
-            get => isPaused;
-
-            set {
-                isPaused = value;
-
-                if (isPaused)
-                    Time.timeScale = 0F;
-                else
-                    Time.timeScale = 1F;
-
             }
         }
 
@@ -590,7 +574,7 @@ namespace MarkovCraft
             if (FPSText != null)
                 FPSText.text = $"FPS:{((int)(1 / Time.unscaledDeltaTime)).ToString().PadLeft(4, ' ')}";
             
-            if (isPaused) return;
+            if (screenManager != null && screenManager.IsPaused) return;
             
             var cam = CamController?.ViewCamera;
             
@@ -753,7 +737,7 @@ namespace MarkovCraft
             }
         }
 
-        public void ReturnToMenu()
+        public override void ReturnToMenu()
         {
             if (executing)
                 StopExecution();
@@ -761,10 +745,9 @@ namespace MarkovCraft
             ClearUpScene();
 
             // Unpause game to restore time scale
-            IsPaused = false;
+            screenManager!.IsPaused = false;
 
             SceneManager.LoadScene("Scenes/Welcome", LoadSceneMode.Single);
         }
-
     }
 }

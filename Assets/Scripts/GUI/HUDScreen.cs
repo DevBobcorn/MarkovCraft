@@ -5,11 +5,11 @@ namespace MarkovCraft
 {
     public class HUDScreen : BaseScreen
     {
-        private Test? game;
+        private Markov? game;
 
         void Start()
         {
-            game = Test.Instance;
+            game = Markov.Instance;
         }
 
         public override void ScreenUpdate(ScreenManager manager)

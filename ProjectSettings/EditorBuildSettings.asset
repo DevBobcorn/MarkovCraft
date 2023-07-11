@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Markov.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Replay.unity
+    guid: fbd7a138ac1d20d4ca90ece6cf99853b
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 6109de08838965b409e97094b51b9937,
       type: 2}

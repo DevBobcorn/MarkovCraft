@@ -1336,6 +1336,7 @@ GameObject:
   - component: {fileID: 133423226}
   - component: {fileID: 133423225}
   - component: {fileID: 133423224}
+  - component: {fileID: 133423228}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1431,6 +1432,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &133423228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 133423223}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b24f22cec06c7d41a3899c175b9e4e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialScreen: {fileID: 732912709}
 --- !u!1 &139296222
 GameObject:
   m_ObjectHideFlags: 0
@@ -3072,6 +3086,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0af6623c9b43e104eacc0566773eab42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  normalScreen: {fileID: 732912709}
+  game: {fileID: 1317409357}
 --- !u!95 &302010557
 Animator:
   serializedVersion: 5
@@ -3594,6 +3610,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64eb1170a70d2c34bbb6667b7dea8cae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  screenManager: {fileID: 133423228}
   moveSpeed: 40
   scrollSpeed: 100
   zPosLimit: 320
@@ -7671,7 +7688,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 732912706}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
@@ -13092,9 +13109,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1317409356}
   - component: {fileID: 1317409357}
-  - component: {fileID: 1317409358}
   m_Layer: 0
-  m_Name: Testment
+  m_Name: '[Markov Control]'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13131,6 +13147,7 @@ MonoBehaviour:
   L10nTable:
     m_TableReference:
       m_TableCollectionName: GUID:ca01ff9c1eb86df4c93c853003cc7ed6
+  screenManager: {fileID: 133423228}
   CamController: {fileID: 330585548}
   VolumeLayerMask:
     serializedVersion: 2
@@ -13150,18 +13167,6 @@ MonoBehaviour:
   GenerationResultPrefab: {fileID: 4486798577887638714, guid: 4160e5a4c0a129040a739e80297eceda,
     type: 3}
   Loading: 0
---- !u!114 &1317409358
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1317409355}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b24f22cec06c7d41a3899c175b9e4e8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1349419723
 GameObject:
   m_ObjectHideFlags: 0

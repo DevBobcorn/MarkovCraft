@@ -3,11 +3,22 @@ using UnityEngine;
 
 namespace MarkovCraft
 {
-    [RequireComponent(typeof (Test))]
     public class ScreenManager : MonoBehaviour
     {
+        [SerializeField] private BaseScreen? initialScreen;
         private BaseScreen? activeScreen;
         public BaseScreen? ActiveScreen => activeScreen;
+        
+        private bool isPaused = true;
+        public bool IsPaused
+        {
+            get => isPaused;
+
+            set {
+                isPaused = value;
+                Time.timeScale = isPaused ? 0F : 1F;
+            }
+        }
 
         public void SetActiveScreen(BaseScreen newScreen)
         {
@@ -15,7 +26,7 @@ namespace MarkovCraft
                 activeScreen.Hide(this);
             
             activeScreen = newScreen;
-            Test.Instance.IsPaused = newScreen.ShouldPause();
+            IsPaused = newScreen.ShouldPause();
 
             newScreen.Show(this);
         }
@@ -29,7 +40,10 @@ namespace MarkovCraft
 
         void Start()
         {
-            SetActiveScreenByType<HUDScreen>();
+            if (initialScreen != null) // Initialize screen
+            {
+                SetActiveScreen(initialScreen);
+            }
         }
 
         void Update()

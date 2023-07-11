@@ -166,7 +166,7 @@ namespace MarkovCraft
             properlyLoaded = true;
 
             if (ScreenHeader != null)
-                ScreenHeader.text = Test.GetL10nString("editor.text.loaded", confModelFile);
+                ScreenHeader.text = Markov.GetL10nString("editor.text.loaded", confModelFile);
         }
 
         private IEnumerator UpdateActiveCharSetFromModel(string modelFileName)
@@ -226,9 +226,9 @@ namespace MarkovCraft
             properlyLoaded = false;
 
             if (ScreenHeader != null)
-                ScreenHeader.text = Test.GetL10nString("editor.text.loading");
+                ScreenHeader.text = Markov.GetL10nString("editor.text.loading");
             
-            confModelFile = Test.Instance.ConfiguredModelFile;
+            confModelFile = Markov.Instance.ConfiguredModelFile;
             
             if (ModelDropdown == null || SizeXInput == null || SizeYInput == null || SizeZInput == null ||SaveButton == null || AmountInput == null ||
                     StepsInput == null || SeedsInput == null || AnimatedToggle == null || GridTransform == null || BlockStatePreview == null)
@@ -236,13 +236,13 @@ namespace MarkovCraft
                 Debug.LogWarning("Editor is not properly loaded!");
 
                 if (ScreenHeader != null)
-                    ScreenHeader.text = Test.GetL10nString("editor.text.load_failure");
+                    ScreenHeader.text = Markov.GetL10nString("editor.text.load_failure");
 
                 working = false;
                 return;
             }
 
-            StartCoroutine(InitializeScreen(Test.Instance.ConfiguredModelFile));
+            StartCoroutine(InitializeScreen(Markov.Instance.ConfiguredModelFile));
         }
 
         public override void OnHide(ScreenManager manager)
@@ -303,7 +303,7 @@ namespace MarkovCraft
 
                 manager?.SetActiveScreenByType<HUDScreen>();
 
-                Test.Instance.SetConfiguredModel(confModelFile);
+                Markov.Instance.SetConfiguredModel(confModelFile);
             }
 
         }

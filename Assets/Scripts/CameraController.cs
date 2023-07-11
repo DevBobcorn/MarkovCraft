@@ -7,6 +7,8 @@ namespace MarkovCraft
     [RequireComponent(typeof (Camera))]
     public class CameraController : MonoBehaviour
     {
+        [SerializeField] private ScreenManager? screenManager;
+
         [SerializeField] public float moveSpeed   =  10F;
         [SerializeField] public float scrollSpeed = 500F;
         [SerializeField] public float zPosLimit   = 320F;
@@ -29,7 +31,7 @@ namespace MarkovCraft
 
         void Update()
         {
-            if (Test.Instance.IsPaused)
+            if (screenManager != null && screenManager.IsPaused)
             {
                 dragging = false;
                 return;

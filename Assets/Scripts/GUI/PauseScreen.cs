@@ -5,12 +5,8 @@ namespace MarkovCraft
 {
     public class PauseScreen : BaseScreen
     {
-        private Test? game;
-
-        void Start()
-        {
-            game = Test.Instance;
-        }
+        [SerializeField] private BaseScreen? normalScreen;
+        [SerializeField] private GameScene? game;
 
         public override bool ShouldPause() => true;
 
@@ -18,9 +14,8 @@ namespace MarkovCraft
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                manager.SetActiveScreenByType<HUDScreen>();
+                BackToGame();
             }
-
         }
 
         public void ReturnToMenu()
@@ -31,8 +26,10 @@ namespace MarkovCraft
 
         public void BackToGame()
         {
-            manager!.SetActiveScreenByType<HUDScreen>();
-
+            if (normalScreen != null)
+            {
+                manager!.SetActiveScreen(normalScreen);
+            }
         }
     }
 }

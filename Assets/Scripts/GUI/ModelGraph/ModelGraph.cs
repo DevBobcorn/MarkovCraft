@@ -167,7 +167,7 @@ namespace MarkovCraft
             };
             void generate(ModelGraph graph, Node node, Transform transform)
             {
-                var nodeName = Test.GetL10nString(GetNodeNameKey(node));
+                var nodeName = Markov.GetL10nString(GetNodeNameKey(node));
                 var nodeNumId = node.numId;
                 char[] characters = node.grid.characters;
 

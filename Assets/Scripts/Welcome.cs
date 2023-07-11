@@ -145,6 +145,25 @@ namespace MarkovCraft
             StartCoroutine(MarkovCoroutine());
         }
 
+        private IEnumerator ReplayCoroutine()
+        {
+            GetComponent<Animator>().SetTrigger("Enter");
+
+            yield return new WaitForSecondsRealtime(0.32F);
+
+            var op = SceneManager.LoadSceneAsync("Scenes/Replay", LoadSceneMode.Single);
+
+            while (op.progress < 0.9F)
+                yield return null;
+        }
+
+        public void EnterReplay()
+        {
+            if (VersionHolder == null || downloadingRes) return;
+
+            StartCoroutine(ReplayCoroutine());
+        }
+
         public void QuitApp()
         {
             Application.Quit();
