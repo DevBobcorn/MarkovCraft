@@ -67,6 +67,7 @@ namespace MarkovCraft
         private BlockGeometry?[] blockGeometries = { };
         private float3[] blockTints = { };
         private int blockMeshCount = 0;
+        // Character => (meshIndex, meshColor)
         private readonly Dictionary<char, int2> palette = new();
 
         [HideInInspector] public bool Loading = false;
@@ -162,6 +163,19 @@ namespace MarkovCraft
             blockMeshes = BlockMeshGenerator.GenerateMeshes(buffers);
         }
 
+        // Get all mapping items
+        public Dictionary<char, CustomMappingItem>? GetFullPalette()
+        {
+            if (currentConfModel is null || Loading)
+                return null;
+            
+            var mapAsDict = currentConfModel.CustomMapping.ToDictionary(x => x.Character, x => x);
+            
+            return palette.ToDictionary(x => x.Key, x => mapAsDict.ContainsKey(x.Key) ? mapAsDict[x.Key] :
+                    new CustomMappingItem() { Character = x.Key, BlockState = string.Empty, Color = ColorConvert.GetOpaqueColor32(x.Value.y) });
+        }
+
+        // Get only mapping items whose key is among the given charset
         public Dictionary<char, CustomMappingItem>? GetExportPalette(HashSet<char> charSet)
         {
             if (currentConfModel is null || Loading)
@@ -398,6 +412,9 @@ namespace MarkovCraft
 
             List<GenerationResult> results = new();
 
+            int maxX = 0, maxY = 0, maxZ = 0;
+            int stepsPerFrame = 5;
+
             for (int k = 1; k <= model.Amount; k++)
             {
                 if (!executing) // Stop execution
@@ -416,25 +433,31 @@ namespace MarkovCraft
                 
                 GenerationText.text = GetL10nString("status.info.generation_start", k);
 
-                (byte[] state, char[] legend, int FX, int FY, int FZ, int stepCount) data = new();
+                (byte[] state, char[] legend, int FX, int FY, int FZ, int stepCount) dataFrame = new();
 
                 var enumerator = interpreter.Run(seed, model.Steps, model.Animated).GetEnumerator();
 
                 bool hasNext = true;
+                var recordedFrames = new List<GenerationFrameRecord>();
 
                 while (hasNext)
                 {
                     bool frameCompleted = false;
 
                     Task.Run(() => {
-                        hasNext = enumerator.MoveNext();
+                        for (int s = 0;s < stepsPerFrame;s++)
+                        {
+                            if (hasNext)
+                                hasNext = enumerator.MoveNext();
+                        }
+
                         frameCompleted = true;
                     });
 
                     while (!frameCompleted)
                         yield return null;
                     
-                    data = enumerator.Current;
+                    dataFrame = enumerator.Current;
 
                     if (!executing) // Stop execution
                     {
@@ -447,13 +470,22 @@ namespace MarkovCraft
                     if (model.Animated) // Visualize this step
                     {
                         // Update generation text
-                        GenerationText.text = GetL10nString("status.info.generation_step", k, data.stepCount, (int)(tick * 1000));
+                        GenerationText.text = GetL10nString("status.info.generation_step", k, dataFrame.stepCount, (int)(tick * 1000));
 
-                        var pos = new int3(2 + xCount * (data.FX + 2), 0, 2 + zCount * (data.FY + 2));
-                        result.UpdateVolume(pos, new(data.FX, data.FZ, data.FY));
+                        var pos = new int3(2 + xCount * (dataFrame.FX + 2), 0, 2 + zCount * (dataFrame.FY + 2));
+                        result.UpdateVolume(pos, new(dataFrame.FX, dataFrame.FZ, dataFrame.FY));
 
-                        var instanceData = BlockDataBuilder.GetInstanceData(data.state!, data.FX, data.FY, data.FZ, pos, data.legend.Select(ch => palette[ch]).ToArray());
+                        var instanceData = BlockDataBuilder.GetInstanceData(dataFrame.state!, dataFrame.FX, dataFrame.FY, dataFrame.FZ, pos,
+                                // Frame legend index => (meshIndex, meshColor)
+                                dataFrame.legend.Select(ch => palette[ch]).ToArray());
                         BlockInstanceSpawner.VisualizeState(instanceData, materials, blockMeshes, tick, 0.5F);
+
+                        // Record the data frame
+                        recordedFrames.Add(new GenerationFrameRecord(new int3(dataFrame.FX, dataFrame.FY, dataFrame.FZ),
+                                dataFrame.state.Select(v => dataFrame.legend[v]).ToArray()));
+                        if (dataFrame.FX > maxX) maxX = dataFrame.FX;
+                        if (dataFrame.FY > maxY) maxY = dataFrame.FY;
+                        if (dataFrame.FZ > maxZ) maxZ = dataFrame.FZ;
 
                         // Update active node on graph
                         ModelGraphGenerator.UpdateGraph(ModelGraphUI!, interpreter.current);
@@ -465,26 +497,41 @@ namespace MarkovCraft
 
                 if (executing) // Visualize final state (last step)
                 {
-                    var pos = new int3(2 + xCount * (data.FX + 2), 0, 2 + zCount * (data.FY + 2));
-                    result.UpdateVolume(pos, new(data.FX, data.FZ, data.FY));
+                    var pos = new int3(2 + xCount * (dataFrame.FX + 2), 0, 2 + zCount * (dataFrame.FY + 2));
+                    result.UpdateVolume(pos, new(dataFrame.FX, dataFrame.FZ, dataFrame.FY));
 
-                    var instanceData = BlockDataBuilder.GetInstanceData(data.state!, data.FX, data.FY, data.FZ, pos,
-                            data.legend.Select(ch => palette[ch]).ToArray());
-
+                    var instanceData = BlockDataBuilder.GetInstanceData(dataFrame.state!, dataFrame.FX, dataFrame.FY, dataFrame.FZ, pos,
+                            dataFrame.legend.Select(ch => palette[ch]).ToArray());
+                    
                     // The final visualization is persistent
                     BlockInstanceSpawner.VisualizePersistentState(instanceData, materials, blockMeshes);
 
-                    var stateClone = new byte[data.state!.Length];
-                    Array.Copy(data.state!, stateClone, stateClone.Length);
+                    // Record the data frame
+                    recordedFrames.Add(new GenerationFrameRecord(new int3(dataFrame.FX, dataFrame.FY, dataFrame.FZ),
+                            dataFrame.state.Select(v => dataFrame.legend![v]).ToArray()));
+                    if (dataFrame.FX > maxX) maxX = dataFrame.FX;
+                    if (dataFrame.FY > maxY) maxY = dataFrame.FY;
+                    if (dataFrame.FZ > maxZ) maxZ = dataFrame.FZ;
 
-                    var legendClone = new char[data.legend!.Length];
-                    Array.Copy(data.legend!, legendClone, legendClone.Length);
+                    var stateClone = new byte[dataFrame.state!.Length];
+                    Array.Copy(dataFrame.state!, stateClone, stateClone.Length);
 
-                    result.SetData((new[] { confModelFile, $"{seed}" }, stateClone, legendClone, data.FX, data.FY, data.FZ, data.stepCount));
+                    var legendClone = new char[dataFrame.legend!.Length];
+                    Array.Copy(dataFrame.legend!, legendClone, legendClone.Length);
 
-                    Debug.Log($"Iteration #{k} complete. Steps: {data.stepCount}");
+                    result.SetData((new[] { confModelFile, $"{seed}" }, stateClone, legendClone, dataFrame.FX, dataFrame.FY, dataFrame.FZ, dataFrame.stepCount));
+
+                    Debug.Log($"Iteration #{k} complete. Steps: {dataFrame.stepCount} Frames: {recordedFrames.Count}");
                     ModelGraphUI!.SetActiveNode(-1); // Deselect active node
                     GenerationText.text = GetL10nString("status.info.generation_complete", k);
+
+                    var recordingName = (currentConfModel?.Model ?? "Untitled") + $"_#{k}";
+                    var recPalette = GetFullPalette();
+
+                    if (recPalette is not null) // Save recording
+                    {
+                        StartCoroutine(RecordingExporter.SaveRecording(recPalette, recordingName, maxX, maxY, maxZ, recordedFrames.ToArray()));
+                    }
                 }
             }
 
@@ -498,46 +545,44 @@ namespace MarkovCraft
             var ver = VersionHolder!.Versions[VersionHolder.SelectedVersion];
 
             StartCoroutine(LoadMCBlockData(ver.DataVersion, ver.ResourceVersion, () => {
-                    if (PlaybackSpeedSlider != null)
+                if (PlaybackSpeedSlider != null)
+                {
+                    PlaybackSpeedSlider.onValueChanged.AddListener(UpdatePlaybackSpeed);
+                    UpdatePlaybackSpeed(PlaybackSpeedSlider.value);
+                }
+
+                if (ConfigButton != null)
+                {
+                    ConfigButton.onClick.RemoveAllListeners();
+                    ConfigButton.onClick.AddListener(() => GetComponent<ScreenManager>().SetActiveScreenByType<ModelEditorScreen>() );
+                }
+
+                if (ExportButton != null)
+                {
+                    ExportButton.onClick.RemoveAllListeners();
+                    ExportButton.onClick.AddListener(() => GetComponent<ScreenManager>().SetActiveScreenByType<ExporterScreen>() );
+                }
+
+                var dir = PathHelper.GetExtraDataFile("configured_models");
+                if (Directory.Exists(dir) && ConfiguredModelDropdown != null)
+                {
+                    var options = new List<TMP_Dropdown.OptionData>();
+                    loadedConfModels.Clear();
+                    int index = 0;
+                    foreach (var m in Directory.GetFiles(dir, "*.xml", SearchOption.AllDirectories))
                     {
-                        PlaybackSpeedSlider.onValueChanged.AddListener(UpdatePlaybackSpeed);
-                        UpdatePlaybackSpeed(PlaybackSpeedSlider.value);
+                        var modelPath = m.Substring(dir.Length + 1);
+                        options.Add(new(modelPath));
+                        loadedConfModels.Add(index++, modelPath);
                     }
 
-                    if (ConfigButton != null)
-                    {
-                        ConfigButton.onClick.RemoveAllListeners();
-                        ConfigButton.onClick.AddListener(() => GetComponent<ScreenManager>().SetActiveScreenByType<ModelEditorScreen>() );
-                    }
+                    ConfiguredModelDropdown.AddOptions(options);
+                    ConfiguredModelDropdown.onValueChanged.AddListener(UpdateDropdownOption);
 
-                    if (ExportButton != null)
-                    {
-                        ExportButton.onClick.RemoveAllListeners();
-                        ExportButton.onClick.AddListener(() => GetComponent<ScreenManager>().SetActiveScreenByType<ExporterScreen>() );
-                    }
-
-                    var dir = PathHelper.GetExtraDataFile("configured_models");
-                    if (Directory.Exists(dir) && ConfiguredModelDropdown != null)
-                    {
-                        var options = new List<TMP_Dropdown.OptionData>();
-                        loadedConfModels.Clear();
-                        int index = 0;
-                        foreach (var m in Directory.GetFiles(dir, "*.xml", SearchOption.AllDirectories))
-                        {
-                            var modelPath = m.Substring(dir.Length + 1);
-                            options.Add(new(modelPath));
-                            loadedConfModels.Add(index++, modelPath);
-                        }
-
-                        ConfiguredModelDropdown.AddOptions(options);
-                        ConfiguredModelDropdown.onValueChanged.AddListener(UpdateDropdownOption);
-
-                        if (options.Count > 0) // Use first model by default
-                            UpdateDropdownOption(0);
-                    }
-                }));
-            
-            
+                    if (options.Count > 0) // Use first model by default
+                        UpdateDropdownOption(0);
+                }
+            }));
         }
 
         void Update()

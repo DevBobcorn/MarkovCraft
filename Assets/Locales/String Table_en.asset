@@ -147,7 +147,7 @@ MonoBehaviour:
   - m_Id: 380619232026624
     m_Localized: 'Iteration: #{0}
 
-      Step: {1} ({2}ms/step)'
+      Step: {1} ({2}ms/it)'
     m_Metadata:
       m_Items: []
   - m_Id: 380621543088128

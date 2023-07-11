@@ -30,4 +30,8 @@ public class PathHelper
         return Directory.GetParent(Application.dataPath).FullName + $"{SP}Extra Data{SP}{fileName}";
     }
 
+    public static string GetRecordingFile(string fileName)
+    {
+        return Directory.GetParent(Application.dataPath).FullName + $"{SP}Recordings{SP}{fileName}";
+    }
 }

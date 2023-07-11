@@ -143,7 +143,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 380619232026624
-    m_Localized: "\u5E8F\u53F7\uFF1A#{0}\n\u6B65\u6570\uFF1A{1}\uFF08{2}\u6BEB\u79D2\u6BCF\u6B65\uFF09"
+    m_Localized: "\u5E8F\u53F7\uFF1A#{0}\n\u6B65\u6570\uFF1A{1}\uFF08{2}\u6BEB\u79D2/\u8FED\u4EE3\uFF09"
     m_Metadata:
       m_Items: []
   - m_Id: 380621543088128

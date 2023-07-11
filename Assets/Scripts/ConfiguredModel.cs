@@ -10,11 +10,16 @@ using UnityEditor;
 namespace MarkovCraft
 {
     [Serializable]
-    public struct CustomMappingItem
+    public class CustomMappingItem : Json.JSONSerializable
     {
         public char Character;
-        public string BlockState;
+        public string BlockState = string.Empty;
         public Color32 Color;
+
+        public string ToJson()
+        {
+            return "{\"color\":\"" + ColorConvert.GetRGB(Color) + "\",\"state\":\"" + BlockState + "\"}";
+        }
     }
 
     [CreateAssetMenu(fileName = "ConfiguredModel", menuName = "MarkovCraft/Configured Model")]
