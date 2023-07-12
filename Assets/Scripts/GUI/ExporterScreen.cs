@@ -126,7 +126,7 @@ namespace MarkovCraft
             if (ScreenHeader != null)
                 ScreenHeader.text = GameScene.GetL10nString("exporter.text.loading");
             
-            var game = GameScene.Instance as Markov;
+            var game = GameScene.Instance as GenerationScene;
 
             if (game is null)
             {
@@ -157,7 +157,7 @@ namespace MarkovCraft
                 Debug.LogWarning("Exporter is not properly loaded!");
 
                 if (ScreenHeader != null)
-                    ScreenHeader.text = Markov.GetL10nString("exporter.text.load_failure");
+                    ScreenHeader.text = GenerationScene.GetL10nString("exporter.text.load_failure");
 
                 working = false;
                 return;
@@ -227,7 +227,7 @@ namespace MarkovCraft
                 
                 working = false;
 
-                manager?.SetActiveScreenByType<HUDScreen>();
+                manager?.SetActiveScreenByType<GenerationScreen>();
             }
 
         }
@@ -243,7 +243,7 @@ namespace MarkovCraft
             if (working) return;
             
             if (Input.GetKeyDown(KeyCode.Escape))
-                manager.SetActiveScreenByType<HUDScreen>();
+                manager.SetActiveScreenByType<GenerationScreen>();
 
         }
     }

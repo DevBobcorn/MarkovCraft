@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MarkovCraft
 {
-    public class HUDScreen : BaseScreen
+    public class GenerationScreen : BaseScreen
     {
         private GameScene? game;
 

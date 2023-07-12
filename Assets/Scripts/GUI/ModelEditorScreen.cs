@@ -228,7 +228,7 @@ namespace MarkovCraft
             if (ScreenHeader != null)
                 ScreenHeader.text = GameScene.GetL10nString("editor.text.loading");
             
-            var game = GameScene.Instance as Markov;
+            var game = GameScene.Instance as GenerationScene;
 
             if (game is null)
             {
@@ -308,7 +308,7 @@ namespace MarkovCraft
                     ConfiguredModel.GetXMLDoc(model).Save($"{PathHelper.GetExtraDataFile("configured_models")}/{confModelFile}");
                 }
 
-                var game = GameScene.Instance as Markov;
+                var game = GameScene.Instance as GenerationScene;
 
                 if (game is null)
                 {
@@ -319,7 +319,7 @@ namespace MarkovCraft
                 
                 working = false;
 
-                manager?.SetActiveScreenByType<HUDScreen>();
+                manager?.SetActiveScreenByType<GenerationScreen>();
 
                 game.SetConfiguredModel(confModelFile);
             }
@@ -331,7 +331,7 @@ namespace MarkovCraft
             if (working) return;
             
             if (Input.GetKeyDown(KeyCode.Escape))
-                manager.SetActiveScreenByType<HUDScreen>();
+                manager.SetActiveScreenByType<GenerationScreen>();
 
         }
     }

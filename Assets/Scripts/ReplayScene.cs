@@ -22,7 +22,7 @@ using MinecraftClient.Mapping;
 
 namespace MarkovCraft
 {
-    public class Replay : GameScene
+    public class ReplayScene : GameScene
     {
         [SerializeField] private ScreenManager? screenManager;
         [SerializeField] public TMP_Text? PlaybackSpeedText, ReplayText, FPSText;

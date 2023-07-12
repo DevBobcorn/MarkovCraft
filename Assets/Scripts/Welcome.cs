@@ -132,7 +132,7 @@ namespace MarkovCraft
 
             yield return new WaitForSecondsRealtime(0.32F);
 
-            var op = SceneManager.LoadSceneAsync("Scenes/Markov", LoadSceneMode.Single);
+            var op = SceneManager.LoadSceneAsync("Scenes/Generation", LoadSceneMode.Single);
 
             while (op.progress < 0.9F)
                 yield return null;

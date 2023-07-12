@@ -3552,7 +3552,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 30, y: 45, z: 0}
 --- !u!114 &330585547
 MonoBehaviour:
@@ -4824,7 +4824,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!114 &410087042
 MonoBehaviour:
@@ -7645,7 +7645,7 @@ GameObject:
   - component: {fileID: 732912710}
   - component: {fileID: 732912709}
   m_Layer: 5
-  m_Name: HUD Screen
+  m_Name: Generation Screen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8868,7 +8868,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &847983629
 GameObject:
@@ -13110,7 +13110,7 @@ GameObject:
   - component: {fileID: 1317409356}
   - component: {fileID: 1317409357}
   m_Layer: 0
-  m_Name: '[Markov Control]'
+  m_Name: '[Generation Control]'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13129,7 +13129,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1317409357
 MonoBehaviour:
@@ -13147,6 +13147,8 @@ MonoBehaviour:
   L10nTable:
     m_TableReference:
       m_TableCollectionName: GUID:ca01ff9c1eb86df4c93c853003cc7ed6
+  BlockMaterial: {fileID: 2100000, guid: 7e3ea3dacd3f3c143805a48d2f20257c, type: 2}
+  Loading: 0
   screenManager: {fileID: 133423228}
   CamController: {fileID: 330585548}
   VolumeLayerMask:
@@ -13163,10 +13165,8 @@ MonoBehaviour:
   ExecuteButton: {fileID: 1237230332}
   ExportButton: {fileID: 967166046}
   ModelGraphUI: {fileID: 896529363}
-  BlockMaterial: {fileID: 2100000, guid: 7e3ea3dacd3f3c143805a48d2f20257c, type: 2}
   GenerationResultPrefab: {fileID: 4486798577887638714, guid: 4160e5a4c0a129040a739e80297eceda,
     type: 3}
-  Loading: 0
 --- !u!1 &1349419723
 GameObject:
   m_ObjectHideFlags: 0

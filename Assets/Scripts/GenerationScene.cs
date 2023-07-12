@@ -10,13 +10,10 @@ using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using UnityEngine.Localization;
-using UnityEngine.Localization.Settings;
 using UnityEngine.SceneManagement;
 using Unity.Mathematics;
 using TMPro;
 
-using MinecraftClient;
 using MinecraftClient.Resource;
 using MinecraftClient.Mapping;
 
@@ -24,7 +21,7 @@ using MarkovJunior;
 
 namespace MarkovCraft
 {
-    public class Markov : GameScene
+    public class GenerationScene : GameScene
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
 
