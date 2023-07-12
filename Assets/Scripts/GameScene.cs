@@ -29,8 +29,6 @@ namespace MarkovCraft
         protected BlockGeometry?[] blockGeometries = { };
         protected float3[] blockTints = { };
         protected int blockMeshCount = 0;
-        // Character => (meshIndex, meshColor)
-        protected readonly Dictionary<char, int2> palette = new();
 
         // Unity config and asset files
         [SerializeField] protected VersionHolder? VersionHolder;
@@ -58,9 +56,50 @@ namespace MarkovCraft
             return string.Format(str.Value, p);
         }
 
-
         public static string GetL10nBlockName(ResourceLocation blockId) =>
                 Instance.L10nBlockNameTable.GetValueOrDefault($"block.{blockId.Namespace}.{blockId.Path}", $"block.{blockId.Namespace}.{blockId.Path}");
+
+
+        protected void GenerateBlockMeshes(Dictionary<int, int> stateId2Mesh) // StateId => Mesh index
+        {
+            var statePalette = BlockStatePalette.INSTANCE;
+            var buffers = new VertexBuffer[blockMeshCount];
+
+            blockGeometries = new BlockGeometry[blockMeshCount];
+            blockTints = new float3[blockMeshCount];
+            
+            for (int i = 0;i < buffers.Length;i++)
+                buffers[i] = new();
+
+            // #0 is default cube mesh
+            CubeGeometry.Build(ref buffers[0], ResourcePackManager.BLANK_TEXTURE, 0, 0, 0, 0b111111, new float3(1F));
+
+            var modelTable = ResourcePackManager.Instance.StateModelTable;
+            
+            foreach (var pair in stateId2Mesh) // StateId => Mesh index
+            {
+                var stateId = pair.Key;
+
+                if (modelTable.ContainsKey(stateId))
+                {
+                    var blockGeometry = modelTable[stateId].Geometries[0];
+                    var blockTint = statePalette.GetBlockColor(stateId, DummyWorld, Location.Zero, statePalette.FromId(stateId));
+
+                    blockGeometry.Build(ref buffers[pair.Value], float3.zero, 0b111111, blockTint);
+                    
+                    blockGeometries[pair.Value] = blockGeometry;
+                    blockTints[pair.Value] = blockTint;
+                }
+                else
+                {
+                    Debug.LogWarning($"Model for block state #{stateId} ({statePalette.FromId(stateId)}) is not available. Using cube model instead.");
+                    CubeGeometry.Build(ref buffers[pair.Value], ResourcePackManager.BLANK_TEXTURE, 0, 0, 0, 0b111111, new float3(1F));
+                }
+            }
+
+            // Set result to blockMeshes
+            blockMeshes = BlockMeshGenerator.GenerateMeshes(buffers);
+        }
 
         protected IEnumerator LoadMCBlockData(string dataVersion, string resVersion, Action? prepare = null, Action<string>? update = null, Action? callback = null)
         {

@@ -287,6 +287,10 @@ MonoBehaviour:
     m_Key: node.name.unknown
     m_Metadata:
       m_Items: []
+  - m_Id: 27571790341935104
+    m_Key: Replay/Canvas/Replay Screen/Recording Dropdown/Text (TMP)
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

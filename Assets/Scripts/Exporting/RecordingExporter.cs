@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using Newtonsoft.Json;
 
 namespace MarkovCraft
 {
@@ -20,7 +21,7 @@ namespace MarkovCraft
             Debug.Log($"Exporting generation process with {recordedFrames.Length} frames");
             yield return null;
 
-            Dictionary<string, object> exportData = new();
+            //Dictionary<string, object> exportData = new();
             // Character => new palette index
             Dictionary<char, int> charMap = new();
             var stateMap = new CustomMappingItem[recPalette.Count];
@@ -34,10 +35,10 @@ namespace MarkovCraft
             }
 
             // First export the current palette
-            exportData.Add("palette", recPalette.ToDictionary(x => charMap[x.Key].ToString(), x => (object) x.Value));
-            exportData.Add("size_x", maxX);
-            exportData.Add("size_y", maxY);
-            exportData.Add("size_z", maxZ);
+            //exportData.Add("palette", recPalette.ToDictionary(x => charMap[x.Key].ToString(), x => (object) x.Value));
+            //exportData.Add("size_x", maxX);
+            //exportData.Add("size_y", maxY);
+            //exportData.Add("size_z", maxZ);
 
             // Export frames
             var simulationBox = new int[maxX * maxY * maxZ];
@@ -47,7 +48,8 @@ namespace MarkovCraft
 
             // Fill the array with -1 which indicates uninitialized
             Array.Fill(simulationBox, -1);
-            List<object> frameData = new();
+            //List<object> frameData = new();
+            List<string> frameData = new();
             // Simulate the whole thing frame by frame
             for (int frameIdx = 0;frameIdx < frameLimit && frameIdx < recordedFrames.Length;frameIdx++)
             {
@@ -74,9 +76,17 @@ namespace MarkovCraft
             }
 
             // Export frame data
-            exportData.Add("frame_data", frameData);
+            //exportData.Add("frame_data", frameData);
 
-            File.WriteAllText(PathHelper.GetRecordingFile($"{recordingName}.json"), Json.Object2Json(exportData));
+            RecordingData recData = new(
+                    recPalette.ToDictionary(x => charMap[x.Key].ToString(), x =>
+                            new ColoredBlockStateInfo( ColorConvert.GetHexRGBString(x.Value.Color), x.Value.BlockState )),
+                    maxX, maxY, maxZ, frameData
+            );
+
+            string jsonText = JsonConvert.SerializeObject(recData);
+            File.WriteAllText(PathHelper.GetRecordingFile($"{recordingName}.json"), jsonText);
+            //File.WriteAllText(PathHelper.GetRecordingFile($"{recordingName}.json"), Json.Object2Json(exportData));
         }
     }
 }

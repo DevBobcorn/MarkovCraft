@@ -312,6 +312,10 @@ MonoBehaviour:
     m_Localized: Unknown Node
     m_Metadata:
       m_Items: []
+  - m_Id: 27571790341935104
+    m_Localized: 'Select Recording:'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

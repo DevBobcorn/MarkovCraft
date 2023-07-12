@@ -43,6 +43,8 @@ namespace MarkovCraft
         public string ConfiguredModelFile => confModelFile;
         private readonly Dictionary<int, string> loadedConfModels = new();
         private ConfiguredModel? currentConfModel = null;
+        // Character => (meshIndex, meshColor)
+        private readonly Dictionary<char, int2> meshPalette = new();
 
         private Interpreter? interpreter = null;
         private float playbackSpeed = 1F;
@@ -52,53 +54,12 @@ namespace MarkovCraft
         {
             if (interpreter != null && ModelGraphUI != null)
             {
-                var graphPalette = palette.ToDictionary(x => x.Key, x => ColorConvert.GetOpaqueColor32(x.Value.y));
+                var graphPalette = meshPalette.ToDictionary(x => x.Key, x => ColorConvert.GetOpaqueColor32(x.Value.y));
                 ModelGraphGenerator.GenerateGraph(ModelGraphUI, modelName, interpreter.root, graphPalette);
             }
             else
                 ModelGraphUI?.gameObject.SetActive(false);
 
-        }
-
-        private void GenerateBlockMeshes(Dictionary<int, int> stateId2Mesh) // StateId => Mesh index
-        {
-            var statePalette = BlockStatePalette.INSTANCE;
-            var buffers = new VertexBuffer[blockMeshCount];
-
-            blockGeometries = new BlockGeometry[blockMeshCount];
-            blockTints = new float3[blockMeshCount];
-            
-            for (int i = 0;i < buffers.Length;i++)
-                buffers[i] = new();
-
-            // #0 is default cube mesh
-            CubeGeometry.Build(ref buffers[0], ResourcePackManager.BLANK_TEXTURE, 0, 0, 0, 0b111111, new float3(1F));
-
-            var modelTable = ResourcePackManager.Instance.StateModelTable;
-            
-            foreach (var pair in stateId2Mesh) // StateId => Mesh index
-            {
-                var stateId = pair.Key;
-
-                if (modelTable.ContainsKey(stateId))
-                {
-                    var blockGeometry = modelTable[stateId].Geometries[0];
-                    var blockTint = statePalette.GetBlockColor(stateId, DummyWorld, Location.Zero, statePalette.FromId(stateId));
-
-                    blockGeometry.Build(ref buffers[pair.Value], float3.zero, 0b111111, blockTint);
-                    
-                    blockGeometries[pair.Value] = blockGeometry;
-                    blockTints[pair.Value] = blockTint;
-                }
-                else
-                {
-                    Debug.LogWarning($"Model for block state #{stateId} ({statePalette.FromId(stateId)}) is not available. Using cube model instead.");
-                    CubeGeometry.Build(ref buffers[pair.Value], ResourcePackManager.BLANK_TEXTURE, 0, 0, 0, 0b111111, new float3(1F));
-                }
-            }
-
-            // Set result to blockMeshes
-            blockMeshes = BlockMeshGenerator.GenerateMeshes(buffers);
         }
 
         // Get all mapping items
@@ -109,7 +70,7 @@ namespace MarkovCraft
             
             var mapAsDict = currentConfModel.CustomMapping.ToDictionary(x => x.Character, x => x);
             
-            return palette.ToDictionary(x => x.Key, x => mapAsDict.ContainsKey(x.Key) ? mapAsDict[x.Key] :
+            return meshPalette.ToDictionary(x => x.Key, x => mapAsDict.ContainsKey(x.Key) ? mapAsDict[x.Key] :
                     new CustomMappingItem() { Character = x.Key, BlockState = string.Empty, Color = ColorConvert.GetOpaqueColor32(x.Value.y) });
         }
 
@@ -121,7 +82,7 @@ namespace MarkovCraft
             
             var mapAsDict = currentConfModel.CustomMapping.ToDictionary(x => x.Character, x => x);
             
-            return palette.Where(x => charSet.Contains(x.Key)).ToDictionary(x => x.Key, x => mapAsDict.ContainsKey(x.Key) ? mapAsDict[x.Key] :
+            return meshPalette.Where(x => charSet.Contains(x.Key)).ToDictionary(x => x.Key, x => mapAsDict.ContainsKey(x.Key) ? mapAsDict[x.Key] :
                     new CustomMappingItem() { Character = x.Key, BlockState = string.Empty, Color = ColorConvert.GetOpaqueColor32(x.Value.y) });
         }
 
@@ -194,10 +155,10 @@ namespace MarkovCraft
             var statePalette = BlockStatePalette.INSTANCE;
             var stateId2Mesh = new Dictionary<int, int>(); // StateId => Mesh index
 
-            palette.Clear();
+            meshPalette.Clear();
 
             XDocument.Load(PathHelper.GetExtraDataFile("palette.xml")).Root.Elements("color").ToList().ForEach(x =>
-                    palette.Add(x.Get<char>("symbol"), new(0, ColorConvert.RGBFromHexString(x.Get<string>("value")))));
+                    meshPalette.Add(x.Get<char>("symbol"), new(0, ColorConvert.RGBFromHexString(x.Get<string>("value")))));
 
             blockMeshCount = 1; // #0 is preserved for default cube mesh
 
@@ -215,28 +176,25 @@ namespace MarkovCraft
                         //Debug.Log($"Mapped '{item.Character}' to [{stateId}] {state}");
 
                         if (stateId2Mesh.TryAdd(stateId, blockMeshCount))
-                            palette[item.Character] = new(blockMeshCount++, rgb);
+                            meshPalette[item.Character] = new(blockMeshCount++, rgb);
                         else // The mesh of this block state is already regestered, just use it
-                            palette[item.Character] = new(stateId2Mesh[stateId], rgb);
+                            meshPalette[item.Character] = new(stateId2Mesh[stateId], rgb);
                     }
                     else // Default cube mesh with custom color
-                        palette[item.Character] = new(0, rgb);
+                        meshPalette[item.Character] = new(0, rgb);
                 }
                 else // Default cube mesh with custom color
-                    palette[item.Character] = new(0, rgb);
+                    meshPalette[item.Character] = new(0, rgb);
                 
                 yield return null;
             }
 
             // Update model graph
             GenerateProcedureGraph(confModel.Model);
-            //RedrawModelGraphAsImage(confModel.Model);
-
             yield return null;
 
             // Generate block meshes
             GenerateBlockMeshes(stateId2Mesh);
-
             yield return null;
 
             Loading = false;
@@ -338,7 +296,7 @@ namespace MarkovCraft
 
                         var instanceData = BlockDataBuilder.GetInstanceData(dataFrame.state!, dataFrame.FX, dataFrame.FY, dataFrame.FZ, pos,
                                 // Frame legend index => (meshIndex, meshColor)
-                                dataFrame.legend.Select(ch => palette[ch]).ToArray());
+                                dataFrame.legend.Select(ch => meshPalette[ch]).ToArray());
                         BlockInstanceSpawner.VisualizeState(instanceData, materials, blockMeshes, tick, 0.5F);
 
                         // Record the data frame
@@ -362,7 +320,7 @@ namespace MarkovCraft
                     result.UpdateVolume(pos, new(dataFrame.FX, dataFrame.FZ, dataFrame.FY));
 
                     var instanceData = BlockDataBuilder.GetInstanceData(dataFrame.state!, dataFrame.FX, dataFrame.FY, dataFrame.FZ, pos,
-                            dataFrame.legend.Select(ch => palette[ch]).ToArray());
+                            dataFrame.legend.Select(ch => meshPalette[ch]).ToArray());
                     
                     // The final visualization is persistent
                     BlockInstanceSpawner.VisualizePersistentState(instanceData, materials, blockMeshes);
@@ -438,7 +396,7 @@ namespace MarkovCraft
                         int index = 0;
                         foreach (var m in Directory.GetFiles(dir, "*.xml", SearchOption.AllDirectories))
                         {
-                            var modelPath = m.Substring(dir.Length + 1);
+                            var modelPath = m.Substring(m.LastIndexOf(SP) + 1);
                             options.Add(new(modelPath));
                             loadedConfModels.Add(index++, modelPath);
                         }
