@@ -25,43 +25,58 @@ namespace MarkovCraft
     public class Replay : GameScene
     {
         [SerializeField] private ScreenManager? screenManager;
+        [SerializeField] public TMP_Text? PlaybackSpeedText, ReplayText, FPSText;
         
-        // Palettes and resources
-        public class World : AbstractWorld { }
-        public readonly World DummyWorld = new();
-
-        private Mesh[] blockMeshes = { };
-        private BlockGeometry?[] blockGeometries = { };
-        private float3[] blockTints = { };
-        private int blockMeshCount = 0;
-        // Character => (meshIndex, meshColor)
-        private readonly Dictionary<char, int2> palette = new();
-
-        [HideInInspector] public bool Loading = false;
-
-        private static Replay? instance;
-        public static Replay Instance
-        {
-            get {
-                if (instance == null)
-                    instance = Component.FindObjectOfType<Replay>();
-
-                return instance!;
-            }
-        }
+        private float playbackSpeed = 1F;
+        private bool replaying = false;
 
         void Start()
         {
-            
+            // First load Minecraft data & resources
+            var ver = VersionHolder!.Versions[VersionHolder.SelectedVersion];
+
+            StartCoroutine(LoadMCBlockData(ver.DataVersion, ver.ResourceVersion,
+                () => {
+                    //ExecuteButton!.interactable = false;
+                    //ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.load_resource");
+                },
+                (status) => ReplayText!.text = GetL10nString(status),
+                () => {
+                    ReplayText!.text = "UwU";
+                })
+            );
         }
 
         void Update()
         {
+            if (FPSText != null)
+                FPSText.text = $"FPS:{((int)(1 / Time.unscaledDeltaTime)).ToString().PadLeft(4, ' ')}";
             
+        }
+
+        public void StartReplay()
+        {
+
+        }
+
+        public void StopReplay()
+        {
+
+        }
+
+        private void ClearUpScene()
+        {
+            // Clear up persistent entities
+            BlockInstanceSpawner.ClearUpPersistentState();
         }
 
         public override void ReturnToMenu()
         {
+            if (replaying)
+                StopReplay();
+            
+            ClearUpScene();
+
             // Unpause game to restore time scale
             screenManager!.IsPaused = false;
 

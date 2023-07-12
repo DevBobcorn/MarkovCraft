@@ -71,7 +71,7 @@ namespace MarkovCraft
             ExportButton.onClick.AddListener(Export);
             ExportFormatDropdown.ClearOptions();
             ExportFormatDropdown.AddOptions(EXPORT_FORMAT_KEYS.Select(x =>
-                    new TMP_Dropdown.OptionData(Markov.GetL10nString(x))).ToList());
+                    new TMP_Dropdown.OptionData(GameScene.GetL10nString(x))).ToList());
             var lastUsedFormatIndex = PlayerPrefs.GetInt(EXPORT_FORMAT_KEY, 0);
             ExportFormatDropdown.value = lastUsedFormatIndex;
             // Initialize mappings panel
@@ -110,10 +110,10 @@ namespace MarkovCraft
             properlyLoaded = true;
 
             if (ScreenHeader != null)
-                ScreenHeader.text = Markov.GetL10nString("exporter.text.loaded", data.info[0]);
+                ScreenHeader.text = GameScene.GetL10nString("exporter.text.loaded", data.info[0]);
             
             if (InfoText != null)
-                InfoText.text = Markov.GetL10nString("export.text.result_info", data.info[0], data.info[1], data.FX, data.FZ, data.FY);
+                InfoText.text = GameScene.GetL10nString("export.text.result_info", data.info[0], data.info[1], data.FX, data.FZ, data.FY);
             
         }
 
@@ -124,9 +124,16 @@ namespace MarkovCraft
             properlyLoaded = false;
 
             if (ScreenHeader != null)
-                ScreenHeader.text = Markov.GetL10nString("exporter.text.loading");
+                ScreenHeader.text = GameScene.GetL10nString("exporter.text.loading");
             
-            var game = Markov.Instance;
+            var game = GameScene.Instance as Markov;
+
+            if (game is null)
+            {
+                Debug.LogError("Wrong game scene!");
+                working = false;
+                return;
+            }
             
             // Get selected result data
             exportData = game.GetSelectedResultData();

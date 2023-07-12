@@ -21,14 +21,14 @@ namespace MarkovCraft
         [SerializeField] public GameObject? previewObject;
         [SerializeField] public CanvasGroup? imageCanvasGroup;
 
-        private Markov? game;
+        private GameScene? game;
 
         private CanvasGroup? canvasGroup;
         private TMP_Text? descText;
 
         void Start()
         {
-            game = Markov.Instance;
+            game = GameScene.Instance;
 
             canvasGroup = GetComponent<CanvasGroup>();
             descText = GetComponentInChildren<TMP_Text>();
@@ -134,7 +134,7 @@ namespace MarkovCraft
             else
             {
                 imageCanvasGroup!.alpha = 0F;
-                descText!.text = Markov.GetL10nString("blockstate_preview.info.no_candidates");
+                descText!.text = GameScene.GetL10nString("blockstate_preview.info.no_candidates");
             }
         }
 
@@ -150,7 +150,7 @@ namespace MarkovCraft
                 canvasGroup!.alpha = 1F;
 
                 var newState = BlockStatePalette.INSTANCE.StatesTable[stateId];
-                var blockName = Markov.GetL10nBlockName(newState.BlockId);
+                var blockName = GameScene.GetL10nBlockName(newState.BlockId);
 
                 descText!.text = $"[{stateId}] {blockName}\n{newState}";
                 UpdatePreviewObject(stateId, newState);

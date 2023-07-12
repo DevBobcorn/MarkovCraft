@@ -5,11 +5,11 @@ namespace MarkovCraft
 {
     public class ReplayScreen : BaseScreen
     {
-        private Replay? game;
+        private GameScene? game;
 
         void Start()
         {
-            game = Replay.Instance;
+            game = GameScene.Instance;
         }
 
         public override void ScreenUpdate(ScreenManager manager)

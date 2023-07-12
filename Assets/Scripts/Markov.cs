@@ -28,9 +28,6 @@ namespace MarkovCraft
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
 
-        [SerializeField] private VersionHolder? VersionHolder;
-        [SerializeField] private LocalizedStringTable? L10nTable;
-
         [SerializeField] private ScreenManager? screenManager;
         [SerializeField] public CameraController? CamController;
         [SerializeField] public LayerMask VolumeLayerMask;
@@ -41,9 +38,6 @@ namespace MarkovCraft
         [SerializeField] public Slider? PlaybackSpeedSlider;
         [SerializeField] public Button? ConfigButton, ExecuteButton, ExportButton;
         [SerializeField] public ModelGraph? ModelGraphUI;
-
-        [SerializeField] public Material? BlockMaterial;
-
         [SerializeField] public GameObject? GenerationResultPrefab;
         private readonly List<GenerationResult> generationResults = new();
         private GenerationResult? selectedResult = null;
@@ -56,43 +50,6 @@ namespace MarkovCraft
         private Interpreter? interpreter = null;
         private float playbackSpeed = 1F;
         private bool executing = false;
-
-        // Palettes and resources
-        private Dictionary<string, string> L10nBlockNameTable = new();
-
-        public class World : AbstractWorld { }
-        public readonly World DummyWorld = new();
-
-        private Mesh[] blockMeshes = { };
-        private BlockGeometry?[] blockGeometries = { };
-        private float3[] blockTints = { };
-        private int blockMeshCount = 0;
-        // Character => (meshIndex, meshColor)
-        private readonly Dictionary<char, int2> palette = new();
-
-        [HideInInspector] public bool Loading = false;
-
-        private static Markov? instance;
-        public static Markov Instance
-        {
-            get {
-                if (instance == null)
-                    instance = Component.FindObjectOfType<Markov>();
-
-                return instance!;
-            }
-        }
-
-        public static string GetL10nString(string key, params object[] p)
-        {
-            var str = Instance.L10nTable?.GetTable().GetEntry(key);
-            if (str is null) return $"<{key}>";
-            return string.Format(str.Value, p);
-        }
-
-
-        public static string GetL10nBlockName(ResourceLocation blockId) =>
-                Instance.L10nBlockNameTable.GetValueOrDefault($"block.{blockId.Namespace}.{blockId.Path}", $"block.{blockId.Namespace}.{blockId.Path}");
 
         private void GenerateProcedureGraph(string modelName)
         {
@@ -295,83 +252,6 @@ namespace MarkovCraft
             GenerationText!.text = GetL10nString("status.info.loaded_conf_model", confModelFile);
         }
 
-        private IEnumerator LoadMCBlockData(string dataVersion, string resVersion, Action? callback = null)
-        {
-            Loading = true;
-            ExecuteButton!.interactable = false;
-            ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.load_resource");
-
-            // Wait for splash animation to complete...
-            yield return new WaitForSecondsRealtime(0.5F);
-
-            // First load all possible Block States...
-            var loadFlag = new DataLoadFlag();
-            Task.Run(() => BlockStatePalette.INSTANCE.PrepareData(dataVersion, loadFlag));
-            while (!loadFlag.Finished) yield return null;
-            
-            // Then load all Items...
-            // [Code removed]
-
-            // Get resource pack manager...
-            var packManager = ResourcePackManager.Instance;
-
-            // Load resource packs...
-            packManager.ClearPacks();
-            // Collect packs
-            packManager.AddPack(new($"vanilla-{resVersion}"));
-            // Load valid packs...
-            loadFlag.Finished = false;
-            Task.Run(() => packManager.LoadPacks(loadFlag,
-                    (status) => Loom.QueueOnMainThread(() => GenerationText!.text = GetL10nString(status))));
-            while (!loadFlag.Finished) yield return null;
-            
-            Loading = false;
-
-            if (loadFlag.Failed)
-            {
-                Debug.LogWarning("Block data loading failed");
-                yield break;
-            }
-
-            BlockMaterial!.SetTexture("_BaseMap", packManager.GetAtlasArray(RenderType.SOLID));
-
-            yield return null;
-
-            var mcLang = LocalizationSettings.SelectedLocale.Identifier.Code.ToLower() switch
-            {
-                "zh-hans" => "zh_cn",
-
-                _         => "en_us"
-            };
-
-            var langPath = PathHelper.GetPackDirectoryNamed(
-                    $"vanilla-{resVersion}{SP}assets{SP}minecraft{SP}lang{SP}{mcLang}.json");
-
-            // Load translated block names
-            L10nBlockNameTable.Clear();
-
-            if (File.Exists(langPath)) // Json file present, just load it
-            {
-                foreach (var entry in Json.ParseJson(File.ReadAllText(langPath)).Properties.Where(x => x.Key.StartsWith("block.")))
-                    L10nBlockNameTable.Add(entry.Key, entry.Value.StringValue);
-            }
-            else // Not present yet, try downloading it
-            {
-                yield return StartCoroutine(ResourceDownloader.DownloadLanguageJson(resVersion, mcLang,
-                    (status) => Loom.QueueOnMainThread(() => GenerationText!.text = GetL10nString(status)),
-                    () => { }, (succeed) => {
-                        if (succeed) // Downloaded successfully, load it now
-                            foreach (var entry in Json.ParseJson(File.ReadAllText(langPath)).Properties.Where(x => x.Key.StartsWith("block.")))
-                                L10nBlockNameTable.Add(entry.Key, entry.Value.StringValue);
-                        else
-                            Debug.LogWarning($"Language file not available at {langPath}, block names not loaded.");
-                    }));
-            }
-
-            if (callback is not null)
-                callback.Invoke();
-        }
-
         private IEnumerator RunGeneration()
         {
             if (executing || currentConfModel is null || interpreter is null || BlockMaterial is null || GenerationText == null || GenerationResultPrefab is null)
@@ -528,45 +408,52 @@ namespace MarkovCraft
             // First load Minecraft data & resources
             var ver = VersionHolder!.Versions[VersionHolder.SelectedVersion];
 
-            StartCoroutine(LoadMCBlockData(ver.DataVersion, ver.ResourceVersion, () => {
-                if (PlaybackSpeedSlider != null)
-                {
-                    PlaybackSpeedSlider.onValueChanged.AddListener(UpdatePlaybackSpeed);
-                    UpdatePlaybackSpeed(PlaybackSpeedSlider.value);
-                }
-
-                if (ConfigButton != null)
-                {
-                    ConfigButton.onClick.RemoveAllListeners();
-                    ConfigButton.onClick.AddListener(() => GetComponent<ScreenManager>().SetActiveScreenByType<ModelEditorScreen>() );
-                }
-
-                if (ExportButton != null)
-                {
-                    ExportButton.onClick.RemoveAllListeners();
-                    ExportButton.onClick.AddListener(() => GetComponent<ScreenManager>().SetActiveScreenByType<ExporterScreen>() );
-                }
-
-                var dir = PathHelper.GetExtraDataFile("configured_models");
-                if (Directory.Exists(dir) && ConfiguredModelDropdown != null)
-                {
-                    var options = new List<TMP_Dropdown.OptionData>();
-                    loadedConfModels.Clear();
-                    int index = 0;
-                    foreach (var m in Directory.GetFiles(dir, "*.xml", SearchOption.AllDirectories))
+            StartCoroutine(LoadMCBlockData(ver.DataVersion, ver.ResourceVersion,
+                () => {
+                    ExecuteButton!.interactable = false;
+                    ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.load_resource");
+                },
+                (status) => GenerationText!.text = GetL10nString(status),
+                () => {
+                    if (PlaybackSpeedSlider != null)
                     {
-                        var modelPath = m.Substring(dir.Length + 1);
-                        options.Add(new(modelPath));
-                        loadedConfModels.Add(index++, modelPath);
+                        PlaybackSpeedSlider.onValueChanged.AddListener(UpdatePlaybackSpeed);
+                        UpdatePlaybackSpeed(PlaybackSpeedSlider.value);
                     }
 
-                    ConfiguredModelDropdown.AddOptions(options);
-                    ConfiguredModelDropdown.onValueChanged.AddListener(UpdateDropdownOption);
+                    if (ConfigButton != null)
+                    {
+                        ConfigButton.onClick.RemoveAllListeners();
+                        ConfigButton.onClick.AddListener(() => GetComponent<ScreenManager>().SetActiveScreenByType<ModelEditorScreen>() );
+                    }
 
-                    if (options.Count > 0) // Use first model by default
-                        UpdateDropdownOption(0);
-                }
-            }));
+                    if (ExportButton != null)
+                    {
+                        ExportButton.onClick.RemoveAllListeners();
+                        ExportButton.onClick.AddListener(() => GetComponent<ScreenManager>().SetActiveScreenByType<ExporterScreen>() );
+                    }
+
+                    var dir = PathHelper.GetExtraDataFile("configured_models");
+                    if (Directory.Exists(dir) && ConfiguredModelDropdown != null)
+                    {
+                        var options = new List<TMP_Dropdown.OptionData>();
+                        loadedConfModels.Clear();
+                        int index = 0;
+                        foreach (var m in Directory.GetFiles(dir, "*.xml", SearchOption.AllDirectories))
+                        {
+                            var modelPath = m.Substring(dir.Length + 1);
+                            options.Add(new(modelPath));
+                            loadedConfModels.Add(index++, modelPath);
+                        }
+
+                        ConfiguredModelDropdown.AddOptions(options);
+                        ConfiguredModelDropdown.onValueChanged.AddListener(UpdateDropdownOption);
+
+                        if (options.Count > 0) // Use first model by default
+                            UpdateDropdownOption(0);
+                    }
+                })
+            );
         }
 
         void Update()

@@ -166,7 +166,7 @@ namespace MarkovCraft
             properlyLoaded = true;
 
             if (ScreenHeader != null)
-                ScreenHeader.text = Markov.GetL10nString("editor.text.loaded", confModelFile);
+                ScreenHeader.text = GameScene.GetL10nString("editor.text.loaded", confModelFile);
         }
 
         private IEnumerator UpdateActiveCharSetFromModel(string modelFileName)
@@ -226,9 +226,18 @@ namespace MarkovCraft
             properlyLoaded = false;
 
             if (ScreenHeader != null)
-                ScreenHeader.text = Markov.GetL10nString("editor.text.loading");
+                ScreenHeader.text = GameScene.GetL10nString("editor.text.loading");
             
-            confModelFile = Markov.Instance.ConfiguredModelFile;
+            var game = GameScene.Instance as Markov;
+
+            if (game is null)
+            {
+                Debug.LogError("Wrong game scene!");
+                working = false;
+                return;
+            }
+            
+            confModelFile = game.ConfiguredModelFile;
             
             if (ModelDropdown == null || SizeXInput == null || SizeYInput == null || SizeZInput == null ||SaveButton == null || AmountInput == null ||
                     StepsInput == null || SeedsInput == null || AnimatedToggle == null || GridTransform == null || BlockStatePreview == null)
@@ -236,13 +245,13 @@ namespace MarkovCraft
                 Debug.LogWarning("Editor is not properly loaded!");
 
                 if (ScreenHeader != null)
-                    ScreenHeader.text = Markov.GetL10nString("editor.text.load_failure");
+                    ScreenHeader.text = GameScene.GetL10nString("editor.text.load_failure");
 
                 working = false;
                 return;
             }
 
-            StartCoroutine(InitializeScreen(Markov.Instance.ConfiguredModelFile));
+            StartCoroutine(InitializeScreen(game.ConfiguredModelFile));
         }
 
         public override void OnHide(ScreenManager manager)
@@ -298,12 +307,21 @@ namespace MarkovCraft
                     
                     ConfiguredModel.GetXMLDoc(model).Save($"{PathHelper.GetExtraDataFile("configured_models")}/{confModelFile}");
                 }
+
+                var game = GameScene.Instance as Markov;
+
+                if (game is null)
+                {
+                    Debug.LogError("Wrong game scene!");
+                    working = false;
+                    return;
+                }
                 
                 working = false;
 
                 manager?.SetActiveScreenByType<HUDScreen>();
 
-                Markov.Instance.SetConfiguredModel(confModelFile);
+                game.SetConfiguredModel(confModelFile);
             }
 
         }
