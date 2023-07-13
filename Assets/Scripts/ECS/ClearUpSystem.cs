@@ -31,6 +31,8 @@ namespace MarkovCraft
             {
                 if (magic.ValueRO.LifeTime <= 0F)
                     magic.ValueRW.LifeTime = 1F;
+                
+                magic.ValueRW.TimeLeft = 0.1F;
             }
 
             // Remove all clear up tag components

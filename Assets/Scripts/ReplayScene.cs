@@ -134,6 +134,8 @@ namespace MarkovCraft
             }
         }
 
+        private const int FRAME_LIMIT = 5;
+
         public IEnumerator UpdateRecording(string recordingFile)
         {
             Loading = true;
@@ -237,7 +239,8 @@ namespace MarkovCraft
 
             List<BlockChangeInfo> allBlockChanges = new();
 
-            for (int f = 0;f < recData.FrameData.Count;f++) // For each frame i the recording
+            // Pre-process these frames
+            for (int f = 0;f < recData.FrameData.Count && f < FRAME_LIMIT;f++) // For each frame i the recording
             {
                 var nums = recData.FrameData[f].Split(' ');
                 if (nums.Length % 4 != 0)
@@ -342,7 +345,16 @@ namespace MarkovCraft
             ClearUpScene();
             replaying = true;
 
+            yield return StartCoroutine(ReplayRegular());
+
+            if (replaying) // If the replay hasn't been forced stopped
+                StopReplay();
+        }
+
+        private IEnumerator ReplayRegular()
+        {
             Material[] materials = { BlockMaterial! };
+            var simulationBox = new byte[sizeX * sizeY * sizeZ];
 
             for (int f = 0;f < frameData.Count;f++)
             {
@@ -352,6 +364,40 @@ namespace MarkovCraft
                 }
 
                 float tick = 1F / playbackSpeed;
+
+                foreach (var change in frameData[f])
+                {
+                    simulationBox[change.x + change.y * sizeX + change.z * sizeX * sizeY] = (byte) change.newBlock;
+                }
+
+                var instanceData = BlockDataBuilder.GetInstanceData(simulationBox, sizeX, sizeY, sizeZ, int3.zero, meshPalette);
+                BlockInstanceSpawner.VisualizeState(instanceData, materials, blockMeshes, tick);
+
+                ReplayText!.text = $"Frame {f} / {frameData.Count}";
+                yield return new WaitForSeconds(tick);
+            }
+
+            if (replaying)
+            {
+                var instanceData = BlockDataBuilder.GetInstanceData(simulationBox, sizeX, sizeY, sizeZ, int3.zero, meshPalette);
+                BlockInstanceSpawner.VisualizePersistentState(instanceData, materials, blockMeshes);
+            }
+        }
+
+        private IEnumerator ReplayOptimized()
+        {
+            Material[] materials = { BlockMaterial! };
+
+            // For optimized playback, playback speed cannot be hot-updated when playing
+            float constTick = 1F / playbackSpeed;
+
+            for (int f = 0;f < frameData.Count;f++)
+            {
+                if (!replaying) // Replaying terminated
+                {
+                    break;
+                }
+                
                 BlockChangeInfo[] changes;
 
                 if (sizeZ != 1) // 3d mode, filter out air block placement
@@ -364,17 +410,15 @@ namespace MarkovCraft
                 }
 
                 var instanceData = (
-                        changes.Select(x => new int3(x.x, x.z, x.y)).ToArray(), 
+                        changes.Select(x => new int3(x.x, x.z, x.y)).ToArray(),
                         changes.Select(x => meshPalette[x.newBlock]).ToArray(),
-                        changes.Select(x => x.persistence * tick).ToArray()
+                        changes.Select(x => x.persistence * constTick).ToArray()
                 );
                 BlockInstanceSpawner.VisualizeState(instanceData, materials, blockMeshes);
 
-                yield return new WaitForSeconds(tick);
+                ReplayText!.text = $"Frame {f} / {frameData.Count}";
+                yield return new WaitForSeconds(constTick);
             }
-
-            if (replaying) // If the replay hasn't been forced stopped
-                StopReplay();
         }
 
         public void StartReplay()
