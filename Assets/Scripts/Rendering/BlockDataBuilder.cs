@@ -8,7 +8,7 @@ namespace MarkovCraft
     {
         private static bool checkAir3d(byte index) => index == 0;
 
-        public static (int3[], int2[]) GetInstanceData(byte[] state, int FX, int FY, int FZ, int3 pos, int2[] palette)
+        public static (int3[], int2[]) GetInstanceData(byte[] state, int FX, int FY, int FZ, int3 pos, int2[] meshPalette)
         {
             List<int3> posData = new();
             List<int2> meshData = new();
@@ -20,7 +20,7 @@ namespace MarkovCraft
                 if (FZ == 1) // 2d mode, byte 0 is not air
                 {
                     posData.Add(new int3(x, z, y) + pos);
-                    meshData.Add(palette[v]);
+                    meshData.Add(meshPalette[v]);
                 }
                 else if (!checkAir3d(v)) // 3d mode, byte 0 is air
                 {
@@ -42,7 +42,7 @@ namespace MarkovCraft
                     if (notCulled) // At least one side of this cube is visible
                     {
                         posData.Add(new int3(x, z, y) + pos);
-                        meshData.Add(palette[v]);
+                        meshData.Add(meshPalette[v]);
                     }
                     
                 }

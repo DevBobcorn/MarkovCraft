@@ -15,45 +15,38 @@ namespace MarkovCraft
         // Markov    X  Z  Y
         // Minecraft Z  Y  X
 
-        public static IEnumerator SaveRecording(Dictionary<char, CustomMappingItem> recPalette, string recordingName,
-                int maxX, int maxY, int maxZ, GenerationFrameRecord[] recordedFrames)
+        public static IEnumerator SaveRecording(Dictionary<char, CustomMappingItem> fullPalette, string recordingName,
+                int sizeX, int sizeY, int sizeZ, GenerationFrameRecord[] recordedFrames)
         {
             Debug.Log($"Exporting generation process with {recordedFrames.Length} frames");
             yield return null;
 
-            //Dictionary<string, object> exportData = new();
             // Character => new palette index
             Dictionary<char, int> charMap = new();
-            var stateMap = new CustomMappingItem[recPalette.Count];
+            var stateMap = new CustomMappingItem[fullPalette.Count];
+            var recPalette = new ColoredBlockStateInfo[fullPalette.Count];
 
             int index = 0;
-            foreach (var item in recPalette)
+            foreach (var item in fullPalette)
             {
                 charMap.Add(item.Key, index);
                 stateMap[index] = item.Value;
+                recPalette[index] = new(ColorConvert.GetHexRGBString(item.Value.Color),
+                        item.Value.BlockState);
                 index++;
             }
 
-            // First export the current palette
-            //exportData.Add("palette", recPalette.ToDictionary(x => charMap[x.Key].ToString(), x => (object) x.Value));
-            //exportData.Add("size_x", maxX);
-            //exportData.Add("size_y", maxY);
-            //exportData.Add("size_z", maxZ);
-
             // Export frames
-            var simulationBox = new int[maxX * maxY * maxZ];
-            int frameLimit = 10;
+            var simulationBox = new int[sizeX * sizeY * sizeZ];
 
-            int mcSizeX = maxY, mcSizeY = maxZ, mcSizeZ = maxX;
+            // In 3d mode, 0 is the index of air block whereas 2d mode has no air block
+            int initValue = (sizeZ == 1) ? -1 : 0;
+            Array.Fill(simulationBox, initValue);
 
-            // Fill the array with -1 which indicates uninitialized
-            Array.Fill(simulationBox, -1);
-            //List<object> frameData = new();
             List<string> frameData = new();
             // Simulate the whole thing frame by frame
-            for (int frameIdx = 0;frameIdx < frameLimit && frameIdx < recordedFrames.Length;frameIdx++)
+            for (int frameIdx = 0;frameIdx < recordedFrames.Length;frameIdx++)
             {
-                Debug.Log($"Exporting frame #{frameIdx}");
                 List<int> blockChanges = new();
 
                 var frame = recordedFrames[frameIdx];
@@ -63,30 +56,26 @@ namespace MarkovCraft
                 for (byte z = 0; z < fZ; z++) for (byte y = 0; y < fY; y++) for (byte x = 0; x < fX; x++)
                 {
                     int framePos = x + y * fX + z * fX * fY;
-                    int boxPos = x + y * maxX + z * maxX * maxY;
+                    int boxPos = x + y * sizeX + z * sizeX * sizeY;
+                    int paletteIndex = charMap[frameStates[framePos]];
 
-                    if (simulationBox[boxPos] != frameStates[framePos]) // The block is changed in this frame
+                    if (simulationBox[boxPos] != paletteIndex) // The block is changed in this frame
                     {
+                        simulationBox[boxPos] = paletteIndex;
+
                         // Register the block change
-                        blockChanges.AddRange(new int[]{ x, y, z, frameStates[framePos] });
+                        blockChanges.AddRange(new int[]{ x, y, z, paletteIndex });
                     }
                 }
 
                 frameData.Add(string.Join(" ", blockChanges));
+                Debug.Log($"Exporting frame #{frameIdx} changes: [{blockChanges.Count * 4}]");
             }
 
-            // Export frame data
-            //exportData.Add("frame_data", frameData);
-
-            RecordingData recData = new(
-                    recPalette.ToDictionary(x => charMap[x.Key].ToString(), x =>
-                            new ColoredBlockStateInfo( ColorConvert.GetHexRGBString(x.Value.Color), x.Value.BlockState )),
-                    maxX, maxY, maxZ, frameData
-            );
+            RecordingData recData = new(recPalette.ToList(), sizeX, sizeY, sizeZ, frameData);
 
             string jsonText = JsonConvert.SerializeObject(recData);
             File.WriteAllText(PathHelper.GetRecordingFile($"{recordingName}.json"), jsonText);
-            //File.WriteAllText(PathHelper.GetRecordingFile($"{recordingName}.json"), Json.Object2Json(exportData));
         }
     }
 }

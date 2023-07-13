@@ -17,13 +17,13 @@ namespace MarkovCraft
 
     public record RecordingData
     {
-        public Dictionary<string, ColoredBlockStateInfo> Palette;
+        public List<ColoredBlockStateInfo> Palette;
         public int SizeX;
         public int SizeY;
         public int SizeZ;
         public List<string> FrameData;
 
-        public RecordingData(Dictionary<string, ColoredBlockStateInfo> palette, int sizeX, int sizeY, int sizeZ, List<string> frameData)
+        public RecordingData(List<ColoredBlockStateInfo> palette, int sizeX, int sizeY, int sizeZ, List<string> frameData)
         {
             Palette = palette;
             SizeX = sizeX;

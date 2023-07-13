@@ -297,7 +297,7 @@ namespace MarkovCraft
                         var instanceData = BlockDataBuilder.GetInstanceData(dataFrame.state!, dataFrame.FX, dataFrame.FY, dataFrame.FZ, pos,
                                 // Frame legend index => (meshIndex, meshColor)
                                 dataFrame.legend.Select(ch => meshPalette[ch]).ToArray());
-                        BlockInstanceSpawner.VisualizeState(instanceData, materials, blockMeshes, tick, 0.5F);
+                        BlockInstanceSpawner.VisualizeState(instanceData, materials, blockMeshes, tick);
 
                         // Record the data frame
                         recordedFrames.Add(new GenerationFrameRecord(new int3(dataFrame.FX, dataFrame.FY, dataFrame.FZ),
@@ -345,16 +345,16 @@ namespace MarkovCraft
                     GenerationText.text = GetL10nString("status.info.generation_complete", k);
 
                     var recordingName = (currentConfModel?.Model ?? "Untitled") + $"_#{k}";
-                    var recPalette = GetFullPalette();
+                    var fullPalette = GetFullPalette();
 
-                    if (recPalette is not null) // Save recording
+                    if (fullPalette is not null) // Save recording
                     {
-                        StartCoroutine(RecordingExporter.SaveRecording(recPalette, recordingName, maxX, maxY, maxZ, recordedFrames.ToArray()));
+                        StartCoroutine(RecordingExporter.SaveRecording(fullPalette, recordingName, maxX, maxY, maxZ, recordedFrames.ToArray()));
                     }
                 }
             }
 
-            if (executing) // If the execution wasn't forced stopped
+            if (executing) // If the execution hasn't been forced stopped
                 StopExecution();
         }
 
