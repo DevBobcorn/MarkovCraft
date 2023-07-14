@@ -20,7 +20,7 @@ namespace MarkovCraft
         [SerializeField] private VersionHolder? VersionHolder;
         [SerializeField] private LocalizedStringTable? L10nTable;
         [SerializeField] Animator? CubeAnimator;
-        [SerializeField] Button? EnterButton, DownloadButton, LanguageButton;
+        [SerializeField] Button? EnterButton, DownloadButton, ReplayButton;
 
         private Animator? downloadButtonAnimator;
         private bool downloadingRes = false;
@@ -46,9 +46,12 @@ namespace MarkovCraft
             var resPresent = Directory.Exists(newResPath);
 
             downloadButtonAnimator?.SetBool("Hidden", resPresent);
+
             if (EnterButton != null)
                 EnterButton.interactable = resPresent;
-
+            
+            if (ReplayButton != null)
+                ReplayButton.interactable = resPresent;
         }
 
         void Start()

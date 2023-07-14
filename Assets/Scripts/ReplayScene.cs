@@ -391,10 +391,13 @@ namespace MarkovCraft
 
         private IEnumerator ReplayOptimized()
         {
-            Material[] materials = { BlockMaterial! };
-
             // For optimized playback, playback speed cannot be hot-updated when playing
             float constTick = 1F / playbackSpeed;
+            // Lock playback speed slider
+            if (PlaybackSpeedSlider != null)
+                PlaybackSpeedSlider.interactable = false;
+
+            Material[] materials = { BlockMaterial! };
 
             for (int f = 0;f < frameData.Count;f++)
             {
@@ -424,6 +427,10 @@ namespace MarkovCraft
                 ReplayText!.text = $"Frame {f} / {frameData.Count}";
                 yield return new WaitForSeconds(constTick);
             }
+
+            // Unlock playback speed slider
+            if (PlaybackSpeedSlider != null)
+                PlaybackSpeedSlider.interactable = true;
         }
 
         public void StartReplay()

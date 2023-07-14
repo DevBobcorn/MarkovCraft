@@ -75,6 +75,13 @@ namespace MarkovCraft
             RecordingData recData = new(recPalette.ToList(), sizeX, sizeY, sizeZ, frameData);
 
             string jsonText = JsonConvert.SerializeObject(recData);
+            var folderName = PathHelper.GetRecordingFile(string.Empty);
+
+            if (!Directory.Exists(folderName)) // Create folder if not present
+            {
+                Directory.CreateDirectory(folderName);
+            }
+
             File.WriteAllText(PathHelper.GetRecordingFile($"{recordingName}.json"), jsonText);
         }
     }
