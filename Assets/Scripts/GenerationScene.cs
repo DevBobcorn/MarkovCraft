@@ -381,13 +381,13 @@ namespace MarkovCraft
                     if (ConfigButton != null)
                     {
                         ConfigButton.onClick.RemoveAllListeners();
-                        ConfigButton.onClick.AddListener(() => GetComponent<ScreenManager>().SetActiveScreenByType<ModelEditorScreen>() );
+                        ConfigButton.onClick.AddListener(() => screenManager!.SetActiveScreenByType<ModelEditorScreen>() );
                     }
 
                     if (ExportButton != null)
                     {
                         ExportButton.onClick.RemoveAllListeners();
-                        ExportButton.onClick.AddListener(() => GetComponent<ScreenManager>().SetActiveScreenByType<ExporterScreen>() );
+                        ExportButton.onClick.AddListener(() => screenManager!.SetActiveScreenByType<ExporterScreen>() );
                     }
 
                     var dir = PathHelper.GetExtraDataFile("configured_models");
