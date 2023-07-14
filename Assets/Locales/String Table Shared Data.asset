@@ -316,7 +316,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 28296596267929600
-    m_Key: Replay/Canvas/Replay Screen/Title Text
+    m_Key: hud.text.recording_replay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28311964730462208
+    m_Key: status.error.open_json_failure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28325291175120896
+    m_Key: hud.text.optimized_playback_toggle
     m_Metadata:
       m_Items: []
   m_Metadata:

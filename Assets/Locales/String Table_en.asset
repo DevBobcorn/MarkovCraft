@@ -344,6 +344,14 @@ MonoBehaviour:
     m_Localized: Recording Replay
     m_Metadata:
       m_Items: []
+  - m_Id: 28311964730462208
+    m_Localized: Couldn't open json file at {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28325291175120896
+    m_Localized: Optimized Playback(disables speed slider during playback)
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

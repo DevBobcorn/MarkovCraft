@@ -39,8 +39,10 @@ namespace MarkovCraft
             // Export frames
             var simulationBox = new int[sizeX * sizeY * sizeZ];
 
+            bool is2d = sizeZ == 1;
+
             // In 3d mode, 0 is the index of air block whereas 2d mode has no air block
-            int initValue = (sizeZ == 1) ? -1 : 0;
+            int initValue = is2d ? -1 : 0;
             Array.Fill(simulationBox, initValue);
 
             List<string> frameData = new();
@@ -64,7 +66,14 @@ namespace MarkovCraft
                         simulationBox[boxPos] = paletteIndex;
 
                         // Register the block change
-                        blockChanges.AddRange(new int[]{ x, y, z, paletteIndex });
+                        if (is2d) // Omit the z value which is always 0
+                        {
+                            blockChanges.AddRange(new int[]{ x, y, paletteIndex });
+                        }
+                        else
+                        {
+                            blockChanges.AddRange(new int[]{ x, y, z, paletteIndex });
+                        }
                     }
                 }
 
@@ -72,7 +81,7 @@ namespace MarkovCraft
                 Debug.Log($"Exporting frame #{frameIdx} changes: [{blockChanges.Count * 4}]");
             }
 
-            RecordingData recData = new(recPalette.ToList(), sizeX, sizeY, sizeZ, frameData);
+            RecordingData recData = new(recPalette.ToList(), is2d ? 2 : 3, sizeX, sizeY, sizeZ, frameData);
 
             string jsonText = JsonConvert.SerializeObject(recData);
             var folderName = PathHelper.GetRecordingFile(string.Empty);

@@ -31,6 +31,7 @@ namespace MarkovCraft
         [SerializeField] public TMP_Text? PlaybackSpeedText, ReplayText, FPSText;
         [SerializeField] public TMP_Dropdown? RecordingDropdown;
         [SerializeField] public Slider? PlaybackSpeedSlider;
+        [SerializeField] public Toggle? OptimizedPlaybackToggle;
         [SerializeField] public Button? ReplayButton; // , ExportButton;
 
         private string recordingFile = string.Empty;
@@ -38,6 +39,7 @@ namespace MarkovCraft
         private readonly Dictionary<int, string> loadedRecordings = new();
         private ColoredBlockStateInfo[] recordingPalette = { }; // Palette of active recording
         private int sizeX, sizeY, sizeZ; // Size of active recording
+        private bool is2d; // Whether or not the active recording is 2d
         private readonly List<BlockChangeInfo[]> frameData = new(); // Frame data of active recording
         // Recording palette index => (meshIndex, meshColor)
         private int2[] meshPalette = { };
@@ -165,7 +167,7 @@ namespace MarkovCraft
 
                     if (recData is not null)
                     {
-                        Debug.Log($"Recording [{fileName}] loaded: Size: {recData.SizeX}x{recData.SizeY}x{recData.SizeZ} Frames: {recData.FrameData.Count}");
+                        Debug.Log($"Recording [{fileName}] loaded: Dimension: {recData.Dimension}d Size: {recData.SizeX}x{recData.SizeY}x{recData.SizeZ} Frames: {recData.FrameData.Count}");
 
                         succeeded = true;
                     }
@@ -237,13 +239,33 @@ namespace MarkovCraft
             // Initialize the array with -1 which indicates not changed yet
             Array.Fill(changeTrackingBox, -1);
 
+            // Pre-process these frames
             List<BlockChangeInfo> allBlockChanges = new();
 
-            // Pre-process these frames
+            switch (recData.Dimension)
+            {
+                case 2:
+                    is2d = true;
+                    break;
+                case 3:
+                    is2d = false;
+                    break;
+                default:
+                    Debug.LogWarning($"Invalid dimension: {recData.Dimension}");
+                    Loading = false;
+                    ReplayText!.text = GetL10nString("status.error.open_json_failure", fileName);
+                    yield break;
+            }
+
+            // For 3d, every item contains 4 numbers: x, y, z and palette index,
+            // and as for 2d, it's 3 numbers with z values omitted
+            int itemLength = is2d ? 3 : 4;
+            
             for (int f = 0;f < recData.FrameData.Count && f < FRAME_LIMIT;f++) // For each frame i the recording
             {
                 var nums = recData.FrameData[f].Split(' ');
-                if (nums.Length % 4 != 0)
+
+                if (nums.Length % itemLength != 0)
                 {
                     if (nums.Length > 1) // Not empty string, which return an array with a length of 1
                         Debug.Log($"Malformed frame data with a length of {nums.Length}");
@@ -252,12 +274,12 @@ namespace MarkovCraft
 
                 List<BlockChangeInfo> blockChangesCurrentFrame = new();
 
-                for (int i = 0;i < nums.Length;i += 4)
+                for (int i = 0;i < nums.Length;i += itemLength)
                 {
                     int x = int.Parse(nums[i    ]);
                     int y = int.Parse(nums[i + 1]);
-                    int z = int.Parse(nums[i + 2]);
-                    int b = int.Parse(nums[i + 3]);
+                    int z = is2d ? 0                      : int.Parse(nums[i + 2]);
+                    int b = is2d ? int.Parse(nums[i + 2]) : int.Parse(nums[i + 3]);
 
                     int posInBox = x + y * sizeX + z * sizeX * sizeY;
 
@@ -350,7 +372,10 @@ namespace MarkovCraft
 
             replaying = true;
 
-            yield return StartCoroutine(ReplayOptimized());
+            if (OptimizedPlaybackToggle?.isOn ?? true)
+                yield return StartCoroutine(ReplayOptimized());
+            else
+                yield return StartCoroutine(ReplayRegular());
 
             if (replaying) // If the replay hasn't been forced stopped
                 StopReplay();
@@ -378,7 +403,7 @@ namespace MarkovCraft
                 var instanceData = BlockDataBuilder.GetInstanceData(simulationBox, sizeX, sizeY, sizeZ, int3.zero, meshPalette);
                 BlockInstanceSpawner.VisualizeState(instanceData, materials, blockMeshes, tick);
 
-                ReplayText!.text = $"Frame {f} / {frameData.Count}";
+                ReplayText!.text = $"Frame {f} / {frameData.Count} (Regular)";
                 yield return new WaitForSeconds(tick);
             }
 
@@ -408,13 +433,13 @@ namespace MarkovCraft
                 
                 BlockChangeInfo[] changes;
 
-                if (sizeZ != 1) // 3d mode, filter out air block placement
-                {
-                    changes = frameData[f].Where(x => x.newBlock != 0).ToArray();
-                }
-                else // 2d mode, nothing special needed
+                if (is2d) // 2d mode, nothing special needed
                 {
                     changes = frameData[f];
+                }
+                else // 3d mode, filter out air block placement
+                {
+                    changes = frameData[f].Where(x => x.newBlock != 0).ToArray();
                 }
 
                 var instanceData = (
@@ -424,7 +449,7 @@ namespace MarkovCraft
                 );
                 BlockInstanceSpawner.VisualizeState(instanceData, materials, blockMeshes);
 
-                ReplayText!.text = $"Frame {f} / {frameData.Count}";
+                ReplayText!.text = $"Frame {f} / {frameData.Count} (Optimized)";
                 yield return new WaitForSeconds(constTick);
             }
 
