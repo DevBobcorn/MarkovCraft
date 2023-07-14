@@ -31,7 +31,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8361141510144
-    m_Localized: 'Selected Model:'
+    m_Localized: 'Configured Model:'
     m_Metadata:
       m_Items: []
   - m_Id: 9929253363712
@@ -313,7 +313,35 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 27571790341935104
-    m_Localized: 'Select Recording:'
+    m_Localized: 'Recording Select:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28282735292780544
+    m_Localized: Start Replay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28282822358142976
+    m_Localized: Stop Replay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28283581397143552
+    m_Localized: Loading Recording...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28284556249862144
+    m_Localized: '[{0}] loaded'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28284971888611328
+    m_Localized: Loading...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28289458426548224
+    m_Localized: Building item geometries...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28296596267929600
+    m_Localized: Recording Replay
     m_Metadata:
       m_Items: []
   references:

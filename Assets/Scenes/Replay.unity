@@ -838,6 +838,7 @@ GameObject:
   - component: {fileID: 657310197}
   - component: {fileID: 657310199}
   - component: {fileID: 657310198}
+  - component: {fileID: 657310200}
   m_Layer: 5
   m_Name: Title Text
   m_TagString: Untagged
@@ -885,7 +886,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Replay
+  m_text: Recording Replay
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9baf05edbcb5b8a4caaa1987e9d8cb2a, type: 2}
   m_sharedMaterial: {fileID: -8751252669686695664, guid: 9baf05edbcb5b8a4caaa1987e9d8cb2a,
@@ -963,6 +964,49 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 657310196}
   m_CullTransparentMesh: 1
+--- !u!114 &657310200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657310196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69beb381e244f92449b8c4cf954630e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TrackedObjects:
+  - rid: 4330822694879625218
+  references:
+    version: 2
+    RefIds:
+    - rid: 4330822694879625218
+      type: {class: TrackedMonoBehaviourObject, ns: UnityEngine.Localization.PropertyVariants.TrackedObjects,
+        asm: Unity.Localization}
+      data:
+        m_Target: {fileID: 657310198}
+        m_TrackedProperties:
+          items:
+          - rid: 4330822694879625219
+        m_UpdateType: 0
+        m_Changed:
+          m_PersistentCalls:
+            m_Calls: []
+    - rid: 4330822694879625219
+      type: {class: LocalizedStringProperty, ns: UnityEngine.Localization.PropertyVariants.TrackedProperties,
+        asm: Unity.Localization}
+      data:
+        m_Localized:
+          m_TableReference:
+            m_TableCollectionName: GUID:ca01ff9c1eb86df4c93c853003cc7ed6
+          m_TableEntryReference:
+            m_KeyId: 28296596267929600
+            m_Key: 
+          m_FallbackState: 0
+          m_WaitForCompletion: 0
+          m_LocalVariables: []
+        m_PropertyPath: m_text
 --- !u!1 &827501978
 GameObject:
   m_ObjectHideFlags: 0
@@ -1547,10 +1591,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 2105438499}
   m_HandleRect: {fileID: 1681657740}
   m_Direction: 0
-  m_MinValue: 0.5
+  m_MinValue: 5
   m_MaxValue: 25
   m_WholeNumbers: 0
-  m_Value: 1
+  m_Value: 20
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []

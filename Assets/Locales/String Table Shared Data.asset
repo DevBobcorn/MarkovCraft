@@ -288,7 +288,35 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 27571790341935104
-    m_Key: Replay/Canvas/Replay Screen/Recording Dropdown/Text (TMP)
+    m_Key: hud.text.selected_recording
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28282735292780544
+    m_Key: hud.text.start_replay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28282822358142976
+    m_Key: hud.text.stop_replay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28283581397143552
+    m_Key: status.info.load_recording
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28284556249862144
+    m_Key: status.info.loaded_recording
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28284971888611328
+    m_Key: hud.text.load_recording
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28289458426548224
+    m_Key: status.info.build_item_geometry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28296596267929600
+    m_Key: Replay/Canvas/Replay Screen/Title Text
     m_Metadata:
       m_Items: []
   m_Metadata:
