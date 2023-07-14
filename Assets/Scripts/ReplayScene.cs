@@ -134,7 +134,7 @@ namespace MarkovCraft
             }
         }
 
-        private const int FRAME_LIMIT = 5;
+        private const int FRAME_LIMIT = int.MaxValue; // 5;
 
         public IEnumerator UpdateRecording(string recordingFile)
         {
@@ -343,9 +343,14 @@ namespace MarkovCraft
             }
 
             ClearUpScene();
+            // Delay a bit so that the first frame of replay doesn't get cleared
+            // This can cause missing blocks if using optimized block population
+            // (calling ReplayOptimized() coroutine) 
+            yield return new WaitForSecondsRealtime(0.1F);
+
             replaying = true;
 
-            yield return StartCoroutine(ReplayRegular());
+            yield return StartCoroutine(ReplayOptimized());
 
             if (replaying) // If the replay hasn't been forced stopped
                 StopReplay();

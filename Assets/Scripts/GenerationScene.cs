@@ -217,6 +217,8 @@ namespace MarkovCraft
             }
 
             ClearUpScene();
+            // Delay a bit so that the first frame of generation doesn't get cleared
+            yield return new WaitForSecondsRealtime(0.1F);
 
             executing = true;
             var model = currentConfModel;
