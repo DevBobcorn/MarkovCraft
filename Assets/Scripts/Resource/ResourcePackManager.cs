@@ -144,6 +144,8 @@ namespace MinecraftClient.Resource
             Debug.Log($"Resource packs loaded in {sw.ElapsedMilliseconds} ms.");
             Debug.Log($"Built {StateModelTable.Count} block state geometry lists.");
 
+            updateStatus("status.info.resource_loaded");
+
             flag.Finished = true;
         }
 

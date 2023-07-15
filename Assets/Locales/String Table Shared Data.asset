@@ -327,6 +327,10 @@ MonoBehaviour:
     m_Key: hud.text.optimized_playback_toggle
     m_Metadata:
       m_Items: []
+  - m_Id: 28680962999521280
+    m_Key: status.info.resource_loaded
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

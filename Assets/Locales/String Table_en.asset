@@ -352,6 +352,10 @@ MonoBehaviour:
     m_Localized: Optimized Playback(disables speed slider during playback)
     m_Metadata:
       m_Items: []
+  - m_Id: 28680962999521280
+    m_Localized: Resource loaded
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
