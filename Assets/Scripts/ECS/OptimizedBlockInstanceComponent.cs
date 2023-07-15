@@ -4,11 +4,10 @@ using Unity.Mathematics;
 
 namespace MarkovCraft
 {
-    public struct BlockInstanceComponent : IComponentData
+    public struct OptimizedBlockInstanceComponent : IComponentData
     {
         public float LifeTime;
-        public float TimeLeft;
+        public float Timer;
         public int3 Position;
-
     }
 }

@@ -26,17 +26,20 @@ namespace MarkovCraft
             var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            foreach (var (magic, entity) in
-                    SystemAPI.Query<RefRW<BlockInstanceComponent>>().WithEntityAccess())
+            foreach (var (comp, entity) in
+                    SystemAPI.Query<RefRW<RegularBlockInstanceComponent>>().WithEntityAccess())
             {
-                if (magic.ValueRO.LifeTime <= 0F)
-                    magic.ValueRW.LifeTime = 1F;
-                
-                magic.ValueRW.TimeLeft = 0.1F;
+                comp.ValueRW.LifeTime = 0.1F;
+            }
+
+            foreach (var (comp, entity) in
+                    SystemAPI.Query<RefRW<OptimizedBlockInstanceComponent>>().WithEntityAccess())
+            {
+                comp.ValueRW.LifeTime = 0.1F;
             }
 
             // Remove all clear up tag components
-            foreach (var (markov, entity) in
+            foreach (var (comp, entity) in
                     SystemAPI.Query<RefRW<ClearTagComponent>>().WithEntityAccess())
             {
                 ecb.DestroyEntity(entity);

@@ -9,7 +9,7 @@ using Unity.Transforms;
 namespace MarkovCraft
 {
     [GenerateTestsForBurstCompatibility]
-    public struct SpawnFadeJob : IJobParallelFor
+    public struct RegularSpawnJob : IJobParallelFor
     {
         public Entity Prototype;
         public EntityCommandBuffer.ParallelWriter Ecb;
@@ -21,7 +21,7 @@ namespace MarkovCraft
         public NativeArray<int2> MeshData; // mesh index, color
 
         [ReadOnly]
-        public NativeArray<float> LifeTime;
+        public float LifeTime;
 
         private static readonly float4 WHITE = new(1F);
 
@@ -32,9 +32,6 @@ namespace MarkovCraft
             // Prototype has all correct components up front, can use SetComponent
             var pos = PositionData[index];
             var mesh = MeshData[index];
-            var life = LifeTime[index];
-
-            if (life < 0F) life = 0F;
 
             Ecb.SetComponent(index, e, new LocalToWorld {
                     Value = float4x4.TRS(
@@ -43,10 +40,10 @@ namespace MarkovCraft
                         new(1F, 1F, 1F)
                     ) });
             
-            Ecb.SetComponent(index, e, new InstanceBlockColor { Value = mesh.x == 0 ? ComputeColor(mesh.y) : WHITE });
+            Ecb.SetComponent(index, e, new InstanceBlockColorComponent { Value = mesh.x == 0 ? ComputeColor(mesh.y) : WHITE });
             Ecb.SetComponent(index, e, MaterialMeshInfo.FromRenderMeshArrayIndices(0, mesh.x));
 
-            Ecb.SetComponent(index, e, new BlockInstanceComponent { TimeLeft = life, LifeTime = life, Position = pos });
+            Ecb.SetComponent(index, e, new RegularBlockInstanceComponent { Timer = 0F, LifeTime = LifeTime, Position = pos });
             
         }
 

@@ -299,7 +299,7 @@ namespace MarkovCraft
                         var instanceData = BlockDataBuilder.GetInstanceData(dataFrame.state!, dataFrame.FX, dataFrame.FY, dataFrame.FZ, pos,
                                 // Frame legend index => (meshIndex, meshColor)
                                 dataFrame.legend.Select(ch => meshPalette[ch]).ToArray());
-                        BlockInstanceSpawner.VisualizeState(instanceData, materials, blockMeshes, tick);
+                        BlockInstanceSpawner.VisualizeFrameState(instanceData, materials, blockMeshes, tick);
 
                         // Record the data frame
                         recordedFrames.Add(new GenerationFrameRecord(new int3(dataFrame.FX, dataFrame.FY, dataFrame.FZ),

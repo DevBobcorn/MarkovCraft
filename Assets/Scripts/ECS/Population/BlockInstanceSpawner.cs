@@ -15,12 +15,14 @@ namespace MarkovCraft
         private static readonly Bounds cubeBounds = new Bounds(new(0.5F, 0.5F, 0.5F), new(1F, 1F, 1F));
         private static readonly RenderBounds renderBounds = new RenderBounds { Value = cubeBounds.ToAABB() };
 
+        // Regular block population - persistent
         public static void VisualizePersistentState((int3[], int2[]) instanceDataRaw, Material[] materials, Mesh[] meshes)
         {
-            VisualizeState(instanceDataRaw, materials, meshes, 0F);
+            VisualizeFrameState(instanceDataRaw, materials, meshes, 0F);
         }
 
-        public static void VisualizeState((int3[], int2[]) instanceDataRaw, Material[] materials, Mesh[] meshes, float lifeTime)
+        // Regular block population - one frame
+        public static void VisualizeFrameState((int3[], int2[]) instanceDataRaw, Material[] materials, Mesh[] meshes, float lifeTime)
         {
             var entityCount = instanceDataRaw.Item1.Length;
 
@@ -52,22 +54,21 @@ namespace MarkovCraft
                 renderMeshArray,
                 MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
             
-            entityManager.AddComponentData(prototype, new InstanceBlockColor());
-            entityManager.AddComponentData(prototype, new BlockInstanceComponent());
+            entityManager.AddComponentData(prototype, new InstanceBlockColorComponent());
+            entityManager.AddComponentData(prototype, new RegularBlockInstanceComponent());
             
             #endregion
 
             // Spawn most of the entities in a Burst job by cloning a pre-created prototype entity,
             // which can be either a Prefab or an entity created at run time like in this sample.
             // This is the fastest and most efficient way to create entities at run time.
-            var spawnJob = new SpawnJob
+            var spawnJob = new RegularSpawnJob
             {
                 Ecb = ecbJob.AsParallelWriter(),
                 Prototype = prototype,
                 PositionData = posData,
                 MeshData = meshData,
-                LifeTime = lifeTime,
-                TimeLeft = (lifeTime <= 0F) ? 0F : (lifeTime + 0.1F)
+                LifeTime = lifeTime
             };
 
             var spawnHandle = spawnJob.Schedule(entityCount, 128);
@@ -80,6 +81,7 @@ namespace MarkovCraft
             entityManager.DestroyEntity(prototype);
         }
 
+        // Optimized block population - instanced life time
         public static void VisualizeState((int3[], int2[], float[]) instanceDataRaw, Material[] materials, Mesh[] meshes)
         {
             var entityCount = instanceDataRaw.Item1.Length;
@@ -114,15 +116,15 @@ namespace MarkovCraft
                 renderMeshArray,
                 MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
             
-            entityManager.AddComponentData(prototype, new InstanceBlockColor());
-            entityManager.AddComponentData(prototype, new BlockInstanceComponent());
+            entityManager.AddComponentData(prototype, new InstanceBlockColorComponent());
+            entityManager.AddComponentData(prototype, new OptimizedBlockInstanceComponent());
             
             #endregion
 
             // Spawn most of the entities in a Burst job by cloning a pre-created prototype entity,
             // which can be either a Prefab or an entity created at run time like in this sample.
             // This is the fastest and most efficient way to create entities at run time.
-            var spawnJob = new SpawnFadeJob
+            var spawnJob = new OptimizedSpawnJob
             {
                 Ecb = ecbJob.AsParallelWriter(),
                 Prototype = prototype,

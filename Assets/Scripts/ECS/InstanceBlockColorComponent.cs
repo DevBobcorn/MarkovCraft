@@ -5,7 +5,7 @@ using Unity.Rendering;
 namespace MarkovCraft
 {
     [MaterialProperty("_BaseColor")]
-    public struct InstanceBlockColor : IComponentData
+    public struct InstanceBlockColorComponent : IComponentData
     {
         public float4 Value;
     }
@@ -13,14 +13,14 @@ namespace MarkovCraft
     [UnityEngine.DisallowMultipleComponent]
     public class InstanceBlockColorAuthoring : UnityEngine.MonoBehaviour
     {
-        [Unity.Entities.RegisterBinding(typeof(InstanceBlockColor), nameof(InstanceBlockColor.Value))]
+        [Unity.Entities.RegisterBinding(typeof(InstanceBlockColorComponent), nameof(InstanceBlockColorComponent.Value))]
         public UnityEngine.Color color;
 
         class InstanceBlockColorBaker : Unity.Entities.Baker<InstanceBlockColorAuthoring>
         {
             public override void Bake(InstanceBlockColorAuthoring authoring)
             {
-                InstanceBlockColor component = default(InstanceBlockColor);
+                InstanceBlockColorComponent component = default(InstanceBlockColorComponent);
                 float4 colorValues;
                 colorValues.x = authoring.color.linear.r;
                 colorValues.y = authoring.color.linear.g;

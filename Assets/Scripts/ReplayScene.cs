@@ -401,7 +401,7 @@ namespace MarkovCraft
                 }
 
                 var instanceData = BlockDataBuilder.GetInstanceData(simulationBox, sizeX, sizeY, sizeZ, int3.zero, meshPalette);
-                BlockInstanceSpawner.VisualizeState(instanceData, materials, blockMeshes, tick);
+                BlockInstanceSpawner.VisualizeFrameState(instanceData, materials, blockMeshes, tick);
 
                 ReplayText!.text = $"Frame {f} / {frameData.Count} (Regular)";
                 yield return new WaitForSeconds(tick);
