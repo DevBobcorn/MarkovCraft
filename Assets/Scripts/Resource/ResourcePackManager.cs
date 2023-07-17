@@ -201,7 +201,7 @@ namespace MinecraftClient.Resource
                             //Debug.Log($"Generating item model for {itemModelId} tintable: {tintable}");
                         }
 
-                        var itemGeometry = new ItemGeometryBuilder(rawModel).Build(generated);
+                        var itemGeometry = new ItemGeometryBuilder(rawModel).Build();
 
                         RenderType renderType;
 
@@ -242,7 +242,7 @@ namespace MinecraftClient.Resource
                                         //Debug.Log($"Generating item model for {itemModelId} tintable: {tintable}");
                                     }
 
-                                    var overrideGeometry = new ItemGeometryBuilder(rawOverrideModel).Build(overrideGenerated);
+                                    var overrideGeometry = new ItemGeometryBuilder(rawOverrideModel).Build();
                                     var predicate = ItemModelPredicate.fromJson(o.Properties["predicate"]);
                                     
                                     itemModel.AddOverride(predicate, overrideGeometry);
