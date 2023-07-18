@@ -8,9 +8,9 @@
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
 
-# MarkovCraft resources
+# CornModel resources
 /[Rr]esource [Pp]acks/*/
-!/[Rr]esource [Pp]acks/default/
+!/[Rr]esource [Pp]acks/vanilla_fix/
 /[Ll]ang/
 /*.ini
 
