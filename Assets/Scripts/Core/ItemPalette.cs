@@ -171,8 +171,8 @@ namespace MinecraftClient.Mapping
                             Debug.LogWarning($"Failed to apply fixed color rules to {itemId} ({numId})!");
                         
                     }
-                    else
-                        Debug.LogWarning($"Applying fixed color rules to undefined item {itemId}!");
+                    //else
+                    //    Debug.LogWarning($"Applying fixed color rules to undefined item {itemId}!");
                 }
             }
 
@@ -198,8 +198,8 @@ namespace MinecraftClient.Mapping
                             Debug.LogWarning($"Failed to apply fixed multi-color rules to {itemId} ({numId})!");
                         
                     }
-                    else
-                        Debug.LogWarning($"Applying fixed multi-color rules to undefined item {itemId}!");
+                    //else
+                    //    Debug.LogWarning($"Applying fixed multi-color rules to undefined item {itemId}!");
                 }
             }
 

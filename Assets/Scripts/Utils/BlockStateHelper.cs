@@ -18,8 +18,10 @@ namespace MarkovCraft
             {
                 var blockId = ResourceLocation.fromString(parts[0]);
 
-                if (palette.StateListTable.ContainsKey(blockId)) // Get first in the hash set
-                    return palette.StateListTable[blockId].First();
+                if (palette.DefaultStateTable.ContainsKey(blockId))
+                {
+                    return palette.DefaultStateTable[blockId];
+                }
                 else
                 {
                     //Debug.LogWarning($"Block with id {blockId} is not present");
@@ -31,7 +33,7 @@ namespace MarkovCraft
                 var blockId = ResourceLocation.fromString(parts[0]);
                 var filter = parts[1].Substring(0, parts[1].Length - 1); // Remove trailing ']'
 
-                if (palette.StateListTable.ContainsKey(blockId)) // Get first in the hash set
+                if (palette.StateListTable.ContainsKey(blockId)) // StateListTable should have the same keys as DefaultStateTable
                 {
                     var predicate = BlockStatePredicate.fromString(filter);
 
@@ -41,8 +43,8 @@ namespace MarkovCraft
                             return stateId;
                     }
 
-                    //Debug.LogWarning($"Block with id {blockId} is present, but no state matches predicate [{filter}]. Using first state instead");
-                    return palette.StateListTable[blockId].First();
+                    //Debug.LogWarning($"Block with id {blockId} is present, but no state matches predicate [{filter}]. Using default state instead");
+                    return palette.DefaultStateTable[blockId];
                 }
                 else
                 {
@@ -61,7 +63,8 @@ namespace MarkovCraft
         public static ResourceLocation[] GetBlockIdCandidates(ResourceLocation incompleteBlockId)
         {
             return BlockStatePalette.INSTANCE.StateListTable.Keys.Where(
-                    x => x.Namespace == incompleteBlockId.Namespace && x.Path.StartsWith(incompleteBlockId.Path)).Take(3).ToArray();
+                    x => x.Namespace == incompleteBlockId.Namespace &&
+                            x.Path.StartsWith(incompleteBlockId.Path)).Take(3).ToArray();
         }
     }
 }

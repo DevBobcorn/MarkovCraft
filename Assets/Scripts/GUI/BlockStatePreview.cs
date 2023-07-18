@@ -126,7 +126,8 @@ namespace MarkovCraft
                         $"<color=yellow>{x.ToString()[0..typedLength]}</color>{x.ToString()[typedLength..]}"));
 
                 var palette = BlockStatePalette.INSTANCE;
-                var stateId = palette.StateListTable[candidates[0]].First();
+                //var stateId = palette.StateListTable[candidates[0]].First();
+                var stateId = palette.DefaultStateTable[candidates[0]];
                 UpdatePreviewObject(stateId, palette.StatesTable[stateId]);
                 
                 imageCanvasGroup!.alpha = 1F;
