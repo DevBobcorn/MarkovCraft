@@ -331,6 +331,38 @@ MonoBehaviour:
     m_Key: status.info.resource_loaded
     m_Metadata:
       m_Items: []
+  - m_Id: 29795123905105920
+    m_Key: auto_mapper.text.auto_mapping
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29795200484708352
+    m_Key: auto_mapper.text.skip_assigned_items
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29795537350234112
+    m_Key: auto_mapper.text.apply
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29829179975864320
+    m_Key: auto_mapper.block_group.wool
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29829663621058560
+    m_Key: auto_mapper.block_group.terracotta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29830818401030144
+    m_Key: auto_mapper.block_group.shulker_box
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29830841650057216
+    m_Key: auto_mapper.block_group.concrete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29830866648109056
+    m_Key: auto_mapper.block_group.concrete_powder
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

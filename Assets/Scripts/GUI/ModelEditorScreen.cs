@@ -9,6 +9,7 @@ using TMPro;
 using System.Xml.Linq;
 
 using MarkovJunior;
+using MinecraftClient;
 
 namespace MarkovCraft
 {
@@ -33,6 +34,8 @@ namespace MarkovCraft
         [SerializeField] public GameObject? MappingItemPrefab;
         // BlockState Preview
         [SerializeField] public BlockStatePreview? BlockStatePreview;
+        // Auto Mapping Panel
+        [SerializeField] public AutoMappingPanel? AutoMappingPanel;
 
         private readonly List<MappingEditorItem> mappingItems = new();
         private bool working = false, properlyLoaded = false;
@@ -162,6 +165,9 @@ namespace MarkovCraft
 
             ShowActiveCharSet(activeCharSet);
 
+            // Hide auto mapping panel
+            AutoMappingPanel?.Hide();
+
             working = false;
             properlyLoaded = true;
 
@@ -274,6 +280,51 @@ namespace MarkovCraft
                 else // Hide it
                     mappingItem.gameObject.SetActive(false);
             }
+        }
+
+        public void AutoMap()
+        {
+            var selectedBlocks = AutoMappingPanel?.GetSelectedBlocks();
+
+            if (selectedBlocks is not null && selectedBlocks.Count > 0)
+            {
+                bool skipAssigned = AutoMappingPanel!.SkipAssignedBlocks;
+                Debug.Log($"Skip assigned : {skipAssigned}");
+                
+                // Perform auto mapping
+                foreach (var item in mappingItems)
+                {
+                    if (!skipAssigned || item.GetBlockState() == string.Empty)
+                    {
+                        var targetColor = ColorConvert.OpaqueColor32FromHexString(item.GetColorCode());
+                        int minDist = int.MaxValue;
+                        ResourceLocation pickedBlock = ResourceLocation.INVALID;
+
+                        foreach (var block in selectedBlocks)
+                        {
+                            int rDist = targetColor.r - block.Value.r;
+                            int gDist = targetColor.g - block.Value.g;
+                            int bDist = targetColor.b - block.Value.b;
+                            int newDist = rDist * rDist + gDist * gDist + bDist * bDist;
+                            
+                            if (newDist < minDist) // This color is closer to target color, update this entry
+                            {
+                                minDist = newDist;
+                                pickedBlock = block.Key;
+                            }
+                        }
+
+                        if (pickedBlock != ResourceLocation.INVALID) // A block is picked
+                        {
+                            item.SetBlockState(pickedBlock.ToString());
+                            Debug.Log($"Mapping {item.GetColorCode()} to {pickedBlock}");
+                        }
+                    }
+                }
+            }
+
+            // Hide auto mapping panel
+            AutoMappingPanel!.Hide();
         }
 
         private void SaveConfiguredModel()

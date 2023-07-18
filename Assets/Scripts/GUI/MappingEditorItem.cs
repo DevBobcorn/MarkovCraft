@@ -114,6 +114,11 @@ namespace MarkovCraft
             return blockState;
         }
 
+        public void SetBlockState(string blockState)
+        {
+            BlockStateInput!.SetTextWithoutNotify(blockState); // Avoid updating block preview
+        }
+
         public void TagAsSpecial(string blockState)
         {
             BlockStateInput!.SetTextWithoutNotify(blockState); // Avoid updating block preview

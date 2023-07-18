@@ -356,6 +356,38 @@ MonoBehaviour:
     m_Localized: Resource loaded
     m_Metadata:
       m_Items: []
+  - m_Id: 29795123905105920
+    m_Localized: Auto Mapping
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29795200484708352
+    m_Localized: Skip Assigned Items
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29795537350234112
+    m_Localized: Apply
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29829179975864320
+    m_Localized: Wool
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29829663621058560
+    m_Localized: Terracotta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29830818401030144
+    m_Localized: Shulker Box
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29830841650057216
+    m_Localized: Concrete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29830866648109056
+    m_Localized: Concrete Powder
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

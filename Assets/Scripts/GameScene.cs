@@ -125,6 +125,7 @@ namespace MarkovCraft
             packManager.ClearPacks();
             // Collect packs
             packManager.AddPack(new($"vanilla-{resVersion}"));
+            packManager.AddPack(new($"vanilla_fix"));
             // Load valid packs...
             loadFlag.Finished = false;
             Task.Run(() => packManager.LoadPacks(loadFlag,
