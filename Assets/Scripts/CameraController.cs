@@ -31,7 +31,7 @@ namespace MarkovCraft
 
         void Update()
         {
-            if (screenManager != null && screenManager.IsPaused)
+            if (screenManager != null && !screenManager.AllowsMovementInput)
             {
                 dragging = false;
                 return;

@@ -20,6 +20,8 @@ namespace MarkovCraft
             }
         }
 
+        public bool AllowsMovementInput = false;
+
         public void SetActiveScreen(BaseScreen newScreen)
         {
             if (activeScreen != null)
@@ -27,6 +29,7 @@ namespace MarkovCraft
             
             activeScreen = newScreen;
             IsPaused = newScreen.ShouldPause();
+            AllowsMovementInput = newScreen.AllowsMovementInput();
 
             newScreen.Show(this);
         }

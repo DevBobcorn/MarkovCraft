@@ -28,6 +28,8 @@ namespace MarkovCraft
 
         public virtual bool ShouldPause() => false;
 
+        public virtual bool AllowsMovementInput() => false;
+
         public abstract void ScreenUpdate(ScreenManager manager);
     }
 }

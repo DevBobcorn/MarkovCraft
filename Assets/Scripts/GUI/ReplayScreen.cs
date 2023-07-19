@@ -12,6 +12,8 @@ namespace MarkovCraft
             game = GameScene.Instance;
         }
 
+        public override bool AllowsMovementInput() => true;
+
         public override void ScreenUpdate(ScreenManager manager)
         {
             if (Input.GetKeyDown(KeyCode.Escape))
