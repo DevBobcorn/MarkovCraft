@@ -7,6 +7,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+using MinecraftClient;
+
 namespace MarkovCraft
 {
     public class ExporterScreen : BaseScreen
@@ -30,6 +32,8 @@ namespace MarkovCraft
         [SerializeField] public GameObject? MappingItemPrefab;
         // BlockState Preview
         [SerializeField] public BlockStatePreview? BlockStatePreview;
+        // Auto Mapping Panel
+        [SerializeField] public AutoMappingPanel? AutoMappingPanel;
 
         private (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ, int steps)? exportData;
         private Dictionary<char, CustomMappingItem>? exportPalette;
@@ -37,7 +41,7 @@ namespace MarkovCraft
         private readonly List<MappingEditorItem> mappingItems = new();
         private bool working = false, properlyLoaded = false;
 
-        // No pause for animated inventory
+        // Disable pause for animated inventory
         public override bool ShouldPause() => false;
 
         private bool CheckWindows() => Application.platform == RuntimePlatform.WindowsEditor ||
@@ -177,6 +181,51 @@ namespace MarkovCraft
 
         }
 
+        public void AutoMap()
+        {
+            var selectedBlocks = AutoMappingPanel?.GetSelectedBlocks();
+
+            if (selectedBlocks is not null && selectedBlocks.Count > 0)
+            {
+                bool skipAssigned = AutoMappingPanel!.SkipAssignedBlocks;
+                Debug.Log($"Skip assigned : {skipAssigned}");
+                
+                // Perform auto mapping
+                foreach (var item in mappingItems)
+                {
+                    if (!skipAssigned || item.GetBlockState() == string.Empty)
+                    {
+                        var targetColor = ColorConvert.OpaqueColor32FromHexString(item.GetColorCode());
+                        int minDist = int.MaxValue;
+                        ResourceLocation pickedBlock = ResourceLocation.INVALID;
+
+                        foreach (var block in selectedBlocks)
+                        {
+                            int rDist = targetColor.r - block.Value.r;
+                            int gDist = targetColor.g - block.Value.g;
+                            int bDist = targetColor.b - block.Value.b;
+                            int newDist = rDist * rDist + gDist * gDist + bDist * bDist;
+                            
+                            if (newDist < minDist) // This color is closer to target color, update this entry
+                            {
+                                minDist = newDist;
+                                pickedBlock = block.Key;
+                            }
+                        }
+
+                        if (pickedBlock != ResourceLocation.INVALID) // A block is picked
+                        {
+                            item.SetBlockState(pickedBlock.ToString());
+                            Debug.Log($"Mapping {item.GetColorCode()} to {pickedBlock}");
+                        }
+                    }
+                }
+            }
+
+            // Hide auto mapping panel
+            AutoMappingPanel!.Hide();
+        }
+
         private void Export()
         {
             if (working) return;
@@ -210,6 +259,15 @@ namespace MarkovCraft
 
                 // Save last used export format
                 PlayerPrefs.SetInt(EXPORT_FORMAT_KEY, formatIndex);
+
+                // Apply export palette overrides
+                mappingItems.ForEach(x => {
+                    if (exportPalette!.ContainsKey(x.Character))
+                    {
+                        exportPalette[x.Character].Color = ColorConvert.OpaqueColor32FromHexString(x.GetColorCode());
+                        exportPalette[x.Character].BlockState = x.GetBlockState();
+                    }
+                });
 
                 switch (formatIndex)
                 {

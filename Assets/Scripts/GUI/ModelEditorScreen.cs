@@ -41,7 +41,7 @@ namespace MarkovCraft
         private bool working = false, properlyLoaded = false;
         private string confModelFile = string.Empty;
 
-        // No pause for animated inventory
+        // Disable pause for animated inventory
         public override bool ShouldPause() => false;
 
         private IEnumerator InitializeScreen(string confModelFile)

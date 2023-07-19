@@ -116,7 +116,10 @@ namespace MarkovCraft
 
         public void SetBlockState(string blockState)
         {
-            BlockStateInput!.SetTextWithoutNotify(blockState); // Avoid updating block preview
+            if (BlockStateInput!.interactable) // The blockstate input is not locked
+            {
+                BlockStateInput!.SetTextWithoutNotify(blockState); // Avoid updating block preview
+            }
         }
 
         public void TagAsSpecial(string blockState)
