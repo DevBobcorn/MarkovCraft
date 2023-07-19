@@ -363,6 +363,10 @@ MonoBehaviour:
     m_Key: auto_mapper.block_group.concrete_powder
     m_Metadata:
       m_Items: []
+  - m_Id: 30022644886081536
+    m_Key: Generation/Canvas/Model Editor Screen/Auto Mapping Button/Text (TMP)
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -388,6 +388,10 @@ MonoBehaviour:
     m_Localized: Concrete Powder
     m_Metadata:
       m_Items: []
+  - m_Id: 30022644886081536
+    m_Localized: Auto Map
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

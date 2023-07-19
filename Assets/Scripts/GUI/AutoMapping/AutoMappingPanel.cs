@@ -15,6 +15,8 @@ namespace MarkovCraft
         [SerializeField] private GameObject? groupPrefab;
         [SerializeField] private Toggle? skipAssignedBlocksToggle;
 
+        [SerializeField] private GameObject? autoMappingEntry;
+
         public bool SkipAssignedBlocks { get; private set; } = true;
 
         private bool initialized = false;
@@ -106,6 +108,12 @@ namespace MarkovCraft
             canvasGroup.alpha = 1F;
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
+
+            // Disable auto map entry
+            if (autoMappingEntry != null)
+            {
+                autoMappingEntry.SetActive(false);
+            }
         }
 
         public void Hide()
@@ -114,6 +122,12 @@ namespace MarkovCraft
             canvasGroup.alpha = 0F;
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
+
+            // Enable auto map entry
+            if (autoMappingEntry != null)
+            {
+                autoMappingEntry.SetActive(true);
+            }
         }
     }
 }
