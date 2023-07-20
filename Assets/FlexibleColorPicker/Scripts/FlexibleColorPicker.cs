@@ -13,7 +13,7 @@
  */
 
 // Uncomment this line to switch from using UnityEngin.UI inputfield and dropdown to TMPro version
-// #define TMPro
+#define TMPro
 
 using System;
 using System.Collections.Generic;
