@@ -22,11 +22,14 @@ namespace MarkovCraft
     public class GenerationScene : GameScene
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
+        private static readonly Vector3 BLOCK_SELECTION_HIDDEN_POS = new Vector3(0F, -100F, 0F);
 
         [SerializeField] private ScreenManager? screenManager;
         [SerializeField] public CameraController? CamController;
         [SerializeField] public LayerMask VolumeLayerMask;
+        [SerializeField] public LayerMask BlockColliderLayerMask;
         [SerializeField] public VolumeSelection? VolumeSelection;
+        [SerializeField] public GameObject? BlockSelection;
 
         [SerializeField] public TMP_Text? VolumeText, PlaybackSpeedText, GenerationText, FPSText;
         [SerializeField] public TMP_Dropdown? ConfiguredModelDropdown;
@@ -429,27 +432,50 @@ namespace MarkovCraft
 
                     if (!EventSystem.current.IsPointerOverGameObject() && Physics.Raycast(ray.origin, ray.direction, out hit, 1000F, VolumeLayerMask))
                     {
-                        UpdateSelectedResult(hit.collider.gameObject.GetComponent<GenerationResult>());
+                        UpdateSelectedResult(hit.collider.gameObject.GetComponentInParent<GenerationResult>());
 
                         if (Input.GetKeyDown(KeyCode.Mouse0) && selectedResult!.Completed) // Lock can only be applied to completed results
                         {
+                            // Lock volume selection
                             VolumeSelection!.Lock();
-
+                            // Enable block colliders
+                            selectedResult.EnableBlockColliders();
                             // Show export button
                             ExportButton?.GetComponent<Animator>()?.SetBool("Hidden", false);
                         }
                     }
                     else
+                    {
                         UpdateSelectedResult(null);
+                    }
                 }
                 else // Selection is locked
                 {
-                    if (!EventSystem.current.IsPointerOverGameObject() && Input.GetKeyDown(KeyCode.Mouse0))
+                    if (!EventSystem.current.IsPointerOverGameObject())
                     {
-                        VolumeSelection!.Unlock();
+                        var ray = cam.ScreenPointToRay(Input.mousePosition);
+                        RaycastHit hit;
+                        
+                        // Volume is still locked, update block selection
+                        if (Physics.Raycast(ray.origin, ray.direction, out hit, 1000F, BlockColliderLayerMask)) // Mouse pointer is over a block
+                        {
+                            BlockSelection!.transform.position = hit.collider.bounds.center;
+                        }
+                        else // Mouse pointer is over no block
+                        {
+                            BlockSelection!.transform.position = BLOCK_SELECTION_HIDDEN_POS;
 
-                        // Hide export button
-                        ExportButton?.GetComponent<Animator>()?.SetBool("Hidden", true);
+                            if (Input.GetKeyDown(KeyCode.Mouse0)) // Unlock volume
+                            {
+                                // Unlock volume selection
+                                VolumeSelection!.Unlock();
+                                BlockSelection!.transform.position = BLOCK_SELECTION_HIDDEN_POS;
+                                // Disable block colliders
+                                selectedResult?.DisableBlockColliders();
+                                // Hide export button
+                                ExportButton?.GetComponent<Animator>()?.SetBool("Hidden", true);
+                            }
+                        }
                     }
                 }
 
@@ -460,6 +486,9 @@ namespace MarkovCraft
         private void UpdateSelectedResult(GenerationResult? newResult)
         {
             if (selectedResult == newResult) return;
+
+            // Disable block colliders
+            selectedResult?.DisableBlockColliders();
 
             if (newResult != null && newResult.Valid) // Valid
             {
@@ -476,6 +505,8 @@ namespace MarkovCraft
             {
                 VolumeText!.text = string.Empty;
                 VolumeSelection!.HideVolume();
+                // Reset block selection
+                BlockSelection!.transform.position = BLOCK_SELECTION_HIDDEN_POS;
 
                 // Hide export button
                 ExportButton?.GetComponent<Animator>()?.SetBool("Hidden", true);

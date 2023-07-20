@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ConfiguredModel Model="SeaVilla" SizeX="10" SizeY="10" SizeZ="4" Amount="1" Steps="10000" Animated="false" StepsPerRefresh="1">
+  <CustomMapping>
+    <Item Character="B" Color="000000" BlockState="minecraft:black_concrete" />
+    <Item Character="I" Color="1D2B53" BlockState="minecraft:gray_concrete" />
+    <Item Character="P" Color="7E2553" BlockState="minecraft:purple_terracotta" />
+    <Item Character="E" Color="008751" BlockState="minecraft:cyan_shulker_box" />
+    <Item Character="N" Color="AB5236" BlockState="minecraft:orange_terracotta" />
+    <Item Character="D" Color="5F574F" BlockState="minecraft:cyan_terracotta" />
+    <Item Character="A" Color="C2C3C7" BlockState="minecraft:white_concrete" />
+    <Item Character="W" Color="FFF1E8" BlockState="minecraft:white_wool" />
+    <Item Character="R" Color="FF004D" BlockState="minecraft:red_wool" />
+    <Item Character="O" Color="FFA300" BlockState="minecraft:yellow_concrete" />
+    <Item Character="Y" Color="FFEC27" BlockState="minecraft:yellow_wool" />
+    <Item Character="G" Color="00E436" BlockState="minecraft:lime_concrete" />
+    <Item Character="U" Color="29ADFF" BlockState="minecraft:light_blue_wool" />
+    <Item Character="S" Color="83769C" BlockState="minecraft:light_blue_terracotta" />
+    <Item Character="K" Color="FF77A8" BlockState="minecraft:pink_shulker_box" />
+    <Item Character="F" Color="FFCCAA" BlockState="minecraft:white_terracotta" />
+    <Item Character="b" Color="291814" BlockState="minecraft:black_terracotta" />
+    <Item Character="i" Color="111D35" BlockState="minecraft:black_shulker_box" />
+    <Item Character="p" Color="422136" BlockState="minecraft:gray_terracotta" />
+    <Item Character="e" Color="125359" BlockState="minecraft:gray_wool" />
+    <Item Character="n" Color="742F29" BlockState="minecraft:brown_shulker_box" />
+    <Item Character="d" Color="49333B" BlockState="minecraft:gray_concrete" />
+    <Item Character="a" Color="A28879" BlockState="minecraft:light_gray_wool" />
+    <Item Character="w" Color="F3EF7D" BlockState="minecraft:white_terracotta" />
+    <Item Character="r" Color="BE1250" BlockState="minecraft:red_wool" />
+    <Item Character="o" Color="FF6C24" BlockState="minecraft:orange_wool" />
+    <Item Character="y" Color="A8E72E" BlockState="minecraft:lime_wool" />
+    <Item Character="g" Color="00B543" BlockState="minecraft:cyan_wool" />
+    <Item Character="u" Color="065AB5" BlockState="minecraft:cyan_concrete" />
+    <Item Character="s" Color="754665" BlockState="minecraft:purple_terracotta" />
+    <Item Character="k" Color="FF6E59" BlockState="minecraft:pink_concrete" />
+    <Item Character="f" Color="FF9D81" BlockState="minecraft:pink_wool" />
+    <Item Character="C" Color="00FFFF" BlockState="minecraft:light_blue_wool" />
+    <Item Character="c" Color="5FCDE4" BlockState="minecraft:light_blue_wool" />
+    <Item Character="H" Color="E4BB40" BlockState="minecraft:yellow_wool" />
+    <Item Character="h" Color="8A6F30" BlockState="minecraft:terracotta" />
+    <Item Character="J" Color="4B692F" BlockState="minecraft:green_shulker_box" />
+    <Item Character="j" Color="45107E" BlockState="minecraft:blue_shulker_box" />
+    <Item Character="L" Color="847E87" BlockState="minecraft:light_gray_wool" />
+    <Item Character="l" Color="696A6A" BlockState="minecraft:light_gray_shulker_box" />
+    <Item Character="M" Color="FF00FF" BlockState="minecraft:magenta_wool" />
+    <Item Character="m" Color="9C09CC" BlockState="minecraft:purple_wool" />
+    <Item Character="Q" Color="9BADB7" BlockState="minecraft:light_gray_wool" />
+    <Item Character="q" Color="3F3F74" BlockState="minecraft:blue_terracotta" />
+    <Item Character="T" Color="37946E" BlockState="minecraft:cyan_wool" />
+    <Item Character="t" Color="323C39" BlockState="minecraft:gray_shulker_box" />
+    <Item Character="V" Color="8F974A" BlockState="minecraft:light_gray_terracotta" />
+    <Item Character="v" Color="524B24" BlockState="minecraft:green_terracotta" />
+    <Item Character="X" Color="FF0000" BlockState="minecraft:orange_concrete" />
+    <Item Character="x" Color="D95763" BlockState="minecraft:pink_concrete" />
+    <Item Character="Z" Color="FFFFFF" BlockState="minecraft:white_wool" />
+    <Item Character="z" Color="CBDBFC" BlockState="minecraft:white_shulker_box" />
+  </CustomMapping>
+</ConfiguredModel>
