@@ -26,12 +26,13 @@ namespace MarkovCraft
     public class ConfiguredModel : ScriptableObject
     {
         [SerializeField] public string Model = "Apartemazements";
-        [SerializeField] public int SizeX = 8;
-        [SerializeField] public int SizeY = 8;
-        [SerializeField] public int SizeZ = 8;
-        [SerializeField] public int Amount = 1;
-        [SerializeField] public int Steps = 1000;
-        [SerializeField] public bool Animated = true;
+        [SerializeField] public int SizeX = 8; // [1, 256]
+        [SerializeField] public int SizeY = 8; // [1, 256]
+        [SerializeField] public int SizeZ = 8; // [1, 256]
+        [SerializeField] public int Amount = 1; // [1, 100]
+        [SerializeField] public int Steps = 1000; // [1000, 100000]
+        [SerializeField] public bool Animated = true; // true or false
+        [SerializeField] public int StepsPerRefresh = 1; // [1, 100]
         [SerializeField] public int[] Seeds = { };
 
         [SerializeField] public CustomMappingItem[] CustomMapping = { };
@@ -56,6 +57,7 @@ namespace MarkovCraft
             model.Amount = root.Get<int>("Amount", model.Amount);
             model.Steps = root.Get<int>("Steps", model.Steps);
             model.Animated = root.Get<bool>("Animated", model.Animated);
+            model.StepsPerRefresh = root.Get<int>("StepsPerRefresh", model.StepsPerRefresh);
 
             // Generation seeds
             var xSeeds = root.Element("Seeds");
@@ -100,7 +102,8 @@ namespace MarkovCraft
                 new XAttribute("SizeZ", model.SizeZ),
                 new XAttribute("Amount", model.Amount),
                 new XAttribute("Steps", model.Steps),
-                new XAttribute("Animated", model.Animated)
+                new XAttribute("Animated", model.Animated),
+                new XAttribute("StepsPerRefresh", model.StepsPerRefresh)
             );
             
             // Generation seeds

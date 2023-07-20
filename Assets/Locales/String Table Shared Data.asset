@@ -364,7 +364,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 30022644886081536
-    m_Key: Generation/Canvas/Model Editor Screen/Auto Mapping Button/Text (TMP)
+    m_Key: auto_mapper.text.auto_map
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30379949334925312
+    m_Key: editor.text.steps_per_refresh
     m_Metadata:
       m_Items: []
   m_Metadata:

@@ -392,6 +392,10 @@ MonoBehaviour:
     m_Localized: Auto Map
     m_Metadata:
       m_Items: []
+  - m_Id: 30379949334925312
+    m_Localized: Steps / Refresh
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

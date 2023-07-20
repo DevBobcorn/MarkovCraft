@@ -14,9 +14,7 @@ using UnityEngine.SceneManagement;
 using Unity.Mathematics;
 using TMPro;
 
-using MinecraftClient.Resource;
 using MinecraftClient.Mapping;
-
 using MarkovJunior;
 
 namespace MarkovCraft
@@ -234,7 +232,7 @@ namespace MarkovCraft
             List<GenerationResult> results = new();
 
             int maxX = 0, maxY = 0, maxZ = 0;
-            int stepsPerFrame = 5;
+            int stepsPerFrame = model.StepsPerRefresh;
 
             for (int k = 1; k <= model.Amount; k++)
             {
@@ -381,7 +379,7 @@ namespace MarkovCraft
                     if (ConfigButton != null)
                     {
                         ConfigButton.onClick.RemoveAllListeners();
-                        ConfigButton.onClick.AddListener(() => screenManager!.SetActiveScreenByType<ModelEditorScreen>() );
+                        ConfigButton.onClick.AddListener(() => screenManager!.SetActiveScreenByType<ConfiguredModelEditorScreen>() );
                     }
 
                     if (ExportButton != null)

@@ -13,7 +13,7 @@ using MinecraftClient;
 
 namespace MarkovCraft
 {
-    public class ModelEditorScreen : BaseScreen
+    public class ConfiguredModelEditorScreen : BaseScreen
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
         private const string MODEL_FOLDER = "configured_models";
@@ -28,6 +28,7 @@ namespace MarkovCraft
         [SerializeField] public TMP_InputField? StepsInput;
         [SerializeField] public TMP_InputField? SeedsInput;
         [SerializeField] public Toggle? AnimatedToggle;
+        [SerializeField] public TMP_InputField? StepsPerRefreshInput;
         [SerializeField] public Button? SaveButton;
         // Mapping Items Panel
         [SerializeField] public RectTransform? GridTransform;
@@ -346,9 +347,10 @@ namespace MarkovCraft
                     int.TryParse(SizeZInput!.text, out model.SizeZ);
                     int.TryParse(AmountInput!.text, out model.Amount);
                     int.TryParse(StepsInput!.text, out model.Steps);
-
                     model.Animated = AnimatedToggle!.isOn;
+                    int.TryParse(StepsPerRefreshInput!.text, out model.StepsPerRefresh);
                     model.Seeds = SeedsInput!.text.Split(' ').Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => int.Parse(x)).ToArray();
+                    
                     model.CustomMapping = mappingItems.Where(x => x.ShouldBeSaved()).Select(x => new CustomMappingItem()
                     {
                         Character = x.Character,
