@@ -3,8 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-using MinecraftClient.Mapping;
-
 namespace MarkovCraft
 {
     public class MappingEditorItem : MonoBehaviour
@@ -40,8 +38,7 @@ namespace MarkovCraft
 
             // BlockState Preview
             this.blockStatePreview = blockStatePreview;
-
-            // Character input
+            // Character display
             CharacterText.text = character.ToString();
             // Color input
             ColorCodeInput.text = ColorConvert.GetHexRGBString(rgb);
@@ -52,54 +49,65 @@ namespace MarkovCraft
             SetOverridesPaletteColor(defoRgb != rgb);
 
             // Assign control events (should get called only once)
-            RevertOverrideButton.onClick.AddListener(RevertColorToBaseValue);
-            ColorCodeInput.onValueChanged.AddListener(UpdateColorCode);
-            ColorCodeInput.onEndEdit.AddListener(ValidateColorCode);
+            RevertOverrideButton.onClick.AddListener(OnRevertOverrideButtonClick);
+            ColorCodeInput.onValueChanged.AddListener(OnColorCodeInputValueChange);
+            ColorCodeInput.onEndEdit.AddListener(OnColorCodeInputValidate);
 
-            BlockStateInput.onSelect.AddListener(ShowBlockStatePreview);
-            BlockStateInput.onValueChanged.AddListener(UpdateBlockStateText);
-            BlockStateInput.onEndEdit.AddListener(HideBlockStatePreview);
+            BlockStateInput.onSelect.AddListener((blockState) => ShowBlockStatePreview(blockState));
+            BlockStateInput.onValueChanged.AddListener(OnUpdateBlockStateInput);
+            BlockStateInput.onEndEdit.AddListener((_) => HideBlockStatePreview());
         }
 
-        public void UpdateColorCode(string colorHex)
+        public void SetCharacter(char character)
+        {
+            this.character = character;
+            // Character display
+            CharacterText!.text = character.ToString();
+        }
+
+        public void SetColorRGB(int newRgb)
+        {
+            // Update color sprite
+            ColorPreviewImage!.color = ColorConvert.GetOpaqueColor32(newRgb);
+            // Check if the color is overriden
+            SetOverridesPaletteColor(newRgb != defaultRgb);
+        }
+
+        public void OnColorCodeInputValueChange(string colorHex)
         {
             int newRgb = ColorConvert.RGBFromHexString(colorHex.PadRight(6, '0'));
+            // Update color sprite
             ColorPreviewImage!.color = ColorConvert.GetOpaqueColor32(newRgb);
-
-            if (newRgb == defaultRgb)
-                SetOverridesPaletteColor(false);
-            else
-                SetOverridesPaletteColor(true);
+            // Check if the color is overriden
+            SetOverridesPaletteColor(newRgb != defaultRgb);
         }
 
-        public void ValidateColorCode(string colorHex)
+        public void OnColorCodeInputValidate(string colorHex)
         {
             ColorCodeInput!.text = colorHex.PadRight(6, '0').ToUpper();
-
         }
 
-        public void ShowBlockStatePreview(string blockState)
+        private void ShowBlockStatePreview(string blockState)
         {
             var stateId = BlockStateHelper.GetStateIdFromString(blockState);
 
-            blockStatePreview!.UpdatePreview(stateId);
+            blockStatePreview?.UpdatePreview(stateId);
         }
 
-        public void UpdateBlockStateText(string blockState)
+        private void OnUpdateBlockStateInput(string blockState)
         {
             var stateId = BlockStateHelper.GetStateIdFromString(blockState);
 
             if (stateId != BlockStateHelper.INVALID_BLOCKSTATE)
-                blockStatePreview!.UpdatePreview(stateId);
+                blockStatePreview?.UpdatePreview(stateId);
             else
-                blockStatePreview!.UpdateHint(blockState);
+                blockStatePreview?.UpdateHint(blockState);
         }
 
-        public void HideBlockStatePreview(string blockState)
+        private void HideBlockStatePreview()
         {
             // Hide preview
-            blockStatePreview!.UpdatePreview(BlockStateHelper.INVALID_BLOCKSTATE);
-
+            blockStatePreview?.UpdatePreview(BlockStateHelper.INVALID_BLOCKSTATE);
         }
 
         public string GetColorCode() => ColorCodeInput?.text ?? "000000";
@@ -131,7 +139,7 @@ namespace MarkovCraft
             MarkCornerImage!.color = SpecialTagColor;
         }
 
-        public void SetOverridesPaletteColor(bool o)
+        private void SetOverridesPaletteColor(bool o)
         {
             overridesPaletteColor = o;
 
@@ -143,7 +151,7 @@ namespace MarkovCraft
             return overridesPaletteColor || !string.IsNullOrWhiteSpace(BlockStateInput?.text);
         }
 
-        public void RevertColorToBaseValue()
+        private void OnRevertOverrideButtonClick()
         {
             if (ColorPreviewImage == null || CharacterText == null || ColorCodeInput == null || BlockStateInput == null)
             {

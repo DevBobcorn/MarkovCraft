@@ -30,6 +30,9 @@ namespace MarkovCraft
         [SerializeField] public LayerMask BlockColliderLayerMask;
         [SerializeField] public VolumeSelection? VolumeSelection;
         [SerializeField] public GameObject? BlockSelection;
+        [SerializeField] public CanvasGroup? BlockSelectionPanelGroup;
+        [SerializeField] public TMP_Text? BlockSelectionText;
+        [SerializeField] public MappingEditorItem? BlockSelectionMappingItem;
 
         [SerializeField] public TMP_Text? VolumeText, PlaybackSpeedText, GenerationText, FPSText;
         [SerializeField] public TMP_Dropdown? ConfiguredModelDropdown;
@@ -46,6 +49,8 @@ namespace MarkovCraft
         private ConfiguredModel? currentConfModel = null;
         // Character => (meshIndex, meshColor)
         private readonly Dictionary<char, int2> meshPalette = new();
+        // Character => CustomMappingItem
+        private readonly Dictionary<char, CustomMappingItem> fullPalette = new();
 
         private Interpreter? interpreter = null;
         private float playbackSpeed = 1F;
@@ -63,28 +68,29 @@ namespace MarkovCraft
 
         }
 
-        // Get all mapping items
-        public Dictionary<char, CustomMappingItem>? GetFullPalette()
+        // Get only mapping items whose key is among the given charset
+        public Dictionary<char, CustomMappingItem> GetExportPalette(HashSet<char> charSet)
         {
-            if (currentConfModel is null || Loading)
-                return null;
-            
-            var mapAsDict = currentConfModel.CustomMapping.ToDictionary(x => x.Character, x => x);
-            
-            return meshPalette.ToDictionary(x => x.Key, x => mapAsDict.ContainsKey(x.Key) ? mapAsDict[x.Key] :
-                    new CustomMappingItem() { Character = x.Key, BlockState = string.Empty, Color = ColorConvert.GetOpaqueColor32(x.Value.y) });
+            return fullPalette.Where(x => charSet.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value);
         }
 
-        // Get only mapping items whose key is among the given charset
-        public Dictionary<char, CustomMappingItem>? GetExportPalette(HashSet<char> charSet)
+        public void UpdateBlockSelection(CustomMappingItem? selectedItem, string text = "")
         {
-            if (currentConfModel is null || Loading)
-                return null;
-            
-            var mapAsDict = currentConfModel.CustomMapping.ToDictionary(x => x.Character, x => x);
-            
-            return meshPalette.Where(x => charSet.Contains(x.Key)).ToDictionary(x => x.Key, x => mapAsDict.ContainsKey(x.Key) ? mapAsDict[x.Key] :
-                    new CustomMappingItem() { Character = x.Key, BlockState = string.Empty, Color = ColorConvert.GetOpaqueColor32(x.Value.y) });
+            if (selectedItem is null)
+            {
+                BlockSelectionPanelGroup!.alpha = 0F;
+            }
+            else
+            {
+                BlockSelectionPanelGroup!.alpha = 1F;
+                BlockSelectionText!.text = text;
+                BlockSelectionMappingItem!.SetBlockState(selectedItem.BlockState);
+                BlockSelectionMappingItem!.SetCharacter(selectedItem.Character);
+                // Update mapping color
+                var hexString = ColorConvert.GetHexRGBString(selectedItem.Color);
+                BlockSelectionMappingItem!.OnColorCodeInputValidate(hexString);
+                BlockSelectionMappingItem!.OnColorCodeInputValueChange(hexString);
+            }
         }
 
         public IEnumerator UpdateConfiguredModel(string confModelFile, ConfiguredModel confModel)
@@ -156,10 +162,17 @@ namespace MarkovCraft
             var statePalette = BlockStatePalette.INSTANCE;
             var stateId2Mesh = new Dictionary<int, int>(); // StateId => Mesh index
 
+            // Update full palette and mesh palette
             meshPalette.Clear();
+            fullPalette.Clear();
 
             XDocument.Load(PathHelper.GetExtraDataFile("palette.xml")).Root.Elements("color").ToList().ForEach(x =>
-                    meshPalette.Add(x.Get<char>("symbol"), new(0, ColorConvert.RGBFromHexString(x.Get<string>("value")))));
+            {
+                var character = x.Get<char>("symbol");
+                var rgb = ColorConvert.RGBFromHexString(x.Get<string>("value"));
+                meshPalette.Add( character, new int2(0, rgb) );
+                fullPalette.Add( character, new CustomMappingItem { Character = character, Color = ColorConvert.GetOpaqueColor32(rgb) } );
+            });
 
             blockMeshCount = 1; // #0 is preserved for default cube mesh
 
@@ -186,6 +199,15 @@ namespace MarkovCraft
                 }
                 else // Default cube mesh with custom color
                     meshPalette[item.Character] = new(0, rgb);
+                
+                if (fullPalette.ContainsKey(item.Character)) // Entry defined in base palette, overwrite it
+                {
+                    fullPalette[item.Character] = item;
+                }
+                else // A new entry
+                {
+                    fullPalette.Add( item.Character, item );
+                }
                 
                 yield return null;
             }
@@ -323,6 +345,7 @@ namespace MarkovCraft
                     result.UpdateVolume(pos, new(dataFrame.FX, dataFrame.FZ, dataFrame.FY));
 
                     var instanceData = BlockDataBuilder.GetInstanceData(dataFrame.state!, dataFrame.FX, dataFrame.FY, dataFrame.FZ, pos,
+                            // Frame legend index => (meshIndex, meshColor)
                             dataFrame.legend.Select(ch => meshPalette[ch]).ToArray());
                     
                     // The final visualization is persistent
@@ -348,12 +371,8 @@ namespace MarkovCraft
                     GenerationText.text = GetL10nString("status.info.generation_complete", k);
 
                     var recordingName = (currentConfModel?.Model ?? "Untitled") + $"_#{k}";
-                    var fullPalette = GetFullPalette();
 
-                    if (fullPalette is not null) // Save recording
-                    {
-                        StartCoroutine(RecordingExporter.SaveRecording(fullPalette, recordingName, maxX, maxY, maxZ, recordedFrames.ToArray()));
-                    }
+                    StartCoroutine(RecordingExporter.SaveRecording(fullPalette, recordingName, maxX, maxY, maxZ, recordedFrames.ToArray()));
                 }
             }
 
@@ -457,30 +476,35 @@ namespace MarkovCraft
                         RaycastHit hit;
                         
                         // Volume is still locked, update block selection
-                        if (Physics.Raycast(ray.origin, ray.direction, out hit, 1000F, BlockColliderLayerMask)) // Mouse pointer is over a block
+                        if (selectedResult != null && Physics.Raycast(ray.origin, ray.direction, out hit, 1000F, BlockColliderLayerMask)) // Mouse pointer is over a block
                         {
+                            // Get block position in the volume (local space in volume)
+                            var boxCollider = hit.collider as BoxCollider;
+                            (int x, int y, int z, char character) = selectedResult.GetColliderPosInVolume(boxCollider!);
+
+                            UpdateBlockSelection(fullPalette[character], $"({x}, {y}, {z})");
+                            // Update cursor position (world space)
                             BlockSelection!.transform.position = hit.collider.bounds.center;
                         }
                         else // Mouse pointer is over no block
                         {
-                            BlockSelection!.transform.position = BLOCK_SELECTION_HIDDEN_POS;
-
                             if (Input.GetKeyDown(KeyCode.Mouse0)) // Unlock volume
                             {
                                 // Unlock volume selection
                                 VolumeSelection!.Unlock();
-                                BlockSelection!.transform.position = BLOCK_SELECTION_HIDDEN_POS;
                                 // Disable block colliders
                                 selectedResult?.DisableBlockColliders();
                                 // Hide export button
                                 ExportButton?.GetComponent<Animator>()?.SetBool("Hidden", true);
                             }
+
+                            // Reset block selection
+                            BlockSelection!.transform.position = BLOCK_SELECTION_HIDDEN_POS;
+                            UpdateBlockSelection(null);
                         }
                     }
                 }
-
             }
-
         }
 
         private void UpdateSelectedResult(GenerationResult? newResult)
@@ -507,6 +531,7 @@ namespace MarkovCraft
                 VolumeSelection!.HideVolume();
                 // Reset block selection
                 BlockSelection!.transform.position = BLOCK_SELECTION_HIDDEN_POS;
+                UpdateBlockSelection(null);
 
                 // Hide export button
                 ExportButton?.GetComponent<Animator>()?.SetBool("Hidden", true);

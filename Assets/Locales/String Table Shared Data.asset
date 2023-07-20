@@ -371,6 +371,10 @@ MonoBehaviour:
     m_Key: editor.text.steps_per_refresh
     m_Metadata:
       m_Items: []
+  - m_Id: 30470153584447488
+    m_Key: Generation/Canvas/Generation Screen/Selected Block Panel/Text (TMP)
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

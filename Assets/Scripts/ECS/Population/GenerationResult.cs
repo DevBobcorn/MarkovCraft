@@ -89,6 +89,21 @@ namespace MarkovCraft
             }
         }
 
+        public (int, int, int, char) GetColliderPosInVolume(BoxCollider collider)
+        {
+            float3 offset = new float3(GenerationSize.x / 2F - 0.5F, GenerationSize.y / 2F - 0.5F, GenerationSize.z / 2F - 0.5F);
+            float3 pos = ((float3) collider.center) + offset;
+
+            int x = Mathf.RoundToInt(pos.x); // Unity X => Markov X
+            int z = Mathf.RoundToInt(pos.y); // Unity Y => Markov Z
+            int y = Mathf.RoundToInt(pos.z); // Unity Z => Markov Y
+
+            (string[] _, byte[] state, char[] legend, int FX, int FY, int FZ, int _) = data!.Value;
+            char c = legend[state[x + y * FX + z * FX * FY]];
+
+            return (x, y, z, c);
+        }
+
         public void DisableBlockColliders()
         {
             // Enable volume collider

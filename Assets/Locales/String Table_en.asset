@@ -396,6 +396,10 @@ MonoBehaviour:
     m_Localized: Steps / Refresh
     m_Metadata:
       m_Items: []
+  - m_Id: 30470153584447488
+    m_Localized: 'Selected Block:'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
