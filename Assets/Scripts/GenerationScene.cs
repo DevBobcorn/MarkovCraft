@@ -284,6 +284,8 @@ namespace MarkovCraft
             int maxX = 0, maxY = 0, maxZ = 0;
             int stepsPerFrame = model.StepsPerRefresh;
 
+            var record = false;
+
             for (int k = 1; k <= model.Amount; k++)
             {
                 if (!executing) // Stop execution
@@ -349,9 +351,13 @@ namespace MarkovCraft
                                 dataFrame.legend.Select(ch => meshPalette[ch]).ToArray());
                         BlockInstanceSpawner.VisualizeFrameState(instanceData, materials, blockMeshes, tick);
 
-                        // Record the data frame
-                        recordedFrames.Add(new GenerationFrameRecord(new int3(dataFrame.FX, dataFrame.FY, dataFrame.FZ),
-                                dataFrame.state.Select(v => dataFrame.legend[v]).ToArray()));
+                        if (record)
+                        {
+                            // Record the data frame
+                            recordedFrames.Add(new GenerationFrameRecord(new int3(dataFrame.FX, dataFrame.FY, dataFrame.FZ),
+                                    dataFrame.state.Select(v => dataFrame.legend[v]).ToArray()));
+                        }
+                        
                         if (dataFrame.FX > maxX) maxX = dataFrame.FX;
                         if (dataFrame.FY > maxY) maxY = dataFrame.FY;
                         if (dataFrame.FZ > maxZ) maxZ = dataFrame.FZ;
@@ -376,9 +382,6 @@ namespace MarkovCraft
                     // The final visualization is persistent
                     BlockInstanceSpawner.VisualizePersistentState(instanceData, materials, blockMeshes);
 
-                    // Record the data frame
-                    recordedFrames.Add(new GenerationFrameRecord(new int3(dataFrame.FX, dataFrame.FY, dataFrame.FZ),
-                            dataFrame.state.Select(v => dataFrame.legend![v]).ToArray()));
                     if (dataFrame.FX > maxX) maxX = dataFrame.FX;
                     if (dataFrame.FY > maxY) maxY = dataFrame.FY;
                     if (dataFrame.FZ > maxZ) maxZ = dataFrame.FZ;
@@ -395,9 +398,14 @@ namespace MarkovCraft
                     ModelGraphUI!.SetActiveNode(-1); // Deselect active node
                     GenerationText.text = GetL10nString("status.info.generation_complete", k);
 
-                    var recordingName = (currentConfModel?.Model ?? "Untitled") + $"_#{k}";
-
-                    StartCoroutine(RecordingExporter.SaveRecording(fullPaletteForEditing, recordingName, maxX, maxY, maxZ, recordedFrames.ToArray()));
+                    if (record)
+                    {
+                        // Record the data frame
+                        recordedFrames.Add(new GenerationFrameRecord(new int3(dataFrame.FX, dataFrame.FY, dataFrame.FZ),
+                                dataFrame.state.Select(v => dataFrame.legend![v]).ToArray()));
+                        var recordingName = (currentConfModel?.Model ?? "Untitled") + $"_#{k}";
+                        StartCoroutine(RecordingExporter.SaveRecording(fullPaletteForEditing, recordingName, maxX, maxY, maxZ, recordedFrames.ToArray()));
+                    }
                 }
             }
 
