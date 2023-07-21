@@ -39,7 +39,7 @@ namespace MarkovCraft
         [SerializeField] public AutoMappingPanel? AutoMappingPanel;
 
         private (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ, int steps)? exportData;
-        // Items in this dictionary share refereces with generation scene's full palette
+        // Items in this dictionary share refereces with generation scene's fullPaletteForEditing
         // If items get changed, it'll also be reflected in other scenes
         private Dictionary<char, CustomMappingItem>? exportPalette;
         private readonly List<MappingEditorItem> mappingItems = new();
@@ -134,8 +134,7 @@ namespace MarkovCraft
             working = true;
             properlyLoaded = false;
 
-            if (ScreenHeader != null)
-                ScreenHeader.text = GameScene.GetL10nString("exporter.text.loading");
+            ScreenHeader!.text = GameScene.GetL10nString("exporter.text.loading");
             
             var game = GameScene.Instance as GenerationScene;
 
@@ -163,7 +162,7 @@ namespace MarkovCraft
                 exportPalette = game.GetPartialPaletteForEditing(finalLegend.ToHashSet());
             }
             
-            if (exportData is null || exportPalette is null || ExportButton == null || GridTransform == null)
+            if (exportData is null || exportPalette is null)
             {
                 Debug.LogWarning("Exporter is not properly loaded!");
 

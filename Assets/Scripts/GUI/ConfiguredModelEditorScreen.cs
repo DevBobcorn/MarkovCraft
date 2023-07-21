@@ -41,7 +41,14 @@ namespace MarkovCraft
         [SerializeField] public AutoMappingPanel? AutoMappingPanel;
 
         private readonly List<MappingEditorItem> mappingItems = new();
+        // Items in this dictionary share refereces with generation scene's fullPaletteAsLoaded
+        // Its CustomMappingItem objects SHOULD NOT be edited
+        private Dictionary<char, CustomMappingItem> fullPaletteAsLoaded = new();
+        // Base color palette, loaded in and taken from generation scene
+        private Dictionary<char, int> baseColorPalette = new();
         private bool working = false, properlyLoaded = false;
+        // Current configured model, loaded in and taken from generation scene
+        private ConfiguredModel? confModel = null;
         private string confModelFile = string.Empty;
 
         // Disable pause for animated inventory
@@ -49,10 +56,6 @@ namespace MarkovCraft
 
         private IEnumerator InitializeScreen(string confModelFile)
         {
-            // Load configured model file
-            var xdoc = XDocument.Load($"{PathHelper.GetExtraDataFile("configured_models")}/{confModelFile}");
-            var confModel = ConfiguredModel.CreateFromXMLDoc(xdoc);
-
             // Initialize settings panel
             var dir = PathHelper.GetExtraDataFile("models");
             int index = 0, selectedIndex = -1;
@@ -60,10 +63,10 @@ namespace MarkovCraft
 
             foreach (var m in Directory.GetFiles(dir, "*.xml", SearchOption.TopDirectoryOnly))
             {
-                var confModelModel = m[(dir.Length + 1)..^4];
-                options.Add(new(confModelModel));
+                var modelName = m[(dir.Length + 1)..^4];
+                options.Add(new(modelName));
 
-                if (confModelModel.Equals(confModel.Model))
+                if (modelName.Equals(confModel!.Model))
                     selectedIndex = index;
                 
                 index++;
@@ -78,7 +81,7 @@ namespace MarkovCraft
             if (selectedIndex != -1)
                 ModelDropdown.value = selectedIndex;
             
-            SizeXInput!.text = confModel.SizeX.ToString();
+            SizeXInput!.text = confModel!.SizeX.ToString();
             SizeYInput!.text = confModel.SizeY.ToString();
             SizeZInput!.text = confModel.SizeZ.ToString();
 
@@ -91,83 +94,36 @@ namespace MarkovCraft
                 SeedsInput!.text = string.Empty;
             
             AnimatedToggle!.isOn = confModel.Animated;
+            StepsPerRefreshInput!.text = confModel.StepsPerRefresh.ToString();
 
             SaveButton!.onClick.RemoveAllListeners();
             SaveButton.onClick.AddListener(SaveConfiguredModel);
 
             // Initialize mappings panel
-            XDocument? basePaletteDoc = null, modelDoc = null;
-
-            string paletteFileName = PathHelper.GetExtraDataFile($"palette.xml");
-            string modelFileName = PathHelper.GetExtraDataFile($"models{SP}{confModel.Model}.xml");
-
-            if (File.Exists(paletteFileName) && File.Exists(modelFileName))
-            {
-                var fs1 = new FileStream(paletteFileName, FileMode.Open);
-                var fs2 = new FileStream(modelFileName, FileMode.Open);
-
-                var task1 = XDocument.LoadAsync(fs1, LoadOptions.SetLineInfo, new());
-                var task2 = XDocument.LoadAsync(fs2, LoadOptions.SetLineInfo, new());
-
-                while (!task1.IsCompleted || !task2.IsCompleted)
-                    yield return null;
-                
-                fs1.Close();
-                fs2.Close();
-                
-                if (task1.IsCompletedSuccessfully && task2.IsCompletedSuccessfully)
-                {
-                    basePaletteDoc = task1.Result;
-                    modelDoc = task2.Result;
-                }
-            }
             
-            if (basePaletteDoc is null || modelDoc is null)
-            {
-                Debug.LogWarning($"ERROR: Couldn't open xml file at {paletteFileName}");
-                working = false;
-                properlyLoaded = false;
-                yield break;
-            }
-
-            yield return null;
-
-            var basePalette = new Dictionary<char, int>();
-
-            basePaletteDoc.Root.Elements("color").ToList().ForEach(x => basePalette.Add(
-                    x.Get<char>("symbol"), ColorConvert.RGBFromHexString(x.Get<string>("value"))));
-            
-            var activeCharSet = new HashSet<char>();
-
-            // Find all used symbols in the whole MarkovJunior model
-            foreach (var vals in from node in modelDoc.Descendants()
-                    where node.Attribute("values") is not null
-                    select node.Attribute("values").Value )
-                vals.ToList().ForEach(ch => activeCharSet.Add(ch));
-            
-            var fullCharSet = basePalette.Keys.ToHashSet();
-
-            var customMapping = confModel.CustomMapping.ToDictionary(x => x.Character, x => x);
-
             // Populate mapping item grid
-            foreach (var ch in fullCharSet)
+
+            // All mapping items, whether included in the currently selected model
+            // or not, should be populated. This is because the selected MJ model
+            // can be changed, and the active items should be updated accordingly.
+            foreach (var pair in fullPaletteAsLoaded)
             {
                 var newItemObj = GameObject.Instantiate(MappingItemPrefab);
                 var newItem = newItemObj!.GetComponent<MappingEditorItem>();
 
                 mappingItems.Add(newItem);
 
-                var defoColor = basePalette[ch];
+                int defaultRgb = baseColorPalette[pair.Key];
+                int loadedRgb = ColorConvert.GetRGB(pair.Value.Color);
 
-                var custom = customMapping.ContainsKey(ch);
-                newItem.InitializeData(ch, defoColor, custom ? ColorConvert.GetRGB(customMapping[ch].Color)
-                        : defoColor, custom ? customMapping[ch].BlockState : string.Empty, ColorPicker!, BlockStatePreview!);
+                newItem.InitializeData(pair.Key, defaultRgb, loadedRgb, pair.Value.BlockState, ColorPicker!, BlockStatePreview!);
 
                 newItem.transform.SetParent(GridTransform);
                 newItem.transform.localScale = Vector3.one;
             }
 
-            ShowActiveCharSet(activeCharSet);
+            // Update which items should be displayed (included in selected model)
+            yield return StartCoroutine(UpdateActiveCharSetFromModel(confModel.Model));
 
             // Hide auto mapping panel
             AutoMappingPanel?.Hide();
@@ -182,10 +138,11 @@ namespace MarkovCraft
                 ScreenHeader.text = GameScene.GetL10nString("editor.text.loaded", confModelFile);
         }
 
-        private IEnumerator UpdateActiveCharSetFromModel(string modelFileName)
+        private IEnumerator UpdateActiveCharSetFromModel(string modelName)
         {
             working = true;
 
+            string modelFileName = PathHelper.GetExtraDataFile($"models{SP}{modelName}.xml");
             XDocument? modelDoc = null;
 
             if (File.Exists(modelFileName))
@@ -225,11 +182,11 @@ namespace MarkovCraft
         {
             if (working || !properlyLoaded) return;
 
-            var confModelModel = ModelDropdown?.options[newValue].text;
-            if (confModelModel is null) return;
+            var modelName = ModelDropdown?.options[newValue].text;
+            if (modelName is null) return;
 
-            string modelFileName = PathHelper.GetExtraDataFile($"models{SP}{confModelModel}.xml");
-            StartCoroutine(UpdateActiveCharSetFromModel(modelFileName));
+            // Update which items should be displayed (included in selected model)
+            StartCoroutine(UpdateActiveCharSetFromModel(modelName));
         }
 
         public override void OnShow(ScreenManager manager)
@@ -238,8 +195,7 @@ namespace MarkovCraft
             working = true;
             properlyLoaded = false;
 
-            if (ScreenHeader != null)
-                ScreenHeader.text = GameScene.GetL10nString("editor.text.loading");
+            ScreenHeader!.text = GameScene.GetL10nString("editor.text.loading");
             
             var game = GameScene.Instance as GenerationScene;
 
@@ -250,10 +206,12 @@ namespace MarkovCraft
                 return;
             }
             
+            confModel = game.ConfiguredModel;
             confModelFile = game.ConfiguredModelFile;
+            baseColorPalette = game.GetBaseColorPalette();
+            fullPaletteAsLoaded = game.GetFullPaletteAsLoaded();
             
-            if (ModelDropdown == null || SizeXInput == null || SizeYInput == null || SizeZInput == null ||SaveButton == null || AmountInput == null ||
-                    StepsInput == null || SeedsInput == null || AnimatedToggle == null || GridTransform == null || BlockStatePreview == null)
+            if (confModel == null)
             {
                 Debug.LogWarning("Editor is not properly loaded!");
 

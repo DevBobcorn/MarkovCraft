@@ -43,15 +43,21 @@ namespace MarkovCraft
         private readonly List<GenerationResult> generationResults = new();
         private GenerationResult? selectedResult = null;
 
+        // Character => RGB Color specified in base palette
+        // This palette should be loaded for only once
+        private readonly Dictionary<char, int> baseColorPalette = new();
+        private bool baseColorPaletteLoaded = false;
+
         private string confModelFile = string.Empty;
         public string ConfiguredModelFile => confModelFile;
         private readonly Dictionary<int, string> loadedConfModels = new();
         private ConfiguredModel? currentConfModel = null;
+        public ConfiguredModel? ConfiguredModel => currentConfModel;
         // Character => (meshIndex, meshColor)
         private readonly Dictionary<char, int2> meshPalette = new();
         // Character => CustomMappingItem, its items CAN be edited in exporter
         private readonly Dictionary<char, CustomMappingItem> fullPaletteForEditing = new();
-        // Character => CustomMappingItem, its items SHOULD NOT be changed once loaded from file
+        // Character => CustomMappingItem, its items SHOULD NOT be edited once loaded from file
         private readonly Dictionary<char, CustomMappingItem> fullPaletteAsLoaded = new();
         private Interpreter? interpreter = null;
         private float playbackSpeed = 1F;
@@ -66,37 +72,39 @@ namespace MarkovCraft
             }
             else
                 ModelGraphUI?.gameObject.SetActive(false);
-
         }
 
-        public Dictionary<char, CustomMappingItem> GetFullPaletteForEditing()
+        private void EnsureBasePaletteLoaded()
         {
-            return fullPaletteForEditing;
+            if (!baseColorPaletteLoaded)
+            {
+                XDocument.Load(PathHelper.GetExtraDataFile("palette.xml")).Root.Elements("color").ToList().ForEach(x =>
+                {
+                    var character = x.Get<char>("symbol");
+                    var rgb = ColorConvert.RGBFromHexString(x.Get<string>("value"));
+                    baseColorPalette.Add(character, rgb);
+                });
+
+                baseColorPaletteLoaded = true;
+            }
+        }
+
+        public Dictionary<char, int> GetBaseColorPalette()
+        {
+            // Load base palette if not loaded yet
+            EnsureBasePaletteLoaded();
+            return baseColorPalette;
+        }        
+
+        public Dictionary<char, CustomMappingItem> GetFullPaletteAsLoaded()
+        {
+            return fullPaletteAsLoaded;
         }
 
         // Get only mapping items whose key is among the given charset
         public Dictionary<char, CustomMappingItem> GetPartialPaletteForEditing(HashSet<char> charSet)
         {
             return fullPaletteForEditing.Where(x => charSet.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value);
-        }
-
-        public void UpdateBlockSelection(CustomMappingItem? selectedItem, string text = "")
-        {
-            if (selectedItem is null)
-            {
-                BlockSelectionPanelGroup!.alpha = 0F;
-            }
-            else
-            {
-                BlockSelectionPanelGroup!.alpha = 1F;
-                BlockSelectionText!.text = text;
-                BlockSelectionMappingItem!.SetBlockState(selectedItem.BlockState);
-                BlockSelectionMappingItem!.SetCharacter(selectedItem.Character);
-                // Update mapping color
-                var hexString = ColorConvert.GetHexRGBString(selectedItem.Color);
-                BlockSelectionMappingItem!.OnColorCodeInputValidate(hexString);
-                BlockSelectionMappingItem!.OnColorCodeInputValueChange(hexString);
-            }
         }
 
         public IEnumerator UpdateConfiguredModel(string confModelFile, ConfiguredModel confModel)
@@ -173,18 +181,21 @@ namespace MarkovCraft
             fullPaletteForEditing.Clear();
             fullPaletteAsLoaded.Clear();
 
-            // Load base palette
-            XDocument.Load(PathHelper.GetExtraDataFile("palette.xml")).Root.Elements("color").ToList().ForEach(x =>
+            // Load base palette if not loaded yet
+            EnsureBasePaletteLoaded();
+
+            // First apply all items in base palette
+            foreach (var pair in baseColorPalette)
             {
-                var character = x.Get<char>("symbol");
-                var rgb = ColorConvert.RGBFromHexString(x.Get<string>("value"));
-                meshPalette.Add( character, new int2(0, rgb) );
-                fullPaletteAsLoaded.Add( character, new CustomMappingItem { Character = character, Color = ColorConvert.GetOpaqueColor32(rgb) } );
-            });
+                meshPalette.Add( pair.Key, new int2(0, pair.Value) );
+                fullPaletteAsLoaded.Add( pair.Key, new CustomMappingItem{
+                        Character = pair.Key, Color = ColorConvert.GetOpaqueColor32(pair.Value) } );
+            }
 
             blockMeshCount = 1; // #0 is preserved for default cube mesh
 
-            foreach (var item in confModel.CustomMapping) // Read and apply custom mappings
+            // Read and apply custom mappings
+            foreach (var item in confModel.CustomMapping)
             {
                 int rgb = ColorConvert.GetRGB(item.Color);
 
@@ -445,6 +456,25 @@ namespace MarkovCraft
                     }
                 })
             );
+        }
+
+        public void UpdateBlockSelection(CustomMappingItem? selectedItem, string text = "")
+        {
+            if (selectedItem is null)
+            {
+                BlockSelectionPanelGroup!.alpha = 0F;
+            }
+            else
+            {
+                BlockSelectionPanelGroup!.alpha = 1F;
+                BlockSelectionText!.text = text;
+                BlockSelectionMappingItem!.SetBlockState(selectedItem.BlockState);
+                BlockSelectionMappingItem!.SetCharacter(selectedItem.Character);
+                // Update mapping color
+                var hexString = ColorConvert.GetHexRGBString(selectedItem.Color);
+                BlockSelectionMappingItem!.OnColorCodeInputValidate(hexString);
+                BlockSelectionMappingItem!.OnColorCodeInputValueChange(hexString);
+            }
         }
 
         void Update()
