@@ -25,19 +25,23 @@ namespace MarkovCraft
         [SerializeField] public TMP_Text? ScreenHeader, InfoText;
         // Settings Panel
         [SerializeField] public TMP_InputField? ExportFolderInput;
-        [SerializeField] public Button? ExportButton, OpenExplorerButton;
+        [SerializeField] public Button? ExportButton, ApplyMappingButton;
+        [SerializeField] public Button? OpenExplorerButton;
         [SerializeField] public TMP_Dropdown? ExportFormatDropdown;
         // Mapping Items Panel
         [SerializeField] public RectTransform? GridTransform;
         [SerializeField] public GameObject? MappingItemPrefab;
         // BlockState Preview
         [SerializeField] public BlockStatePreview? BlockStatePreview;
+        // Color Picker
+        [SerializeField] public MappingItemColorPicker? ColorPicker;
         // Auto Mapping Panel
         [SerializeField] public AutoMappingPanel? AutoMappingPanel;
 
         private (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ, int steps)? exportData;
+        // Items in this dictionary share refereces with generation scene's full palette
+        // If items get changed, it'll also be reflected in other scenes
         private Dictionary<char, CustomMappingItem>? exportPalette;
-
         private readonly List<MappingEditorItem> mappingItems = new();
         private bool working = false, properlyLoaded = false;
 
@@ -49,8 +53,7 @@ namespace MarkovCraft
 
         private IEnumerator InitializeScreen(HashSet<char> minimumCharSet)
         {
-            if (exportData is null || exportPalette is null || ExportFolderInput == null || ExportButton == null ||
-                    ExportFormatDropdown == null || OpenExplorerButton == null || BlockStatePreview == null)
+            if (exportData is null || exportPalette is null)
             {
                 Debug.LogWarning($"ERROR: Export screen not correctly initialized!");
                 working = false;
@@ -63,17 +66,21 @@ namespace MarkovCraft
 
             // Initialize settings panel
             var savedExportPath = PlayerPrefs.GetString(EXPORT_PATH_KEY, Directory.GetParent(Application.dataPath).ToString());
-            ExportFolderInput.text = savedExportPath;
+            ExportFolderInput!.text = savedExportPath;
             if (CheckWindows())
             {
-                OpenExplorerButton.onClick.RemoveAllListeners();
+                OpenExplorerButton!.onClick.RemoveAllListeners();
                 OpenExplorerButton.onClick.AddListener(ShowExplorer);
             }
             else // Hide this button
-                OpenExplorerButton.gameObject.SetActive(false);
-            ExportButton.onClick.RemoveAllListeners();
+                OpenExplorerButton!.gameObject.SetActive(false);
+            
+            ExportButton!.onClick.RemoveAllListeners();
             ExportButton.onClick.AddListener(Export);
-            ExportFormatDropdown.ClearOptions();
+            ApplyMappingButton!.onClick.RemoveAllListeners();
+            ApplyMappingButton.onClick.AddListener(ApplyMappings);
+
+            ExportFormatDropdown!.ClearOptions();
             ExportFormatDropdown.AddOptions(EXPORT_FORMAT_KEYS.Select(x =>
                     new TMP_Dropdown.OptionData(GameScene.GetL10nString(x))).ToList());
             var lastUsedFormatIndex = PlayerPrefs.GetInt(EXPORT_FORMAT_KEY, 0);
@@ -90,7 +97,7 @@ namespace MarkovCraft
                 var itemVal = exportPalette[ch];
                 var rgb = ColorConvert.GetRGB(itemVal.Color);
 
-                newItem.InitializeData(ch, rgb, rgb, itemVal.BlockState, BlockStatePreview);
+                newItem.InitializeData(ch, rgb, rgb, itemVal.BlockState, ColorPicker!, BlockStatePreview!);
 
                 newItem.transform.SetParent(GridTransform);
                 newItem.transform.localScale = Vector3.one;
@@ -153,7 +160,7 @@ namespace MarkovCraft
                 foreach (var v in byteVals)
                     minimumCharSet.Add(finalLegend[v]);
 
-                exportPalette = game.GetExportPalette(finalLegend.ToHashSet());
+                exportPalette = game.GetPartialPaletteForEditing(finalLegend.ToHashSet());
             }
             
             if (exportData is null || exportPalette is null || ExportButton == null || GridTransform == null)
@@ -172,13 +179,16 @@ namespace MarkovCraft
 
         public override void OnHide(ScreenManager manager)
         {
+            // The export palette is not destroyed. If exporter is screen is opened again
+            // before the selected generation result is changed, the old export palette
+            // containing cached mapping items will still be used
+            
             var array = mappingItems.ToArray();
 
             for (int i = 0;i < array.Length;i++)
                 Destroy(array[i].gameObject);
             
             mappingItems.Clear();
-
         }
 
         public void AutoMap()
@@ -224,6 +234,29 @@ namespace MarkovCraft
 
             // Hide auto mapping panel
             AutoMappingPanel!.Hide();
+        }
+
+        private void ApplyMappings()
+        {
+            if (working) return;
+
+            if (properlyLoaded) // The editor is properly loaded
+            {
+                working = true;
+
+                // Apply export palette overrides
+                mappingItems.ForEach(x => {
+                    if (exportPalette!.ContainsKey(x.Character))
+                    {
+                        exportPalette[x.Character].Color = ColorConvert.OpaqueColor32FromHexString(x.GetColorCode());
+                        exportPalette[x.Character].BlockState = x.GetBlockState();
+                    }
+                });
+
+                working = false;
+
+                manager?.SetActiveScreenByType<GenerationScreen>();
+            }
         }
 
         private void Export()
@@ -282,12 +315,10 @@ namespace MarkovCraft
                         break;
                 }
                 
-                
                 working = false;
 
                 manager?.SetActiveScreenByType<GenerationScreen>();
             }
-
         }
 
         public void ShowExplorer()

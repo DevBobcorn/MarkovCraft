@@ -372,7 +372,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 30470153584447488
-    m_Key: Generation/Canvas/Generation Screen/Selected Block Panel/Text (TMP)
+    m_Key: hud.text.selected_block
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30891891526930432
+    m_Key: exporter.text.apply_mappings
     m_Metadata:
       m_Items: []
   m_Metadata:

@@ -35,6 +35,8 @@ namespace MarkovCraft
         [SerializeField] public GameObject? MappingItemPrefab;
         // BlockState Preview
         [SerializeField] public BlockStatePreview? BlockStatePreview;
+        // Color Picker
+        [SerializeField] public MappingItemColorPicker? ColorPicker;
         // Auto Mapping Panel
         [SerializeField] public AutoMappingPanel? AutoMappingPanel;
 
@@ -94,7 +96,7 @@ namespace MarkovCraft
             SaveButton.onClick.AddListener(SaveConfiguredModel);
 
             // Initialize mappings panel
-            XDocument? paletteDoc = null, confModelDoc = null;
+            XDocument? basePaletteDoc = null, modelDoc = null;
 
             string paletteFileName = PathHelper.GetExtraDataFile($"palette.xml");
             string modelFileName = PathHelper.GetExtraDataFile($"models{SP}{confModel.Model}.xml");
@@ -115,12 +117,12 @@ namespace MarkovCraft
                 
                 if (task1.IsCompletedSuccessfully && task2.IsCompletedSuccessfully)
                 {
-                    paletteDoc = task1.Result;
-                    confModelDoc = task2.Result;
+                    basePaletteDoc = task1.Result;
+                    modelDoc = task2.Result;
                 }
             }
             
-            if (paletteDoc is null || confModelDoc is null)
+            if (basePaletteDoc is null || modelDoc is null)
             {
                 Debug.LogWarning($"ERROR: Couldn't open xml file at {paletteFileName}");
                 working = false;
@@ -132,22 +134,23 @@ namespace MarkovCraft
 
             var basePalette = new Dictionary<char, int>();
 
-            paletteDoc.Root.Elements("color").ToList().ForEach(x => basePalette.Add(
+            basePaletteDoc.Root.Elements("color").ToList().ForEach(x => basePalette.Add(
                     x.Get<char>("symbol"), ColorConvert.RGBFromHexString(x.Get<string>("value"))));
             
             var activeCharSet = new HashSet<char>();
 
-            foreach (var vals in from node in confModelDoc.Descendants()
+            // Find all used symbols in the whole MarkovJunior model
+            foreach (var vals in from node in modelDoc.Descendants()
                     where node.Attribute("values") is not null
                     select node.Attribute("values").Value )
                 vals.ToList().ForEach(ch => activeCharSet.Add(ch));
             
-            var FullCharSet = basePalette.Keys.ToHashSet();
+            var fullCharSet = basePalette.Keys.ToHashSet();
 
             var customMapping = confModel.CustomMapping.ToDictionary(x => x.Character, x => x);
 
             // Populate mapping item grid
-            foreach (var ch in FullCharSet)
+            foreach (var ch in fullCharSet)
             {
                 var newItemObj = GameObject.Instantiate(MappingItemPrefab);
                 var newItem = newItemObj!.GetComponent<MappingEditorItem>();
@@ -158,7 +161,7 @@ namespace MarkovCraft
 
                 var custom = customMapping.ContainsKey(ch);
                 newItem.InitializeData(ch, defoColor, custom ? ColorConvert.GetRGB(customMapping[ch].Color)
-                        : defoColor, custom ? customMapping[ch].BlockState : string.Empty, BlockStatePreview!);
+                        : defoColor, custom ? customMapping[ch].BlockState : string.Empty, ColorPicker!, BlockStatePreview!);
 
                 newItem.transform.SetParent(GridTransform);
                 newItem.transform.localScale = Vector3.one;
@@ -168,6 +171,9 @@ namespace MarkovCraft
 
             // Hide auto mapping panel
             AutoMappingPanel?.Hide();
+
+            // Hide color picker
+            ColorPicker?.CloseAndDiscard();
 
             working = false;
             properlyLoaded = true;

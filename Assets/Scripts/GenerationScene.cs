@@ -49,9 +49,10 @@ namespace MarkovCraft
         private ConfiguredModel? currentConfModel = null;
         // Character => (meshIndex, meshColor)
         private readonly Dictionary<char, int2> meshPalette = new();
-        // Character => CustomMappingItem
-        private readonly Dictionary<char, CustomMappingItem> fullPalette = new();
-
+        // Character => CustomMappingItem, its items CAN be edited in exporter
+        private readonly Dictionary<char, CustomMappingItem> fullPaletteForEditing = new();
+        // Character => CustomMappingItem, its items SHOULD NOT be changed once loaded from file
+        private readonly Dictionary<char, CustomMappingItem> fullPaletteAsLoaded = new();
         private Interpreter? interpreter = null;
         private float playbackSpeed = 1F;
         private bool executing = false;
@@ -68,10 +69,15 @@ namespace MarkovCraft
 
         }
 
-        // Get only mapping items whose key is among the given charset
-        public Dictionary<char, CustomMappingItem> GetExportPalette(HashSet<char> charSet)
+        public Dictionary<char, CustomMappingItem> GetFullPaletteForEditing()
         {
-            return fullPalette.Where(x => charSet.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value);
+            return fullPaletteForEditing;
+        }
+
+        // Get only mapping items whose key is among the given charset
+        public Dictionary<char, CustomMappingItem> GetPartialPaletteForEditing(HashSet<char> charSet)
+        {
+            return fullPaletteForEditing.Where(x => charSet.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value);
         }
 
         public void UpdateBlockSelection(CustomMappingItem? selectedItem, string text = "")
@@ -164,19 +170,21 @@ namespace MarkovCraft
 
             // Update full palette and mesh palette
             meshPalette.Clear();
-            fullPalette.Clear();
+            fullPaletteForEditing.Clear();
+            fullPaletteAsLoaded.Clear();
 
+            // Load base palette
             XDocument.Load(PathHelper.GetExtraDataFile("palette.xml")).Root.Elements("color").ToList().ForEach(x =>
             {
                 var character = x.Get<char>("symbol");
                 var rgb = ColorConvert.RGBFromHexString(x.Get<string>("value"));
                 meshPalette.Add( character, new int2(0, rgb) );
-                fullPalette.Add( character, new CustomMappingItem { Character = character, Color = ColorConvert.GetOpaqueColor32(rgb) } );
+                fullPaletteAsLoaded.Add( character, new CustomMappingItem { Character = character, Color = ColorConvert.GetOpaqueColor32(rgb) } );
             });
 
             blockMeshCount = 1; // #0 is preserved for default cube mesh
 
-            foreach (var item in confModel.CustomMapping) // Read and assign custom mapping
+            foreach (var item in confModel.CustomMapping) // Read and apply custom mappings
             {
                 int rgb = ColorConvert.GetRGB(item.Color);
 
@@ -200,16 +208,22 @@ namespace MarkovCraft
                 else // Default cube mesh with custom color
                     meshPalette[item.Character] = new(0, rgb);
                 
-                if (fullPalette.ContainsKey(item.Character)) // Entry defined in base palette, overwrite it
+                if (fullPaletteAsLoaded.ContainsKey(item.Character)) // Entry defined in base palette, overwrite it
                 {
-                    fullPalette[item.Character] = item;
+                    fullPaletteAsLoaded[item.Character] = item;
                 }
                 else // A new entry
                 {
-                    fullPalette.Add( item.Character, item );
+                    fullPaletteAsLoaded.Add( item.Character, item );
                 }
                 
                 yield return null;
+            }
+
+            // Make a copy of each mapping item for editing
+            foreach (var pair in fullPaletteAsLoaded)
+            {
+                fullPaletteForEditing.Add( pair.Key, pair.Value.AsCopy() );
             }
 
             // Update model graph
@@ -372,7 +386,7 @@ namespace MarkovCraft
 
                     var recordingName = (currentConfModel?.Model ?? "Untitled") + $"_#{k}";
 
-                    StartCoroutine(RecordingExporter.SaveRecording(fullPalette, recordingName, maxX, maxY, maxZ, recordedFrames.ToArray()));
+                    StartCoroutine(RecordingExporter.SaveRecording(fullPaletteForEditing, recordingName, maxX, maxY, maxZ, recordedFrames.ToArray()));
                 }
             }
 
@@ -482,7 +496,7 @@ namespace MarkovCraft
                             var boxCollider = hit.collider as BoxCollider;
                             (int x, int y, int z, char character) = selectedResult.GetColliderPosInVolume(boxCollider!);
 
-                            UpdateBlockSelection(fullPalette[character], $"({x}, {y}, {z})");
+                            UpdateBlockSelection(fullPaletteForEditing[character], $"({x}, {y}, {z})");
                             // Update cursor position (world space)
                             BlockSelection!.transform.position = hit.collider.bounds.center;
                         }

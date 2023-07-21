@@ -16,6 +16,16 @@ namespace MarkovCraft
         public string BlockState = string.Empty;
         public Color32 Color;
 
+        public CustomMappingItem AsCopy()
+        {
+            return new CustomMappingItem
+            {
+                Character = this.Character,
+                BlockState = this.BlockState,
+                Color = this.Color
+            };
+        }
+
         public string ToJson()
         {
             return "{\"color\":\"" + ColorConvert.GetRGB(Color) + "\",\"state\":\"" + BlockState + "\"}";
@@ -35,6 +45,8 @@ namespace MarkovCraft
         [SerializeField] public int StepsPerRefresh = 1; // [1, 100]
         [SerializeField] public int[] Seeds = { };
 
+        // These items themselves shouldn't be changed once they have been loaded/updated from file
+        // Copies of these items should be created and used for editing purposes
         [SerializeField] public CustomMappingItem[] CustomMapping = { };
 
         public static ConfiguredModel CreateFromXMLDoc(XDocument xdoc)
