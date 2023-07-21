@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 6825726678341137683}
   - component: {fileID: 6937765701711117773}
   - component: {fileID: 7198767666416752307}
-  - component: {fileID: 7465028035241863667}
+  - component: {fileID: 3641365361647943710}
+  - component: {fileID: 8891449581898757624}
   m_Layer: 5
   m_Name: Mapping Item ColorPicker
   m_TagString: Untagged
@@ -28,7 +29,7 @@ RectTransform:
   m_GameObject: {fileID: 153938331226348453}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.2, y: 1.2, z: 1}
+  m_LocalScale: {x: 1.6, y: 1.6, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7321415514005308520}
@@ -88,7 +89,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &7465028035241863667
+--- !u!114 &3641365361647943710
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -97,7 +98,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 153938331226348453}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31629c56f6f83234a90f6296f902f9c0, type: 3}
+  m_Script: {fileID: 11500000, guid: 5847fdaed31f9614ebb46e82d7aa8901, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   pickers:
@@ -180,6 +181,19 @@ MonoBehaviour:
     a:
       range: {x: 1, y: 1}
       overrideStatic: 0
+  initialColorPreview: {fileID: 5858193147464330666}
+--- !u!225 &8891449581898757624
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 153938331226348453}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &447682666552357421
 GameObject:
   m_ObjectHideFlags: 0
@@ -949,13 +963,14 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4357496033881261261}
+  - {fileID: 6561787494112402971}
   m_Father: {fileID: 6825726678341137683}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -35, y: -20}
-  m_SizeDelta: {x: -250, y: 50}
+  m_AnchoredPosition: {x: 30, y: -20}
+  m_SizeDelta: {x: -200, y: 50}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &8405205732125351735
 CanvasRenderer:
@@ -1057,7 +1072,7 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7465028035241863667}
+      - m_Target: {fileID: 3641365361647943710}
         m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
         m_MethodName: FinishTypeHex
         m_Mode: 0
@@ -1087,7 +1102,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7465028035241863667}
+      - m_Target: {fileID: 3641365361647943710}
         m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
         m_MethodName: TypeHex
         m_Mode: 0
@@ -1185,8 +1200,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: HS
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 9baf05edbcb5b8a4caaa1987e9d8cb2a, type: 2}
+  m_sharedMaterial: {fileID: -8751252669686695664, guid: 9baf05edbcb5b8a4caaa1987e9d8cb2a,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1210,7 +1226,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24.15
+  m_fontSize: 23.2
   m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1711,6 +1727,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 9003764508470860953}
   - {fileID: 6404051863187862475}
   - {fileID: 1796371353008480731}
   m_Father: {fileID: 6825726678341137683}
@@ -1719,8 +1736,141 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 20, y: -20}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0, y: 1}
+--- !u!1 &1623754880416515744
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6561787494112402971}
+  - component: {fileID: 1518832098626752571}
+  - component: {fileID: 8819874650728689490}
+  - component: {fileID: 7706552762650567557}
+  m_Layer: 5
+  m_Name: Revert Button
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &6561787494112402971
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623754880416515744}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6629985991334033297}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -5, y: -8}
+  m_SizeDelta: {x: 35, y: 35}
+  m_Pivot: {x: 1, y: 1}
+--- !u!222 &1518832098626752571
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623754880416515744}
+  m_CullTransparentMesh: 1
+--- !u!114 &8819874650728689490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623754880416515744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 2d78f29679ea2f44a91ceb98bad7d02a, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!114 &7706552762650567557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623754880416515744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 0.7924528, g: 0.7924528, b: 0.7924528, a: 1}
+    m_HighlightedColor: {r: 0.49803922, g: 0.49803922, b: 0.49803922, a: 1}
+    m_PressedColor: {r: 0.16981131, g: 0.16981131, b: 0.16981131, a: 1}
+    m_SelectedColor: {r: 0.7921569, g: 0.7921569, b: 0.7921569, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 8819874650728689490}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3641365361647943710}
+        m_TargetAssemblyTypeName: MarkovCraft.MappingItemColorPicker, Assembly-CSharp
+        m_MethodName: RevertToInitialColor
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1653401256371104699
 GameObject:
   m_ObjectHideFlags: 0
@@ -1922,7 +2072,7 @@ GameObject:
   - component: {fileID: 3227384513059546849}
   - component: {fileID: 3583383800813162637}
   - component: {fileID: 4951552540994373403}
-  - component: {fileID: 6217003341270178604}
+  - component: {fileID: 2611616584508493665}
   m_Layer: 5
   m_Name: RPicker
   m_TagString: Untagged
@@ -1992,7 +2142,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 1
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6217003341270178604
+--- !u!114 &2611616584508493665
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2009,8 +2159,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: SetPointerFocus
           m_Mode: 3
           m_Arguments:
@@ -2021,8 +2171,8 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
           m_Arguments:
@@ -2037,8 +2187,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
           m_Arguments:
@@ -3306,6 +3456,82 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Padding: {x: -8, y: -5, z: -8, w: -5}
   m_Softness: {x: 0, y: 0}
+--- !u!1 &3730762735438250098
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9003764508470860953}
+  - component: {fileID: 5858193147464330666}
+  - component: {fileID: 5678088142619593280}
+  m_Layer: 5
+  m_Name: InitialColorPreview
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &9003764508470860953
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3730762735438250098}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7321415514005308520}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0.5}
+--- !u!114 &5858193147464330666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3730762735438250098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 0.70388687, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 3f18f8476b7bfc642a7ba293296dc40f, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 1
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &5678088142619593280
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3730762735438250098}
+  m_CullTransparentMesh: 0
 --- !u!1 &4330408713198162467
 GameObject:
   m_ObjectHideFlags: 0
@@ -3757,7 +3983,7 @@ RectTransform:
   m_Father: {fileID: 7321415514005308520}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
@@ -3868,7 +4094,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: Option A
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 9baf05edbcb5b8a4caaa1987e9d8cb2a, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -3932,7 +4158,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &4782533104072634032
@@ -4824,7 +5050,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7465028035241863667}
+      - m_Target: {fileID: 3641365361647943710}
         m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
         m_MethodName: ChangeMode
         m_Mode: 0
@@ -5000,7 +5226,7 @@ GameObject:
   - component: {fileID: 1353640199623422391}
   - component: {fileID: 3825474866097463459}
   - component: {fileID: 2286672091361160286}
-  - component: {fileID: 4153441062219794089}
+  - component: {fileID: 170208111486859947}
   m_Layer: 5
   m_Name: VPicker
   m_TagString: Untagged
@@ -5070,7 +5296,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 1
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &4153441062219794089
+--- !u!114 &170208111486859947
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5087,8 +5313,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: SetPointerFocus
           m_Mode: 3
           m_Arguments:
@@ -5099,8 +5325,8 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
           m_Arguments:
@@ -5115,8 +5341,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
           m_Arguments:
@@ -5138,7 +5364,7 @@ GameObject:
   - component: {fileID: 4713435382934371049}
   - component: {fileID: 8623105257898199205}
   - component: {fileID: 4491399578431109544}
-  - component: {fileID: 159827273135432519}
+  - component: {fileID: 2511409384078322647}
   m_Layer: 5
   m_Name: GPicker
   m_TagString: Untagged
@@ -5208,7 +5434,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 1
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &159827273135432519
+--- !u!114 &2511409384078322647
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5225,8 +5451,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: SetPointerFocus
           m_Mode: 3
           m_Arguments:
@@ -5237,8 +5463,8 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
           m_Arguments:
@@ -5253,8 +5479,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
           m_Arguments:
@@ -5352,7 +5578,7 @@ GameObject:
   - component: {fileID: 6451717068059791349}
   - component: {fileID: 4287300741990217096}
   - component: {fileID: 6650779482872571274}
-  - component: {fileID: 3251163063196065408}
+  - component: {fileID: 4844355666765845784}
   m_Layer: 5
   m_Name: SPicker
   m_TagString: Untagged
@@ -5422,7 +5648,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 1
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &3251163063196065408
+--- !u!114 &4844355666765845784
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5439,8 +5665,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: SetPointerFocus
           m_Mode: 3
           m_Arguments:
@@ -5451,8 +5677,8 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
           m_Arguments:
@@ -5467,8 +5693,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
           m_Arguments:
@@ -5718,7 +5944,7 @@ GameObject:
   - component: {fileID: 4840432251322579368}
   - component: {fileID: 4562990942559935693}
   - component: {fileID: 6724710039157981564}
-  - component: {fileID: 3119312474524714066}
+  - component: {fileID: 711927821844925966}
   m_Layer: 5
   m_Name: BPicker
   m_TagString: Untagged
@@ -5788,7 +6014,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 1
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &3119312474524714066
+--- !u!114 &711927821844925966
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5805,8 +6031,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: SetPointerFocus
           m_Mode: 3
           m_Arguments:
@@ -5817,8 +6043,8 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
           m_Arguments:
@@ -5833,8 +6059,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
           m_Arguments:
@@ -6131,8 +6357,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -20, y: -10}
-  m_SizeDelta: {x: 60, y: 60}
+  m_AnchoredPosition: {x: -10, y: -10}
+  m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 1, y: 1}
 --- !u!222 &4365570234581473701
 CanvasRenderer:
@@ -6193,10 +6419,10 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0, g: 0, b: 0, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.49803922, g: 0.49803922, b: 0.49803922, a: 1}
+    m_PressedColor: {r: 0, g: 0, b: 0, a: 1}
+    m_SelectedColor: {r: 0, g: 0, b: 0, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -6215,7 +6441,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7308181905419678910}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3641365361647943710}
+        m_TargetAssemblyTypeName: MarkovCraft.MappingItemColorPicker, Assembly-CSharp
+        m_MethodName: CloseAndApply
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &7191720297230680125
 GameObject:
   m_ObjectHideFlags: 0
@@ -6313,8 +6551,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: SetPointerFocus
           m_Mode: 3
           m_Arguments:
@@ -6325,8 +6563,8 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
           m_Arguments:
@@ -6341,8 +6579,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
           m_Arguments:
@@ -6463,7 +6701,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28
+  m_fontSize: 31.8
   m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -6796,8 +7034,8 @@ GameObject:
   - component: {fileID: 1487733260833576861}
   - component: {fileID: 3964073492066877247}
   - component: {fileID: 6959093719968608346}
-  - component: {fileID: 9025728577421450233}
   - component: {fileID: 4050680854709007338}
+  - component: {fileID: 1040030495778058416}
   m_Layer: 5
   m_Name: HPicker
   m_TagString: Untagged
@@ -6867,63 +7105,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 1
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &9025728577421450233
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8302178598148744142}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 2
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: SetPointerFocus
-          m_Mode: 3
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 4
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: PointerUpdate
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 5
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 7465028035241863667}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: PointerUpdate
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
 --- !u!114 &4050680854709007338
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6940,6 +7121,63 @@ MonoBehaviour:
   y: 6
   meshType: 0
   sprite: {fileID: 21300000, guid: ce940996bbf9aaf48b93e33ebcc08831, type: 3}
+--- !u!114 &1040030495778058416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8302178598148744142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 2
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
+          m_MethodName: SetPointerFocus
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 4
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
+          m_MethodName: PointerUpdate
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 5
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3641365361647943710}
+          m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
+          m_MethodName: PointerUpdate
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &8432832287817357810
 GameObject:
   m_ObjectHideFlags: 0

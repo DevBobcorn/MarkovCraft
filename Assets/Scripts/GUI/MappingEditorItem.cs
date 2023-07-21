@@ -13,8 +13,10 @@ namespace MarkovCraft
         [SerializeField] TMP_InputField? ColorCodeInput;
         [SerializeField] TMP_InputField? BlockStateInput;
 
+        [SerializeField] Button? EditColorButton;
         [SerializeField] Button? RevertOverrideButton;
 
+        private MappingItemColorPicker? colorPicker;
         private BlockStatePreview? blockStatePreview;
         private bool overridesPaletteColor = false;
 
@@ -24,10 +26,11 @@ namespace MarkovCraft
         private char character;
         public char Character => character;
 
-        public void InitializeData(char character, int defoRgb, int rgb, string blockState, BlockStatePreview blockStatePreview)
+        public void InitializeData(char character, int defoRgb, int rgb, string blockState, 
+                MappingItemColorPicker colorPicker, BlockStatePreview blockStatePreview)
         {
             if (ColorPreviewImage == null || CharacterText == null || ColorCodeInput == null || BlockStateInput == null
-                    || MarkCornerImage == null || RevertOverrideButton == null)
+                    || MarkCornerImage == null || EditColorButton == null || RevertOverrideButton == null)
             {
                 Debug.LogError("Mapping Item missing components!");
                 return;
@@ -43,6 +46,8 @@ namespace MarkovCraft
             // Color input
             ColorCodeInput.text = ColorConvert.GetHexRGBString(rgb);
             ColorPreviewImage.color = ColorConvert.GetOpaqueColor32(rgb);
+            // Color picker
+            this.colorPicker = colorPicker;
             // Black state input
             BlockStateInput.text = blockState;
 
@@ -52,10 +57,18 @@ namespace MarkovCraft
             RevertOverrideButton.onClick.AddListener(OnRevertOverrideButtonClick);
             ColorCodeInput.onValueChanged.AddListener(OnColorCodeInputValueChange);
             ColorCodeInput.onEndEdit.AddListener(OnColorCodeInputValidate);
+            EditColorButton.onClick.AddListener(() => OnEditColorButtonClick());
 
             BlockStateInput.onSelect.AddListener((blockState) => ShowBlockStatePreview(blockState));
             BlockStateInput.onValueChanged.AddListener(OnUpdateBlockStateInput);
             BlockStateInput.onEndEdit.AddListener((_) => HideBlockStatePreview());
+        }
+
+        private void OnEditColorButtonClick()
+        {
+            var currentColor = (Color32) ColorPreviewImage!.color;
+            currentColor.a = (byte) 255; // Fully opaque
+            colorPicker?.OpenAndInitialize(this, currentColor);
         }
 
         public void SetCharacter(char character)
@@ -71,6 +84,8 @@ namespace MarkovCraft
             ColorPreviewImage!.color = ColorConvert.GetOpaqueColor32(newRgb);
             // Check if the color is overriden
             SetOverridesPaletteColor(newRgb != defaultRgb);
+            // Update color code
+            ColorCodeInput!.SetTextWithoutNotify(ColorConvert.GetHexRGBString(newRgb));
         }
 
         public void OnColorCodeInputValueChange(string colorHex)
