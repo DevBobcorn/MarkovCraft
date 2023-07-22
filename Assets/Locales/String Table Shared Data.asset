@@ -379,6 +379,22 @@ MonoBehaviour:
     m_Key: exporter.text.apply_mappings
     m_Metadata:
       m_Items: []
+  - m_Id: 31220356012773376
+    m_Key: hud.text.record_hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31238120081395712
+    m_Key: hud.text.block_selection_mapping
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31238213018783744
+    m_Key: hud.text.block_selection_export_override
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31246398375006208
+    m_Key: replay.text.current_frame
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

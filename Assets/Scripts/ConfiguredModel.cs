@@ -26,6 +26,11 @@ namespace MarkovCraft
             };
         }
 
+        public bool MapTargetIdentical(CustomMappingItem item)
+        {
+            return item.BlockState.Equals(BlockState) && item.Color.Equals(Color);
+        }
+
         public string ToJson()
         {
             return "{\"color\":\"" + ColorConvert.GetRGB(Color) + "\",\"state\":\"" + BlockState + "\"}";

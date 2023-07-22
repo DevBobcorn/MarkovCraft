@@ -403,7 +403,7 @@ namespace MarkovCraft
                 var instanceData = BlockDataBuilder.GetInstanceData(simulationBox, sizeX, sizeY, sizeZ, int3.zero, meshPalette);
                 BlockInstanceSpawner.VisualizeFrameState(instanceData, materials, blockMeshes, tick);
 
-                ReplayText!.text = $"Frame {f} / {frameData.Count} (Regular)";
+                ReplayText!.text = GetL10nString("replay.text.current_frame", f, frameData.Count);
                 yield return new WaitForSeconds(tick);
             }
 
@@ -449,7 +449,7 @@ namespace MarkovCraft
                 );
                 BlockInstanceSpawner.VisualizeState(instanceData, materials, blockMeshes);
 
-                ReplayText!.text = $"Frame {f} / {frameData.Count} (Optimized)";
+                ReplayText!.text = GetL10nString("replay.text.current_frame", f, frameData.Count);
                 yield return new WaitForSeconds(constTick);
             }
 

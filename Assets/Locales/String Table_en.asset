@@ -404,6 +404,22 @@ MonoBehaviour:
     m_Localized: Apply Mappings
     m_Metadata:
       m_Items: []
+  - m_Id: 31220356012773376
+    m_Localized: Record (View in Replay)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31238120081395712
+    m_Localized: 'Original Mapping:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31238213018783744
+    m_Localized: 'Will be exported as:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31246398375006208
+    m_Localized: 'Current Frame: {0} / {1}'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -33,7 +33,10 @@ namespace MarkovCraft
         [SerializeField] public CanvasGroup? BlockSelectionPanelGroup;
         [SerializeField] public TMP_Text? BlockSelectionText;
         [SerializeField] public MappingEditorItem? BlockSelectionMappingItem;
+        [SerializeField] public MappingEditorItem? ExportOverrideMappingItem;
+        [SerializeField] public GameObject? ExportOverrideSection;
 
+        [SerializeField] public Toggle? RecordToggle;
         [SerializeField] public TMP_Text? VolumeText, PlaybackSpeedText, GenerationText, FPSText;
         [SerializeField] public TMP_Dropdown? ConfiguredModelDropdown;
         [SerializeField] public Slider? PlaybackSpeedSlider;
@@ -284,7 +287,7 @@ namespace MarkovCraft
             int maxX = 0, maxY = 0, maxZ = 0;
             int stepsPerFrame = model.StepsPerRefresh;
 
-            var record = false;
+            var record = RecordToggle?.isOn ?? false;
 
             for (int k = 1; k <= model.Amount; k++)
             {
@@ -466,7 +469,7 @@ namespace MarkovCraft
             );
         }
 
-        public void UpdateBlockSelection(CustomMappingItem? selectedItem, string text = "")
+        public void UpdateBlockSelection(CustomMappingItem? selectedItem, CustomMappingItem? selectedItemOverride = null, string text = "")
         {
             if (selectedItem is null)
             {
@@ -476,12 +479,27 @@ namespace MarkovCraft
             {
                 BlockSelectionPanelGroup!.alpha = 1F;
                 BlockSelectionText!.text = text;
+                // Update mapping item information
                 BlockSelectionMappingItem!.SetBlockState(selectedItem.BlockState);
                 BlockSelectionMappingItem!.SetCharacter(selectedItem.Character);
-                // Update mapping color
                 var hexString = ColorConvert.GetHexRGBString(selectedItem.Color);
                 BlockSelectionMappingItem!.OnColorCodeInputValidate(hexString);
                 BlockSelectionMappingItem!.OnColorCodeInputValueChange(hexString);
+
+                if (selectedItemOverride is not null) // Display override section
+                {
+                    ExportOverrideSection?.SetActive(true);
+                    // Update mapping item information
+                    ExportOverrideMappingItem!.SetBlockState(selectedItemOverride.BlockState);
+                    ExportOverrideMappingItem!.SetCharacter(selectedItemOverride.Character);
+                    var hexOverrideString = ColorConvert.GetHexRGBString(selectedItemOverride.Color);
+                    ExportOverrideMappingItem!.OnColorCodeInputValidate(hexOverrideString);
+                    ExportOverrideMappingItem!.OnColorCodeInputValueChange(hexOverrideString);
+                }
+                else // Hide override section
+                {
+                    ExportOverrideSection?.SetActive(false);
+                }
             }
         }
 
@@ -534,7 +552,10 @@ namespace MarkovCraft
                             var boxCollider = hit.collider as BoxCollider;
                             (int x, int y, int z, char character) = selectedResult.GetColliderPosInVolume(boxCollider!);
 
-                            UpdateBlockSelection(fullPaletteForEditing[character], $"({x}, {y}, {z})");
+                            var itemAsLoaded = fullPaletteAsLoaded[character];
+                            var itemToExport = fullPaletteForEditing[character];
+
+                            UpdateBlockSelection(itemAsLoaded, itemAsLoaded.MapTargetIdentical(itemToExport) ? null : itemToExport, $"({x}, {y}, {z})");
                             // Update cursor position (world space)
                             BlockSelection!.transform.position = hit.collider.bounds.center;
                         }
@@ -666,6 +687,11 @@ namespace MarkovCraft
                 ExecuteButton.onClick.RemoveAllListeners();
                 ExecuteButton.onClick.AddListener(StopExecution);
             }
+
+            if (RecordToggle != null)
+            {
+                RecordToggle.enabled = false;
+            }
         }
 
         public void StopExecution()
@@ -684,6 +710,11 @@ namespace MarkovCraft
                 ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.start_execution");
                 ExecuteButton.onClick.RemoveAllListeners();
                 ExecuteButton.onClick.AddListener(StartExecution);
+            }
+
+            if (RecordToggle != null)
+            {
+                RecordToggle.enabled = true;
             }
         }
 
