@@ -40,7 +40,7 @@ namespace MarkovCraft
         [SerializeField] public TMP_Text? VolumeText, PlaybackSpeedText, GenerationText, FPSText;
         [SerializeField] public TMP_Dropdown? ConfiguredModelDropdown;
         [SerializeField] public Slider? PlaybackSpeedSlider;
-        [SerializeField] public Button? ConfigButton, ExecuteButton, ExportButton;
+        [SerializeField] public Button? CreateButton, ConfigButton, ExecuteButton, ExportButton;
         [SerializeField] public ModelGraph? ModelGraphUI;
         [SerializeField] public GameObject? GenerationResultPrefab;
         private readonly List<GenerationResult> generationResults = new();
@@ -432,6 +432,12 @@ namespace MarkovCraft
                     {
                         PlaybackSpeedSlider.onValueChanged.AddListener(UpdatePlaybackSpeed);
                         UpdatePlaybackSpeed(PlaybackSpeedSlider.value);
+                    }
+
+                    if (CreateButton != null)
+                    {
+                        CreateButton.onClick.RemoveAllListeners();
+                        CreateButton.onClick.AddListener(() => screenManager!.SetActiveScreenByType<ConfiguredModelCreatorScreen>() );
                     }
 
                     if (ConfigButton != null)

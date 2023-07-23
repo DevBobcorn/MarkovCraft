@@ -11,7 +11,7 @@ namespace MarkovCraft
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
         private const string PLACE_HOLDER = "<model/path/here>";
-        private const string MODEL_FOLDER = "configured_models";
+        private const string CONFIGURED_MODEL_FOLDER = "configured_models";
 
         private string XDocFileName = PLACE_HOLDER;
 
@@ -19,7 +19,7 @@ namespace MarkovCraft
         {
             GUILayout.Space(10);
 
-            GUILayout.Label($"Load from/Save to (file under {MODEL_FOLDER}):");
+            GUILayout.Label($"Load from/Save to (file under {CONFIGURED_MODEL_FOLDER}):");
             XDocFileName = GUILayout.TextField(XDocFileName);
 
             if (XDocFileName.Equals(PLACE_HOLDER)) // Fill in default xml model path
@@ -41,7 +41,7 @@ namespace MarkovCraft
 
                 if (modelObj is not null)
                 {
-                    var path = PathHelper.GetExtraDataFile($"{MODEL_FOLDER}{SP}{XDocFileName}");
+                    var path = PathHelper.GetExtraDataFile($"{CONFIGURED_MODEL_FOLDER}{SP}{XDocFileName}");
                     
                     if (File.Exists(path))
                     {
@@ -64,7 +64,7 @@ namespace MarkovCraft
 
                 if (modelObj is not null)
                 {
-                    var path = PathHelper.GetExtraDataFile($"{MODEL_FOLDER}{SP}{XDocFileName}");
+                    var path = PathHelper.GetExtraDataFile($"{CONFIGURED_MODEL_FOLDER}{SP}{XDocFileName}");
                     var xdoc = ConfiguredModel.GetXMLDoc(modelObj);
                     xdoc.Save(path);
 

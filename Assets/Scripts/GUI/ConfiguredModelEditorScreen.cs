@@ -134,8 +134,7 @@ namespace MarkovCraft
             working = false;
             properlyLoaded = true;
 
-            if (ScreenHeader != null)
-                ScreenHeader.text = GameScene.GetL10nString("editor.text.loaded", confModelFile);
+            ScreenHeader!.text = GameScene.GetL10nString("editor.text.loaded", confModelFile);
         }
 
         private IEnumerator UpdateActiveCharSetFromModel(string modelName)
@@ -215,8 +214,7 @@ namespace MarkovCraft
             {
                 Debug.LogWarning("Editor is not properly loaded!");
 
-                if (ScreenHeader != null)
-                    ScreenHeader.text = GameScene.GetL10nString("editor.text.load_failure");
+                ScreenHeader!.text = GameScene.GetL10nString("editor.text.load_failure");
 
                 working = false;
                 return;

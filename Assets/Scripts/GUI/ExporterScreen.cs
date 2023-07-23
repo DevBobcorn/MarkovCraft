@@ -120,11 +120,9 @@ namespace MarkovCraft
             working = false;
             properlyLoaded = true;
 
-            if (ScreenHeader != null)
-                ScreenHeader.text = GameScene.GetL10nString("exporter.text.loaded", data.info[0]);
+            ScreenHeader!.text = GameScene.GetL10nString("exporter.text.loaded", data.info[0]);
             
-            if (InfoText != null)
-                InfoText.text = GameScene.GetL10nString("export.text.result_info", data.info[0], data.info[1], data.FX, data.FZ, data.FY);
+            InfoText!.text = GameScene.GetL10nString("export.text.result_info", data.info[0], data.info[1], data.FX, data.FZ, data.FY);
             
         }
 
@@ -166,8 +164,7 @@ namespace MarkovCraft
             {
                 Debug.LogWarning("Exporter is not properly loaded!");
 
-                if (ScreenHeader != null)
-                    ScreenHeader.text = GenerationScene.GetL10nString("exporter.text.load_failure");
+                ScreenHeader!.text = GenerationScene.GetL10nString("exporter.text.load_failure");
 
                 working = false;
                 return;
