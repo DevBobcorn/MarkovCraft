@@ -16,12 +16,12 @@ namespace MarkovCraft
             return (color.r << 16) + (color.g << 8) + color.b;
         }
 
-        public static int GetOpqaueRGB(Color32 color)
+        public static int GetOpaqueRGB(Color32 color)
         {
             return (255 << 24) + (color.r << 16) + (color.g << 8) + color.b;
         }
 
-        public static int GetOpqaueRGB(int rgb)
+        public static int GetOpaqueRGB(int rgb)
         {
             return (255 << 24) + (rgb & 0xFFFFFF);
         }

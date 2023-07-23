@@ -28,6 +28,8 @@ namespace MarkovCraft
         [SerializeField] public Button? ExportButton, ApplyMappingButton;
         [SerializeField] public Button? OpenExplorerButton;
         [SerializeField] public TMP_Dropdown? ExportFormatDropdown;
+        // Result Preview
+        [SerializeField] public Image? ResultPreviewImage;
         // Mapping Items Panel
         [SerializeField] public RectTransform? GridTransform;
         [SerializeField] public GameObject? MappingItemPrefab;
@@ -122,7 +124,17 @@ namespace MarkovCraft
 
             ScreenHeader!.text = GameScene.GetL10nString("exporter.text.loaded", data.info[0]);
             
+            // Update Info text
             InfoText!.text = GameScene.GetL10nString("export.text.result_info", data.info[0], data.info[1], data.FX, data.FZ, data.FY);
+            // Update Preview Image
+            var (pixels, sizeX, sizeY) = MarkovJunior.Graphics.Render(data.state, data.FX, data.FY, data.FZ,
+                    data.legend.Select(x => ColorConvert.GetOpaqueRGB(exportPalette[x].Color)).ToArray(), 6, 0);
+            var tex = MarkovJunior.Graphics.CreateTexture2D(pixels, sizeX, sizeY);
+            //tex.filterMode = FilterMode.Point;
+            // Update sprite
+            var sprite = Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2, tex.height / 2));
+            ResultPreviewImage!.sprite = sprite;
+            ResultPreviewImage!.SetNativeSize();
         }
 
         public override void OnShow(ScreenManager manager)
