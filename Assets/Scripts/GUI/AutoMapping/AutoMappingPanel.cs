@@ -81,7 +81,7 @@ namespace MarkovCraft
 
         private void CreateGroup(string groupName, BlockGroupItemInfo[] items)
         {
-            var groupObj = GameObject.Instantiate(groupPrefab);
+            var groupObj = Instantiate(groupPrefab);
             groupObj!.transform.SetParent(groups, false);
 
             var group = groupObj.GetComponent<BlockGroup>();

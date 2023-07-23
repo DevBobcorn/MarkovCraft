@@ -89,7 +89,7 @@ namespace MarkovCraft
             // Populate mapping item grid
             foreach (var ch in minimumCharSet)
             {
-                var newItemObj = GameObject.Instantiate(MappingItemPrefab);
+                var newItemObj = Instantiate(MappingItemPrefab);
                 var newItem = newItemObj!.GetComponent<MappingEditorItem>();
 
                 mappingItems.Add(newItem);
@@ -123,7 +123,6 @@ namespace MarkovCraft
             ScreenHeader!.text = GameScene.GetL10nString("exporter.text.loaded", data.info[0]);
             
             InfoText!.text = GameScene.GetL10nString("export.text.result_info", data.info[0], data.info[1], data.FX, data.FZ, data.FY);
-            
         }
 
         public override void OnShow(ScreenManager manager)

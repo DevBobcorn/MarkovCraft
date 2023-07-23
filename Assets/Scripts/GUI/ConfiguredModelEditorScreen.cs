@@ -108,7 +108,7 @@ namespace MarkovCraft
             // can be changed, and the active items should be updated accordingly.
             foreach (var pair in fullPaletteAsLoaded)
             {
-                var newItemObj = GameObject.Instantiate(MappingItemPrefab);
+                var newItemObj = Instantiate(MappingItemPrefab);
                 var newItem = newItemObj!.GetComponent<MappingEditorItem>();
 
                 mappingItems.Add(newItem);

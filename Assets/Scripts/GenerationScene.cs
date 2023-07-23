@@ -297,7 +297,7 @@ namespace MarkovCraft
                 int seed = seeds != null && k <= seeds.Length ? seeds[k - 1] : rand.Next();
                 int xCount = (k - 1) % resultPerLine,  zCount = (k - 1) / resultPerLine;
                 
-                var resultObj = GameObject.Instantiate(GenerationResultPrefab);
+                var resultObj = Instantiate(GenerationResultPrefab);
                 resultObj.name = $"Result #{k} (Seed: {seed})";
                 var result = resultObj!.GetComponent<GenerationResult>();
                 result.GenerationSeed = seed;

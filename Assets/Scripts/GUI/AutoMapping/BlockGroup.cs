@@ -89,7 +89,7 @@ namespace MarkovCraft
             // Populate group items
             foreach (var item in itemSource)
             {
-                var itemObj = GameObject.Instantiate(groupItemPrefab);
+                var itemObj = Instantiate(groupItemPrefab);
                 itemObj!.transform.SetParent(groupItems, false);
 
                 var blockId = ResourceLocation.fromString(item.BlockId);
