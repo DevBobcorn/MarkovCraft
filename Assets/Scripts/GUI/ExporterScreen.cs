@@ -44,7 +44,7 @@ namespace MarkovCraft
         // Items in this dictionary share refereces with generation scene's fullPaletteForEditing
         // If items get changed, it'll also be reflected in other scenes
         private Dictionary<char, CustomMappingItem>? exportPalette;
-        private readonly List<MappingEditorItem> mappingItems = new();
+        private readonly List<MappingItem> mappingItems = new();
         private bool working = false, properlyLoaded = false;
 
         // Disable pause for animated inventory
@@ -92,7 +92,7 @@ namespace MarkovCraft
             foreach (var ch in minimumCharSet)
             {
                 var newItemObj = Instantiate(MappingItemPrefab);
-                var newItem = newItemObj!.GetComponent<MappingEditorItem>();
+                var newItem = newItemObj!.GetComponent<MappingItem>();
 
                 mappingItems.Add(newItem);
 
@@ -126,9 +126,9 @@ namespace MarkovCraft
             
             // Update Info text
             InfoText!.text = GameScene.GetL10nString("export.text.result_info", data.info[0], data.info[1], data.FX, data.FZ, data.FY);
+            var prev = GetPreviewData();
             // Update Preview Image
-            var (pixels, sizeX, sizeY) = MarkovJunior.Graphics.Render(data.state, data.FX, data.FY, data.FZ,
-                    data.legend.Select(x => ColorConvert.GetOpaqueRGB(exportPalette[x].Color)).ToArray(), 6, 0);
+            var (pixels, sizeX, sizeY) = MarkovJunior.Graphics.Render(prev.state, prev.sizeX, prev.sizeY, prev.sizeZ, prev.colors, 6, 0);
             var tex = MarkovJunior.Graphics.CreateTexture2D(pixels, sizeX, sizeY);
             //tex.filterMode = FilterMode.Point;
             // Update sprite
@@ -241,6 +241,13 @@ namespace MarkovCraft
 
             // Hide auto mapping panel
             AutoMappingPanel!.Hide();
+        }
+
+        public (int sizeX, int sizeY, int sizeZ, byte[] state, int[] colors) GetPreviewData()
+        {
+            var data = exportData!.Value;
+            return (data.FX, data.FY, data.FZ, data.state, data.legend.Select(
+                    x => ColorConvert.GetOpaqueRGB(exportPalette![x].Color)).ToArray());
         }
 
         private void ApplyMappings()

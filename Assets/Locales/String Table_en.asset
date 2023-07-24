@@ -420,6 +420,22 @@ MonoBehaviour:
     m_Localized: 'Current Frame: {0} / {1}'
     m_Metadata:
       m_Items: []
+  - m_Id: 31965160040501248
+    m_Localized: 'Right-Handed
+
+      Z is up
+
+      <size=12>(MarkovCraft)</size>'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31965499011567616
+    m_Localized: 'Left-Handed
+
+      Y is up
+
+      <size=12>(Minecraft)</size>'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

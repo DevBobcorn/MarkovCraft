@@ -395,6 +395,14 @@ MonoBehaviour:
     m_Key: replay.text.current_frame
     m_Metadata:
       m_Items: []
+  - m_Id: 31965160040501248
+    m_Key: Generation/Environment/[Markov Origin]/Text (TMP)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31965499011567616
+    m_Key: Generation/Environment/[Minecraft Origin]/Text (TMP)
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

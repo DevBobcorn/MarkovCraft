@@ -9,7 +9,7 @@ namespace MarkovCraft
     {
         [SerializeField] private Image? initialColorPreview;
         private Color32 initialColor = Color.black;
-        private MappingEditorItem? activeItem = null;
+        private MappingItem? activeItem = null;
 
         private void Open()
         {
@@ -27,7 +27,7 @@ namespace MarkovCraft
             canvasGroup.blocksRaycasts = false;
         }
 
-        public void OpenAndInitialize(MappingEditorItem item, Color32 initColor)
+        public void OpenAndInitialize(MappingItem item, Color32 initColor)
         {
             if (activeItem != null) // Opened by an item while editing another one
             {
@@ -59,7 +59,7 @@ namespace MarkovCraft
             Close();
         }
 
-        private void ApplyToItem(MappingEditorItem item)
+        private void ApplyToItem(MappingItem item)
         {
             int curRgb = ColorConvert.GetRGB(color);
             item.SetColorRGB(curRgb);

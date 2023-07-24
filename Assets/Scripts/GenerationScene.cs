@@ -32,8 +32,8 @@ namespace MarkovCraft
         [SerializeField] public GameObject? BlockSelection;
         [SerializeField] public CanvasGroup? BlockSelectionPanelGroup;
         [SerializeField] public TMP_Text? BlockSelectionText;
-        [SerializeField] public MappingEditorItem? BlockSelectionMappingItem;
-        [SerializeField] public MappingEditorItem? ExportOverrideMappingItem;
+        [SerializeField] public MappingItem? BlockSelectionMappingItem;
+        [SerializeField] public MappingItem? ExportOverrideMappingItem;
         [SerializeField] public GameObject? ExportOverrideSection;
 
         [SerializeField] public Toggle? RecordToggle;

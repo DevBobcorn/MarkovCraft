@@ -40,7 +40,7 @@ namespace MarkovCraft
         // Auto Mapping Panel
         [SerializeField] public AutoMappingPanel? AutoMappingPanel;
 
-        private readonly List<MappingEditorItem> mappingItems = new();
+        private readonly List<MappingItem> mappingItems = new();
         // Items in this dictionary share refereces with generation scene's fullPaletteAsLoaded
         // Its CustomMappingItem objects SHOULD NOT be edited
         private Dictionary<char, CustomMappingItem> fullPaletteAsLoaded = new();
@@ -109,7 +109,7 @@ namespace MarkovCraft
             foreach (var pair in fullPaletteAsLoaded)
             {
                 var newItemObj = Instantiate(MappingItemPrefab);
-                var newItem = newItemObj!.GetComponent<MappingEditorItem>();
+                var newItem = newItemObj!.GetComponent<MappingItem>();
 
                 mappingItems.Add(newItem);
 

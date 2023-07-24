@@ -399,6 +399,14 @@ MonoBehaviour:
     m_Localized: "\u5F53\u524D\u5E27\uFF1A{0} / {1}"
     m_Metadata:
       m_Items: []
+  - m_Id: 31965160040501248
+    m_Localized: "\u53F3\u624B\u5750\u6807\u7CFB\nZ\u4E3A\u7EB5\u8F74\n<size=12>(MarkovCraft)</size>"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31965499011567616
+    m_Localized: "\u5DE6\u624B\u5750\u6807\u7CFB\nY\u4E3A\u7EB5\u8F74\n<size=12>(Minecraft)</size>"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
