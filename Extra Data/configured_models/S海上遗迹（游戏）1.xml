@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ConfiguredModel Model="SeaVilla" SizeX="10" SizeY="10" SizeZ="4" Amount="1" Steps="10000" Animated="false" StepsPerRefresh="1">
+  <Seeds>
+    <Seed Value="11" />
+  </Seeds>
   <CustomMapping>
     <Item Character="B" Color="000000" BlockState="minecraft:black_concrete" />
     <Item Character="I" Color="1D2B53" BlockState="minecraft:gray_concrete" />
@@ -13,7 +16,7 @@
     <Item Character="O" Color="FFA300" BlockState="minecraft:yellow_concrete" />
     <Item Character="Y" Color="FFEC27" BlockState="minecraft:yellow_wool" />
     <Item Character="G" Color="00E436" BlockState="minecraft:lime_concrete" />
-    <Item Character="U" Color="29ADFF" BlockState="minecraft:light_blue_wool" />
+    <Item Character="U" Color="29ADFF" BlockState="light_blue_concrete" />
     <Item Character="S" Color="83769C" BlockState="minecraft:light_blue_terracotta" />
     <Item Character="K" Color="FF77A8" BlockState="minecraft:pink_shulker_box" />
     <Item Character="F" Color="FFCCAA" BlockState="minecraft:white_terracotta" />

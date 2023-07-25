@@ -67,7 +67,7 @@ namespace MarkovCraft
             bool is2d = data.FZ == 1;
 
             // Initialize settings panel
-            var savedExportPath = PlayerPrefs.GetString(EXPORT_PATH_KEY, Directory.GetParent(Application.dataPath).ToString());
+            var savedExportPath = PlayerPrefs.GetString(EXPORT_PATH_KEY, PathHelper.GetDefaultExportPath());
             ExportFolderInput!.text = savedExportPath;
             if (CheckWindows())
             {

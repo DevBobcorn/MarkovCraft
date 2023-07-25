@@ -34,4 +34,9 @@ public class PathHelper
     {
         return Directory.GetParent(Application.dataPath).FullName + $"{SP}Recordings{SP}{fileName}";
     }
+
+    public static string GetDefaultExportPath()
+    {
+        return Directory.GetParent(Application.dataPath).FullName + $"{SP}Exported";
+    }
 }

@@ -62,7 +62,9 @@ namespace MarkovCraft
         private IEnumerator InitializeScreen()
         {
             // Initialize settings panel
-            var dir = PathHelper.GetExtraDataFile("models");
+            var modelDir = PathHelper.GetExtraDataFile("models");
+            var prevDir = PathHelper.GetExtraDataFile("model_previews");
+
             int index = 0;
             
             modelItems.Clear();
@@ -71,14 +73,27 @@ namespace MarkovCraft
                 Destroy(item.gameObject);
             }
 
-            foreach (var m in Directory.GetFiles(dir, "*.xml", SearchOption.TopDirectoryOnly))
+            foreach (var m in Directory.GetFiles(modelDir, "*.xml", SearchOption.TopDirectoryOnly))
             {
-                var modelName = m[(dir.Length + 1)..^4];
+                var modelName = m[(modelDir.Length + 1)..^4];
                 var modelItemObj = Instantiate(ModelItemPrefab)!;
                 modelItemObj.transform.SetParent(GridTransform, false);
 
                 var modelItem = modelItemObj.GetComponent<ModelItem>();
                 modelItem.SetModelName(AddSpacesBeforeUppercase(AddSpacesBeforeUppercase(modelName)));
+
+                var prevPath = prevDir + $"{SP}{modelName}.png";
+                // See if preview is available
+                if (File.Exists(prevPath))
+                {
+                    var tex = new Texture2D(2, 2);
+                    //tex.filterMode = FilterMode.Point;
+                    var bytes = File.ReadAllBytes(prevPath);
+                    tex.LoadImage(bytes);
+                    // Update sprite
+                    var sprite = UnityEngine.Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2, tex.height / 2));
+                    modelItem.SetPreviewSprite(sprite);
+                }
 
                 modelItems.Add(modelName, modelItem);
                 

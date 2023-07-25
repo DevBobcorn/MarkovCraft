@@ -117,7 +117,7 @@ namespace MarkovCraft
                     tex.LoadImage(bytes);
                     // Update sprite
                     var sprite = Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2, tex.height / 2));
-                    itemTexture.overrideSprite = sprite;
+                    itemTexture.sprite = sprite;
                     // Calculate average color of this texture
                     var pixels = tex.GetPixels32();
                     int rSum = 0, gSum = 0, bSum = 0;
