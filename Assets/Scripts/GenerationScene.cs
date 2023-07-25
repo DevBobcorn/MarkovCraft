@@ -599,7 +599,7 @@ namespace MarkovCraft
                 var fsc = newResult.FinalStepCount;
 
                 VolumeText!.text = GetL10nString("hud.text.result_info", newResult.Iteration, newResult.GenerationSeed,
-                        size.x, size.y, size.z, fsc == 0 ? "-" : fsc.ToString());
+                        size.x, size.z, size.y, fsc == 0 ? "-" : fsc.ToString());
                 VolumeSelection!.UpdateVolume(newResult.GetVolumePosition(), newResult.GetVolumeSize());
             
                 selectedResult = newResult;

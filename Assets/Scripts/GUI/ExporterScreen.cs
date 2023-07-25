@@ -125,10 +125,12 @@ namespace MarkovCraft
             ScreenHeader!.text = GameScene.GetL10nString("exporter.text.loaded", data.info[0]);
             
             // Update Info text
-            InfoText!.text = GameScene.GetL10nString("export.text.result_info", data.info[0], data.info[1], data.FX, data.FZ, data.FY);
+            InfoText!.text = GameScene.GetL10nString("export.text.result_info", data.info[0], data.info[1], data.FX, data.FY, data.FZ);
             var prev = GetPreviewData();
+
             // Update Preview Image
-            var (pixels, sizeX, sizeY) = MarkovJunior.Graphics.Render(prev.state, prev.sizeX, prev.sizeY, prev.sizeZ, prev.colors, 6, 0);
+            var (pixels, sizeX, sizeY) = ResultDetailPanel.RenderPreview(prev.sizeX, prev.sizeY, prev.sizeZ,
+                    prev.state, prev.colors, is2d ? ResultDetailPanel.PreviewRotation.ZERO : ResultDetailPanel.PreviewRotation.NINETY);
             var tex = MarkovJunior.Graphics.CreateTexture2D(pixels, sizeX, sizeY);
             //tex.filterMode = FilterMode.Point;
             // Update sprite
@@ -248,6 +250,16 @@ namespace MarkovCraft
             var data = exportData!.Value;
             return (data.FX, data.FY, data.FZ, data.state, data.legend.Select(
                     x => ColorConvert.GetOpaqueRGB(exportPalette![x].Color)).ToArray());
+        }
+
+        public (string dir, string name)? GetExportNames()
+        {
+            if (properlyLoaded) // The editor is properly loaded
+            {
+                return (ExportFolderInput!.text, exportData!.Value.info[0][0..^4].ToLower());
+            }
+
+            return null;
         }
 
         private void ApplyMappings()
