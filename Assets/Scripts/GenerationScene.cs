@@ -684,8 +684,8 @@ namespace MarkovCraft
 
             if (selectedIndex != -1)
             {
-                //UpdateDropdownOption(selectedIndex);
                 ConfiguredModelDropdown!.value = selectedIndex;
+                UpdateDropdownOption(selectedIndex);
             }
         }
 

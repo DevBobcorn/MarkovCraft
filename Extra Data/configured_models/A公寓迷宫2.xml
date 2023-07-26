@@ -1,7 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ConfiguredModel Model="Apartemazements" SizeX="8" SizeY="8" SizeZ="8" Amount="4" Steps="1000" Animated="false" StepsPerRefresh="1">
+  <Seeds>
+    <Seed Value="111" />
+    <Seed Value="222" />
+    <Seed Value="333" />
+  </Seeds>
   <CustomMapping>
-    <Item Character="E" Color="008751" BlockState="minecraft:grass_block[snowy=false]" />
+    <Item Character="E" Color="008751" BlockState="minecraft:grass_block" />
     <Item Character="N" Color="AB5236" BlockState="minecraft:dirt" />
     <Item Character="A" Color="FFFFFF" BlockState="minecraft:white_concrete" />
     <Item Character="W" Color="FFC1C1" BlockState="minecraft:quartz_block" />
