@@ -112,7 +112,7 @@ namespace MarkovCraft
 
                 newItem.InitializeData(ch, rgb, rgb, itemVal.BlockState, ColorPicker!, BlockStatePreview!);
 
-                newItem.transform.SetParent(GridTransform);
+                newItem.transform.SetParent(GridTransform, false);
                 newItem.transform.localScale = Vector3.one;
             }
 

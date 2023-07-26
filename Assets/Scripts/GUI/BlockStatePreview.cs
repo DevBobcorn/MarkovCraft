@@ -15,11 +15,11 @@ namespace MarkovCraft
     [RequireComponent(typeof (CanvasGroup))]
     public class BlockStatePreview : MonoBehaviour
     {
-        public const int PREVIEW_CULLFLAG = 0b101001;
+        private static readonly float3 ITEM_CENTER = new(-0.5F, -0.5F, -0.5F);
+        public const int PREVIEW_CULLFLAG = 0b011001;
 
         [HideInInspector] public int currentStateId = -1;
         [SerializeField] public GameObject? previewObject;
-        [SerializeField] public CanvasGroup? imageCanvasGroup;
 
         private GameScene? game;
 
@@ -34,6 +34,7 @@ namespace MarkovCraft
             descText = GetComponentInChildren<TMP_Text>();
 
             canvasGroup.alpha = 0F; // Hide on start
+            previewObject!.SetActive(false);
 
             if (previewObject == null)
                 Debug.LogWarning("Preview Object of BlockState Preview not assigned!");
@@ -111,10 +112,12 @@ namespace MarkovCraft
             if (string.IsNullOrEmpty(incompleteBlockId.Path))
             {
                 canvasGroup!.alpha = 0F;
+                previewObject!.SetActive(false);
                 return;
             }
 
             canvasGroup!.alpha = 1F;
+            previewObject!.SetActive(true);
 
             var candidates = BlockStateHelper.GetBlockIdCandidates(incompleteBlockId);
 
@@ -130,11 +133,11 @@ namespace MarkovCraft
                 var stateId = palette.DefaultStateTable[candidates[0]];
                 UpdatePreviewObject(stateId, palette.StatesTable[stateId]);
                 
-                imageCanvasGroup!.alpha = 1F;
+                previewObject!.SetActive(true);
             }
             else
             {
-                imageCanvasGroup!.alpha = 0F;
+                previewObject!.SetActive(false);
                 descText!.text = GameScene.GetL10nString("blockstate_preview.info.no_candidates");
             }
         }
@@ -144,11 +147,12 @@ namespace MarkovCraft
             if (stateId == BlockStateHelper.INVALID_BLOCKSTATE) // Hide away
             {
                 canvasGroup!.alpha = 0F;
-
+                previewObject!.SetActive(false);
             }
             else // Show up and display specified state
             {
                 canvasGroup!.alpha = 1F;
+                previewObject!.SetActive(true);
 
                 var newState = BlockStatePalette.INSTANCE.StatesTable[stateId];
                 var blockName = GameScene.GetL10nBlockName(newState.BlockId);
@@ -156,10 +160,8 @@ namespace MarkovCraft
                 descText!.text = $"[{stateId}] {blockName}\n{newState}";
                 UpdatePreviewObject(stateId, newState);
 
-                imageCanvasGroup!.alpha = 1F;
+                previewObject!.SetActive(true);
             }
-
-            
         }
 
         private void UpdatePreviewObject(int stateId, BlockState newState)
@@ -173,7 +175,7 @@ namespace MarkovCraft
                 var visualBuffer = new VertexBuffer();
 
                 var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, game!.DummyWorld, Location.Zero, newState);
-                ResourcePackManager.Instance.StateModelTable[stateId].Geometries[0].Build(ref visualBuffer, float3.zero, PREVIEW_CULLFLAG, blockTint);
+                ResourcePackManager.Instance.StateModelTable[stateId].Geometries[0].Build(ref visualBuffer, ITEM_CENTER, PREVIEW_CULLFLAG, blockTint);
 
                 previewObject.GetComponent<MeshFilter>().sharedMesh = BuildMesh(visualBuffer);
             }
