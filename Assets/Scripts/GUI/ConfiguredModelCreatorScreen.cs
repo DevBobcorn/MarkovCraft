@@ -102,26 +102,6 @@ namespace MarkovCraft
 
             yield return null;
 
-            //if (selectedIndex != -1)
-            //    ModelDropdown.value = selectedIndex;
-            
-            /*
-            SizeXInput!.text = confModel!.SizeX.ToString();
-            SizeYInput!.text = confModel.SizeY.ToString();
-            SizeZInput!.text = confModel.SizeZ.ToString();
-
-            AmountInput!.text = confModel.Amount.ToString();
-            StepsInput!.text = confModel.Steps.ToString();
-
-            if (confModel.Seeds.Length > 0)
-                SeedsInput!.text = string.Join(' ', confModel.Seeds);
-            else
-                SeedsInput!.text = string.Empty;
-            
-            AnimatedToggle!.isOn = confModel.Animated;
-            StepsPerRefreshInput!.text = confModel.StepsPerRefresh.ToString();
-            */
-
             SaveButton!.onClick.RemoveAllListeners();
             SaveButton.onClick.AddListener(SaveConfiguredModel);
 
@@ -156,7 +136,7 @@ namespace MarkovCraft
                 working = true;
 
                 var model = ScriptableObject.CreateInstance(typeof (ConfiguredModel)) as ConfiguredModel;
-                var confModelFile = "TODO.xml";
+                var saveFileName = "TODO.xml";
 
                 if (model is not null)
                 {
@@ -174,7 +154,7 @@ namespace MarkovCraft
                     // No custom mappings
                     model.CustomMapping = new CustomMappingItem[] { };
                     
-                    ConfiguredModel.GetXMLDoc(model).Save($"{PathHelper.GetExtraDataFile(CONFIGURED_MODEL_FOLDER)}/{confModelFile}");
+                    ConfiguredModel.GetXMLDoc(model).Save($"{PathHelper.GetExtraDataFile(CONFIGURED_MODEL_FOLDER)}/{saveFileName}");
                 }
 
                 var game = GameScene.Instance as GenerationScene;
@@ -190,7 +170,7 @@ namespace MarkovCraft
 
                 manager?.SetActiveScreenByType<GenerationScreen>();
 
-                game.SetConfiguredModel(confModelFile);
+                game.UpdateConfiguredModel(saveFileName);
             }
 
         }

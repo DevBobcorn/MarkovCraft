@@ -452,25 +452,10 @@ namespace MarkovCraft
                         ExportButton.onClick.AddListener(() => screenManager!.SetActiveScreenByType<ExporterScreen>() );
                     }
 
-                    var dir = PathHelper.GetExtraDataFile("configured_models");
-                    if (Directory.Exists(dir) && ConfiguredModelDropdown != null)
-                    {
-                        var options = new List<TMP_Dropdown.OptionData>();
-                        loadedConfModels.Clear();
-                        int index = 0;
-                        foreach (var m in Directory.GetFiles(dir, "*.xml", SearchOption.AllDirectories))
-                        {
-                            var modelPath = m.Substring(m.LastIndexOf(SP) + 1);
-                            options.Add(new(modelPath));
-                            loadedConfModels.Add(index++, modelPath);
-                        }
+                    UpdateConfModelList();
 
-                        ConfiguredModelDropdown.AddOptions(options);
-                        ConfiguredModelDropdown.onValueChanged.AddListener(UpdateDropdownOption);
-
-                        if (options.Count > 0) // Use first model by default
-                            UpdateDropdownOption(0);
-                    }
+                    if (loadedConfModels.Count > 0) // Use first model by default
+                        UpdateDropdownOption(0);
                 })
             );
         }
@@ -660,7 +645,51 @@ namespace MarkovCraft
                 SetConfiguredModel(loadedConfModels[newValue]);
         }
 
-        public void SetConfiguredModel(string newConfModelFile)
+        private void UpdateConfModelList()
+        {
+            var dir = PathHelper.GetExtraDataFile("configured_models");
+
+            if (Directory.Exists(dir))
+            {
+                var options = new List<TMP_Dropdown.OptionData>();
+                loadedConfModels.Clear();
+                int index = 0;
+                foreach (var m in Directory.GetFiles(dir, "*.xml", SearchOption.AllDirectories))
+                {
+                    var modelPath = m.Substring(m.LastIndexOf(SP) + 1);
+                    options.Add(new(modelPath));
+                    loadedConfModels.Add(index++, modelPath);
+                }
+
+                ConfiguredModelDropdown!.onValueChanged.RemoveAllListeners();
+                ConfiguredModelDropdown!.ClearOptions();
+                ConfiguredModelDropdown.AddOptions(options);
+                ConfiguredModelDropdown.onValueChanged.AddListener(UpdateDropdownOption);
+            }
+        }
+
+        public void UpdateConfiguredModel(string confModelFile)
+        {
+            // First update configure model list
+            UpdateConfModelList();
+            // Find index of this item in our list
+            int selectedIndex = -1;
+            foreach (var pair in loadedConfModels)
+            {
+                if (pair.Value == confModelFile)
+                {
+                    selectedIndex = pair.Key;
+                }
+            }
+
+            if (selectedIndex != -1)
+            {
+                //UpdateDropdownOption(selectedIndex);
+                ConfiguredModelDropdown!.value = selectedIndex;
+            }
+        }
+
+        private void SetConfiguredModel(string newConfModelFile)
         {
             if (executing)
                 StopExecution();

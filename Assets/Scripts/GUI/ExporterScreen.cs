@@ -223,7 +223,7 @@ namespace MarkovCraft
             if (selectedBlocks is not null && selectedBlocks.Count > 0)
             {
                 bool skipAssigned = AutoMappingPanel!.SkipAssignedBlocks;
-                Debug.Log($"Skip assigned : {skipAssigned}");
+                //Debug.Log($"Skip assigned : {skipAssigned}");
                 
                 // Perform auto mapping
                 foreach (var item in mappingItems)
@@ -251,7 +251,7 @@ namespace MarkovCraft
                         if (pickedBlock != ResourceLocation.INVALID) // A block is picked
                         {
                             item.SetBlockState(pickedBlock.ToString());
-                            Debug.Log($"Mapping {item.GetColorCode()} to {pickedBlock}");
+                            //Debug.Log($"Mapping {item.GetColorCode()} to {pickedBlock}");
                         }
                     }
                 }

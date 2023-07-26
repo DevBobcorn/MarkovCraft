@@ -39,7 +39,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 10017107255296
-    m_Localized: Size
+    m_Localized: Initial Size<size=28> (L/W/H)</size>
     m_Metadata:
       m_Items: []
   - m_Id: 10133750849536
@@ -248,8 +248,7 @@ MonoBehaviour:
   - m_Id: 722967874936832
     m_Localized: 'Result #{0} Seed: {1}
 
-      Final Size: {2}x{3}x{4} Final Steps:
-      {5}'
+      Actual Size: {2}x{3}x{4} Steps: {5}'
     m_Metadata:
       m_Items: []
   - m_Id: 749456838270976
@@ -438,6 +437,14 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 32640138226372608
     m_Localized: Type export file name here...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 32660081936371712
+    m_Localized: Save file name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 32665219203796992
+    m_Localized: Save As
     m_Metadata:
       m_Items: []
   references:

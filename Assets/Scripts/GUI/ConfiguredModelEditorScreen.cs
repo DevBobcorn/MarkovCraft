@@ -29,6 +29,7 @@ namespace MarkovCraft
         [SerializeField] public TMP_InputField? SeedsInput;
         [SerializeField] public Toggle? AnimatedToggle;
         [SerializeField] public TMP_InputField? StepsPerRefreshInput;
+        [SerializeField] public TMP_InputField? SaveNameInput;
         [SerializeField] public Button? SaveButton;
         // Mapping Items Panel
         [SerializeField] public RectTransform? GridTransform;
@@ -96,6 +97,7 @@ namespace MarkovCraft
             AnimatedToggle!.isOn = confModel.Animated;
             StepsPerRefreshInput!.text = confModel.StepsPerRefresh.ToString();
 
+            SaveNameInput!.text = confModelFile;
             SaveButton!.onClick.RemoveAllListeners();
             SaveButton.onClick.AddListener(SaveConfiguredModel);
 
@@ -252,7 +254,7 @@ namespace MarkovCraft
             if (selectedBlocks is not null && selectedBlocks.Count > 0)
             {
                 bool skipAssigned = AutoMappingPanel!.SkipAssignedBlocks;
-                Debug.Log($"Skip assigned : {skipAssigned}");
+                //Debug.Log($"Skip assigned : {skipAssigned}");
                 
                 // Perform auto mapping
                 foreach (var item in mappingItems)
@@ -280,7 +282,7 @@ namespace MarkovCraft
                         if (pickedBlock != ResourceLocation.INVALID) // A block is picked
                         {
                             item.SetBlockState(pickedBlock.ToString());
-                            Debug.Log($"Mapping {item.GetColorCode()} to {pickedBlock}");
+                            //Debug.Log($"Mapping {item.GetColorCode()} to {pickedBlock}");
                         }
                     }
                 }
@@ -293,6 +295,9 @@ namespace MarkovCraft
         private void SaveConfiguredModel()
         {
             if (working) return;
+
+            // File name to save to, and the file to load after saving
+            var saveFileName = confModelFile;
 
             if (properlyLoaded) // The editor is properly loaded
             {
@@ -320,7 +325,15 @@ namespace MarkovCraft
                         BlockState = x.GetBlockState()
                     }).ToArray();
                     
-                    ConfiguredModel.GetXMLDoc(model).Save($"{PathHelper.GetExtraDataFile("configured_models")}/{confModelFile}");
+                    var savePath = PathHelper.GetExtraDataFile("configured_models");
+                    var specifiedName = SaveNameInput!.text;
+
+                    if (ExporterScreen.CheckFileName(specifiedName))
+                    {
+                        saveFileName = specifiedName;
+                    }
+
+                    ConfiguredModel.GetXMLDoc(model).Save($"{savePath}{SP}{saveFileName}");
                 }
 
                 var game = GameScene.Instance as GenerationScene;
@@ -336,7 +349,7 @@ namespace MarkovCraft
 
                 manager?.SetActiveScreenByType<GenerationScreen>();
 
-                game.SetConfiguredModel(confModelFile);
+                game.UpdateConfiguredModel(saveFileName);
             }
 
         }

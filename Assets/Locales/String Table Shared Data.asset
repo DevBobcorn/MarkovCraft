@@ -32,7 +32,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 10017107255296
-    m_Key: editor.text.size
+    m_Key: editor.text.initial_size
     m_Metadata:
       m_Items: []
   - m_Id: 10133750849536
@@ -405,6 +405,14 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 32640138226372608
     m_Key: exporter.text.export_name_hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 32660081936371712
+    m_Key: exporter.text.save_name_hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 32665219203796992
+    m_Key: editor.text.save_as
     m_Metadata:
       m_Items: []
   m_Metadata:
