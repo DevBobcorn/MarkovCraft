@@ -15,8 +15,8 @@ namespace MarkovCraft
 
         private static bool checkAir3d(byte index) => index == 0;
 
-        public static void Export(string[] info, byte[] state, char[] legend, int FX, int FY, int FZ,
-                Dictionary<char, CustomMappingItem> exportPalette, DirectoryInfo dirInfo)
+        public static void Export(byte[] state, char[] legend, int FX, int FY, int FZ,
+                Dictionary<char, CustomMappingItem> exportPalette, DirectoryInfo dirInfo, string fileName)
         {
             var funcText = new StringBuilder();
             int mcSizeX = FY, mcSizeY = FZ, mcSizeZ = FX;
@@ -40,7 +40,6 @@ namespace MarkovCraft
                 }
             }
 
-            var fileName = $"{info[0][0..^4].ToLower()}_{info[1]}.mcfunction";
             var filePath = $"{dirInfo.FullName}{SP}{fileName}";
             
             File.WriteAllText(filePath, funcText.ToString());

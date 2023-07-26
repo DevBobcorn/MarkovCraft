@@ -22,9 +22,15 @@ namespace MarkovCraft
             "exporter.format.vox_model"
         };
 
+        private static readonly string[] EXPORT_FORMAT_EXT_NAMES = {
+            "nbt",
+            "mcfunction",
+            "vox"
+        };
+
         [SerializeField] public TMP_Text? ScreenHeader, InfoText;
         // Settings Panel
-        [SerializeField] public TMP_InputField? ExportFolderInput;
+        [SerializeField] public TMP_InputField? ExportFolderInput, ExportNameInput;
         [SerializeField] public Button? ExportButton, ApplyMappingButton;
         [SerializeField] public Button? OpenExplorerButton;
         [SerializeField] public TMP_Dropdown? ExportFormatDropdown;
@@ -37,6 +43,8 @@ namespace MarkovCraft
         [SerializeField] public BlockStatePreview? BlockStatePreview;
         // Color Picker
         [SerializeField] public MappingItemColorPicker? ColorPicker;
+        // Result Detail Panel
+        [SerializeField] public ResultDetailPanel? ResultDetailPanel;
         // Auto Mapping Panel
         [SerializeField] public AutoMappingPanel? AutoMappingPanel;
 
@@ -85,8 +93,11 @@ namespace MarkovCraft
             ExportFormatDropdown!.ClearOptions();
             ExportFormatDropdown.AddOptions(EXPORT_FORMAT_KEYS.Select(x =>
                     new TMP_Dropdown.OptionData(GameScene.GetL10nString(x))).ToList());
-            var lastUsedFormatIndex = PlayerPrefs.GetInt(EXPORT_FORMAT_KEY, 0);
-            ExportFormatDropdown.value = lastUsedFormatIndex;
+            ExportFormatDropdown!.onValueChanged.RemoveAllListeners();
+            ExportFormatDropdown!.onValueChanged.AddListener(UpdateExportFileName);
+
+            ResultDetailPanel!.Hide();
+            
             // Initialize mappings panel
             // Populate mapping item grid
             foreach (var ch in minimumCharSet)
@@ -127,6 +138,11 @@ namespace MarkovCraft
             // Update Info text
             InfoText!.text = GameScene.GetL10nString("export.text.result_info", data.info[0], data.info[1], data.FX, data.FY, data.FZ);
             var prev = GetPreviewData();
+
+            // Update selected format (and also update default export file name)
+            var lastUsedFormatIndex = PlayerPrefs.GetInt(EXPORT_FORMAT_KEY, 0);
+            ExportFormatDropdown.value = lastUsedFormatIndex;
+            UpdateExportFileName(lastUsedFormatIndex);
 
             // Update Preview Image
             var (pixels, sizeX, sizeY) = ResultDetailPanel.RenderPreview(prev.sizeX, prev.sizeY, prev.sizeZ,
@@ -252,16 +268,6 @@ namespace MarkovCraft
                     x => ColorConvert.GetOpaqueRGB(exportPalette![x].Color)).ToArray());
         }
 
-        public (string dir, string name)? GetExportNames()
-        {
-            if (properlyLoaded) // The editor is properly loaded
-            {
-                return (ExportFolderInput!.text, exportData!.Value.info[0][0..^4].ToLower());
-            }
-
-            return null;
-        }
-
         private void ApplyMappings()
         {
             if (working) return;
@@ -285,6 +291,43 @@ namespace MarkovCraft
             }
         }
 
+        public string GetDefaultExportBaseName()
+        {
+            if (properlyLoaded)
+            {
+                var info = exportData!.Value.info;
+                return $"{info[0][0..^4]}_{info[1]}";
+            }
+
+            return "exported";
+        }
+
+        public string? GetExportPath()
+        {
+            return ExportFolderInput?.text;
+        }
+
+        public static bool CheckFileName(string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+                return false;
+            
+            return true;
+        }
+
+        private void UpdateExportFileName(int selectedFormatIndex)
+        {
+            if (properlyLoaded)
+            {
+                var info = exportData!.Value.info;
+
+                var baseName = $"{info[0][0..^4]}_{info[1]}";
+                var extName = EXPORT_FORMAT_EXT_NAMES[selectedFormatIndex];
+
+                ExportNameInput!.text = $"{baseName}.{extName}";
+            }
+        }
+
         private void Export()
         {
             if (working) return;
@@ -295,6 +338,7 @@ namespace MarkovCraft
 
                 var path = ExportFolderInput!.text;
                 var data = exportData!.Value;
+                var fileName = ExportNameInput!.text;
 
                 var dirInfo = new DirectoryInfo(path);
 
@@ -309,6 +353,13 @@ namespace MarkovCraft
                         working = false;
                         return;
                     }
+                }
+
+                if (!CheckFileName(fileName))
+                {
+                    Debug.LogWarning($"ERROR: Invailid file name: {fileName}");
+                    working = false;
+                    return;
                 }
                 
                 // SavePath is vaild, save it
@@ -331,13 +382,13 @@ namespace MarkovCraft
                 switch (formatIndex)
                 {
                     case 0: // nbt structure
-                        NbtStructureExporter.Export(data.info, data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, 2586);
+                        NbtStructureExporter.Export(data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, fileName, 2586);
                         break;
                     case 1: // mcfunction
-                        McFuncExporter.Export(data.info, data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo);
+                        McFuncExporter.Export(data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, fileName);
                         break;
                     case 2: // vox model
-                        VoxModelExporter.Export(data.info, data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo);
+                        VoxModelExporter.Export(data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, fileName);
                         break;
                 }
                 

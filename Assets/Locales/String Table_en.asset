@@ -436,6 +436,10 @@ MonoBehaviour:
       <size=12>(Minecraft)</size>'
     m_Metadata:
       m_Items: []
+  - m_Id: 32640138226372608
+    m_Localized: Type export file name here...
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

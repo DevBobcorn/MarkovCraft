@@ -18,8 +18,8 @@ namespace MarkovCraft
 
         private static bool checkAir3d(byte index) => index == 0;
 
-        public static void Export(string[] info, byte[] state, char[] legend, int FX, int FY, int FZ,
-                Dictionary<char, CustomMappingItem> exportPalette, DirectoryInfo dirInfo, int dataVersionInt)
+        public static void Export(byte[] state, char[] legend, int FX, int FY, int FZ,
+                Dictionary<char, CustomMappingItem> exportPalette, DirectoryInfo dirInfo, string fileName, int dataVersionInt)
         {
             var nbtObj = new Dictionary<string, object>();
             int mcSizeX = FY, mcSizeY = FZ, mcSizeZ = FX;
@@ -81,8 +81,6 @@ namespace MarkovCraft
 
             // Turn dictionary object into byte array
             var nbtBlob = DataHelper.GetNbt(nbtObj);
-
-            var fileName = $"{info[0][0..^4].ToLower()}_{info[1]}.nbt";
             var filePath = $"{dirInfo.FullName}{SP}{fileName}";
 
             // Compress nbt blob and save it

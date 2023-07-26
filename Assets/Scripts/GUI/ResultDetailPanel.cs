@@ -21,7 +21,8 @@ namespace MarkovCraft
         
         [SerializeField] private Image? detailImage;
         [SerializeField] private Image? coordRefImage;
-        [SerializeField] private PreviewRotation currentRotation = PreviewRotation.ZERO;
+        [SerializeField] private TMPro.TMP_InputField? imageExportNameInput;
+        private PreviewRotation currentRotation = PreviewRotation.ZERO;
         private Texture2D? texture = null;
 
         private static int GetPos(int x, int y, int z, int sizeX, int sizeY)
@@ -170,16 +171,17 @@ namespace MarkovCraft
         public void Save()
         {
             var exporter = GetComponentInParent<ExporterScreen>();
-            var savePath = exporter.GetExportNames();
+            var savePath = exporter.GetExportPath();
+            var saveName = imageExportNameInput!.text;
 
-            if (texture != null && savePath != null)
+            if (ExporterScreen.CheckFileName(saveName) && (texture is not null) && (savePath is not null))
             {
-                var folder = new DirectoryInfo(savePath.Value.dir);
+                var folder = new DirectoryInfo(savePath);
 
                 if (folder.Exists)
                 {
                     var bytes = texture.EncodeToPNG();
-                    var fileName = folder.FullName + SP + $"{savePath.Value.name}.png";
+                    var fileName = folder.FullName + SP + saveName;
 
                     File.WriteAllBytes(fileName, bytes);
                     Debug.Log($"Preview image saved to {fileName}");
@@ -197,6 +199,14 @@ namespace MarkovCraft
             canvasGroup.alpha = 1F;
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
+
+            var exporter = GetComponentInParent<ExporterScreen>();
+            
+            if (exporter is not null)
+            {
+                var baseName = exporter.GetDefaultExportBaseName();
+                imageExportNameInput!.text = $"{baseName}.png";
+            }
 
             bool is2d = UpdateDetailPreview(true);
             UpdateCoordRef(is2d);

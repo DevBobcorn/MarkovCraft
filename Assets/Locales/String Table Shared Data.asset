@@ -396,11 +396,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 31965160040501248
-    m_Key: Generation/Environment/[Markov Origin]/Text (TMP)
+    m_Key: env.hint.markov_craft_axes
     m_Metadata:
       m_Items: []
   - m_Id: 31965499011567616
-    m_Key: Generation/Environment/[Minecraft Origin]/Text (TMP)
+    m_Key: env.hint.minecraft_axes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 32640138226372608
+    m_Key: exporter.text.export_name_hint
     m_Metadata:
       m_Items: []
   m_Metadata:
