@@ -52,6 +52,10 @@ namespace MarkovCraft
             VolumePosition = pos;
             VolumeSize = size;
 
+            // Adjust center for bottom face to render properly
+            VolumePosition.y += 0.5F + 0.01F;
+            VolumeSize.y -= 1F;
+
             // Teleport to target pos if currently hidden
             if (transform.localScale == Vector3.zero)
             {
