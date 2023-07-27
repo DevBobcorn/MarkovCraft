@@ -97,8 +97,7 @@ namespace MarkovCraft
                         blobStream.CopyTo(zipStream);
                     }
 
-            Debug.Log($"Nbt structure file exported to {filePath}");
-
+            Debug.Log($"Nbt structure file exported to {filePath} (Data Version {dataVersionInt})");
         }
     }
 }

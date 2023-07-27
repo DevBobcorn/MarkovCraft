@@ -17,12 +17,14 @@ namespace MarkovCraft
         private const string EXPORT_FORMAT_KEY = "ExportFormat";
 
         private static readonly string[] EXPORT_FORMAT_KEYS = {
+            "exporter.format.sponge_schem",
             "exporter.format.nbt_structure",
             "exporter.format.mcfunction",
             "exporter.format.vox_model"
         };
 
         private static readonly string[] EXPORT_FORMAT_EXT_NAMES = {
+            "schem",
             "nbt",
             "mcfunction",
             "vox"
@@ -49,6 +51,7 @@ namespace MarkovCraft
         [SerializeField] public AutoMappingPanel? AutoMappingPanel;
 
         private (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ, int steps)? exportData;
+        private int exportDataVersion = 0;
         // Items in this dictionary share refereces with generation scene's fullPaletteForEditing
         // If items get changed, it'll also be reflected in other scenes
         private Dictionary<char, CustomMappingItem>? exportPalette;
@@ -175,6 +178,8 @@ namespace MarkovCraft
             
             // Get selected result data
             exportData = game.GetSelectedResultData();
+            exportDataVersion = game.GetDataVersionInt();
+
             // Get export palette
             minimumCharSet.Clear();
             
@@ -348,13 +353,16 @@ namespace MarkovCraft
 
                 switch (formatIndex)
                 {
-                    case 0: // nbt structure
-                        NbtStructureExporter.Export(data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, fileName, minimumCharSet, 2586);
+                    case 0: // sponge schem
+                        SpongeSchemExporter.Export(data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, fileName, minimumCharSet, exportDataVersion);
                         break;
-                    case 1: // mcfunction
+                    case 1: // nbt structure
+                        NbtStructureExporter.Export(data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, fileName, minimumCharSet, exportDataVersion);
+                        break;
+                    case 2: // mcfunction
                         McFuncExporter.Export(data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, fileName);
                         break;
-                    case 2: // vox model
+                    case 3: // vox model
                         VoxModelExporter.Export(data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, fileName);
                         break;
                 }

@@ -4,21 +4,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using UnityEngine.Localization;
-using UnityEngine.Localization.Settings;
 using UnityEngine.SceneManagement;
 using Unity.Mathematics;
 using TMPro;
 using Newtonsoft.Json;
 
-using MinecraftClient;
-using MinecraftClient.Resource;
 using MinecraftClient.Mapping;
 
 namespace MarkovCraft
@@ -72,9 +65,7 @@ namespace MarkovCraft
         void Start()
         {
             // First load Minecraft data & resources
-            var ver = VersionHolder!.Versions[VersionHolder.SelectedVersion];
-
-            StartCoroutine(LoadMCBlockData(ver.DataVersion, ver.ResourceVersion,
+            StartCoroutine(LoadMCBlockData(
                 () => {
                     ReplayButton!.interactable = false;
                     ReplayButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.load_resource");
@@ -320,7 +311,7 @@ namespace MarkovCraft
             ReplayButton.onClick.RemoveAllListeners();
             ReplayButton.onClick.AddListener(StartReplay);
 
-            ReplayText!.text = GetL10nString("status.info.loaded_recording", recordingFile);
+            ReplayText!.text = GetL10nString("status.info.loaded_recording", loadedDataVersionName, loadedDataVersionInt, recordingFile);
         }
 
         void Update()

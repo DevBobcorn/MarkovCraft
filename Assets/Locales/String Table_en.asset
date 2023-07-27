@@ -119,7 +119,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 370218561871872
-    m_Localized: '[{0}] loaded'
+    m_Localized: 'Data Version: {0} ({1})
+
+      [{2}] loaded'
     m_Metadata:
       m_Items: []
   - m_Id: 371970807865344
@@ -230,15 +232,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 506227605807104
-    m_Localized: nbt structure
+    m_Localized: NBT Structure
     m_Metadata:
       m_Items: []
   - m_Id: 506229719736320
-    m_Localized: mcfunction
+    m_Localized: Mcfunction
     m_Metadata:
       m_Items: []
   - m_Id: 506629864726528
-    m_Localized: vox model
+    m_Localized: Vox Model
     m_Metadata:
       m_Items: []
   - m_Id: 708494963417088
@@ -328,7 +330,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 28284556249862144
-    m_Localized: '[{0}] loaded'
+    m_Localized: 'Data Version: {0} ({1})
+
+      [{2}] loaded'
     m_Metadata:
       m_Items: []
   - m_Id: 28284971888611328
@@ -445,6 +449,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 32665219203796992
     m_Localized: Save As
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33072695942254592
+    m_Localized: Sponge Schem
     m_Metadata:
       m_Items: []
   references:

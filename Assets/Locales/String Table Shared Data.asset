@@ -15,320 +15,32 @@ MonoBehaviour:
   m_TableCollectionName: String Table
   m_TableCollectionNameGuidString: ca01ff9c1eb86df4c93c853003cc7ed6
   m_Entries:
-  - m_Id: 8361141510144
-    m_Key: hud.text.selected_model
+  - m_Id: 29830841650057216
+    m_Key: auto_mapper.block_group.concrete
     m_Metadata:
       m_Items: []
-  - m_Id: 8892069093376
-    m_Key: hud.text.playback_speed
+  - m_Id: 29830866648109056
+    m_Key: auto_mapper.block_group.concrete_powder
     m_Metadata:
       m_Items: []
-  - m_Id: 9348711358464
-    m_Key: hud.text.export
+  - m_Id: 29830818401030144
+    m_Key: auto_mapper.block_group.shulker_box
     m_Metadata:
       m_Items: []
-  - m_Id: 9929253363712
-    m_Key: editor.text.model
+  - m_Id: 29829663621058560
+    m_Key: auto_mapper.block_group.terracotta
     m_Metadata:
       m_Items: []
-  - m_Id: 10017107255296
-    m_Key: editor.text.initial_size
+  - m_Id: 29829179975864320
+    m_Key: auto_mapper.block_group.wool
     m_Metadata:
       m_Items: []
-  - m_Id: 10133750849536
-    m_Key: editor.text.amount
+  - m_Id: 29795537350234112
+    m_Key: auto_mapper.text.apply
     m_Metadata:
       m_Items: []
-  - m_Id: 10240953065472
-    m_Key: editor.text.steps
-    m_Metadata:
-      m_Items: []
-  - m_Id: 10292408786944
-    m_Key: editor.text.seeds
-    m_Metadata:
-      m_Items: []
-  - m_Id: 10613512118272
-    m_Key: editor.text.animate_generation
-    m_Metadata:
-      m_Items: []
-  - m_Id: 10715106549760
-    m_Key: editor.text.save
-    m_Metadata:
-      m_Items: []
-  - m_Id: 12964658585600
-    m_Key: editor.text.seeds_hint
-    m_Metadata:
-      m_Items: []
-  - m_Id: 15394976735232
-    m_Key: exporter.text.export_as
-    m_Metadata:
-      m_Items: []
-  - m_Id: 15436202549248
-    m_Key: exporter.text.export_path
-    m_Metadata:
-      m_Items: []
-  - m_Id: 15468838428672
-    m_Key: exporter.text.export
-    m_Metadata:
-      m_Items: []
-  - m_Id: 15521091067904
-    m_Key: exporter.text.export_path_hint
-    m_Metadata:
-      m_Items: []
-  - m_Id: 15596202663936
-    m_Key: exporter.text.open_folder
-    m_Metadata:
-      m_Items: []
-  - m_Id: 16395049803776
-    m_Key: pause.text.game_paused
-    m_Metadata:
-      m_Items: []
-  - m_Id: 16506534404096
-    m_Key: pause.text.back_to_game
-    m_Metadata:
-      m_Items: []
-  - m_Id: 16585508954112
-    m_Key: pause.text.quit_to_main
-    m_Metadata:
-      m_Items: []
-  - m_Id: 21468953878528
-    m_Key: mapping_item.text.blockstate_hint
-    m_Metadata:
-      m_Items: []
-  - m_Id: 355866240786432
-    m_Key: welcome.text.download_res
-    m_Metadata:
-      m_Items: []
-  - m_Id: 367166845001728
-    m_Key: status.info.load_conf_model
-    m_Metadata:
-      m_Items: []
-  - m_Id: 367971987791872
-    m_Key: status.error.open_xml_failure
-    m_Metadata:
-      m_Items: []
-  - m_Id: 368531084320768
-    m_Key: status.error.model_interpreter_failure
-    m_Metadata:
-      m_Items: []
-  - m_Id: 370218561871872
-    m_Key: status.info.loaded_conf_model
-    m_Metadata:
-      m_Items: []
-  - m_Id: 371970807865344
-    m_Key: status.info.gather_resource
-    m_Metadata:
-      m_Items: []
-  - m_Id: 372130187223040
-    m_Key: status.info.create_texture
-    m_Metadata:
-      m_Items: []
-  - m_Id: 372310307414016
-    m_Key: status.info.load_block_model
-    m_Metadata:
-      m_Items: []
-  - m_Id: 373039294226432
-    m_Key: status.info.build_blockstate_geometry
-    m_Metadata:
-      m_Items: []
-  - m_Id: 380477099646976
-    m_Key: status.info.generation_start
-    m_Metadata:
-      m_Items: []
-  - m_Id: 380619232026624
-    m_Key: status.info.generation_step
-    m_Metadata:
-      m_Items: []
-  - m_Id: 380621543088128
-    m_Key: status.info.generation_complete
-    m_Metadata:
-      m_Items: []
-  - m_Id: 387295406366720
-    m_Key: status.info.download_manifest
-    m_Metadata:
-      m_Items: []
-  - m_Id: 387306810679296
-    m_Key: status.info.get_version_info
-    m_Metadata:
-      m_Items: []
-  - m_Id: 387367691001856
-    m_Key: status.info.download_jar
-    m_Metadata:
-      m_Items: []
-  - m_Id: 394586876715008
-    m_Key: status.info.extract_asset
-    m_Metadata:
-      m_Items: []
-  - m_Id: 395821373628416
-    m_Key: status.error.download_resource_failure
-    m_Metadata:
-      m_Items: []
-  - m_Id: 403452238667776
-    m_Key: hud.text.load_resource
-    m_Metadata:
-      m_Items: []
-  - m_Id: 403667049947136
-    m_Key: hud.text.start_execution
-    m_Metadata:
-      m_Items: []
-  - m_Id: 403753582632960
-    m_Key: hud.text.stop_execution
-    m_Metadata:
-      m_Items: []
-  - m_Id: 403911460429824
-    m_Key: hud.text.load_conf_model
-    m_Metadata:
-      m_Items: []
-  - m_Id: 500646488743936
-    m_Key: editor.text.loading
-    m_Metadata:
-      m_Items: []
-  - m_Id: 500808737005568
-    m_Key: editor.text.load_failure
-    m_Metadata:
-      m_Items: []
-  - m_Id: 501063469670400
-    m_Key: editor.text.loaded
-    m_Metadata:
-      m_Items: []
-  - m_Id: 502887979327488
-    m_Key: exporter.text.loading
-    m_Metadata:
-      m_Items: []
-  - m_Id: 503093638635520
-    m_Key: exporter.text.load_failure
-    m_Metadata:
-      m_Items: []
-  - m_Id: 503485516652544
-    m_Key: exporter.text.loaded
-    m_Metadata:
-      m_Items: []
-  - m_Id: 504846685741056
-    m_Key: export.text.result_info
-    m_Metadata:
-      m_Items: []
-  - m_Id: 506227605807104
-    m_Key: exporter.format.nbt_structure
-    m_Metadata:
-      m_Items: []
-  - m_Id: 506229719736320
-    m_Key: exporter.format.mcfunction
-    m_Metadata:
-      m_Items: []
-  - m_Id: 506629864726528
-    m_Key: exporter.format.vox_model
-    m_Metadata:
-      m_Items: []
-  - m_Id: 708494963417088
-    m_Key: welcome.text.current_language
-    m_Metadata:
-      m_Items: []
-  - m_Id: 722967874936832
-    m_Key: hud.text.result_info
-    m_Metadata:
-      m_Items: []
-  - m_Id: 749456838270976
-    m_Key: status.info.get_asset_index
-    m_Metadata:
-      m_Items: []
-  - m_Id: 752739912949760
-    m_Key: status.info.download_lang_text
-    m_Metadata:
-      m_Items: []
-  - m_Id: 1574500561838080
-    m_Key: blockstate_preview.info.no_candidates
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2886989428727808
-    m_Key: node.name.map
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2887401477152768
-    m_Key: node.name.sequence
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2887473581432832
-    m_Key: node.name.markov
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2887560906842112
-    m_Key: node.name.wfc_overlap
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2887566221025280
-    m_Key: node.name.wfc_tile
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2888261594685440
-    m_Key: node.name.all
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2888398219943936
-    m_Key: node.name.one
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2888468612947968
-    m_Key: node.name.prl
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2888591577358336
-    m_Key: node.name.path
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2888832670146560
-    m_Key: node.name.convchain
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2888854178537472
-    m_Key: node.name.convolution
-    m_Metadata:
-      m_Items: []
-  - m_Id: 2889037452845056
-    m_Key: node.name.unknown
-    m_Metadata:
-      m_Items: []
-  - m_Id: 27571790341935104
-    m_Key: hud.text.selected_recording
-    m_Metadata:
-      m_Items: []
-  - m_Id: 28282735292780544
-    m_Key: hud.text.start_replay
-    m_Metadata:
-      m_Items: []
-  - m_Id: 28282822358142976
-    m_Key: hud.text.stop_replay
-    m_Metadata:
-      m_Items: []
-  - m_Id: 28283581397143552
-    m_Key: status.info.load_recording
-    m_Metadata:
-      m_Items: []
-  - m_Id: 28284556249862144
-    m_Key: status.info.loaded_recording
-    m_Metadata:
-      m_Items: []
-  - m_Id: 28284971888611328
-    m_Key: hud.text.load_recording
-    m_Metadata:
-      m_Items: []
-  - m_Id: 28289458426548224
-    m_Key: status.info.build_item_geometry
-    m_Metadata:
-      m_Items: []
-  - m_Id: 28296596267929600
-    m_Key: hud.text.recording_replay
-    m_Metadata:
-      m_Items: []
-  - m_Id: 28311964730462208
-    m_Key: status.error.open_json_failure
-    m_Metadata:
-      m_Items: []
-  - m_Id: 28325291175120896
-    m_Key: hud.text.optimized_playback_toggle
-    m_Metadata:
-      m_Items: []
-  - m_Id: 28680962999521280
-    m_Key: status.info.resource_loaded
+  - m_Id: 30022644886081536
+    m_Key: auto_mapper.text.auto_map
     m_Metadata:
       m_Items: []
   - m_Id: 29795123905105920
@@ -339,60 +51,60 @@ MonoBehaviour:
     m_Key: auto_mapper.text.skip_assigned_items
     m_Metadata:
       m_Items: []
-  - m_Id: 29795537350234112
-    m_Key: auto_mapper.text.apply
+  - m_Id: 1574500561838080
+    m_Key: blockstate_preview.info.no_candidates
     m_Metadata:
       m_Items: []
-  - m_Id: 29829179975864320
-    m_Key: auto_mapper.block_group.wool
+  - m_Id: 10133750849536
+    m_Key: editor.text.amount
     m_Metadata:
       m_Items: []
-  - m_Id: 29829663621058560
-    m_Key: auto_mapper.block_group.terracotta
+  - m_Id: 10613512118272
+    m_Key: editor.text.animate_generation
     m_Metadata:
       m_Items: []
-  - m_Id: 29830818401030144
-    m_Key: auto_mapper.block_group.shulker_box
+  - m_Id: 10017107255296
+    m_Key: editor.text.initial_size
     m_Metadata:
       m_Items: []
-  - m_Id: 29830841650057216
-    m_Key: auto_mapper.block_group.concrete
+  - m_Id: 500808737005568
+    m_Key: editor.text.load_failure
     m_Metadata:
       m_Items: []
-  - m_Id: 29830866648109056
-    m_Key: auto_mapper.block_group.concrete_powder
+  - m_Id: 501063469670400
+    m_Key: editor.text.loaded
     m_Metadata:
       m_Items: []
-  - m_Id: 30022644886081536
-    m_Key: auto_mapper.text.auto_map
+  - m_Id: 500646488743936
+    m_Key: editor.text.loading
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9929253363712
+    m_Key: editor.text.model
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10715106549760
+    m_Key: editor.text.save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 32665219203796992
+    m_Key: editor.text.save_as
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10292408786944
+    m_Key: editor.text.seeds
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12964658585600
+    m_Key: editor.text.seeds_hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10240953065472
+    m_Key: editor.text.steps
     m_Metadata:
       m_Items: []
   - m_Id: 30379949334925312
     m_Key: editor.text.steps_per_refresh
-    m_Metadata:
-      m_Items: []
-  - m_Id: 30470153584447488
-    m_Key: hud.text.selected_block
-    m_Metadata:
-      m_Items: []
-  - m_Id: 30891891526930432
-    m_Key: exporter.text.apply_mappings
-    m_Metadata:
-      m_Items: []
-  - m_Id: 31220356012773376
-    m_Key: hud.text.record_hint
-    m_Metadata:
-      m_Items: []
-  - m_Id: 31238120081395712
-    m_Key: hud.text.block_selection_mapping
-    m_Metadata:
-      m_Items: []
-  - m_Id: 31238213018783744
-    m_Key: hud.text.block_selection_export_override
-    m_Metadata:
-      m_Items: []
-  - m_Id: 31246398375006208
-    m_Key: replay.text.current_frame
     m_Metadata:
       m_Items: []
   - m_Id: 31965160040501248
@@ -403,16 +115,308 @@ MonoBehaviour:
     m_Key: env.hint.minecraft_axes
     m_Metadata:
       m_Items: []
+  - m_Id: 504846685741056
+    m_Key: export.text.result_info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33072695942254592
+    m_Key: exporter.format.sponge_schem
+    m_Metadata:
+      m_Items: []
+  - m_Id: 506229719736320
+    m_Key: exporter.format.mcfunction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 506227605807104
+    m_Key: exporter.format.nbt_structure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 506629864726528
+    m_Key: exporter.format.vox_model
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30891891526930432
+    m_Key: exporter.text.apply_mappings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15468838428672
+    m_Key: exporter.text.export
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15394976735232
+    m_Key: exporter.text.export_as
+    m_Metadata:
+      m_Items: []
   - m_Id: 32640138226372608
     m_Key: exporter.text.export_name_hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15436202549248
+    m_Key: exporter.text.export_path
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15521091067904
+    m_Key: exporter.text.export_path_hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 503093638635520
+    m_Key: exporter.text.load_failure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 503485516652544
+    m_Key: exporter.text.loaded
+    m_Metadata:
+      m_Items: []
+  - m_Id: 502887979327488
+    m_Key: exporter.text.loading
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15596202663936
+    m_Key: exporter.text.open_folder
     m_Metadata:
       m_Items: []
   - m_Id: 32660081936371712
     m_Key: exporter.text.save_name_hint
     m_Metadata:
       m_Items: []
-  - m_Id: 32665219203796992
-    m_Key: editor.text.save_as
+  - m_Id: 31238213018783744
+    m_Key: hud.text.block_selection_export_override
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31238120081395712
+    m_Key: hud.text.block_selection_mapping
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9348711358464
+    m_Key: hud.text.export
+    m_Metadata:
+      m_Items: []
+  - m_Id: 403911460429824
+    m_Key: hud.text.load_conf_model
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28284971888611328
+    m_Key: hud.text.load_recording
+    m_Metadata:
+      m_Items: []
+  - m_Id: 403452238667776
+    m_Key: hud.text.load_resource
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28325291175120896
+    m_Key: hud.text.optimized_playback_toggle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8892069093376
+    m_Key: hud.text.playback_speed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31220356012773376
+    m_Key: hud.text.record_hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28296596267929600
+    m_Key: hud.text.recording_replay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 722967874936832
+    m_Key: hud.text.result_info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30470153584447488
+    m_Key: hud.text.selected_block
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8361141510144
+    m_Key: hud.text.selected_model
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27571790341935104
+    m_Key: hud.text.selected_recording
+    m_Metadata:
+      m_Items: []
+  - m_Id: 403667049947136
+    m_Key: hud.text.start_execution
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28282735292780544
+    m_Key: hud.text.start_replay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 403753582632960
+    m_Key: hud.text.stop_execution
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28282822358142976
+    m_Key: hud.text.stop_replay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21468953878528
+    m_Key: mapping_item.text.blockstate_hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2888261594685440
+    m_Key: node.name.all
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2888832670146560
+    m_Key: node.name.convchain
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2888854178537472
+    m_Key: node.name.convolution
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2886989428727808
+    m_Key: node.name.map
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2887473581432832
+    m_Key: node.name.markov
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2888398219943936
+    m_Key: node.name.one
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2888591577358336
+    m_Key: node.name.path
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2888468612947968
+    m_Key: node.name.prl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2887401477152768
+    m_Key: node.name.sequence
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2889037452845056
+    m_Key: node.name.unknown
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2887560906842112
+    m_Key: node.name.wfc_overlap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2887566221025280
+    m_Key: node.name.wfc_tile
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16506534404096
+    m_Key: pause.text.back_to_game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16395049803776
+    m_Key: pause.text.game_paused
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16585508954112
+    m_Key: pause.text.quit_to_main
+    m_Metadata:
+      m_Items: []
+  - m_Id: 31246398375006208
+    m_Key: replay.text.current_frame
+    m_Metadata:
+      m_Items: []
+  - m_Id: 395821373628416
+    m_Key: status.error.download_resource_failure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 368531084320768
+    m_Key: status.error.model_interpreter_failure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28311964730462208
+    m_Key: status.error.open_json_failure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 367971987791872
+    m_Key: status.error.open_xml_failure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 373039294226432
+    m_Key: status.info.build_blockstate_geometry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28289458426548224
+    m_Key: status.info.build_item_geometry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 372130187223040
+    m_Key: status.info.create_texture
+    m_Metadata:
+      m_Items: []
+  - m_Id: 387367691001856
+    m_Key: status.info.download_jar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 752739912949760
+    m_Key: status.info.download_lang_text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 387295406366720
+    m_Key: status.info.download_manifest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 394586876715008
+    m_Key: status.info.extract_asset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 371970807865344
+    m_Key: status.info.gather_resource
+    m_Metadata:
+      m_Items: []
+  - m_Id: 380621543088128
+    m_Key: status.info.generation_complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 380477099646976
+    m_Key: status.info.generation_start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 380619232026624
+    m_Key: status.info.generation_step
+    m_Metadata:
+      m_Items: []
+  - m_Id: 749456838270976
+    m_Key: status.info.get_asset_index
+    m_Metadata:
+      m_Items: []
+  - m_Id: 387306810679296
+    m_Key: status.info.get_version_info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 372310307414016
+    m_Key: status.info.load_block_model
+    m_Metadata:
+      m_Items: []
+  - m_Id: 367166845001728
+    m_Key: status.info.load_conf_model
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28283581397143552
+    m_Key: status.info.load_recording
+    m_Metadata:
+      m_Items: []
+  - m_Id: 370218561871872
+    m_Key: status.info.loaded_conf_model
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28284556249862144
+    m_Key: status.info.loaded_recording
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28680962999521280
+    m_Key: status.info.resource_loaded
+    m_Metadata:
+      m_Items: []
+  - m_Id: 708494963417088
+    m_Key: welcome.text.current_language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 355866240786432
+    m_Key: welcome.text.download_res
     m_Metadata:
       m_Items: []
   m_Metadata:

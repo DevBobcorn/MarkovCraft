@@ -34,6 +34,8 @@ namespace MarkovCraft
         [SerializeField] protected VersionHolder? VersionHolder;
         [SerializeField] protected LocalizedStringTable? L10nTable;
         protected Dictionary<string, string> L10nBlockNameTable = new();
+        protected string loadedDataVersionName = "MC 0.0";
+        protected int loadedDataVersionInt = 0;
 
         [SerializeField] public Material? BlockMaterial;
         [HideInInspector] public bool Loading = false;
@@ -47,6 +49,11 @@ namespace MarkovCraft
 
                 return instance!;
             }
+        }
+
+        public int GetDataVersionInt()
+        {
+            return loadedDataVersionInt;
         }
 
         public static string GetL10nString(string key, params object[] p)
@@ -101,11 +108,19 @@ namespace MarkovCraft
             blockMeshes = BlockMeshGenerator.GenerateMeshes(buffers);
         }
 
-        protected IEnumerator LoadMCBlockData(string dataVersion, string resVersion, Action? prepare = null, Action<string>? update = null, Action? callback = null)
+        protected IEnumerator LoadMCBlockData(Action? prepare = null, Action<string>? update = null, Action? callback = null)
         {
             Loading = true;
             
             prepare?.Invoke();
+
+            var ver = VersionHolder!.Versions[VersionHolder.SelectedVersion];
+            var dataVersion = ver.DataVersion;
+            var resVersion = ver.ResourceVersion;
+            loadedDataVersionName = ver.Name;
+            loadedDataVersionInt = ver.DataVersionInt;
+
+            Debug.Log($"Loading data version {loadedDataVersionName} ({loadedDataVersionInt})");
 
             // Wait for splash animation to complete...
             yield return new WaitForSecondsRealtime(0.5F);

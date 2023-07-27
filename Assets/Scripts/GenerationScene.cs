@@ -255,7 +255,7 @@ namespace MarkovCraft
             ExecuteButton.onClick.RemoveAllListeners();
             ExecuteButton.onClick.AddListener(StartExecution);
 
-            GenerationText!.text = GetL10nString("status.info.loaded_conf_model", confModelFile);
+            GenerationText!.text = GetL10nString("status.info.loaded_conf_model", loadedDataVersionName, loadedDataVersionInt, confModelFile);
         }
 
         private IEnumerator RunGeneration()
@@ -419,9 +419,7 @@ namespace MarkovCraft
         void Start()
         {
             // First load Minecraft data & resources
-            var ver = VersionHolder!.Versions[VersionHolder.SelectedVersion];
-
-            StartCoroutine(LoadMCBlockData(ver.DataVersion, ver.ResourceVersion,
+            StartCoroutine(LoadMCBlockData(
                 () => {
                     ExecuteButton!.interactable = false;
                     ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.load_resource");

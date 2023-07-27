@@ -14,15 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Versions:
   - Name: MC 1.13.2
+    DataVersionInt: 1631
     DataVersion: 1.13
     ResourceVersion: 1.13.2
   - Name: MC 1.16.5
+    DataVersionInt: 2586
     DataVersion: 1.16
     ResourceVersion: 1.16.5
   - Name: MC 1.18.2
+    DataVersionInt: 2975
     DataVersion: 1.18
     ResourceVersion: 1.18.2
   - Name: MC 1.19.4
+    DataVersionInt: 3337
     DataVersion: 1.19
     ResourceVersion: 1.19.4
-  SelectedVersion: 3
+  SelectedVersion: 0

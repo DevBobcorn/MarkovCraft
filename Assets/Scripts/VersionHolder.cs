@@ -8,6 +8,7 @@ namespace MarkovCraft
     public struct MCVersion
     {
         public string Name;
+        public int DataVersionInt;
         public string DataVersion;
         public string ResourceVersion;
     }
