@@ -52,6 +52,7 @@ namespace MarkovCraft
         // Items in this dictionary share refereces with generation scene's fullPaletteForEditing
         // If items get changed, it'll also be reflected in other scenes
         private Dictionary<char, CustomMappingItem>? exportPalette;
+        private readonly HashSet<char> minimumCharSet = new();
         private readonly List<MappingItem> mappingItems = new();
         private bool working = false, properlyLoaded = false;
 
@@ -111,6 +112,8 @@ namespace MarkovCraft
                 var rgb = ColorConvert.GetRGB(itemVal.Color);
 
                 newItem.InitializeData(ch, rgb, rgb, itemVal.BlockState, ColorPicker!, BlockStatePreview!);
+
+                Debug.Log($"Minimum [{ch}] => {itemVal.BlockState}");
 
                 newItem.transform.SetParent(GridTransform, false);
                 newItem.transform.localScale = Vector3.one;
@@ -175,7 +178,7 @@ namespace MarkovCraft
             // Get selected result data
             exportData = game.GetSelectedResultData();
             // Get export palette
-            var minimumCharSet = new HashSet<char>();
+            minimumCharSet.Clear();
             
             if (exportData is not null)
             {
@@ -186,6 +189,7 @@ namespace MarkovCraft
                 foreach (var v in byteVals)
                     minimumCharSet.Add(finalLegend[v]);
 
+                // Final legend and export palette can contain a few unused entries
                 exportPalette = game.GetPartialPaletteForEditing(finalLegend.ToHashSet());
             }
             
@@ -218,45 +222,8 @@ namespace MarkovCraft
 
         public void AutoMap()
         {
-            var selectedBlocks = AutoMappingPanel?.GetSelectedBlocks();
-
-            if (selectedBlocks is not null && selectedBlocks.Count > 0)
-            {
-                bool skipAssigned = AutoMappingPanel!.SkipAssignedBlocks;
-                //Debug.Log($"Skip assigned : {skipAssigned}");
-                
-                // Perform auto mapping
-                foreach (var item in mappingItems)
-                {
-                    if (!skipAssigned || item.GetBlockState() == string.Empty)
-                    {
-                        var targetColor = ColorConvert.OpaqueColor32FromHexString(item.GetColorCode());
-                        int minDist = int.MaxValue;
-                        ResourceLocation pickedBlock = ResourceLocation.INVALID;
-
-                        foreach (var block in selectedBlocks)
-                        {
-                            int rDist = targetColor.r - block.Value.r;
-                            int gDist = targetColor.g - block.Value.g;
-                            int bDist = targetColor.b - block.Value.b;
-                            int newDist = rDist * rDist + gDist * gDist + bDist * bDist;
-                            
-                            if (newDist < minDist) // This color is closer to target color, update this entry
-                            {
-                                minDist = newDist;
-                                pickedBlock = block.Key;
-                            }
-                        }
-
-                        if (pickedBlock != ResourceLocation.INVALID) // A block is picked
-                        {
-                            item.SetBlockState(pickedBlock.ToString());
-                            //Debug.Log($"Mapping {item.GetColorCode()} to {pickedBlock}");
-                        }
-                    }
-                }
-            }
-
+            // Do auto mapping
+            AutoMappingPanel!.AutoMap(mappingItems);
             // Hide auto mapping panel
             AutoMappingPanel!.Hide();
         }
@@ -280,8 +247,9 @@ namespace MarkovCraft
                 mappingItems.ForEach(x => {
                     if (exportPalette!.ContainsKey(x.Character))
                     {
-                        exportPalette[x.Character].Color = ColorConvert.OpaqueColor32FromHexString(x.GetColorCode());
-                        exportPalette[x.Character].BlockState = x.GetBlockState();
+                        var item = exportPalette[x.Character];
+                        item.Color = ColorConvert.OpaqueColor32FromHexString(x.GetColorCode());
+                        item.BlockState = x.GetBlockState();
                     }
                 });
 
@@ -374,8 +342,9 @@ namespace MarkovCraft
                 mappingItems.ForEach(x => {
                     if (exportPalette!.ContainsKey(x.Character))
                     {
-                        exportPalette[x.Character].Color = ColorConvert.OpaqueColor32FromHexString(x.GetColorCode());
-                        exportPalette[x.Character].BlockState = x.GetBlockState();
+                        var item = exportPalette[x.Character];
+                        item.Color = ColorConvert.OpaqueColor32FromHexString(x.GetColorCode());
+                        item.BlockState = x.GetBlockState();
                     }
                 });
 

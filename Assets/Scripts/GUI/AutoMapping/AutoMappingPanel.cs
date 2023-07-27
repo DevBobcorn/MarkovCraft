@@ -88,7 +88,7 @@ namespace MarkovCraft
             group.SetData(groupName, items);
         }
 
-        public Dictionary<ResourceLocation, Color32> GetSelectedBlocks()
+        private Dictionary<ResourceLocation, Color32> GetSelectedBlocks()
         {
             var result = new Dictionary<ResourceLocation, Color32>();
 
@@ -98,6 +98,45 @@ namespace MarkovCraft
             }
 
             return result;
+        }
+
+        public void AutoMap(List<MappingItem> mappingItems)
+        {
+            var selectedBlocks = GetSelectedBlocks();
+
+            if (selectedBlocks is not null && selectedBlocks.Count > 0)
+            {
+                // Perform auto mapping
+                foreach (var item in mappingItems)
+                {
+                    if (!SkipAssignedBlocks || item.GetBlockState() == string.Empty)
+                    {
+                        var targetColor = ColorConvert.OpaqueColor32FromHexString(item.GetColorCode());
+                        int minDist = int.MaxValue;
+                        ResourceLocation pickedBlock = ResourceLocation.INVALID;
+
+                        foreach (var block in selectedBlocks)
+                        {
+                            int rDist = targetColor.r - block.Value.r;
+                            int gDist = targetColor.g - block.Value.g;
+                            int bDist = targetColor.b - block.Value.b;
+                            int newDist = rDist * rDist + gDist * gDist + bDist * bDist;
+                            
+                            if (newDist < minDist) // This color is closer to target color, update this entry
+                            {
+                                minDist = newDist;
+                                pickedBlock = block.Key;
+                            }
+                        }
+
+                        if (pickedBlock != ResourceLocation.INVALID) // A block is picked
+                        {
+                            item.SetBlockState(pickedBlock.ToString());
+                            //Debug.Log($"Mapping {item.GetColorCode()} to {pickedBlock}");
+                        }
+                    }
+                }
+            }
         }
 
         public void Show()
