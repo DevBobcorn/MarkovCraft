@@ -104,6 +104,8 @@ namespace MarkovCraft
             var selectedIndex = locales.IndexOf(selected);
             if (selectedIndex >= 0)
                 LocalizationSettings.SelectedLocale = locales[(selectedIndex + 1) % locales.Count];
+
+            Debug.Log($"Locale changed to {LocalizationSettings.SelectedLocale}");
         }
 
         public void DownloadResource()
