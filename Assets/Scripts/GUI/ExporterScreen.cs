@@ -113,8 +113,6 @@ namespace MarkovCraft
 
                 newItem.InitializeData(ch, rgb, rgb, itemVal.BlockState, ColorPicker!, BlockStatePreview!);
 
-                Debug.Log($"Minimum [{ch}] => {itemVal.BlockState}");
-
                 newItem.transform.SetParent(GridTransform, false);
                 newItem.transform.localScale = Vector3.one;
             }
@@ -351,7 +349,7 @@ namespace MarkovCraft
                 switch (formatIndex)
                 {
                     case 0: // nbt structure
-                        NbtStructureExporter.Export(data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, fileName, 2586);
+                        NbtStructureExporter.Export(data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, fileName, minimumCharSet, 2586);
                         break;
                     case 1: // mcfunction
                         McFuncExporter.Export(data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, fileName);

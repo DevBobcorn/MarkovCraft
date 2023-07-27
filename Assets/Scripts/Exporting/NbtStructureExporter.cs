@@ -19,7 +19,7 @@ namespace MarkovCraft
         private static bool checkAir3d(byte index) => index == 0;
 
         public static void Export(byte[] state, char[] legend, int FX, int FY, int FZ,
-                Dictionary<char, CustomMappingItem> exportPalette, DirectoryInfo dirInfo, string fileName, int dataVersionInt)
+                Dictionary<char, CustomMappingItem> exportPalette, DirectoryInfo dirInfo, string fileName, HashSet<char> minimumCharSet, int dataVersionInt)
         {
             var nbtObj = new Dictionary<string, object>();
             int mcSizeX = FY, mcSizeY = FZ, mcSizeZ = FX;
@@ -36,6 +36,12 @@ namespace MarkovCraft
 
             foreach (var item in exportPalette)
             {
+                if (!minimumCharSet.Contains(item.Key))
+                {
+                    // Export palette may still contain a few unused entries, filter them out
+                    continue;
+                }
+
                 var stateStr = item.Value.BlockState;
                 var stateId = BlockStateHelper.GetStateIdFromString(stateStr);
                 if (stateId == BlockStateHelper.INVALID_BLOCKSTATE)
@@ -48,7 +54,7 @@ namespace MarkovCraft
                 {
                     var idx = structurePalette.Count;
                     structureRemap.Add(item.Key, idx);
-                    //Debug.Log($"[{idx}] => [{stateId}] {blockState}");
+                    //Debug.Log($"[{idx}] {item.Key} => [{stateId}] {blockState}");
                     structurePalette.Add(blockState);
                 }
             }
