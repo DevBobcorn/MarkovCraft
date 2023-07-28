@@ -115,7 +115,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 368531084320768
-    m_Localized: Failed to create model interpreter
+    m_Localized: 'Failed to create model interpreter
+
+      Check if the initial
+      size of configured model is valid'
     m_Metadata:
       m_Items: []
   - m_Id: 370218561871872
@@ -453,6 +456,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 33072695942254592
     m_Localized: Sponge Schem
+    m_Metadata:
+      m_Items: []
+  - m_Id: 33363460278915072
+    m_Localized: NewConfModel.xml
     m_Metadata:
       m_Items: []
   references:

@@ -419,6 +419,10 @@ MonoBehaviour:
     m_Key: welcome.text.download_res
     m_Metadata:
       m_Items: []
+  - m_Id: 33363460278915072
+    m_Key: creator.text.default_file_name
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

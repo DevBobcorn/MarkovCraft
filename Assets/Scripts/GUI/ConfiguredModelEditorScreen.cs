@@ -233,7 +233,6 @@ namespace MarkovCraft
                 Destroy(array[i].gameObject);
             
             mappingItems.Clear();
-
         }
 
         private void ShowActiveCharSet(HashSet<char> charSet)
@@ -269,7 +268,6 @@ namespace MarkovCraft
                 working = true;
 
                 var model = ScriptableObject.CreateInstance(typeof (ConfiguredModel)) as ConfiguredModel;
-
                 if (model is not null)
                 {
                     model.Model = ModelDropdown!.options[ModelDropdown.value].text;
@@ -313,10 +311,8 @@ namespace MarkovCraft
                 working = false;
 
                 manager?.SetActiveScreenByType<GenerationScreen>();
-
                 game.UpdateConfiguredModel(saveFileName);
             }
-
         }
 
         public override void ScreenUpdate(ScreenManager manager)

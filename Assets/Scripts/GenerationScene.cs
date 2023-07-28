@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -116,7 +117,8 @@ namespace MarkovCraft
             GenerationText!.text = GetL10nString("status.info.load_conf_model", confModelFile);
 
             ExecuteButton!.interactable = false;
-            ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.load_conf_model");
+            var localizedLoadText = GetL10nString("hud.text.load_conf_model");
+            ExecuteButton.GetComponentInChildren<TMP_Text>().text = localizedLoadText;
 
             // Clear up scene
             ClearUpScene();
@@ -125,7 +127,7 @@ namespace MarkovCraft
             ModelGraphUI?.ClearUp();
 
             string fileName = PathHelper.GetExtraDataFile($"models{SP}{confModel.Model}.xml");
-            Debug.Log($"{confModel.Model} > {fileName}");
+            Debug.Log($"{confModelFile} ({confModel.Model}) > {fileName}");
 
             XDocument? modelDoc = null;
 
@@ -155,16 +157,36 @@ namespace MarkovCraft
             yield return null;
 
             var loadComplete = false;
+            var tokenSource = new CancellationTokenSource();
+            interpreter = null;
 
             Task.Run(() => {
                 // Use a task to load this in so that the main thread doesn't get blocked
                 interpreter = Interpreter.Load(modelDoc.Root, confModel.SizeX, confModel.SizeY, confModel.SizeZ);
 
                 loadComplete = true;
-            });
+            }, tokenSource.Token);
+
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
 
             while (!loadComplete)
+            {
+                var secs = sw.Elapsed.TotalSeconds;
+
+                if (secs > 8) // Loading process taking too long
+                {
+                    tokenSource.Cancel();
+                    Debug.Log("Loading process taking too long, cancelling...");
+                    // break the loop
+                    break;
+                }
+
+                GenerationText!.text = $"{localizedLoadText} {secs:0.00}s";
                 yield return null;
+            }
+
+            sw.Stop();
 
             if (interpreter == null)
             {
