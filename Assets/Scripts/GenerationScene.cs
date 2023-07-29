@@ -538,6 +538,8 @@ namespace MarkovCraft
                         {
                             // Lock volume selection
                             VolumeSelection!.Lock();
+                            // Set camera center
+                            CamController!.SetCenterPosition(selectedResult.GetVolumePosition());
                             // Enable block colliders
                             selectedResult.EnableBlockColliders();
                             // Show export button

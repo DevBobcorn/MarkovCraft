@@ -16,7 +16,7 @@ namespace MarkovCraft
 
         public override void ScreenUpdate(ScreenManager manager)
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (Input.GetKeyDown(KeyCode.C))
             {
                 if (!game!.Loading)
                     manager.SetActiveScreenByType<ConfiguredModelEditorScreen>();

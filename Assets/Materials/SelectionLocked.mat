@@ -25,10 +25,11 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _ALPHAMODULATE_ON
+  - _EMISSION
+  - _RECEIVE_SHADOWS_OFF
   - _SURFACE_TYPE_TRANSPARENT
   m_InvalidKeywords: []
-  m_LightmapFlags: 4
+  m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 1
   m_CustomRenderQueue: 3000
@@ -101,8 +102,8 @@ Material:
     m_Floats:
     - _AlphaClip: 0
     - _AlphaToMask: 0
-    - _Blend: 3
-    - _BlendModePreserveSpecular: 1
+    - _Blend: 0
+    - _BlendModePreserveSpecular: 0
     - _BumpScale: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
@@ -110,8 +111,8 @@ Material:
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DstBlend: 0
-    - _DstBlendAlpha: 1
+    - _DstBlend: 10
+    - _DstBlendAlpha: 10
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
@@ -120,18 +121,18 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
-    - _ReceiveShadows: 1
+    - _ReceiveShadows: 0
     - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _SrcBlend: 2
-    - _SrcBlendAlpha: 0
+    - _SrcBlend: 5
+    - _SrcBlendAlpha: 1
     - _Surface: 1
     - _WorkflowMode: 1
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 0.39215687}
+    - _Color: {r: 1, g: 1, b: 1, a: 0.39215687}
+    - _EmissionColor: {r: 2, g: 2, b: 2, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
