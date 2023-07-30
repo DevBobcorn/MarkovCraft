@@ -415,7 +415,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 31238120081395712
-    m_Localized: 'Original Mapping:'
+    m_Localized: 'Original Mapping<size=24>(As in conf model)</size>:'
     m_Metadata:
       m_Items: []
   - m_Id: 31238213018783744

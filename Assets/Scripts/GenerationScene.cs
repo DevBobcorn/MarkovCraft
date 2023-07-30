@@ -541,7 +541,7 @@ namespace MarkovCraft
                             // Set camera center
                             CamController!.SetCenterPosition(selectedResult.GetVolumePosition());
                             // Enable block colliders
-                            selectedResult.EnableBlockColliders();
+                            StartCoroutine(selectedResult.EnableBlockColliders());
                             // Show export button
                             ExportButton?.GetComponent<Animator>()?.SetBool("Hidden", false);
                         }

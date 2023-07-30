@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ConfiguredModel Model="Island" SizeX="500" SizeY="500" SizeZ="1" Amount="1" Steps="10000000" Animated="false" StepsPerRefresh="1">
+  <CustomMapping>
+    <Item Character="I" Color="ABCBE8" />
+    <Item Character="E" Color="93C08D" />
+    <Item Character="Y" Color="F1EBC2" />
+    <Item Character="G" Color="A8D1A5" />
+    <Item Character="U" Color="CEE6F9" />
+    <Item Character="S" Color="D0D8AC" />
+    <Item Character="s" Color="E9E0B2" />
+    <Item Character="T" Color="2B8AA9" />
+  </CustomMapping>
+</ConfiguredModel>

@@ -388,7 +388,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 31238120081395712
-    m_Localized: "\u539F\u59CB\u6620\u5C04\uFF1A"
+    m_Localized: "\u539F\u59CB\u6620\u5C04<size=24>\uFF08\u4EE5\u9884\u7F6E\u6A21\u578B\u4E3A\u51C6\uFF09</size>\uFF1A"
     m_Metadata:
       m_Items: []
   - m_Id: 31238213018783744

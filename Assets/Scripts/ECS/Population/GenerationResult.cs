@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections;
 using UnityEngine;
 using Unity.Mathematics;
 
@@ -6,6 +7,8 @@ namespace MarkovCraft
 {
     public class GenerationResult : MonoBehaviour
     {
+        private int BLOCK_COLLIDER_COUNT_MAX = 1000000;
+
         [HideInInspector] public int3 GenerationPosition;
         [HideInInspector] public int3 GenerationSize;
         [HideInInspector] public int Iteration;
@@ -19,6 +22,7 @@ namespace MarkovCraft
         [SerializeField] private GameObject? volumeColliderHolder;
         [SerializeField] private string blockColliderLayerName = "BlockCollider";
         private GameObject? blockColliderHolder;
+        private bool blockColliderAvailable = false;
 
         private bool completed = false;
         public bool Completed => completed;
@@ -57,14 +61,16 @@ namespace MarkovCraft
             transform.position = GetVolumePosition();
         }
 
-        public void EnableBlockColliders()
+        public IEnumerator EnableBlockColliders()
         {
             // Disable volume collider
             volumeColliderHolder!.SetActive(false);
 
-            if (blockColliderHolder == null) // Collider Holder not present yet
+            yield return null;
+
+            if (!blockColliderAvailable) // Collider Holder not present yet
             {
-                if (data is not null)
+                if (data is not null && data.Value.state.Length < BLOCK_COLLIDER_COUNT_MAX)
                 {
                     blockColliderHolder = new GameObject("Block Colliders");
                     blockColliderHolder.transform.SetParent(transform, false);
@@ -78,14 +84,30 @@ namespace MarkovCraft
                     var colliderPositions = BlockDataBuilder.GetColliderData(state, FX, FY, FZ);
                     for (int i = 0;i < colliderPositions.Length;i++)
                     {
+                        if (blockColliderHolder == null)
+                        {
+                            // Gone, give it up
+                            yield break;
+                        }
+
                         var b = blockColliderHolder.AddComponent<BoxCollider>();
                         b.center = colliderPositions[i] + offset;
+
+                        if (i % 100 == 0) // Take a break
+                        {
+                            yield return null;
+                        }
                     }
+
+                    blockColliderAvailable = true;
                 }
             }
             else
             {
-                blockColliderHolder.SetActive(true);
+                if (blockColliderHolder != null)
+                {
+                    blockColliderHolder!.SetActive(true);
+                }
             }
         }
 
@@ -109,7 +131,7 @@ namespace MarkovCraft
             // Enable volume collider
             volumeColliderHolder!.SetActive(true);
 
-            if (blockColliderHolder != null) // Collider Holder is present
+            if (blockColliderAvailable && blockColliderHolder != null) // Collider Holder is present
             {
                 blockColliderHolder.SetActive(false);
             }

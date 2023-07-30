@@ -74,7 +74,11 @@ namespace MarkovCraft
                     var dragOffset = curDragPos - lastDragPos;
 
                     var dragMultiplier = (yPosition / yPosMax) * 0.3F;
-                    transform.position -= dragMultiplier * (transform.right * dragOffset.x + transform.up * dragOffset.y);
+                    var newPos = transform.position - dragMultiplier * (transform.right * dragOffset.x + transform.up * dragOffset.y);
+
+                    newPos.y = Mathf.Clamp(newPos.y, yPosMin, yPosMax);
+
+                    transform.position = newPos;
 
                     lastDragPos = curDragPos;
                 }
@@ -98,12 +102,12 @@ namespace MarkovCraft
             float fly = 0F;
             float rot = 0F;
 
-            if (Input.GetKey(KeyCode.Q)) // Turn camera counter-clockwise
+            if (Input.GetKey(KeyCode.E)) // Turn camera counter-clockwise
             {
                 rot += 1F;
             }
 
-            if (Input.GetKey(KeyCode.E)) // Turn camera clockwise
+            if (Input.GetKey(KeyCode.Q)) // Turn camera clockwise
             {
                 rot -= 1F;
             }

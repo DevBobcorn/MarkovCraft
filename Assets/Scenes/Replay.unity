@@ -1322,8 +1322,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   screenManager: {fileID: 2002043238}
   moveSpeed: 40
+  turnSpeed: 10
   scrollSpeed: 100
-  zPosLimit: 320
+  yPosMin: 15
+  yPosMax: 365
 --- !u!114 &911379655
 MonoBehaviour:
   m_ObjectHideFlags: 0
