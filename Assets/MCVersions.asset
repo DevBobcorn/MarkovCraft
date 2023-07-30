@@ -29,4 +29,8 @@ MonoBehaviour:
     DataVersionInt: 3337
     DataVersion: 1.19
     ResourceVersion: 1.19.4
-  SelectedVersion: 0
+  - Name: MC 1.20.1
+    DataVersionInt: 3465
+    DataVersion: 1.20
+    ResourceVersion: 1.20.1
+  SelectedVersion: 1
