@@ -25,7 +25,7 @@ namespace MarkovJunior
                 if (info.priority == this.priority)
                     return 0;
                 
-                return info.priority < this.priority ? -1 : 1;
+                return info.priority < this.priority ? 1 : -1;
             }
         }
 
