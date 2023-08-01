@@ -12,7 +12,7 @@ namespace MarkovCraft
         [SerializeField] Color inactiveColor, activeColor;
 
         [HideInInspector] public string NodeName = string.Empty;
-        public string SourceText = string.Empty;
+        public string SourceXml = string.Empty;
 
         public virtual void SetNodeActive(bool active)
         {
@@ -32,6 +32,9 @@ namespace MarkovCraft
             NodeName = name;
         }
 
-
+        public void SetSourceXml(string xml)
+        {
+            SourceXml = xml;
+        }
     }
 }

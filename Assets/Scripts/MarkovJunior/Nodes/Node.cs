@@ -16,7 +16,7 @@ namespace MarkovJunior
         public Grid grid;
 
         public int numId;
-        public string comment = string.Empty;
+        public string sourceXml = string.Empty;
 
         public static Node Factory(XElement xelem, bool[] symmetry, Interpreter ip, Grid grid)
         {
@@ -41,6 +41,8 @@ namespace MarkovJunior
                 "wfc" when xelem.Get<string>("tileset", null) != null => new TileNode(),
                 _ => null
             };
+
+            //result.sourceXml = xelem.ToString();
 
             // Assign a numeral id to this node for later reference
             result.numId = ip.numId++;

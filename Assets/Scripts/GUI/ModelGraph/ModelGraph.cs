@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Linq;
 using UnityEngine;
 using TMPro;
@@ -15,6 +16,7 @@ namespace MarkovCraft
         [SerializeField] public TMP_Text? ModelNameText;
         [SerializeField] public GameObject? ScopeGraphNodePrefab;
         [SerializeField] public GameObject? RuleGraphNodePrefab;
+        [SerializeField] public GameObject? PathGraphNodePrefab;
 
         [SerializeField] public RectTransform? GraphContentTransform;
 
@@ -122,6 +124,20 @@ namespace MarkovCraft
             ACTIVE = ColorConvert.OpaqueColor32FromHexString(settings.Get("active", "FFFFFF"));
         }
 
+        static byte[] NonZeroPositions(int w)
+        {
+            int amount = 0, wcopy = w;
+            for (byte p = 0; p < 32; p++, w >>= 1) if ((w & 1) == 1) amount++;
+            byte[] result = new byte[amount];
+            amount = 0;
+            for (byte p = 0; p < 32; p++, wcopy >>= 1) if ((wcopy & 1) == 1)
+                {
+                    result[amount] = p;
+                    amount++;
+                }
+            return result;
+        }
+
         public static void GenerateGraph(ModelGraph graph, string modelName, Branch root, Dictionary<char, Color32> palette)
         {
             const int ZSHIFT = 4;
@@ -185,6 +201,7 @@ namespace MarkovCraft
                 {
                     var nodeObj = GameObject.Instantiate(graph.RuleGraphNodePrefab, transform);
                     nodeCmp = nodeObj!.GetComponent<RuleGraphNode>();
+                    var ruleNodeCmp = nodeCmp as RuleGraphNode;
 
                     for (int r = 0; r < ruleNode.rules.Length; r++)
                     {
@@ -195,12 +212,27 @@ namespace MarkovCraft
                         var inPreview  = getPreview(rule.binput, rule.IMX, rule.IMY, rule.IMZ, characters, TILE_SIZE);
                         var outPreview = getPreview(rule.output, rule.OMX, rule.OMY, rule.OMZ, characters, TILE_SIZE);
 
-                        (nodeCmp as RuleGraphNode)!.AddRulePreview(r, inPreview, outPreview);
+                        ruleNodeCmp!.AddRulePreview(r, inPreview, outPreview);
                     }
 
                     // Assign this graph node
                     graph.GraphNodes.TryAdd(nodeNumId, nodeCmp);
-                    
+                }
+                else if (node is PathNode pathNode)
+                {
+                    var nodeObj = GameObject.Instantiate(graph.PathGraphNodePrefab, transform);
+                    nodeCmp = nodeObj!.GetComponent<PathGraphNode>();
+                    var pathNodeCmp = nodeCmp as PathGraphNode;
+
+                    var froms = Helper.NonZeroPositions(pathNode.start).Select(b => palette[characters[b]]).ToArray();
+                    var tos = Helper.NonZeroPositions(pathNode.finish).Select(b => palette[characters[b]]).ToArray();
+                    var ons = Helper.NonZeroPositions(pathNode.substrate).Select(b => palette[characters[b]]).ToArray();
+                    var pathColor = palette[characters[pathNode.value]];
+
+                    pathNodeCmp!.SetPreviews(froms, tos, ons, pathColor);
+
+                    // Assign this graph node
+                    graph.GraphNodes.TryAdd(nodeNumId, nodeCmp);
                 }
                 else
                 {
@@ -211,6 +243,8 @@ namespace MarkovCraft
                 // Set node data
                 nodeCmp.SetNodeName($"{nodeName} <color=#888888>#{node.numId}</color>");
                 nodeCmp.SetNodeActive(false);
+
+                nodeCmp.SetSourceXml(node.sourceXml);
 
                 // Assign this graph node
                 graph.GraphNodes.TryAdd(nodeNumId, nodeCmp);
