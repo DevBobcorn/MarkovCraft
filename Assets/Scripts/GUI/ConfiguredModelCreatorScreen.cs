@@ -7,6 +7,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+using MarkovJunior;
+
 namespace MarkovCraft
 {
     public class ConfiguredModelCreatorScreen : BaseScreen
@@ -49,8 +51,22 @@ namespace MarkovCraft
 
             if (modelItems.ContainsKey(modelName))
             {
-                // Select out target
+                // Select our target
                 selectedModel = modelName;
+                // Assign preset values
+                (int px, int py, int pz, int ps, bool anim) = modelItems[modelName].PresetData;
+
+                if (px > 0)
+                    SizeXInput!.text = px.ToString();
+                if (py > 0)
+                    SizeYInput!.text = py.ToString();
+                if (pz > 0)
+                    SizeZInput!.text = pz.ToString();
+                if (ps > 0)
+                    StepsInput!.text = ps.ToString();
+                
+                AnimatedToggle!.isOn = anim;
+
                 // Update text input
                 ModelInput!.text = modelName;
             }
@@ -59,8 +75,8 @@ namespace MarkovCraft
         private IEnumerator InitializeScreen()
         {
             // Initialize settings panel
-            var modelDir = PathHelper.GetExtraDataFile("models");
-            var prevDir = PathHelper.GetExtraDataFile("model_previews");
+            //var modelDir = PathHelper.GetExtraDataFile("models");
+            var modelsPath = PathHelper.GetExtraDataFile("models.xml");
 
             int index = 0;
             
@@ -70,28 +86,29 @@ namespace MarkovCraft
                 Destroy(item.gameObject);
             }
 
-            foreach (var m in Directory.GetFiles(modelDir, "*.xml", SearchOption.TopDirectoryOnly))
+            int maxSteps = StepsInput!.GetComponent<IntegerInputValidator>().MaxValue;
+
+            //foreach (var m in Directory.GetFiles(modelDir, "*.xml", SearchOption.TopDirectoryOnly))
+            foreach (var melem in System.Xml.Linq.XDocument.Load(modelsPath).Root.Elements())
             {
-                var modelName = m[(modelDir.Length + 1)..^4];
+                //var modelName = m[(modelDir.Length + 1)..^4];
+                var modelName = melem.Get<string?>("Model", null);
+
+                if (modelName == null)
+                    continue;
+
                 var modelItemObj = Instantiate(ModelItemPrefab)!;
                 modelItemObj.transform.SetParent(GridTransform, false);
 
                 var modelItem = modelItemObj.GetComponent<ModelItem>();
-                modelItem.SetModelName(modelName);
-                modelItem.SetClickEvent(() => SelectModelItem(modelName));
+                int x = melem.Get<int>("SizeX");
+                int y = melem.Get<int>("SizeY");
+                int z = melem.Get<int>("SizeZ");
+                int steps = melem.Get<int>("Steps", maxSteps);
+                bool animated = melem.Get<bool>("Animated", false);
 
-                var prevPath = prevDir + $"{SP}{modelName}.png";
-                // See if preview is available
-                if (File.Exists(prevPath))
-                {
-                    var tex = new Texture2D(2, 2);
-                    //tex.filterMode = FilterMode.Point;
-                    var bytes = File.ReadAllBytes(prevPath);
-                    tex.LoadImage(bytes);
-                    // Update sprite
-                    var sprite = UnityEngine.Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2, tex.height / 2));
-                    modelItem.SetPreviewSprite(sprite);
-                }
+                modelItem.SetModelData(modelName, x, y, z, steps, animated);
+                modelItem.SetClickEvent(() => SelectModelItem(modelName));
 
                 modelItems.Add(modelName, modelItem);
                 
@@ -116,6 +133,42 @@ namespace MarkovCraft
             properlyLoaded = true;
 
             ScreenHeader!.text = GameScene.GetL10nString("creator.text.loaded");
+
+            yield return new WaitForSecondsRealtime(0.3F);
+
+            StartCoroutine(LoadPreviews());
+        }
+
+        private IEnumerator LoadPreviews()
+        {
+            var prevDir = PathHelper.GetExtraDataFile("model_previews");
+            var pairs = modelItems.ToArray();
+
+            var wait = new WaitForSecondsRealtime(0.05F);
+
+            foreach (var pair in pairs)
+            {
+                var prevPath = prevDir + $"{SP}{pair.Key}.png";
+                // See if preview is available
+                if (File.Exists(prevPath))
+                {
+                    var tex = new Texture2D(2, 2);
+                    //tex.filterMode = FilterMode.Point;
+                    var bytes = File.ReadAllBytes(prevPath);
+                    tex.LoadImage(bytes);
+                    // Update sprite
+                    var sprite = UnityEngine.Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2, tex.height / 2));
+
+                    if (pair.Value == null) // Item got destroyed, screen might be closed already
+                    {
+                        yield break;
+                    }
+
+                    pair.Value.SetPreviewSprite(sprite);
+
+                    yield return wait;
+                }
+            }
         }
 
         public override void OnShow(ScreenManager manager)

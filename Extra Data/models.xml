@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModelPresets>
+    <!-- Recommended Models -->
+    <Preset Model="Apartemazements" SizeX="8" SizeY="8" SizeZ="8"/>
+    <Preset Model="CarmaTower" SizeX="12" SizeY="12" SizeZ="18"/>
+    <Preset Model="ModernHouse" SizeX="9" SizeY="9" SizeZ="4"/>
+    <Preset Model="SeaVilla" SizeX="10" SizeY="10" SizeZ="4"/>
+    <Preset Model="Island" SizeX="800" SizeY="800" SizeZ="1"/>
+    <!-- Other Models -->
+    <Preset Model="Backtracker" SizeX="89" SizeY="89" SizeZ="1" />
+    <Preset Model="BacktrackerCycle" SizeX="59" SizeY="59" SizeZ="1" Steps="1000" />
+    <Preset Model="BasicBrickWall" SizeX="30" SizeY="30" SizeZ="1" />
+    <Preset Model="BasicDijkstraDungeon" SizeX="60" SizeY="60" SizeZ="1" />
+    <Preset Model="BasicDijkstraFill" SizeX="60" SizeY="60" SizeZ="1" />
+    <Preset Model="BasicDungeonGrowth" SizeX="59" SizeY="59" SizeZ="1" />
+    <Preset Model="BasicPartitioning" SizeX="59" SizeY="59" SizeZ="1" Steps="1000" />
+    <Preset Model="BernoulliPercolation" SizeX="359" SizeY="359" SizeZ="1" />
+    <Preset Model="BiasedGrowth" SizeX="120" SizeY="120" SizeZ="1" Steps="1000" />
+    <Preset Model="BiasedGrowthContraction" SizeX="120" SizeY="120" SizeZ="1" Steps="5000" />
+    <Preset Model="BiasedMazeGrowth" SizeX="117" SizeY="117" SizeZ="1" Steps="400" />
+    <Preset Model="BiasedVoronoi" SizeX="80" SizeY="80" SizeZ="1" Steps="1000" />
+    <Preset Model="BishopParity" SizeX="60" SizeY="60" SizeZ="1" />
+    <Preset Model="BlueNoise" SizeX="80" SizeY="80" SizeZ="1" Steps="500" />
+    <Preset Model="Cave" SizeX="60" SizeY="60" SizeZ="1" />
+    <Preset Model="CaveContour" SizeX="80" SizeY="80" SizeZ="1" />
+    <Preset Model="CentralCrawlers" SizeX="60" SizeY="60" SizeZ="1" Steps="300" />
+    <Preset Model="CentralSAW" SizeX="59" SizeY="59" SizeZ="1" />
+    <Preset Model="ChainDungeon" SizeX="60" SizeY="60" SizeZ="1" />
+    <Preset Model="ChainDungeonMaze" SizeX="60" SizeY="60" SizeZ="1" />
+    <Preset Model="ChainMaze" SizeX="60" SizeY="60" SizeZ="1" Animated="true" />
+    <Preset Model="Circuit" SizeX="59" SizeY="59" SizeZ="1" Steps="1200" />
+    <Preset Model="ClosedSurface" SizeX="12" SizeY="12" SizeZ="12" />
+    <Preset Model="ColoredKnots" SizeX="12" SizeY="12" SizeZ="12" />
+    <Preset Model="CompleteSAW" SizeX="19" SizeY="19" SizeZ="1" />
+    <Preset Model="CompleteSAWSmart" SizeX="23" SizeY="23" SizeZ="1" />
+    <Preset Model="ConnectedCaves" SizeX="60" SizeY="60" SizeZ="1" />
+    <Preset Model="ConstrainedCaves" SizeX="60" SizeY="60" SizeZ="1" />
+    <Preset Model="Counting" SizeX="8" SizeY="8" SizeZ="8" />
+    <Preset Model="Coupling" SizeX="80" SizeY="80" SizeZ="1" />
+    <Preset Model="CrawlersChase" SizeX="60" SizeY="60" SizeZ="1" Steps="200" Animated="true" />
+    <Preset Model="CrossCountry" SizeX="80" SizeY="80" SizeZ="1" />
+    <Preset Model="Cycles" SizeX="59" SizeY="59" SizeZ="1" />
+    <Preset Model="DenseSAW" SizeX="59" SizeY="59" SizeZ="1" />
+    <Preset Model="DiagonalPath" SizeX="80" SizeY="80" SizeZ="1" />
+    <Preset Model="Digger" SizeX="359" SizeY="359" SizeZ="1" Steps="50000" />
+    <Preset Model="DijkstraDungeon" SizeX="60" SizeY="60" SizeZ="1" Animated="true" />
+
+
+</ModelPresets>

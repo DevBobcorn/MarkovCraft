@@ -14,6 +14,10 @@ namespace MarkovCraft
         [SerializeField] private Image? modelPreviewFrame;
         [SerializeField] [Range(10F, 500F)] private float frameSize = 100F;
 
+        //       X,   Y,   Z, Steps, Animated
+        private (int, int, int, int, bool) presetData = new();
+        public (int, int, int, int, bool) PresetData => presetData;
+
         private string modelName = string.Empty;
         public string ModelName => modelName;
 
@@ -35,10 +39,12 @@ namespace MarkovCraft
             return newText.ToString();
         }
 
-        public void SetModelName(string name)
+        public void SetModelData(string name, int x, int y, int z, int steps, bool animated)
         {
             modelNameText!.text = AddSpacesBeforeUppercase(name);
             modelName = name;
+
+            presetData = (x, y, z, steps, animated);
         }
 
         public void VisualSelect()

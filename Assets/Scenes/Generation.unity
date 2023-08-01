@@ -10631,7 +10631,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "2\u200B"
+  m_text: "1\u200B"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9baf05edbcb5b8a4caaa1987e9d8cb2a, type: 2}
   m_sharedMaterial: {fileID: -8751252669686695664, guid: 9baf05edbcb5b8a4caaa1987e9d8cb2a,
@@ -14156,7 +14156,7 @@ PrefabInstance:
     - target: {fileID: 8743287456755922985, guid: 3f3bcff5b12e0ac46ad837692e786270,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 0.00012207031
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15079,7 +15079,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: 2
+  m_Text: 1
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -22265,7 +22265,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "2\u200B"
+  m_text: "1\u200B"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9baf05edbcb5b8a4caaa1987e9d8cb2a, type: 2}
   m_sharedMaterial: {fileID: -8751252669686695664, guid: 9baf05edbcb5b8a4caaa1987e9d8cb2a,
@@ -24641,7 +24641,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: 2
+  m_Text: 1
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -34591,7 +34591,7 @@ PrefabInstance:
     - target: {fileID: 8743287456755922985, guid: 3f3bcff5b12e0ac46ad837692e786270,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 0.00012207031
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
