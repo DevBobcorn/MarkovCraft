@@ -462,6 +462,10 @@ MonoBehaviour:
     m_Localized: NewConfModel.xml
     m_Metadata:
       m_Items: []
+  - m_Id: 34834354461413376
+    m_Localized: Create a new configured model
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

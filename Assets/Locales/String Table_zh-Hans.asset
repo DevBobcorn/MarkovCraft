@@ -427,6 +427,10 @@ MonoBehaviour:
     m_Localized: "\u65B0\u5EFA\u9884\u7F6E\u6A21\u578B.xml"
     m_Metadata:
       m_Items: []
+  - m_Id: 34834354461413376
+    m_Localized: "\u521B\u5EFA\u65B0\u7684\u9884\u7F6E\u6A21\u578B"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

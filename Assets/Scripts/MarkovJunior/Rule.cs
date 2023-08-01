@@ -5,8 +5,6 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Collections.Generic;
 
-using MarkovCraft;
-
 namespace MarkovJunior
 {
     class Rule
