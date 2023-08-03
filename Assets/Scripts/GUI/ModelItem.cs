@@ -21,18 +21,25 @@ namespace MarkovCraft
         private string modelName = string.Empty;
         public string ModelName => modelName;
 
-        private string AddSpacesBeforeUppercase(string text, bool preserveAcronyms = true)
+        public static string AddSpacesBeforeUppercase(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
-            return string.Empty;
+                return string.Empty;
+
+            static bool isUpperOrNum(char c)
+            {
+                return char.IsUpper(c) || char.IsDigit(c);
+            };
+
             var newText = new StringBuilder(text.Length * 2);
             newText.Append(text[0]);
             for (int i = 1; i < text.Length; i++)
             {
-                if (char.IsUpper(text[i]))
-                    if ((text[i - 1] != ' ' && !char.IsUpper(text[i - 1])) ||
-                        (preserveAcronyms && char.IsUpper(text[i - 1]) && 
-                        i < text.Length - 1 && !char.IsUpper(text[i + 1])))
+                if (isUpperOrNum(text[i]))
+                    if ((text[i - 1] != ' ' && !isUpperOrNum(text[i - 1])) ||
+                        (isUpperOrNum(text[i - 1]) && 
+                        // Preserve acronyms
+                        i < text.Length - 1 && !isUpperOrNum(text[i + 1])))
                         newText.Append(' ');
                 newText.Append(text[i]);
             }
@@ -57,7 +64,7 @@ namespace MarkovCraft
             GetComponentInChildren<Button>().onClick.AddListener(action);
         }
 
-        public void SetPreviewSprite(Sprite sprite)
+        public void SetPreviewSprite(Sprite sprite, bool is3dPreview)
         {
             modelPreviewImage!.sprite = sprite;
 
@@ -65,10 +72,8 @@ namespace MarkovCraft
             var scale = frameSize / shorterSide;
 
             modelPreviewImage.SetNativeSize();
-            modelPreviewImage.rectTransform.localScale = new(scale, scale, 1F);
-
-            //modelPreviewImage!.rectTransform.sizeDelta
-            //        = new(sprite.rect.width / 2F, sprite.rect.height / 2F);
+            // Stretch height if it is 3d, to make it look better
+            modelPreviewImage.rectTransform.localScale = new(scale, is3dPreview ? scale * 1.1F : scale, 1F);
         }
     }
 }

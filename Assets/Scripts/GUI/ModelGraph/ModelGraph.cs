@@ -63,9 +63,7 @@ namespace MarkovCraft
                     // Scroll to the active node (bottom aligned)
                     GraphContentTransform.anchoredPosition = new(0, -aPos + aHgt - vHgt);
                 }
-                
             }
-            
         }
 
         public void ToggleNodeNamesVisibility()
@@ -82,7 +80,7 @@ namespace MarkovCraft
             activeNode = null;
 
             foreach (Transform child in GraphContentTransform!)
-                GameObject.Destroy(child.gameObject);
+                Destroy(child.gameObject);
             
             GraphContentTransform!.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 0F);
             
@@ -124,20 +122,6 @@ namespace MarkovCraft
             ACTIVE = ColorConvert.OpaqueColor32FromHexString(settings.Get("active", "FFFFFF"));
         }
 
-        static byte[] NonZeroPositions(int w)
-        {
-            int amount = 0, wcopy = w;
-            for (byte p = 0; p < 32; p++, w >>= 1) if ((w & 1) == 1) amount++;
-            byte[] result = new byte[amount];
-            amount = 0;
-            for (byte p = 0; p < 32; p++, wcopy >>= 1) if ((wcopy & 1) == 1)
-                {
-                    result[amount] = p;
-                    amount++;
-                }
-            return result;
-        }
-
         public static void GenerateGraph(ModelGraph graph, string modelName, Branch root, Dictionary<char, Color32> palette)
         {
             const int ZSHIFT = 4;
@@ -146,7 +130,7 @@ namespace MarkovCraft
             // Clear up model graph first
             graph.ClearUp();
             
-            graph.ModelNameText!.text = modelName;
+            graph.ModelNameText!.text = ModelItem.AddSpacesBeforeUppercase(modelName);
             Color32 BACKGROUND = new(0, 0, 0, 0);
 
             void drawRectangle(Color32[] bitmap, int bitmapWidth, int bitmapHeight, int x, int y, int width, int height, Color32 color)
@@ -280,7 +264,7 @@ namespace MarkovCraft
             }
         }
 
-        private static Dictionary<Type, string> NodeNameDict = new()
+        private static readonly Dictionary<Type, string> NodeNameDict = new()
         {
             [typeof (OneNode)] =           "one",
             [typeof (AllNode)] =           "all",

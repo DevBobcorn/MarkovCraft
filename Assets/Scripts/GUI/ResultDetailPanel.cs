@@ -76,12 +76,7 @@ namespace MarkovCraft
             
             if (exporter is not null)
             {
-                var prev = exporter.GetPreviewData();
-
-                int sizeX = prev.sizeX;
-                int sizeY = prev.sizeY;
-                int sizeZ = prev.sizeZ;
-
+                var (sizeX, sizeY, sizeZ, state, colors) = exporter.GetPreviewData();
                 bool is2d = sizeZ == 1;
 
                 if (initRotation)
@@ -91,7 +86,7 @@ namespace MarkovCraft
                 }
 
                 // Update Preview Image
-                var (pixels, texX, texY) = RenderPreview(prev.sizeX, prev.sizeY, prev.sizeZ, prev.state, prev.colors, currentRotation);
+                var (pixels, texX, texY) = RenderPreview(sizeX, sizeY, sizeZ, state, colors, currentRotation);
                 var tex = MarkovJunior.Graphics.CreateTexture2D(pixels, texX, texY);
                 //tex.filterMode = FilterMode.Point;
                 // Update sprite

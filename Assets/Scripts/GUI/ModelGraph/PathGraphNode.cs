@@ -19,7 +19,7 @@ namespace MarkovCraft
             {
                 for (int i = 0;i < froms.Length;i++)
                 {
-                    var colorPreview = GameObject.Instantiate(ColorPreviewPrefab, pathStarts);
+                    var colorPreview = Instantiate(ColorPreviewPrefab, pathStarts);
                     colorPreview!.GetComponent<Image>().color = froms[i];
                 }
             }
@@ -28,7 +28,7 @@ namespace MarkovCraft
             {
                 for (int i = 0;i < tos.Length;i++)
                 {
-                    var colorPreview = GameObject.Instantiate(ColorPreviewPrefab, pathEnds);
+                    var colorPreview = Instantiate(ColorPreviewPrefab, pathEnds);
                     colorPreview!.GetComponent<Image>().color = tos[i];
                 }
             }
@@ -37,7 +37,7 @@ namespace MarkovCraft
             {
                 for (int i = 0;i < ons.Length;i++)
                 {
-                    var colorPreview = GameObject.Instantiate(ColorPreviewPrefab, pathSubstrates);
+                    var colorPreview = Instantiate(ColorPreviewPrefab, pathSubstrates);
                     colorPreview!.GetComponent<Image>().color = ons[i];
                 }
             }

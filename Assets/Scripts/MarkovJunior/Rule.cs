@@ -21,21 +21,11 @@ namespace MarkovJunior
         public bool original;
         public int ruleIndex;
 
-        public static int GetTrailingZeroCount(int number)
+        public static int GetTrailingZeroCount(int w)
         {
-            // return System.Numerics.BitOperations.TrailingZeroCount(number);
-
-            int count = 0;
-
-            for (int bit = 0; bit < sizeof (int) << 3; bit++)
-            {
-                if ((number & (1 << bit)) != 0)
-                    break;
-
-                count++;
-            }
-
-            return count;
+            for (byte p = 0; p < 32; p++, w >>= 1)
+                if ((w & 1) == 1) return p;
+            return 0xff;
         }
 
         public Rule(int[] input, int IMX, int IMY, int IMZ, byte[] output, int OMX, int OMY, int OMZ, int C, double p)

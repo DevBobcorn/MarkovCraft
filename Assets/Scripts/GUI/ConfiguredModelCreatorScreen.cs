@@ -35,7 +35,7 @@ namespace MarkovCraft
         [SerializeField] public GameObject? ModelItemPrefab;
         [SerializeField] public RectTransform? GridTransform;
         private readonly Dictionary<string, ModelItem> modelItems = new();
-        private readonly Dictionary<string, UnityEngine.Sprite> cachedModelPreviews = new();
+        private readonly Dictionary<string, (UnityEngine.Sprite, bool)> cachedModelPreviews = new();
         private string selectedModel = string.Empty;
 
         private bool working = false, properlyLoaded = false;
@@ -73,7 +73,7 @@ namespace MarkovCraft
                 ModelInput!.text = modelName;
 
                 // Update conf model name
-                SaveNameInput!.text = $"{modelName}.xml";
+                //SaveNameInput!.text = $"{modelName}.xml";
             }
         }
 
@@ -147,9 +147,10 @@ namespace MarkovCraft
         private IEnumerator LoadPreviews()
         {
             var prevDir = PathHelper.GetExtraDataFile("model_previews");
+            var prev3dDir = PathHelper.GetExtraDataFile($"model_previews{SP}3d");
             var pairs = modelItems.ToArray();
 
-            var wait = new WaitForSecondsRealtime(0.05F);
+            var wait = new WaitForSecondsRealtime(0.03F);
 
             foreach (var pair in pairs)
             {
@@ -158,13 +159,26 @@ namespace MarkovCraft
                 // See if preview is cached
                 if (cachedModelPreviews.ContainsKey(modelName))
                 {
-                    pair.Value.SetPreviewSprite(cachedModelPreviews[modelName]);
+                    (var sprite, var is3d) = cachedModelPreviews[modelName];
+                    pair.Value.SetPreviewSprite(sprite, is3d);
                     continue;
                 }
 
                 var prevPath = prevDir + $"{SP}{modelName}.png";
+                bool is3dPrev = false;
+
+                bool prevFound = File.Exists(prevPath);
+
+                if (!prevFound) // 2d preview not found, Check 3d preview
+                {
+                    prevPath = prev3dDir + $"{SP}{modelName}.png";
+                    prevFound = File.Exists(prevPath);
+
+                    if (prevFound) is3dPrev = true;
+                }
+
                 // See if preview is available
-                if (File.Exists(prevPath))
+                if (prevFound)
                 {
                     var tex = new Texture2D(2, 2);
                     //tex.filterMode = FilterMode.Point;
@@ -178,8 +192,8 @@ namespace MarkovCraft
                         yield break;
                     }
 
-                    pair.Value.SetPreviewSprite(sprite);
-                    cachedModelPreviews.Add(modelName, sprite);
+                    pair.Value.SetPreviewSprite(sprite, is3dPrev);
+                    cachedModelPreviews.Add(modelName, (sprite, is3dPrev));
 
                     yield return wait;
                 }

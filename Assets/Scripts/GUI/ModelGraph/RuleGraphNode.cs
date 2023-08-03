@@ -27,7 +27,7 @@ namespace MarkovCraft
 
         public void AddRulePreview(int siblingId, Texture2D inPreview, Texture2D outPreview)
         {
-            var rulePreview = GameObject.Instantiate(RulePreviewPrefab, transform);
+            var rulePreview = Instantiate(RulePreviewPrefab, transform);
             rulePreview!.transform.SetAsLastSibling();
 
             var rulePrev = rulePreview.GetComponent<RulePreview>();
