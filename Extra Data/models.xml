@@ -3,9 +3,33 @@
     <!-- Recommended Models -->
     <Preset Model="Apartemazements" SizeX="8" SizeY="8" SizeZ="8"/>
     <Preset Model="CarmaTower" SizeX="12" SizeY="12" SizeZ="18"/>
+    <Preset Model="ClosedSurface" SizeX="12" SizeY="12" SizeZ="12"/>
+    <Preset Model="ColoredKnots" SizeX="12" SizeY="12" SizeZ="12"/>
+    <Preset Model="Escher" SizeX="8" SizeY="8" SizeZ="8"/>
+    <Preset Model="EscherSurface" SizeX="8" SizeY="8" SizeZ="8"/>
+    <Preset Model="Hills" SizeX="40" SizeY="40" SizeZ="12"/>
+    <Preset Model="Knots2D" SizeX="12" SizeY="12"/>
+    <Preset Model="Knots3D" SizeX="8" SizeY="8" SizeZ="8"/>
     <Preset Model="ModernHouse" SizeX="9" SizeY="9" SizeZ="4"/>
+    <Preset Model="Noise" SizeX="24" SizeY="24" SizeZ="24"/>
+    <Preset Model="OddScale" SizeX="8" SizeY="8"/>
+    <Preset Model="OddScale3D" SizeX="8" SizeY="8" SizeZ="8"/>
+    <Preset Model="OpenCave" SizeX="80" SizeY="80"/>
+    <Preset Model="OpenCave3D" SizeX="40" SizeY="40" SizeZ="40"/>
+    <Preset Model="OrientedEscher" SizeX="6" SizeY="6" SizeZ="6"/>
+    <Preset Model="ParallelGrowth" SizeX="29" SizeY="29" SizeZ="29" Steps="24"/>
+    <Preset Model="ParallelMazeGrowth" SizeX="179" SizeY="179"/>
+    <Preset Model="Partitioning" SizeX="11" SizeY="11" SizeZ="3"/>
+    <Preset Model="PeriodicEscher" SizeX="8" SizeY="8" SizeZ="8"/>
+    <Preset Model="PillarsOfEternity" SizeX="9" SizeY="9" SizeZ="9"/>
+    <Preset Model="River" SizeX="20" SizeY="20" SizeZ="20"/>
     <Preset Model="SeaVilla" SizeX="10" SizeY="10" SizeZ="4"/>
+    <Preset Model="StairsPath" SizeX="33" SizeY="33" SizeZ="33"/>
+    <Preset Model="StrangeDungeon" SizeX="29" SizeY="29" SizeZ="29"/>
+    <Preset Model="SubmergedKnots" SizeX="12" SizeY="12" SizeZ="12"/>
+    <Preset Model="Surface" SizeX="10" SizeY="10" SizeZ="10"/>
     <Preset Model="Island" SizeX="800" SizeY="800"/>
+    <Preset Model="WaveBrickWall" SizeX="50" SizeY="50"/>
     <!-- Other Models -->
     <Preset Model="Backtracker" SizeX="89" SizeY="89"/>
     <Preset Model="BacktrackerCycle" SizeX="59" SizeY="59" Steps="1000"/>
@@ -29,8 +53,6 @@
     <Preset Model="ChainDungeonMaze" SizeX="60" SizeY="60"/>
     <Preset Model="ChainMaze" SizeX="60" SizeY="60" Animated="true"/>
     <Preset Model="Circuit" SizeX="59" SizeY="59" Steps="1200"/>
-    <Preset Model="ClosedSurface" SizeX="12" SizeY="12" SizeZ="12"/>
-    <Preset Model="ColoredKnots" SizeX="12" SizeY="12" SizeZ="12"/>
     <Preset Model="CompleteSAW" SizeX="19" SizeY="19"/>
     <Preset Model="CompleteSAWSmart" SizeX="23" SizeY="23"/>
     <Preset Model="ConnectedCaves" SizeX="60" SizeY="60"/>
@@ -48,8 +70,6 @@
     <Preset Model="DualRetraction3D" SizeX="27" SizeY="27" SizeZ="27"/>
     <Preset Model="DungeonGrowth" SizeX="79" SizeY="79" Amount="4"/>
     <Preset Model="Dwarves" SizeX="20" SizeY="20" Steps="85" Animated="true"/>
-    <Preset Model="Escher" SizeX="8" SizeY="8" SizeZ="8"/>
-    <Preset Model="EscherSurface" SizeX="8" SizeY="8" SizeZ="8"/>
     <Preset Model="EuclideanPath" SizeX="80" SizeY="80"/>
     <Preset Model="FindLongCycle" SizeX="27" SizeY="27"/>
     <Preset Model="FireNoise" SizeX="300" SizeY="300"/>
@@ -65,13 +85,10 @@
     <Preset Model="GrowTo" SizeX="120" SizeY="120" Steps="2000"/>
     <Preset Model="HamiltonianPath" SizeX="39" SizeY="39" Steps="150000"/>
     <Preset Model="HamiltonianPaths" SizeX="39" SizeY="39" Steps="1000"/>
-    <Preset Model="Hills" SizeX="40" SizeY="40" SizeZ="12"/>
     <Preset Model="IrregularMazeGrowth" SizeX="79" SizeY="79"/>
     <Preset Model="IrregularSAW" SizeX="79" SizeY="79"/>
     <Preset Model="Keys" SizeX="23" SizeY="23" SizeZ="23"/>
     <Preset Model="KnightPatrol" SizeX="60" SizeY="60" Steps="200"/>
-    <Preset Model="Knots2D" SizeX="12" SizeY="12"/>
-    <Preset Model="Knots3D" SizeX="8" SizeY="8" SizeZ="8"/>
     <Preset Model="Laplace" SizeX="60" SizeY="60" Steps="1000"/>
     <Preset Model="LoopGrowth" SizeX="37" SizeY="37"/>
     <Preset Model="LostCity" SizeX="256" SizeY="256"/>
@@ -85,29 +102,17 @@
     <Preset Model="MultiHeadedWalkDungeon" SizeX="59" SizeY="59"/>
     <Preset Model="NestedGrowth" SizeX="80" SizeY="80" Steps="100"/>
     <Preset Model="NoDeadEnds" SizeX="19" SizeY="19" SizeZ="19"/>
-    <Preset Model="Noise" SizeX="24" SizeY="24" SizeZ="24"/>
     <Preset Model="NystromDungeon" SizeX="39" SizeY="39" Amount="4"/>
-    <Preset Model="OddScale" SizeX="8" SizeY="8"/>
-    <Preset Model="OddScale3D" SizeX="8" SizeY="8" SizeZ="8"/>
-    <Preset Model="OpenCave" SizeX="80" SizeY="80"/>
-    <Preset Model="OpenCave3D" SizeX="40" SizeY="40" SizeZ="40"/>
-    <Preset Model="OrganicMechanic" SizeX="30" SizeY="30" Steps="200"/>
-    <Preset Model="OrientedEscher" SizeX="6" SizeY="6" SizeZ="6"/>
+    <Preset Model="OrganicMechanic" SizeX="30" SizeY="30" Steps="200" Animated="true"/>
     <Preset Model="PaintCompetition" SizeX="48" SizeY="48" Steps="400"/>
-    <Preset Model="ParallelGrowth" SizeX="29" SizeY="29" SizeZ="29" Steps="24"/>
-    <Preset Model="ParallelMazeGrowth" SizeX="179" SizeY="179"/>
-    <Preset Model="Partitioning" SizeX="11" SizeY="11" SizeZ="3"/>
     <Preset Model="Percolation" SizeX="360" SizeY="360"/>
-    <Preset Model="PeriodicEscher" SizeX="8" SizeY="8" SizeZ="8"/>
-    <Preset Model="PillarsOfEternity" SizeX="9" SizeY="9" SizeZ="9"/>
-    <Preset Model="Push" SizeX="40" SizeY="40" Steps="8000"/>
+    <Preset Model="Push" SizeX="40" SizeY="40" Steps="8000" Animated="true"/>
     <Preset Model="PutColoredLs" SizeX="30" SizeY="30"/>
     <Preset Model="PutLs" SizeX="50" SizeY="50"/>
     <Preset Model="RainbowGrowth" SizeX="59" SizeY="59" Steps="1600"/>
     <Preset Model="RegularPath" SizeX="79" SizeY="79"/>
     <Preset Model="RegularSAW" SizeX="19" SizeY="19" SizeZ="19"/>
     <Preset Model="RegularSAWRestart" SizeX="19" SizeY="19" SizeZ="19"/>
-    <Preset Model="River" SizeX="20" SizeY="20" SizeZ="20"/>
     <Preset Model="SAWRestart" SizeX="79" SizeY="79" Steps="2000"/>
     <Preset Model="SelectLargeCaves" SizeX="60" SizeY="60"/>
     <Preset Model="SelectLongKnots" SizeX="10" SizeY="10" SizeZ="10"/>
@@ -118,21 +123,16 @@
     <Preset Model="SmoothTrail" SizeX="59" SizeY="59"/>
     <Preset Model="SnellLaw" SizeX="80" SizeY="80"/>
     <Preset Model="SoftPath" SizeX="80" SizeY="80" SizeZ="80"/>
-    <Preset Model="StairsPath" SizeX="33" SizeY="33" SizeZ="33"/>
     <Preset Model="StochasticVoronoi" SizeX="50" SizeY="50" SizeZ="50"/>
     <Preset Model="StormySnellLaw" SizeX="120" SizeY="120"/>
     <Preset Model="StrangeNoise" SizeX="60" SizeY="60" Steps="500"/>
-    <Preset Model="StrangeDungeon" SizeX="29" SizeY="29" SizeZ="29"/>
     <Preset Model="StrangeGrowth" SizeX="59" SizeY="59" Steps="700"/>
-    <Preset Model="SubmergedKnots" SizeX="12" SizeY="12" SizeZ="12"/>
-    <Preset Model="Surface" SizeX="10" SizeY="10" SizeZ="10"/>
-    <Preset Model="Tetris" SizeX="30" SizeY="30" Steps="1500"/>
+    <Preset Model="Tetris" SizeX="30" SizeY="30" Steps="1500" Animated="true"/>
     <Preset Model="Texture" SizeX="240" SizeY="240"/>
     <Preset Model="TileDungeon" SizeX="12" SizeY="12" Amount="4"/>
     <Preset Model="TilePath" SizeX="20" SizeY="20"/>
     <Preset Model="Trail" SizeX="59" SizeY="59" Steps="3000"/>
     <Preset Model="Voronoi" SizeX="60" SizeY="60" SizeZ="60"/>
-    <Preset Model="WaveBrickWall" SizeX="50" SizeY="50"/>
     <Preset Model="WaveDungeon" SizeX="50" SizeY="50"/>
     <Preset Model="WaveFlowers" SizeX="60" SizeY="60"/>
     <Preset Model="WolfBasedApproach" SizeX="70" SizeY="70" Steps="300"/>
