@@ -293,7 +293,7 @@ MonoBehaviour:
   modelNameText: {fileID: 2975874605020888252}
   modelPreviewImage: {fileID: 7863164763177524149}
   modelPreviewFrame: {fileID: 2240676950909568280}
-  frameSize: 170
+  frameSize: 160
 --- !u!1 &6848223940664504965
 GameObject:
   m_ObjectHideFlags: 0
