@@ -3,20 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
+
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Xml.Linq;
-
-using MarkovJunior;
-using MinecraftClient;
 
 namespace MarkovCraft
 {
     public class ConfiguredModelEditorScreen : BaseScreen
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
-        private const string MODEL_FOLDER = "configured_models";
+        private const string CONFIGURED_MODEL_FOLDER = "configured_models";
 
         [SerializeField] public TMP_Text? ScreenHeader;
         // Settings Panel
@@ -288,7 +286,7 @@ namespace MarkovCraft
                         BlockState = x.GetBlockState()
                     }).ToArray();
                     
-                    var savePath = PathHelper.GetExtraDataFile("configured_models");
+                    var savePath = PathHelper.GetExtraDataFile(CONFIGURED_MODEL_FOLDER);
                     var specifiedName = SaveNameInput!.text;
 
                     if (ExporterScreen.CheckFileName(specifiedName))
@@ -299,15 +297,13 @@ namespace MarkovCraft
                     ConfiguredModel.GetXMLDoc(model).Save($"{savePath}{SP}{saveFileName}");
                 }
 
-                var game = GameScene.Instance as GenerationScene;
-
-                if (game is null)
+                if (GameScene.Instance is not GenerationScene game)
                 {
                     Debug.LogError("Wrong game scene!");
                     working = false;
                     return;
                 }
-                
+
                 working = false;
 
                 manager?.SetActiveScreenByType<GenerationScreen>();

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -34,6 +35,7 @@ namespace MarkovCraft
         [SerializeField] public GameObject? ModelItemPrefab;
         [SerializeField] public RectTransform? GridTransform;
         private readonly Dictionary<string, ModelItem> modelItems = new();
+        private readonly Dictionary<string, UnityEngine.Sprite> cachedModelPreviews = new();
         private string selectedModel = string.Empty;
 
         private bool working = false, properlyLoaded = false;
@@ -69,6 +71,9 @@ namespace MarkovCraft
 
                 // Update text input
                 ModelInput!.text = modelName;
+
+                // Update conf model name
+                SaveNameInput!.text = $"{modelName}.xml";
             }
         }
 
@@ -103,9 +108,9 @@ namespace MarkovCraft
                 var modelItem = modelItemObj.GetComponent<ModelItem>();
                 int x = melem.Get<int>("SizeX");
                 int y = melem.Get<int>("SizeY");
-                int z = melem.Get<int>("SizeZ");
-                int steps = melem.Get<int>("Steps", maxSteps);
-                bool animated = melem.Get<bool>("Animated", false);
+                int z = melem.Get("SizeZ", 1);
+                int steps = melem.Get("Steps", maxSteps);
+                bool animated = melem.Get("Animated", false);
 
                 modelItem.SetModelData(modelName, x, y, z, steps, animated);
                 modelItem.SetClickEvent(() => SelectModelItem(modelName));
@@ -148,7 +153,16 @@ namespace MarkovCraft
 
             foreach (var pair in pairs)
             {
-                var prevPath = prevDir + $"{SP}{pair.Key}.png";
+                var modelName = pair.Key;
+
+                // See if preview is cached
+                if (cachedModelPreviews.ContainsKey(modelName))
+                {
+                    pair.Value.SetPreviewSprite(cachedModelPreviews[modelName]);
+                    continue;
+                }
+
+                var prevPath = prevDir + $"{SP}{modelName}.png";
                 // See if preview is available
                 if (File.Exists(prevPath))
                 {
@@ -165,6 +179,7 @@ namespace MarkovCraft
                     }
 
                     pair.Value.SetPreviewSprite(sprite);
+                    cachedModelPreviews.Add(modelName, sprite);
 
                     yield return wait;
                 }
@@ -207,7 +222,7 @@ namespace MarkovCraft
                     int.TryParse(StepsPerRefreshInput!.text, out model.StepsPerRefresh);
                     model.Seeds = SeedsInput!.text.Split(' ').Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => int.Parse(x)).ToArray();
                     
-                    var savePath = PathHelper.GetExtraDataFile("configured_models");
+                    var savePath = PathHelper.GetExtraDataFile(CONFIGURED_MODEL_FOLDER);
                     var specifiedName = SaveNameInput!.text;
 
                     if (ExporterScreen.CheckFileName(specifiedName))
@@ -218,15 +233,13 @@ namespace MarkovCraft
                     ConfiguredModel.GetXMLDoc(model).Save($"{savePath}{SP}{saveFileName}");
                 }
 
-                var game = GameScene.Instance as GenerationScene;
-
-                if (game is null)
+                if (GameScene.Instance is not GenerationScene game)
                 {
                     Debug.LogError("Wrong game scene!");
                     working = false;
                     return;
                 }
-                
+
                 working = false;
 
                 manager?.SetActiveScreenByType<GenerationScreen>();

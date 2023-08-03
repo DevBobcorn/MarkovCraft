@@ -23,7 +23,8 @@ namespace MarkovCraft
     public class GenerationScene : GameScene
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
-        private static readonly Vector3 BLOCK_SELECTION_HIDDEN_POS = new Vector3(0F, -100F, 0F);
+        private const string CONFIGURED_MODEL_FOLDER = "configured_models";
+        private static readonly Vector3 BLOCK_SELECTION_HIDDEN_POS = new(0F, -100F, 0F);
 
         [SerializeField] private ScreenManager? screenManager;
         [SerializeField] public CameraController? CamController;
@@ -44,7 +45,6 @@ namespace MarkovCraft
         [SerializeField] public Button? CreateButton, ConfigButton, ExecuteButton, ExportButton;
         [SerializeField] public ModelGraph? ModelGraphUI;
         [SerializeField] public GameObject? GenerationResultPrefab;
-        private readonly List<GenerationResult> generationResults = new();
         private GenerationResult? selectedResult = null;
 
         // Character => RGB Color specified in base palette
@@ -669,7 +669,7 @@ namespace MarkovCraft
 
         private void UpdateConfModelList()
         {
-            var dir = PathHelper.GetExtraDataFile("configured_models");
+            var dir = PathHelper.GetExtraDataFile(CONFIGURED_MODEL_FOLDER);
 
             if (Directory.Exists(dir))
             {
@@ -718,7 +718,7 @@ namespace MarkovCraft
             
             confModelFile = newConfModelFile;
 
-            var xdoc = XDocument.Load($"{PathHelper.GetExtraDataFile("configured_models")}/{confModelFile}");
+            var xdoc = XDocument.Load($"{PathHelper.GetExtraDataFile(CONFIGURED_MODEL_FOLDER)}/{confModelFile}");
             var newConfModel = ConfiguredModel.CreateFromXMLDoc(xdoc);
 
             // Assign new configured model

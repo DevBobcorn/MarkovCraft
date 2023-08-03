@@ -7,8 +7,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-using MinecraftClient;
-
 namespace MarkovCraft
 {
     public class ExporterScreen : BaseScreen
@@ -75,8 +73,8 @@ namespace MarkovCraft
                 yield break;
             }
 
-            var data = exportData.Value;
-            bool is2d = data.FZ == 1;
+            var (info, state, legend, FX, FY, FZ, steps) = exportData.Value;
+            bool is2d = FZ == 1;
 
             // Initialize settings panel
             var savedExportPath = PlayerPrefs.GetString(EXPORT_PATH_KEY, PathHelper.GetDefaultExportPath());
@@ -123,7 +121,7 @@ namespace MarkovCraft
             yield return null;
 
             // The character chosen to be air block (not used when 'is2d' equals true)
-            var airCharacter = data.legend[0];
+            var airCharacter = legend[0];
 
             foreach (var item in mappingItems)
             {
@@ -137,10 +135,10 @@ namespace MarkovCraft
             working = false;
             properlyLoaded = true;
 
-            ScreenHeader!.text = GameScene.GetL10nString("exporter.text.loaded", data.info[0]);
+            ScreenHeader!.text = GameScene.GetL10nString("exporter.text.loaded", info[0]);
             
             // Update Info text
-            InfoText!.text = GameScene.GetL10nString("export.text.result_info", data.info[0], data.info[1], data.FX, data.FY, data.FZ);
+            InfoText!.text = GameScene.GetL10nString("export.text.result_info", info[0], info[1], FX, FY, FZ);
             var prev = GetPreviewData();
 
             // Update selected format (and also update default export file name)
@@ -167,9 +165,7 @@ namespace MarkovCraft
 
             ScreenHeader!.text = GameScene.GetL10nString("exporter.text.loading");
             
-            var game = GameScene.Instance as GenerationScene;
-
-            if (game is null)
+            if (GameScene.Instance is not GenerationScene game)
             {
                 Debug.LogError("Wrong game scene!");
                 working = false;
@@ -233,8 +229,8 @@ namespace MarkovCraft
 
         public (int sizeX, int sizeY, int sizeZ, byte[] state, int[] colors) GetPreviewData()
         {
-            var data = exportData!.Value;
-            return (data.FX, data.FY, data.FZ, data.state, data.legend.Select(
+            var (info, state, legend, FX, FY, FZ, steps) = exportData!.Value;
+            return (FX, FY, FZ, state, legend.Select(
                     x => ColorConvert.GetOpaqueRGB(exportPalette![x].Color)).ToArray());
         }
 
@@ -308,7 +304,7 @@ namespace MarkovCraft
                 working = true;
 
                 var path = ExportFolderInput!.text;
-                var data = exportData!.Value;
+                var (info, state, legend, FX, FY, FZ, steps) = exportData!.Value;
                 var fileName = ExportNameInput!.text;
 
                 var dirInfo = new DirectoryInfo(path);
@@ -354,16 +350,16 @@ namespace MarkovCraft
                 switch (formatIndex)
                 {
                     case 0: // sponge schem
-                        SpongeSchemExporter.Export(data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, fileName, minimumCharSet, exportDataVersion);
+                        SpongeSchemExporter.Export(state, legend, FX, FY, FZ, exportPalette!, dirInfo, fileName, minimumCharSet, exportDataVersion);
                         break;
                     case 1: // nbt structure
-                        NbtStructureExporter.Export(data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, fileName, minimumCharSet, exportDataVersion);
+                        NbtStructureExporter.Export(state, legend, FX, FY, FZ, exportPalette!, dirInfo, fileName, minimumCharSet, exportDataVersion);
                         break;
                     case 2: // mcfunction
-                        McFuncExporter.Export(data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, fileName);
+                        McFuncExporter.Export(state, legend, FX, FY, FZ, exportPalette!, dirInfo, fileName);
                         break;
                     case 3: // vox model
-                        VoxModelExporter.Export(data.state, data.legend, data.FX, data.FY, data.FZ, exportPalette!, dirInfo, fileName);
+                        VoxModelExporter.Export(state, legend, FX, FY, FZ, exportPalette!, dirInfo, fileName);
                         break;
                 }
                 
