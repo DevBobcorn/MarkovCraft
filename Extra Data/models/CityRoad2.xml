@@ -1,0 +1,45 @@
+<sequence values="BW">
+  <all in="***/*B*/***" out="***/*W*/***"/>
+  <markov>
+    <one in="WWW/WBW" out="WBW/WBW"/>
+    <one in="WWWWWWW/BBBBBBB" out="WWWBWWW/BBBBBBB"/>
+  </markov>
+  <map scale="13 13 1" values="wbvhGBWCRYH">
+    <rule in="B" out="wwwwwwwwwwwww/wbbbbbbbbbbbw/wbRRRRRRRRRbw/wbRRRRRRRRRbw/wbRRRRRRRRRbw/wbRRRRRRRRRbw/wbRRRRRRRRRbw/wbRRRRRRRRRbw/wbRRRRRRRRRbw/wbRRRRRRRRRbw/wbRRRRRRRRRbw/wbbbbbbbbbbbw/wwwwwwwwwwwww" comment="Mark road cells"/>
+    <rule in="W" out="hhhhhhhhhhhhh/hhhhhhhhhhhhh/hhhhhhhhhhhhh/hhhhhhhhhhhhh/hhhhhhhhhhhhh/hhhhhhhhhhhhh/hhhhhhhhhhhhh/hhhhhhhhhhhhh/hhhhhhhhhhhhh/hhhhhhhhhhhhh/hhhhhhhhhhhhh/hhhhhhhhhhhhh/hhhhhhhhhhhhh" comment="Mark building cells"/>
+    <!-- Road processing -->
+    <all in="bbbbbbbbbbb/wwwwwwwwwww/wwwwwwwwwww/bbbbbbbbbbb" out="bbbbbbbbbbb/bbbbbbbbbbb/bbbbbbbbbbb/bbbbbbbbbbb" comment="Connect roads"/>
+    <all
+    in="wbbbbbbbbbbbw/bbbbbbbbbbbbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbbbbbbbbbbbb/wbbbbbbbbbbbw"
+    out="vbbbbbbbbbbbv/bbbbbbbbbbbbb/bbRRRRRRRRRbb/bbRbbbbbbbRbb/bbRbbbbbbbRbb/bbRbbbbbbbRbb/bbRbbbbbbbRbb/bbRbbbbbbbRbb/bbRbbbbbbbRbb/bbRbbbbbbbRbb/bbRRRRRRRRRbb/bbbbbbbbbbbbb/vbbbbbbbbbbbv"
+    comment="Mark X-Crossroads"/>
+    <all
+    in="wbbbbbbbbbbbw/bbbbbbbbbbbbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbbbbbbbbbbbb/wwwwwwwwwwwww"
+    out="vbbbbbbbbbbbv/bbbbbbbbbbbbb/bbCCCCCCCCCbb/bbCbbbbbbbCbb/bbCbbbbbbbCbb/bbCbbbbbbbCbb/bbCbbbbbbbCbb/bbCbbbbbbbCbb/bbCbbbbbbbCbb/bbCbbbbbbbCbb/bbCbbbbbbbCbb/bbbbbbbbbbbbb/wwwwwwwwwwwww"
+    comment="Mark T-Crossroads"/>
+    <all
+    in="wbbbbbbbbbbbw/bbbbbbbbbbbbw/bbRRRRRRRRRbw/bbRRRRRRRRRbw/bbRRRRRRRRRbw/bbRRRRRRRRRbw/bbRRRRRRRRRbw/bbRRRRRRRRRbw/bbRRRRRRRRRbw/bbRRRRRRRRRbw/bbRRRRRRRRRbw/bbbbbbbbbbbbw/wwwwwwwwwwwww"
+    out="vbbbbbbbbbbbw/bbbbbbbbbbbbw/bbbbbbbbbbRbw/bbbbbbbbbbRbw/bbbbbbbbbbRbw/bbbbbbbbbbRbw/bbbbbbbbbbRbw/bbbbbbbbbbRbw/bbbbbbbbbbRbw/bbbbbbbbbbRbw/bbRRRRRRRRRbw/bbbbbbbbbbbbw/wwwwwwwwwwwww"
+    comment="Mark X-Crossroads"/>
+    <all
+    in="wwwwwwwwwwwww/bbbbbbbbbbbbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbRRRRRRRRRbb/bbbbbbbbbbbbb/wwwwwwwwwwwww"
+    out="wwwwwwwwwwwww/bbbbbbbbbbbbb/bbbbbbbbbbbbb/bYYYYYbYYYYYb/bbbbbbbbbbbbb/bbbbbbbbbbbbb/WWWWWWWWWWWWW/bbbbbbbbbbbbb/bbbbbbbbbbbbb/bYYYYYbYYYYYb/bbbbbbbbbbbbb/bbbbbbbbbbbbb/wwwwwwwwwwwww"
+    comment="Mark staight sections"/>
+
+    <!--Crosswalks -->
+    <all
+    in="bbbbWbbbb/bYbbWbbYb/bYbbWbbYb/bYbbWbbYb/bYbbWbbYb/bYbbWbbYb/bbbbWbbbb/bbbbbbbbb/bbbbbbbbb/RRRRRRRRR"
+    out="bbbbbbbbb/bWbWbWbWb/bWbWbWbWb/bWbWbWbWb/bWbWbWbWb/bWbWbWbWb/bbbbbbbbb/bbbbbbbbb/bbbbbbbbb/RRRRRRRRR"/>
+    <all
+    in="bbbbWbbbb/bYbbWbbYb/bYbbWbbYb/bYbbWbbYb/bYbbWbbYb/bYbbWbbYb/bbbbWbbbb/bbbbbbbbb/bbbbbbbbb/CCCCCCCCC"
+    out="bbbbbbbbb/bWbWbWbWb/bWbWbWbWb/bWbWbWbWb/bWbWbWbWb/bWbWbWbWb/bbbbbbbbb/bbbbbbbbb/bbbbbbbbb/CCCCCCCCC"/>
+
+    <!-- Remove remaining marks on roads -->
+    <!--
+    <all in="C" out="b"/>
+    <all in="R" out="b"/>
+    -->
+    <!-- Building processing -->
+    <prl in="hhhhh/hhhhh/hhhhh/hhhhh/hhhhh" out="*****/*****/**H**/*****/*****"/>
+  </map>
+</sequence>
