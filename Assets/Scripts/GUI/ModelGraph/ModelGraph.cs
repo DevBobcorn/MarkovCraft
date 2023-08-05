@@ -255,12 +255,14 @@ namespace MarkovCraft
             }
             else // Set the current child node as active
             {
-                var currentNode = current.nodes[current.n];
-                graph.SetActiveNode(currentNode.numId);
+                if (current.n < current.nodes.Length)
+                {
+                    var currentNode = current.nodes[current.n];
+                    graph.SetActiveNode(currentNode.numId);
 
-                if (currentNode is RuleNode ruleNode && graph.ActiveNode is RuleGraphNode ruleGraphNode) // Set active branch
-                    ruleGraphNode.SetActiveRules(GetActiveRules(ruleNode));
-                
+                    if (currentNode is RuleNode ruleNode && graph.ActiveNode is RuleGraphNode ruleGraphNode) // Set active branch
+                        ruleGraphNode.SetActiveRules(GetActiveRules(ruleNode));
+                }
             }
         }
 
