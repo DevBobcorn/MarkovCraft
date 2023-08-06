@@ -281,7 +281,7 @@ namespace MarkovCraft
                     
                     model.CustomMapping = mappingItems.Where(x => x.ShouldBeSaved()).Select(x => new CustomMappingItem()
                     {
-                        Character = x.Character,
+                        Symbol = x.Character,
                         Color = ColorConvert.OpaqueColor32FromHexString(x.GetColorCode()),
                         BlockState = x.GetBlockState()
                     }).ToArray();

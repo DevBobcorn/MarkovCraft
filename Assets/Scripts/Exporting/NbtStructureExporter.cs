@@ -11,18 +11,11 @@ namespace MarkovCraft
 {
     public static class NbtStructureExporter
     {
-        private static readonly char SP = Path.DirectorySeparatorChar;
-        // Unity     X  Y  Z
-        // Markov    X  Z  Y
-        // Minecraft Z  Y  X
-
-        private static bool checkAir3d(byte index) => index == 0;
-
-        public static void Export(byte[] state, char[] legend, int FX, int FY, int FZ,
-                Dictionary<char, CustomMappingItem> exportPalette, DirectoryInfo dirInfo, string fileName, HashSet<char> minimumCharSet, int dataVersionInt)
+        public static void Export(int SizeX, int SizeY, int SizeZ, CustomMappingItem[] resultPalette,
+                int[] blockData, string filePath, int dataVersionInt)
         {
             var nbtObj = new Dictionary<string, object>();
-            int mcSizeX = FY, mcSizeY = FZ, mcSizeZ = FX;
+            int mcSizeX = SizeY, mcSizeY = SizeZ, mcSizeZ = SizeX;
 
             // Append size info
             nbtObj.Add("size", new object[] { mcSizeX, mcSizeY, mcSizeZ });
@@ -30,32 +23,28 @@ namespace MarkovCraft
             nbtObj.Add("entities", new object[]{ });
 
             var statePalette = BlockStatePalette.INSTANCE;
-            var structurePalette = new List<BlockState>();
+            var exportPalette = new List<BlockState>();
             // Character => index in structure palette
-            var structureRemap = new Dictionary<char, int>();
-
-            foreach (var item in exportPalette)
+            var resultIndex2exportIndex = new Dictionary<int, int>();
+            for (int resultIndex = 0;resultIndex < resultPalette.Length;resultIndex++)
             {
-                if (!minimumCharSet.Contains(item.Key))
-                {
-                    // Export palette may still contain a few unused entries, filter them out
-                    continue;
-                }
-
-                var stateStr = item.Value.BlockState;
+                var stateStr = resultPalette[resultIndex].BlockState;
                 var stateId = BlockStateHelper.GetStateIdFromString(stateStr);
                 if (stateId == BlockStateHelper.INVALID_BLOCKSTATE)
                     stateId = 0; // Replace invalid blockstates with air
                 var blockState = statePalette.StatesTable[stateId];
 
-                if (structurePalette.Contains(blockState))
-                    structureRemap.Add(item.Key, structurePalette.FindIndex(x => x == blockState));
+                if (exportPalette.Contains(blockState))
+                {
+                    var exportIndex = exportPalette.FindIndex(x => x == blockState);
+                    resultIndex2exportIndex.Add(resultIndex, exportIndex);
+                }
                 else // Blockstate not remapped yet, add it to the structure palette
                 {
-                    var idx = structurePalette.Count;
-                    structureRemap.Add(item.Key, idx);
-                    //Debug.Log($"[{idx}] {item.Key} => [{stateId}] {blockState}");
-                    structurePalette.Add(blockState);
+                    var exportIndex = exportPalette.Count;
+                    resultIndex2exportIndex.Add(resultIndex, exportIndex);
+                    //Debug.Log($"[{exportIndex}] {resultIndex} => [{stateId}] {blockState}");
+                    exportPalette.Add(blockState);
                 }
             }
 
@@ -63,10 +52,10 @@ namespace MarkovCraft
             var blocksData = new List<(int, int, int, int)>();
             for (int mcy = 0;mcy < mcSizeY;mcy++) for (int mcx = 0;mcx < mcSizeX;mcx++) for (int mcz = 0;mcz < mcSizeZ;mcz++)
             {
-                byte v = state[mcz + mcx * mcSizeZ + mcy * mcSizeZ * mcSizeX];
-                char ch = legend[v];
+                int resultIndex = blockData[mcz + mcx * mcSizeZ + mcy * mcSizeZ * mcSizeX];
+                int exportIndex = resultIndex2exportIndex[resultIndex];
 
-                blocksData.Add((mcx, mcy, mcz, structureRemap[ch]));
+                blocksData.Add((mcx, mcy, mcz, exportIndex));
             }
             // - blocks field
             nbtObj.Add("blocks", blocksData.Select(x => new Dictionary<string, object>() {
@@ -74,7 +63,7 @@ namespace MarkovCraft
                         ["state"] = (object) x.Item4
                     }).ToArray() );
             // - palette field
-            nbtObj.Add("palette", structurePalette.Select(x => {
+            nbtObj.Add("palette", exportPalette.Select(x => {
                         var stateAsDict = new Dictionary<string, object>();
                         if (x.Properties.Count > 0)
                             stateAsDict.Add("Properties", x.Properties.ToDictionary(y => y.Key, y => (object) y.Value));
@@ -87,7 +76,6 @@ namespace MarkovCraft
 
             // Turn dictionary object into byte array
             var nbtBlob = DataHelper.GetNbt(nbtObj);
-            var filePath = $"{dirInfo.FullName}{SP}{fileName}";
 
             // Compress nbt blob and save it
             using (var compressedStream = File.Open(filePath, FileMode.Create))

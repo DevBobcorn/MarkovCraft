@@ -11,6 +11,8 @@ namespace MarkovCraft
 {
     public class ExporterScreen : BaseScreen
     {
+        private static readonly char SP = Path.DirectorySeparatorChar;
+
         private const string EXPORT_PATH_KEY = "ExportPath";
         private const string EXPORT_FORMAT_KEY = "ExportFormat";
 
@@ -22,10 +24,8 @@ namespace MarkovCraft
         };
 
         private static readonly string[] EXPORT_FORMAT_EXT_NAMES = {
-            "schem",
-            "nbt",
-            "mcfunction",
-            "vox"
+            "schem",      "nbt",
+            "mcfunction", "vox"
         };
 
         [SerializeField] public TMP_Text? ScreenHeader, InfoText;
@@ -48,12 +48,9 @@ namespace MarkovCraft
         // Auto Mapping Panel
         [SerializeField] public AutoMappingPanel? AutoMappingPanel;
 
-        private (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ, int steps)? exportData;
+        private GenerationResult? exportResult = null;
         private int exportDataVersion = 0;
-        // Items in this dictionary share refereces with generation scene's fullPaletteForEditing
-        // If items get changed, it'll also be reflected in other scenes
-        private Dictionary<char, CustomMappingItem>? exportPalette;
-        private readonly HashSet<char> minimumCharSet = new();
+        // Result palette index => mapping item
         private readonly List<MappingItem> mappingItems = new();
         private bool working = false, properlyLoaded = false;
 
@@ -63,18 +60,15 @@ namespace MarkovCraft
         private bool CheckWindows() => Application.platform == RuntimePlatform.WindowsEditor ||
                 Application.platform == RuntimePlatform.WindowsPlayer;
 
-        private IEnumerator InitializeScreen(HashSet<char> minimumCharSet)
+        private IEnumerator InitializeScreen()
         {
-            if (exportData is null || exportPalette is null)
+            if (exportResult is null)
             {
                 Debug.LogWarning($"ERROR: Export screen not correctly initialized!");
                 working = false;
                 properlyLoaded = false;
                 yield break;
             }
-
-            var (info, state, legend, FX, FY, FZ, steps) = exportData.Value;
-            bool is2d = FZ == 1;
 
             // Initialize settings panel
             var savedExportPath = PlayerPrefs.GetString(EXPORT_PATH_KEY, PathHelper.GetDefaultExportPath());
@@ -101,45 +95,38 @@ namespace MarkovCraft
             ResultDetailPanel!.Hide();
             
             // Initialize mappings panel
-            // Populate mapping item grid
-            foreach (var ch in minimumCharSet)
+            for (var index = 0;index < exportResult.ResultPalette.Length;index++)
             {
                 var newItemObj = Instantiate(MappingItemPrefab);
                 var newItem = newItemObj!.GetComponent<MappingItem>();
-
+                var itemVal = exportResult.ResultPalette[index];
+                // Add item to dictionary and set data
                 mappingItems.Add(newItem);
-
-                var itemVal = exportPalette[ch];
                 var rgb = ColorConvert.GetRGB(itemVal.Color);
-
-                newItem.InitializeData(ch, rgb, rgb, itemVal.BlockState, ColorPicker!, BlockStatePreview!);
-
+                newItem.InitializeData(' ', rgb, rgb, itemVal.BlockState, ColorPicker!, BlockStatePreview!);
+                // Add item to container
                 newItem.transform.SetParent(GridTransform, false);
                 newItem.transform.localScale = Vector3.one;
             }
 
             yield return null;
-
-            // The character chosen to be air block (not used when 'is2d' equals true)
-            var airCharacter = legend[0];
-
-            foreach (var item in mappingItems)
+            // Mark air items
+            foreach (var airIndex in exportResult.AirIndices)
             {
-                if (!is2d && item.Character == airCharacter)
-                {
-                    item.gameObject.transform.SetAsLastSibling();
-                    item.TagAsSpecial("minecraft:air");
-                }
+                var item = mappingItems[airIndex];
+                item.gameObject.transform.SetAsLastSibling();
+                item.TagAsSpecial("minecraft:air");
             }
 
             working = false;
             properlyLoaded = true;
 
-            ScreenHeader!.text = GameScene.GetL10nString("exporter.text.loaded", info[0]);
+            ScreenHeader!.text = GameScene.GetL10nString("exporter.text.loaded", exportResult.ConfiguredModelName);
             
             // Update Info text
-            InfoText!.text = GameScene.GetL10nString("export.text.result_info", info[0], info[1], FX, FY, FZ);
-            var prev = GetPreviewData();
+            InfoText!.text = GameScene.GetL10nString("export.text.result_info", exportResult.ConfiguredModelName,
+                    exportResult.GenerationSeed, exportResult.SizeX, exportResult.SizeY, exportResult.SizeZ);
+            var prev = GetResultPreviewData();
 
             // Update selected format (and also update default export file name)
             var lastUsedFormatIndex = PlayerPrefs.GetInt(EXPORT_FORMAT_KEY, 0);
@@ -148,7 +135,7 @@ namespace MarkovCraft
 
             // Update Preview Image
             var (pixels, sizeX, sizeY) = ResultDetailPanel.RenderPreview(prev.sizeX, prev.sizeY, prev.sizeZ,
-                    prev.state, prev.colors, is2d ? ResultDetailPanel.PreviewRotation.ZERO : ResultDetailPanel.PreviewRotation.NINETY);
+                    prev.blockData, prev.colors, prev.airIndices, exportResult.Is2D ? ResultDetailPanel.PreviewRotation.ZERO : ResultDetailPanel.PreviewRotation.NINETY);
             var tex = MarkovJunior.Graphics.CreateTexture2D(pixels, sizeX, sizeY);
             //tex.filterMode = FilterMode.Point;
             // Update sprite
@@ -173,26 +160,10 @@ namespace MarkovCraft
             }
             
             // Get selected result data
-            exportData = game.GetSelectedResultData();
+            exportResult = game.GetSelectedResult();
             exportDataVersion = game.GetDataVersionInt();
-
-            // Get export palette
-            minimumCharSet.Clear();
             
-            if (exportData is not null)
-            {
-                // Find out characters that appeared in the final result
-                var finalLegend = exportData.Value.legend;
-                var byteVals = exportData.Value.state.ToHashSet();
-
-                foreach (var v in byteVals)
-                    minimumCharSet.Add(finalLegend[v]);
-
-                // Final legend and export palette can contain a few unused entries
-                exportPalette = game.GetPartialPaletteForEditing(finalLegend.ToHashSet());
-            }
-            
-            if (exportData is null || exportPalette is null)
+            if (exportResult is null)
             {
                 Debug.LogWarning("Exporter is not properly loaded!");
 
@@ -202,7 +173,7 @@ namespace MarkovCraft
                 return;
             }
 
-            StartCoroutine(InitializeScreen(minimumCharSet));
+            StartCoroutine(InitializeScreen());
         }
 
         public override void OnHide(ScreenManager manager)
@@ -222,16 +193,14 @@ namespace MarkovCraft
         public void AutoMap()
         {
             // Do auto mapping
-            AutoMappingPanel!.AutoMap(mappingItems);
+            AutoMappingPanel!.AutoMap(mappingItems.ToList());
             // Hide auto mapping panel
             AutoMappingPanel!.Hide();
         }
 
-        public (int sizeX, int sizeY, int sizeZ, byte[] state, int[] colors) GetPreviewData()
+        public (int sizeX, int sizeY, int sizeZ, int[] blockData, int[] colors, HashSet<int> airIndices) GetResultPreviewData()
         {
-            var (info, state, legend, FX, FY, FZ, steps) = exportData!.Value;
-            return (FX, FY, FZ, state, legend.Select(
-                    x => ColorConvert.GetOpaqueRGB(exportPalette![x].Color)).ToArray());
+            return exportResult!.GetPreviewData();
         }
 
         private void ApplyMappings()
@@ -242,15 +211,16 @@ namespace MarkovCraft
             {
                 working = true;
 
+                var resultPalette = exportResult!.ResultPalette;
                 // Apply export palette overrides
-                mappingItems.ForEach(x => {
-                    if (exportPalette!.ContainsKey(x.Character))
-                    {
-                        var item = exportPalette[x.Character];
-                        item.Color = ColorConvert.OpaqueColor32FromHexString(x.GetColorCode());
-                        item.BlockState = x.GetBlockState();
-                    }
-                });
+                for (int resultIndex = 0;resultIndex < resultPalette.Length;resultIndex++)
+                {
+                    var item = mappingItems[resultIndex];
+                    var itemVal = resultPalette[resultIndex];
+
+                    itemVal.Color = ColorConvert.OpaqueColor32FromHexString(item.GetColorCode());
+                    itemVal.BlockState = item.GetBlockState();
+                }
 
                 working = false;
 
@@ -262,8 +232,7 @@ namespace MarkovCraft
         {
             if (properlyLoaded)
             {
-                var info = exportData!.Value.info;
-                return $"{info[0][0..^4]}_{info[1]}";
+                return $"{exportResult!.ConfiguredModelName[0..^4]}_{exportResult!.GenerationSeed}";
             }
 
             return "exported";
@@ -286,9 +255,7 @@ namespace MarkovCraft
         {
             if (properlyLoaded)
             {
-                var info = exportData!.Value.info;
-
-                var baseName = $"{info[0][0..^4]}_{info[1]}";
+                var baseName = $"{exportResult!.ConfiguredModelName[0..^4]}_{exportResult!.GenerationSeed}";
                 var extName = EXPORT_FORMAT_EXT_NAMES[selectedFormatIndex];
 
                 ExportNameInput!.text = $"{baseName}.{extName}";
@@ -299,12 +266,11 @@ namespace MarkovCraft
         {
             if (working) return;
 
-            if (properlyLoaded) // The editor is properly loaded
+            if (properlyLoaded && exportResult != null) // The editor is properly loaded
             {
                 working = true;
 
                 var path = ExportFolderInput!.text;
-                var (info, state, legend, FX, FY, FZ, steps) = exportData!.Value;
                 var fileName = ExportNameInput!.text;
 
                 var dirInfo = new DirectoryInfo(path);
@@ -337,29 +303,47 @@ namespace MarkovCraft
                 // Save last used export format
                 PlayerPrefs.SetInt(EXPORT_FORMAT_KEY, formatIndex);
 
+                var resultPalette = exportResult.ResultPalette;
                 // Apply export palette overrides
-                mappingItems.ForEach(x => {
-                    if (exportPalette!.ContainsKey(x.Character))
-                    {
-                        var item = exportPalette[x.Character];
-                        item.Color = ColorConvert.OpaqueColor32FromHexString(x.GetColorCode());
-                        item.BlockState = x.GetBlockState();
-                    }
-                });
+                for (int resultIndex = 0;resultIndex < resultPalette.Length;resultIndex++)
+                {
+                    var item = mappingItems[resultIndex];
+                    var itemVal = resultPalette[resultIndex];
+
+                    itemVal.Color = ColorConvert.OpaqueColor32FromHexString(item.GetColorCode());
+                    itemVal.BlockState = item.GetBlockState();
+                }
+
+                int sizeX = exportResult.SizeX;
+                int sizeY = exportResult.SizeY;
+                int sizeZ = exportResult.SizeZ;
+                var blockData = exportResult.BlockData;
+
+                var filePath = $"{dirInfo.FullName}{SP}{fileName}";
 
                 switch (formatIndex)
                 {
                     case 0: // sponge schem
-                        SpongeSchemExporter.Export(state, legend, FX, FY, FZ, exportPalette!, dirInfo, fileName, minimumCharSet, exportDataVersion);
+                        SpongeSchemExporter.Export(sizeX, sizeY, sizeZ, resultPalette, blockData, filePath, exportDataVersion);
                         break;
                     case 1: // nbt structure
-                        NbtStructureExporter.Export(state, legend, FX, FY, FZ, exportPalette!, dirInfo, fileName, minimumCharSet, exportDataVersion);
+                        NbtStructureExporter.Export(sizeX, sizeY, sizeZ, resultPalette, blockData, filePath, exportDataVersion);
                         break;
                     case 2: // mcfunction
-                        McFuncExporter.Export(state, legend, FX, FY, FZ, exportPalette!, dirInfo, fileName);
+                        McFuncExporter.Export(sizeX, sizeY, sizeZ, resultPalette, blockData, filePath);
                         break;
                     case 3: // vox model
-                        VoxModelExporter.Export(state, legend, FX, FY, FZ, exportPalette!, dirInfo, fileName);
+                        // Vox use a byte value for x, y, z position and block index
+                        if (sizeX <= 255 && sizeY <= 255 && sizeZ <= 255 && resultPalette.Length <= 255)
+                        {
+                            var voxBlockData = blockData.Select(x => (byte) x).ToArray();
+                            var zeroAsAir = sizeZ != 1;
+                            var resultColorPalette = resultPalette.Select(x => ColorConvert.GetOpaqueRGB(x.Color)).ToArray();
+                            var airIndices = exportResult.AirIndices;
+
+                            MarkovJunior.VoxHelper.SaveVox(voxBlockData, (byte) sizeX, (byte) sizeY, (byte) sizeZ, resultColorPalette, airIndices, filePath);
+                        }
+
                         break;
                 }
                 

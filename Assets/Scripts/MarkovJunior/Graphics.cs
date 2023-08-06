@@ -82,37 +82,42 @@ namespace MarkovJunior
             return texture;
         }
 
-        public static (int[], int, int) Render(byte[] state, int MX, int MY, int MZ, int[] colors, int pixelsize, int MARGIN)
-                => MZ == 1 ? BitmapRender(state, MX, MY, colors, pixelsize, MARGIN) : IsometricRender(state, MX, MY, MZ, colors, pixelsize, MARGIN);
+        public static (int[], int, int) Render(int[] blockData, int MX, int MY, int MZ, int[] colors, HashSet<int> airIndices, int pixelsize, int MARGIN)
+                => MZ == 1 ? BitmapRender(blockData, MX, MY, colors, airIndices, pixelsize, MARGIN) : IsometricRender(blockData, MX, MY, MZ, colors, airIndices, pixelsize, MARGIN);
 
-        public static (int[], int, int) BitmapRender(byte[] state, int MX, int MY, int[] colors, int pixelsize, int MARGIN)
+        public static (int[], int, int) BitmapRender(int[] blockData, int MX, int MY, int[] colors, HashSet<int> airIndices, int pixelsize, int MARGIN)
         {
             int WIDTH = MARGIN + MX * pixelsize, HEIGHT = MY * pixelsize;
             int TOTALWIDTH = WIDTH, TOTALHEIGHT = HEIGHT;
             //int TOTALWIDTH = 189 + MARGIN, TOTALHEIGHT = 189;
             int[] bitmap = new int[TOTALWIDTH * TOTALHEIGHT];
             for (int i = 0; i < bitmap.Length; i++) bitmap[i] = 0; // Fully transparent, black
+            bool isVisible(int v) => !airIndices.Contains(v);
             //for (int i = 0; i < bitmap.Length; i++) bitmap[i] = GUI.BACKGROUND;
 
             int DX = (TOTALWIDTH - WIDTH) / 2;
             int DY = (TOTALHEIGHT - HEIGHT) / 2;
 
             for (int y = 0; y < MY; y++) for (int x = 0; x < MX; x++)
+            {
+                int value = blockData[x + y * MX];
+                if (isVisible(value))
                 {
-                    int c = colors[state[x + y * MX]];
+                    int c = colors[value];
                     for (int dy = 0; dy < pixelsize; dy++) for (int dx = 0; dx < pixelsize; dx++)
-                        {
-                            int SX = DX + x * pixelsize + dx;
-                            int SY = DY + y * pixelsize + dy;
-                            if (SX < 0 || SX >= TOTALWIDTH - MARGIN || SY < 0 || SY >= TOTALHEIGHT) continue;
-                            bitmap[MARGIN + SX + SY * TOTALWIDTH] = c;
-                        }
+                    {
+                        int SX = DX + x * pixelsize + dx;
+                        int SY = DY + y * pixelsize + dy;
+                        if (SX < 0 || SX >= TOTALWIDTH - MARGIN || SY < 0 || SY >= TOTALHEIGHT) continue;
+                        bitmap[MARGIN + SX + SY * TOTALWIDTH] = c;
+                    }
                 }
+            }
             return (bitmap, TOTALWIDTH, TOTALHEIGHT);
         }
 
         static readonly Dictionary<int, Sprite> sprites = new();
-        public static (int[], int, int) IsometricRender(byte[] state, int MX, int MY, int MZ, int[] colors, int blocksize, int MARGIN)
+        public static (int[], int, int) IsometricRender(int[] blockData, int MX, int MY, int MZ, int[] colors, HashSet<int> airIndices, int blocksize, int MARGIN)
         {
             var voxels = new List<Voxel>[MX + MY + MZ - 2];
             var visibleVoxels = new List<Voxel>[MX + MY + MZ - 2];
@@ -122,14 +127,18 @@ namespace MarkovJunior
                 visibleVoxels[i] = new List<Voxel>();
             }
             bool[] visible = new bool[MX * MY * MZ]; //нужен для быстрой работы с transparent
+            bool isVisible(int v) => !airIndices.Contains(v);
 
             for (int z = 0; z < MZ; z++) for (int y = 0; y < MY; y++) for (int x = 0; x < MX; x++)
-                    {
-                        int i = x + y * MX + z * MX * MY;
-                        byte value = state[i];
-                        visible[i] = value != 0;
-                        if (value != 0) voxels[x + y + z].Add(new Voxel(colors[value], x, y, z));
-                    }
+            {
+                int i = x + y * MX + z * MX * MY;
+                int value = blockData[i];
+                visible[i] = isVisible(value);
+                if (visible[i])
+                {
+                    voxels[x + y + z].Add(new Voxel(colors[value], x, y, z));
+                }
+            }
 
             bool[][] hash = ArrayHelper.Array2D(MX + MY - 1, MX + MY + 2 * MZ - 3, false);
             for (int i = voxels.Length - 1; i >= 0; i--)
@@ -191,16 +200,16 @@ namespace MarkovJunior
             }       
 
             for (int i = 0; i < visibleVoxels.Length; i++) foreach (Voxel s in visibleVoxels[i])
-                {
-                    int u = blocksize * (s.x - s.y);
-                    int v = (blocksize * (s.x + s.y) / 2 - blocksize * s.z);
-                    int positionx = WIDTH / 2 + u - blocksize;
-                    //int positionx = WIDTH / 2 + u - 5 * blocksize;
-                    int positiony = (HEIGHT - FITHEIGHT) / 2 + (MZ - 1) * blocksize + v;
-                    var (r, g, b) = RGB(s.color);
-                    Blit(sprite.cube, sprite.width, sprite.height, positionx, positiony, r, g, b);
-                    for (int j = 0; j < 8; j++) if (s.edges[j]) Blit(sprite.edges[j], sprite.width, sprite.height, positionx, positiony, r, g, b);
-                }
+            {
+                int u = blocksize * (s.x - s.y);
+                int v = (blocksize * (s.x + s.y) / 2 - blocksize * s.z);
+                int positionx = WIDTH / 2 + u - blocksize;
+                //int positionx = WIDTH / 2 + u - 5 * blocksize;
+                int positiony = (HEIGHT - FITHEIGHT) / 2 + (MZ - 1) * blocksize + v;
+                var (r, g, b) = RGB(s.color);
+                Blit(sprite.cube, sprite.width, sprite.height, positionx, positiony, r, g, b);
+                for (int j = 0; j < 8; j++) if (s.edges[j]) Blit(sprite.edges[j], sprite.width, sprite.height, positionx, positiony, r, g, b);
+            }
 
             return (screen, MARGIN + WIDTH, HEIGHT);
         }

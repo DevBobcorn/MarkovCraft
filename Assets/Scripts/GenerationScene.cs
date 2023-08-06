@@ -59,10 +59,8 @@ namespace MarkovCraft
         public ConfiguredModel? ConfiguredModel => currentConfModel;
         // Character => (meshIndex, meshColor)
         private readonly Dictionary<char, int2> meshPalette = new();
-        // Character => CustomMappingItem, its items CAN be edited in exporter
-        private readonly Dictionary<char, CustomMappingItem> fullPaletteForEditing = new();
         // Character => CustomMappingItem, its items SHOULD NOT be edited once loaded from file
-        private readonly Dictionary<char, CustomMappingItem> fullPaletteAsLoaded = new();
+        private readonly Dictionary<char, CustomMappingItem> fullPalette = new();
         private Interpreter? interpreter = null;
         private float playbackSpeed = 1F;
         private bool executing = false;
@@ -102,13 +100,7 @@ namespace MarkovCraft
 
         public Dictionary<char, CustomMappingItem> GetFullPaletteAsLoaded()
         {
-            return fullPaletteAsLoaded;
-        }
-
-        // Get only mapping items whose key is among the given charset
-        public Dictionary<char, CustomMappingItem> GetPartialPaletteForEditing(HashSet<char> charSet)
-        {
-            return fullPaletteForEditing.Where(x => charSet.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value);
+            return fullPalette;
         }
 
         public IEnumerator UpdateConfiguredModel(string confModelFile, ConfiguredModel confModel)
@@ -203,8 +195,7 @@ namespace MarkovCraft
 
             // Update full palette and mesh palette
             meshPalette.Clear();
-            fullPaletteForEditing.Clear();
-            fullPaletteAsLoaded.Clear();
+            fullPalette.Clear();
 
             // Load base palette if not loaded yet
             EnsureBasePaletteLoaded();
@@ -213,8 +204,8 @@ namespace MarkovCraft
             foreach (var pair in baseColorPalette)
             {
                 meshPalette.Add( pair.Key, new int2(0, pair.Value) );
-                fullPaletteAsLoaded.Add( pair.Key, new CustomMappingItem{
-                        Character = pair.Key, Color = ColorConvert.GetOpaqueColor32(pair.Value) } );
+                fullPalette.Add( pair.Key, new CustomMappingItem{
+                        Symbol = pair.Key, Color = ColorConvert.GetOpaqueColor32(pair.Value) } );
             }
 
             blockMeshCount = 1; // #0 is preserved for default cube mesh
@@ -234,32 +225,26 @@ namespace MarkovCraft
                         //Debug.Log($"Mapped '{item.Character}' to [{stateId}] {state}");
 
                         if (stateId2Mesh.TryAdd(stateId, blockMeshCount))
-                            meshPalette[item.Character] = new(blockMeshCount++, rgb);
+                            meshPalette[item.Symbol] = new(blockMeshCount++, rgb);
                         else // The mesh of this block state is already regestered, just use it
-                            meshPalette[item.Character] = new(stateId2Mesh[stateId], rgb);
+                            meshPalette[item.Symbol] = new(stateId2Mesh[stateId], rgb);
                     }
                     else // Default cube mesh with custom color
-                        meshPalette[item.Character] = new(0, rgb);
+                        meshPalette[item.Symbol] = new(0, rgb);
                 }
                 else // Default cube mesh with custom color
-                    meshPalette[item.Character] = new(0, rgb);
+                    meshPalette[item.Symbol] = new(0, rgb);
                 
-                if (fullPaletteAsLoaded.ContainsKey(item.Character)) // Entry defined in base palette, overwrite it
+                if (fullPalette.ContainsKey(item.Symbol)) // Entry defined in base palette, overwrite it
                 {
-                    fullPaletteAsLoaded[item.Character] = item;
+                    fullPalette[item.Symbol] = item;
                 }
                 else // A new entry
                 {
-                    fullPaletteAsLoaded.Add( item.Character, item );
+                    fullPalette.Add( item.Symbol, item );
                 }
                 
                 yield return null;
-            }
-
-            // Make a copy of each mapping item for editing
-            foreach (var pair in fullPaletteAsLoaded)
-            {
-                fullPaletteForEditing.Add( pair.Key, pair.Value.AsCopy() );
             }
 
             // Update model graph
@@ -317,13 +302,13 @@ namespace MarkovCraft
                     break;
                 
                 int seed = seeds != null && k <= seeds.Length ? seeds[k - 1] : rand.Next();
-                int xCount = (k - 1) % resultPerLine,  zCount = (k - 1) / resultPerLine;
+                int xCount = (k - 1) % resultPerLine,  yCount = (k - 1) / resultPerLine;
                 
                 var resultObj = Instantiate(GenerationResultPrefab);
                 resultObj.name = $"Result #{k} (Seed: {seed})";
                 var result = resultObj!.GetComponent<GenerationResult>();
                 result.GenerationSeed = seed;
-                result.Iteration = k;
+                result.ResultId = k;
 
                 results.Add(result);
                 
@@ -368,8 +353,8 @@ namespace MarkovCraft
                         // Update generation text
                         GenerationText.text = GetL10nString("status.info.generation_step", k, dataFrame.stepCount, (int)(tick * 1000));
 
-                        var pos = new int3(2 + xCount * (dataFrame.FX + 2), 0, 2 + zCount * (dataFrame.FY + 2));
-                        result.UpdateVolume(pos, new(dataFrame.FX, dataFrame.FZ, dataFrame.FY));
+                        var pos = new int3(2 + xCount * (dataFrame.FX + 2), 0, 2 + yCount * (dataFrame.FY + 2));
+                        result.UpdateVolume(pos, dataFrame.FX, dataFrame.FY, dataFrame.FZ);
 
                         var instanceData = BlockDataBuilder.GetInstanceData(dataFrame.state!, dataFrame.FX, dataFrame.FY, dataFrame.FZ, pos,
                                 // Frame legend index => (meshIndex, meshColor)
@@ -397,8 +382,8 @@ namespace MarkovCraft
 
                 if (executing) // Visualize final state (last step)
                 {
-                    var pos = new int3(2 + xCount * (dataFrame.FX + 2), 0, 2 + zCount * (dataFrame.FY + 2));
-                    result.UpdateVolume(pos, new(dataFrame.FX, dataFrame.FZ, dataFrame.FY));
+                    var pos = new int3(2 + xCount * (dataFrame.FX + 2), 0, 2 + yCount * (dataFrame.FY + 2));
+                    result.UpdateVolume(pos, dataFrame.FX, dataFrame.FY, dataFrame.FZ);
 
                     var instanceData = BlockDataBuilder.GetInstanceData(dataFrame.state!, dataFrame.FX, dataFrame.FY, dataFrame.FZ, pos,
                             // Frame legend index => (meshIndex, meshColor)
@@ -417,7 +402,7 @@ namespace MarkovCraft
                     var legendClone = new char[dataFrame.legend!.Length];
                     Array.Copy(dataFrame.legend!, legendClone, legendClone.Length);
 
-                    result.SetData((new[] { confModelFile, $"{seed}" }, stateClone, legendClone, dataFrame.FX, dataFrame.FY, dataFrame.FZ, dataFrame.stepCount));
+                    result.SetData(fullPalette, stateClone, legendClone, dataFrame.FX, dataFrame.FY, dataFrame.FZ, dataFrame.stepCount, confModelFile, seed);
 
                     Debug.Log($"Iteration #{k} complete. Steps: {dataFrame.stepCount} Frames: {recordedFrames.Count}");
                     ModelGraphUI!.SetActiveNode(-1); // Deselect active node
@@ -429,7 +414,7 @@ namespace MarkovCraft
                         recordedFrames.Add(new GenerationFrameRecord(new int3(dataFrame.FX, dataFrame.FY, dataFrame.FZ),
                                 dataFrame.state.Select(v => dataFrame.legend![v]).ToArray()));
                         var recordingName = (currentConfModel?.Model ?? "Untitled") + $"_#{k}";
-                        StartCoroutine(RecordingExporter.SaveRecording(fullPaletteForEditing, recordingName, maxX, maxY, maxZ, recordedFrames.ToArray()));
+                        StartCoroutine(RecordingExporter.SaveRecording(fullPalette, recordingName, maxX, maxY, maxZ, recordedFrames.ToArray()));
                     }
                 }
             }
@@ -480,7 +465,7 @@ namespace MarkovCraft
             );
         }
 
-        public void UpdateBlockSelection(CustomMappingItem? selectedItem, CustomMappingItem? selectedItemOverride = null, string text = "")
+        public void UpdateBlockSelection(CustomMappingItem? selectedItem, string text = "")
         {
             if (selectedItem is null)
             {
@@ -492,25 +477,10 @@ namespace MarkovCraft
                 BlockSelectionText!.text = text;
                 // Update mapping item information
                 BlockSelectionMappingItem!.SetBlockState(selectedItem.BlockState);
-                BlockSelectionMappingItem!.SetCharacter(selectedItem.Character);
+                //BlockSelectionMappingItem!.SetCharacter(selectedItem.Symbol);
                 var hexString = ColorConvert.GetHexRGBString(selectedItem.Color);
                 BlockSelectionMappingItem!.OnColorCodeInputValidate(hexString);
                 BlockSelectionMappingItem!.OnColorCodeInputValueChange(hexString);
-
-                if (selectedItemOverride is not null) // Display override section
-                {
-                    ExportOverrideSection?.SetActive(true);
-                    // Update mapping item information
-                    ExportOverrideMappingItem!.SetBlockState(selectedItemOverride.BlockState);
-                    ExportOverrideMappingItem!.SetCharacter(selectedItemOverride.Character);
-                    var hexOverrideString = ColorConvert.GetHexRGBString(selectedItemOverride.Color);
-                    ExportOverrideMappingItem!.OnColorCodeInputValidate(hexOverrideString);
-                    ExportOverrideMappingItem!.OnColorCodeInputValueChange(hexOverrideString);
-                }
-                else // Hide override section
-                {
-                    ExportOverrideSection?.SetActive(false);
-                }
             }
         }
 
@@ -528,9 +498,8 @@ namespace MarkovCraft
                 if (!VolumeSelection.Locked) // Update selected volume
                 {
                     var ray = cam.ScreenPointToRay(Input.mousePosition);
-                    RaycastHit hit;
 
-                    if (!EventSystem.current.IsPointerOverGameObject() && Physics.Raycast(ray.origin, ray.direction, out hit, 1000F, VolumeLayerMask))
+                    if (!EventSystem.current.IsPointerOverGameObject() && Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 1000F, VolumeLayerMask))
                     {
                         UpdateSelectedResult(hit.collider.gameObject.GetComponentInParent<GenerationResult>());
 
@@ -556,19 +525,15 @@ namespace MarkovCraft
                     if (!EventSystem.current.IsPointerOverGameObject())
                     {
                         var ray = cam.ScreenPointToRay(Input.mousePosition);
-                        RaycastHit hit;
-                        
+
                         // Volume is still locked, update block selection
-                        if (selectedResult != null && Physics.Raycast(ray.origin, ray.direction, out hit, 1000F, BlockColliderLayerMask)) // Mouse pointer is over a block
+                        if (selectedResult != null && Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 1000F, BlockColliderLayerMask)) // Mouse pointer is over a block
                         {
                             // Get block position in the volume (local space in volume)
                             var boxCollider = hit.collider as BoxCollider;
-                            (int x, int y, int z, char character) = selectedResult.GetColliderPosInVolume(boxCollider!);
+                            (int x, int y, int z, CustomMappingItem item) = selectedResult.GetColliderPosInVolume(boxCollider!);
 
-                            var itemAsLoaded = fullPaletteAsLoaded[character];
-                            var itemToExport = fullPaletteForEditing[character];
-
-                            UpdateBlockSelection(itemAsLoaded, itemAsLoaded.MapTargetIdentical(itemToExport) ? null : itemToExport, $"({x}, {y}, {z})");
+                            UpdateBlockSelection(item, $"({x}, {y}, {z})");
                             // Update cursor position (world space)
                             BlockSelection!.transform.position = hit.collider.bounds.center;
                         }
@@ -602,11 +567,10 @@ namespace MarkovCraft
 
             if (newResult != null && newResult.Valid) // Valid
             {
-                var size = newResult.GenerationSize;
                 var fsc = newResult.FinalStepCount;
 
-                VolumeText!.text = GetL10nString("hud.text.result_info", newResult.Iteration, newResult.GenerationSeed,
-                        size.x, size.z, size.y, fsc == 0 ? "-" : fsc.ToString());
+                VolumeText!.text = GetL10nString("hud.text.result_info", newResult.ResultId, newResult.GenerationSeed,
+                        newResult.SizeX, newResult.SizeY, newResult.SizeZ, fsc == 0 ? "-" : fsc.ToString());
                 VolumeSelection!.UpdateVolume(newResult.GetVolumePosition(), newResult.GetVolumeSize());
             
                 selectedResult = newResult;
@@ -626,13 +590,13 @@ namespace MarkovCraft
             }
         }
 
-        public (string[] info, byte[] state, char[] legend, int FX, int FY, int FZ, int steps)? GetSelectedResultData()
+        public GenerationResult? GetSelectedResult()
         {
             if (selectedResult == null || !selectedResult.Valid || !selectedResult.Completed)
                 return null;
 
             // Result data should be present if the generation is completed
-            return selectedResult.Data;
+            return selectedResult;
         }
 
         private void ClearUpScene()
@@ -678,7 +642,7 @@ namespace MarkovCraft
                 int index = 0;
                 foreach (var m in Directory.GetFiles(dir, "*.xml", SearchOption.AllDirectories))
                 {
-                    var modelPath = m.Substring(m.LastIndexOf(SP) + 1);
+                    var modelPath = m[(m.LastIndexOf(SP) + 1)..];
                     options.Add(new(modelPath));
                     loadedConfModels.Add(index++, modelPath);
                 }

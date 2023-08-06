@@ -1,5 +1,6 @@
 #nullable enable
 using System.IO;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -49,11 +50,11 @@ namespace MarkovCraft
         }
 
         public static (int[] pixels, int texX, int texY) RenderPreview(int sizeX, int sizeY, int sizeZ,
-                byte[] srcState, int[] colors, PreviewRotation rotation = PreviewRotation.ZERO)
+                int[] srcState, int[] colors, HashSet<int> airIndices, PreviewRotation rotation = PreviewRotation.ZERO)
         {
             bool swapXYSize = rotation == PreviewRotation.NINETY || rotation == PreviewRotation.TWO_SEVENTY;
 
-            var state = new byte[srcState.Length];
+            var state = new int[srcState.Length];
             for (int z = 0; z < sizeZ; z++) for (int y = 0; y < sizeY; y++) for (int x = 0; x < sizeX; x++)
             {
                 // Flip X when sampling from source
@@ -63,7 +64,7 @@ namespace MarkovCraft
                 state[dstPos] = srcState[srcPos];
             }
 
-            return MarkovJunior.Graphics.Render(state, swapXYSize ? sizeY : sizeX, swapXYSize ? sizeX : sizeY, sizeZ, colors, 6, 0);
+            return MarkovJunior.Graphics.Render(state, swapXYSize ? sizeY : sizeX, swapXYSize ? sizeX : sizeY, sizeZ, colors, airIndices, 6, 0);
         }
 
         // Returns whether the current preview is 2d
@@ -76,17 +77,17 @@ namespace MarkovCraft
             
             if (exporter is not null)
             {
-                var (sizeX, sizeY, sizeZ, state, colors) = exporter.GetPreviewData();
+                var (sizeX, sizeY, sizeZ, state, colors, airIndices) = exporter.GetResultPreviewData();
                 bool is2d = sizeZ == 1;
 
                 if (initRotation)
                 {
                     // Use 90 deg rotation for 3d to keep the orientation consistency
-                    currentRotation = is2d ? ResultDetailPanel.PreviewRotation.ZERO : ResultDetailPanel.PreviewRotation.NINETY;
+                    currentRotation = is2d ? PreviewRotation.ZERO : PreviewRotation.NINETY;
                 }
 
                 // Update Preview Image
-                var (pixels, texX, texY) = RenderPreview(sizeX, sizeY, sizeZ, state, colors, currentRotation);
+                var (pixels, texX, texY) = RenderPreview(sizeX, sizeY, sizeZ, state, colors, airIndices, currentRotation);
                 var tex = MarkovJunior.Graphics.CreateTexture2D(pixels, texX, texY);
                 //tex.filterMode = FilterMode.Point;
                 // Update sprite
@@ -102,9 +103,9 @@ namespace MarkovCraft
             return false;
         }
 
-        public byte[] GetCoordRefData(int coordRefSize)
+        public int[] GetCoordRefData(int coordRefSize)
         {
-            var coordRefStates = new byte[coordRefSize * coordRefSize * coordRefSize];
+            var coordRefStates = new int[coordRefSize * coordRefSize * coordRefSize];
 
             // Origin, use color #1
             coordRefStates[GetPos(0, 0, 0, coordRefSize, coordRefSize)] = 1;
@@ -130,15 +131,18 @@ namespace MarkovCraft
             var sizeZ = is2d ? 1 : coordRefSize;
 
             var colors = new int[]{
-                0x000000,                            // #0, Black (will be treated as air if is2d)
+                0x000000,                            // #0, Black, Fully Transparent, Air
                 ColorConvert.GetOpaqueRGB(0xFFFFFF), // #1, White
                 ColorConvert.GetOpaqueRGB(0xFF0000), // #2, Red
                 ColorConvert.GetOpaqueRGB(0x00FF00), // #3, Green
                 ColorConvert.GetOpaqueRGB(0x0000FF)  // #4, Blue
             };
 
+            // #0 is air
+            var airIndices = new HashSet<int>(){ 0 };
+
             // Update Preview Image
-            var (pixels, texX, texY) = RenderPreview(sizeX, sizeY, sizeZ, GetCoordRefData(coordRefSize), colors, currentRotation);
+            var (pixels, texX, texY) = RenderPreview(sizeX, sizeY, sizeZ, GetCoordRefData(coordRefSize), colors, airIndices, currentRotation);
             var tex = MarkovJunior.Graphics.CreateTexture2D(pixels, texX, texY);
             //tex.filterMode = FilterMode.Point;
             // Update sprite

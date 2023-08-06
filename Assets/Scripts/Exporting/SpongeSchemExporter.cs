@@ -13,24 +13,18 @@ namespace MarkovCraft
     // for specification of this structure format
     public static class SpongeSchemExporter
     {
-        private static readonly char SP = Path.DirectorySeparatorChar;
-        // Unity     X  Y  Z
-        // Markov    X  Z  Y
-        // Minecraft Z  Y  X
-
-        private static bool checkAir3d(byte index) => index == 0;
-
-        public static void Export(byte[] state, char[] legend, int FX, int FY, int FZ,
-                Dictionary<char, CustomMappingItem> exportPalette, DirectoryInfo dirInfo, string fileName, HashSet<char> minimumCharSet, int dataVersionInt)
+        public static void Export(int SizeX, int SizeY, int SizeZ, CustomMappingItem[] resultPalette,
+                int[] blockData, string filePath, int dataVersionInt)
         {
-            var schemObj = new Dictionary<string, object>(); // Root object
+            var schemObj = new Dictionary<string, object>
+            {
+                // Sponge Schematic v2 (v3 is published already but is not yet supported by map editors like Amulet)
+                { "Version", 2 },
+                // Minecraft data version
+                { "DataVersion", dataVersionInt }
+            }; // Root object
 
-            // Sponge Schematic v2 (v3 is published already but is not yet supported by map editors like Amulet)
-            schemObj.Add("Version", 2);
-            // Minecraft data version
-            schemObj.Add("DataVersion", dataVersionInt);
-
-            short width = (short) FY, height = (short) FZ, length = (short) FX;
+            short width = (short) SizeY, height = (short) SizeZ, length = (short) SizeX;
             // Append size info
             schemObj.Add("Width",  width );
             schemObj.Add("Height", height);
@@ -40,32 +34,28 @@ namespace MarkovCraft
             schemObj.Add("Entities", new object[]{ });
 
             var statePalette = BlockStatePalette.INSTANCE;
-            var structurePalette = new List<BlockState>();
+            var exportPalette = new List<BlockState>();
             // Character => index in structure palette
-            var structureRemap = new Dictionary<char, int>();
-
-            foreach (var item in exportPalette)
+            var resultIndex2exportIndex = new Dictionary<int, int>();
+            for (int resultIndex = 0;resultIndex < resultPalette.Length;resultIndex++)
             {
-                if (!minimumCharSet.Contains(item.Key))
-                {
-                    // Export palette may still contain a few unused entries, filter them out
-                    continue;
-                }
-
-                var stateStr = item.Value.BlockState;
+                var stateStr = resultPalette[resultIndex].BlockState;
                 var stateId = BlockStateHelper.GetStateIdFromString(stateStr);
                 if (stateId == BlockStateHelper.INVALID_BLOCKSTATE)
                     stateId = 0; // Replace invalid blockstates with air
                 var blockState = statePalette.StatesTable[stateId];
 
-                if (structurePalette.Contains(blockState))
-                    structureRemap.Add(item.Key, structurePalette.FindIndex(x => x == blockState));
+                if (exportPalette.Contains(blockState))
+                {
+                    var exportIndex = exportPalette.FindIndex(x => x == blockState);
+                    resultIndex2exportIndex.Add(resultIndex, exportIndex);
+                }
                 else // Blockstate not remapped yet, add it to the structure palette
                 {
-                    var idx = structurePalette.Count;
-                    structureRemap.Add(item.Key, idx);
-                    //Debug.Log($"[{idx}] {item.Key} => [{stateId}] {blockState}");
-                    structurePalette.Add(blockState);
+                    var exportIndex = exportPalette.Count;
+                    resultIndex2exportIndex.Add(resultIndex, exportIndex);
+                    //Debug.Log($"[{exportIndex}] {resultIndex} => [{stateId}] {blockState}");
+                    exportPalette.Add(blockState);
                 }
             }
 
@@ -76,25 +66,33 @@ namespace MarkovCraft
             // Sponge schem uses Y-Z-X order
             for (int mcy = 0;mcy < height;mcy++) for (int mcz = 0;mcz < length;mcz++) for (int mcx = 0;mcx < width;mcx++)
             {
-                byte v = state[mcz + mcx * length + mcy * length * width];
-                int remappedId = structureRemap[legend[v]];
+                int resultIndex = blockData[mcz + mcx * length + mcy * length * width];
+                int exportIndex = resultIndex2exportIndex[resultIndex];
+                
                 // Store it as varint in byte array
-                while ((remappedId & -128) != 0) {
-                    blocksData.Add((byte) (remappedId & 127 | 128));
+                while ((exportIndex & -128) != 0) {
+                    blocksData.Add((byte) (exportIndex & 127 | 128));
                     // Do an UNSIGNED right shift
-                    remappedId = (int)((uint)remappedId >> 7);
+                    exportIndex = (int)((uint)exportIndex >> 7);
                 }
                 // Should be less than 0b 1000 0000 now, safe to cast to byte
-                blocksData.Add((byte) remappedId);
+                blocksData.Add((byte) exportIndex);
             }
 
-            int paletteMax = structurePalette.Count;
+            int paletteMax = exportPalette.Count;
             var schemPalette = new Dictionary<string, object>(paletteMax);
 
             for (int i = 0;i < paletteMax;i++)
             {
-                schemPalette[structurePalette[i].ToString()] = i;
+                schemPalette[exportPalette[i].ToString()] = i;
             }
+
+            // DEBUG - RESULT PALETTE
+            var rp = string.Join(", ", resultPalette.Select((x, idx) => $"{idx} {x.BlockState} // {x.Color}"));
+            Debug.Log($"Result Palette: {rp}");
+            // DEBUG - EXPORT PALETTE
+            var ep = string.Join(", ", exportPalette.Select((x, idx) => $"{idx} {x}"));
+            Debug.Log($"Export Palette: {ep}");
 
             // - palette max field
             schemObj.Add("PaletteMax", paletteMax);
@@ -105,7 +103,6 @@ namespace MarkovCraft
             
             // Turn dictionary object into byte array
             var nbtBlob = DataHelper.GetNbt(schemObj);
-            var filePath = $"{dirInfo.FullName}{SP}{fileName}";
 
             // Compress nbt blob and save it
             using (var compressedStream = File.Open(filePath, FileMode.Create))

@@ -12,7 +12,7 @@ namespace MarkovCraft
     [Serializable]
     public class CustomMappingItem : Json.JSONSerializable
     {
-        public char Character;
+        public char Symbol;
         public string BlockState = string.Empty;
         public Color32 Color;
 
@@ -20,9 +20,9 @@ namespace MarkovCraft
         {
             return new CustomMappingItem
             {
-                Character = this.Character,
-                BlockState = this.BlockState,
-                Color = this.Color
+                Symbol = Symbol,
+                BlockState = BlockState,
+                Color = Color
             };
         }
 
@@ -96,7 +96,7 @@ namespace MarkovCraft
                 var mapping = new List<CustomMappingItem>();
                 foreach (var item in xMapping.Elements("Item"))
                     mapping.Add(new() {
-                        Character = item.Get<char>("Character"),
+                        Symbol = item.Get<char>("Character"),
                         Color = ColorConvert.OpaqueColor32FromHexString(item.Get<string>("Color")),
                         BlockState = item.Get<string>("BlockState", string.Empty)
                     });
@@ -148,7 +148,7 @@ namespace MarkovCraft
                 for (int i = 0;i < mapping.Length;i++)
                 {
                     var item = new XElement("Item",
-                        new XAttribute("Character", mapping[i].Character),
+                        new XAttribute("Character", mapping[i].Symbol),
                         new XAttribute("Color",
                             ColorConvert.GetHexRGBString(mapping[i].Color))
                     );
