@@ -19,12 +19,18 @@ namespace MarkovCraft
             if (Input.GetKeyDown(KeyCode.C))
             {
                 if (!game!.Loading)
+                {
+                    game!.Hide3dGUI();
                     manager.SetActiveScreenByType<ConfiguredModelEditorScreen>();
+                }
             }
             else if (Input.GetKeyDown(KeyCode.Escape))
             {
                 if (!game!.Loading)
+                {
+                    game!.Hide3dGUI();
                     manager.SetActiveScreenByType<PauseScreen>();
+                }
             }
         }
     }

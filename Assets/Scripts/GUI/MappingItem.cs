@@ -7,17 +7,17 @@ namespace MarkovCraft
 {
     public class MappingItem : MonoBehaviour
     {
-        [SerializeField] Color32 SpecialTagColor;
-        [SerializeField] Image? ColorPreviewImage, MarkCornerImage;
-        [SerializeField] TMP_Text? CharacterText;
-        [SerializeField] TMP_InputField? ColorCodeInput;
-        [SerializeField] TMP_InputField? BlockStateInput;
+        [SerializeField] private Color32 SpecialTagColor;
+        [SerializeField] private Image? ColorPreviewImage, MarkCornerImage;
+        [SerializeField] private TMP_Text? CharacterText;
+        [SerializeField] private TMP_InputField? ColorCodeInput;
+        [SerializeField] protected TMP_InputField? BlockStateInput;
 
-        [SerializeField] Button? EditColorButton;
-        [SerializeField] Button? RevertOverrideButton;
+        [SerializeField] private Button? EditColorButton;
+        [SerializeField] private Button? RevertOverrideButton;
 
+        protected BlockStatePreview? blockStatePreview;
         private MappingItemColorPicker? colorPicker;
-        private BlockStatePreview? blockStatePreview;
         private bool overridesPaletteColor = false;
 
         // RGB color of this item in the base palette
@@ -26,7 +26,7 @@ namespace MarkovCraft
         private char character;
         public char Character => character;
 
-        public void InitializeData(char character, int defoRgb, int rgb, string blockState, 
+        public virtual void InitializeData(char character, int defoRgb, int rgb, string blockState, 
                 MappingItemColorPicker colorPicker, BlockStatePreview blockStatePreview)
         {
             if (ColorPreviewImage == null || CharacterText == null || ColorCodeInput == null || BlockStateInput == null
@@ -59,9 +59,9 @@ namespace MarkovCraft
             ColorCodeInput.onEndEdit.AddListener(OnColorCodeInputValidate);
             EditColorButton.onClick.AddListener(() => OnEditColorButtonClick());
 
-            BlockStateInput.onSelect.AddListener((blockState) => ShowBlockStatePreview(blockState));
+            BlockStateInput.onSelect.AddListener(OnSelectBlockStateInput);
             BlockStateInput.onValueChanged.AddListener(OnUpdateBlockStateInput);
-            BlockStateInput.onEndEdit.AddListener((_) => HideBlockStatePreview());
+            BlockStateInput.onEndEdit.AddListener(OnEndEditBlockStateInput);
         }
 
         private void OnEditColorButtonClick()
@@ -102,27 +102,31 @@ namespace MarkovCraft
             ColorCodeInput!.text = colorHex.PadRight(6, '0').ToUpper();
         }
 
-        private void ShowBlockStatePreview(string blockState)
+        protected virtual void OnSelectBlockStateInput(string blockState)
         {
             var stateId = BlockStateHelper.GetStateIdFromString(blockState);
-
+            // Update and show preview
             blockStatePreview?.UpdatePreview(stateId);
         }
 
-        private void OnUpdateBlockStateInput(string blockState)
-        {
-            var stateId = BlockStateHelper.GetStateIdFromString(blockState);
-
-            if (stateId != BlockStateHelper.INVALID_BLOCKSTATE)
-                blockStatePreview?.UpdatePreview(stateId);
-            else
-                blockStatePreview?.UpdateHint(blockState);
-        }
-
-        private void HideBlockStatePreview()
+        protected virtual void OnEndEditBlockStateInput(string _)
         {
             // Hide preview
             blockStatePreview?.UpdatePreview(BlockStateHelper.INVALID_BLOCKSTATE);
+        }
+
+        protected virtual void OnUpdateBlockStateInput(string blockState)
+        {
+            var stateId = BlockStateHelper.GetStateIdFromString(blockState);
+
+            if (stateId != BlockStateHelper.INVALID_BLOCKSTATE) // Update and show preview
+            {
+                blockStatePreview?.UpdatePreview(stateId);
+            }
+            else // Hide preview
+            {
+                blockStatePreview?.UpdateHint(blockState);
+            }
         }
 
         public string GetColorCode() => ColorCodeInput?.text ?? "000000";
@@ -137,7 +141,7 @@ namespace MarkovCraft
             return blockState;
         }
 
-        public void SetBlockState(string blockState)
+        public virtual void SetBlockState(string blockState)
         {
             if (BlockStateInput!.interactable) // The blockstate input is not locked
             {
@@ -145,7 +149,7 @@ namespace MarkovCraft
             }
         }
 
-        public void TagAsSpecial(string blockState)
+        public virtual void TagAsSpecial(string blockState)
         {
             BlockStateInput!.SetTextWithoutNotify(blockState); // Avoid updating block preview
             BlockStateInput.interactable = false;

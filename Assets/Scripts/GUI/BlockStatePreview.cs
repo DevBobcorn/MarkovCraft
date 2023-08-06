@@ -15,21 +15,17 @@ namespace MarkovCraft
     [RequireComponent(typeof (CanvasGroup))]
     public class BlockStatePreview : MonoBehaviour
     {
-        private static readonly float3 ITEM_CENTER = new(-0.5F, -0.5F, -0.5F);
+        public static readonly float3 ITEM_CENTER = new(-0.5F, -0.5F, -0.5F);
         public const int PREVIEW_CULLFLAG = 0b011001;
 
         [HideInInspector] public int currentStateId = -1;
         [SerializeField] public GameObject? previewObject;
-
-        private GameScene? game;
 
         private CanvasGroup? canvasGroup;
         private TMP_Text? descText;
 
         void Start()
         {
-            game = GameScene.Instance;
-
             canvasGroup = GetComponent<CanvasGroup>();
             descText = GetComponentInChildren<TMP_Text>();
 
@@ -174,7 +170,7 @@ namespace MarkovCraft
             {
                 var visualBuffer = new VertexBuffer();
 
-                var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, game!.DummyWorld, Location.Zero, newState);
+                var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, Location.Zero, newState);
                 ResourcePackManager.Instance.StateModelTable[stateId].Geometries[0].Build(ref visualBuffer, ITEM_CENTER, PREVIEW_CULLFLAG, blockTint);
 
                 previewObject.GetComponent<MeshFilter>().sharedMesh = BuildMesh(visualBuffer);

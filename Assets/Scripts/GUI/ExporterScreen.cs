@@ -51,7 +51,7 @@ namespace MarkovCraft
         private GenerationResult? exportResult = null;
         private int exportDataVersion = 0;
         // Result palette index => mapping item
-        private readonly List<MappingItem> mappingItems = new();
+        private readonly List<ExportItem> mappingItems = new();
         private bool working = false, properlyLoaded = false;
 
         // Disable pause for animated inventory
@@ -98,7 +98,7 @@ namespace MarkovCraft
             for (var index = 0;index < exportResult.ResultPalette.Length;index++)
             {
                 var newItemObj = Instantiate(MappingItemPrefab);
-                var newItem = newItemObj!.GetComponent<MappingItem>();
+                var newItem = newItemObj!.GetComponent<ExportItem>();
                 var itemVal = exportResult.ResultPalette[index];
                 // Add item to dictionary and set data
                 mappingItems.Add(newItem);
@@ -193,7 +193,7 @@ namespace MarkovCraft
         public void AutoMap()
         {
             // Do auto mapping
-            AutoMappingPanel!.AutoMap(mappingItems.ToList());
+            AutoMappingPanel!.AutoMap(mappingItems.Select(x => x as MappingItem).ToList());
             // Hide auto mapping panel
             AutoMappingPanel!.Hide();
         }

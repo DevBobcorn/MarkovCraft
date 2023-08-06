@@ -23,7 +23,7 @@ namespace MarkovCraft
 
         // Dummy world
         public class World : AbstractWorld { }
-        public readonly World DummyWorld = new();
+        public static readonly World DummyWorld = new();
         // Palettes and resources
         protected Mesh[] blockMeshes = { };
         protected BlockGeometry?[] blockGeometries = { };
@@ -66,6 +66,8 @@ namespace MarkovCraft
         public static string GetL10nBlockName(ResourceLocation blockId) =>
                 Instance.L10nBlockNameTable.GetValueOrDefault($"block.{blockId.Namespace}.{blockId.Path}", $"block.{blockId.Namespace}.{blockId.Path}");
 
+
+        public virtual void Hide3dGUI() { }
 
         protected void GenerateBlockMeshes(Dictionary<int, int> stateId2Mesh) // StateId => Mesh index
         {

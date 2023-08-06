@@ -34,9 +34,7 @@ namespace MarkovCraft
         [SerializeField] public GameObject? BlockSelection;
         [SerializeField] public CanvasGroup? BlockSelectionPanelGroup;
         [SerializeField] public TMP_Text? BlockSelectionText;
-        [SerializeField] public MappingItem? BlockSelectionMappingItem;
-        [SerializeField] public MappingItem? ExportOverrideMappingItem;
-        [SerializeField] public GameObject? ExportOverrideSection;
+        [SerializeField] public ExportItem? BlockSelectionMappingItem;
 
         [SerializeField] public Toggle? RecordToggle;
         [SerializeField] public TMP_Text? VolumeText, PlaybackSpeedText, GenerationText, FPSText;
@@ -89,6 +87,11 @@ namespace MarkovCraft
 
                 baseColorPaletteLoaded = true;
             }
+        }
+
+        public override void Hide3dGUI()
+        {
+            UpdateBlockSelection(null);
         }
 
         public Dictionary<char, int> GetBaseColorPalette()
@@ -469,6 +472,7 @@ namespace MarkovCraft
         {
             if (selectedItem is null)
             {
+                BlockSelectionMappingItem!.SetBlockState(string.Empty);
                 BlockSelectionPanelGroup!.alpha = 0F;
             }
             else
@@ -489,7 +493,7 @@ namespace MarkovCraft
             if (FPSText != null)
                 FPSText.text = $"FPS:{((int)(1 / Time.unscaledDeltaTime)).ToString().PadLeft(4, ' ')}";
             
-            if (screenManager != null && screenManager.IsPaused) return;
+            if (screenManager != null && !screenManager.AllowsMovementInput) return;
             
             var cam = CamController?.ViewCamera;
             

@@ -195,16 +195,15 @@ namespace MarkovCraft
             properlyLoaded = false;
 
             ScreenHeader!.text = GameScene.GetL10nString("editor.text.loading");
-            
-            var game = GameScene.Instance as GenerationScene;
 
-            if (game is null)
+
+            if (GameScene.Instance is not GenerationScene game)
             {
                 Debug.LogError("Wrong game scene!");
                 working = false;
                 return;
             }
-            
+
             confModel = game.ConfiguredModel;
             confModelFile = game.ConfiguredModelFile;
             baseColorPalette = game.GetBaseColorPalette();
