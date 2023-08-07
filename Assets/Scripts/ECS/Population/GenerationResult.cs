@@ -25,6 +25,7 @@ namespace MarkovCraft
         private bool blockColliderAvailable = false;
 
         private readonly Dictionary<int3, GameObject> renderHolders = new();
+        private readonly Dictionary<int3, HashSet<int>> renderHolderEntries = new();
 
         private bool completed = false;
         public bool Completed => completed;
@@ -90,7 +91,7 @@ namespace MarkovCraft
             
             completed = true;
 
-            TryRebuildResultMesh();
+            RequestRebuildResultMesh();
         }
 
         public (int sizeX, int sizeY, int sizeZ, int[] blockData, int[] colors, HashSet<int> airIndices) GetPreviewData()
@@ -128,17 +129,23 @@ namespace MarkovCraft
             transform.position = GetVolumePosition();
         }
 
-        public void TryRebuildResultMesh()
+        public void RequestRebuildResultMesh(HashSet<int>? updatedEntries = null)
         {
+            if (updatedEntries is not null && updatedEntries.Count == 0)
+            {
+                // It's a update request but nothing is updated
+                return;
+            }
+
             if (completed && !rebuildingMesh)
             {
                 rebuildingMesh = true;
 
-                StartCoroutine(RebuildResultMesh());
+                StartCoroutine(RebuildResultMesh(updatedEntries));
             }
         }
 
-        private IEnumerator RebuildResultMesh()
+        private IEnumerator RebuildResultMesh(HashSet<int>? updatedEntries)
         {
             int chunkX = Mathf.CeilToInt(SizeX / 16F);
             int chunkY = Mathf.CeilToInt(SizeY / 16F);
@@ -152,39 +159,30 @@ namespace MarkovCraft
             var stateIdPalette = ResultPalette.Select(x =>
                     BlockStateHelper.GetStateIdFromString(x.BlockState)).ToArray();
             
+            bool updateFromExistingMesh = updatedEntries is not null;
 
             for (int cx = 0;cx < chunkX;cx++) for (int cy = 0;cy < chunkY;cy++) for (int cz = 0;cz < chunkZ;cz++)
             {
                 GameObject renderHolder;
                 int3 coord = new(cx, cy, cz);
 
+                if (updateFromExistingMesh && renderHolderEntries.ContainsKey(coord))
+                {
+                    if (renderHolderEntries[coord].Intersect(updatedEntries).Count() == 0)
+                    {
+                        // This chunk doesn't contain any updated entries
+                        // No need to rebuild its mesh, skip.
+                        continue;
+                    }
+                }
+
                 // Chunk origin
                 int cox = cx << 4;
                 int coy = cy << 4;
                 int coz = cz << 4;
 
-                if (renderHolders.ContainsKey(coord))
-                {
-                    renderHolder = renderHolders[coord];
-                }
-                else
-                {
-                    renderHolder = new($"[{cx} {cy} {cz}]");
-                    // Set as own child
-                    renderHolder.transform.SetParent(transform, false);
-                    renderHolder.transform.localPosition = new Vector3(cox - SizeX / 2F, coz - SizeZ / 2F, coy - SizeY / 2F);
-                    // Add necesary components
-                    renderHolder.AddComponent<MeshFilter>();
-                    renderHolder.AddComponent<MeshRenderer>();
-
-                    renderHolders.Add(coord, renderHolder);
-                }
-
-                // Unity     X  Y  Z
-                // Markov    X  Z  Y
-                // Minecraft Z  Y  X
-
                 var visualBuffer = new VertexBuffer();
+                var nonAirIndicesInChunk = new HashSet<int>();
 
                 var buildTask = Task.Run(() => {
                     for (int ix = 0;ix < 16;ix++) for (int iy = 0;iy < 16;iy++) for (int iz = 0;iz < 16;iz++)
@@ -198,6 +196,8 @@ namespace MarkovCraft
 
                         int value = BlockData[pos];
                         if (AirIndices.Contains(value)) continue;
+
+                        nonAirIndicesInChunk.Add(value);
 
                         int cullFlags = 0b000000;
 
@@ -213,7 +213,6 @@ namespace MarkovCraft
                             cullFlags |= 0b010000;
                         if (y ==         0 || AirGrid[x + (y - 1) * SizeX + z * SizeX * SizeY]) // Unity -Z (East)  | Markov +Y
                             cullFlags |= 0b100000;
-
 
                         int stateId = stateIdPalette[value];
 
@@ -239,10 +238,31 @@ namespace MarkovCraft
                 while (!buildTask.IsCompleted)
                     yield return null;
 
-                renderHolder.GetComponent<MeshRenderer>().sharedMaterial = blockMaterial;
-                renderHolder.GetComponent<MeshFilter>().sharedMesh = BlockStatePreview.BuildMesh(visualBuffer);
+                if (visualBuffer.vert.Length > 0) // Mesh is not empty
+                {
+                    if (renderHolders.ContainsKey(coord))
+                    {
+                        renderHolder = renderHolders[coord];
+                    }
+                    else
+                    {
+                        renderHolder = new($"[{cx} {cy} {cz}]");
+                        // Set as own child
+                        renderHolder.transform.SetParent(transform, false);
+                        renderHolder.transform.localPosition = new Vector3(cox - SizeX / 2F, coz - SizeZ / 2F, coy - SizeY / 2F);
+                        // Add necesary components
+                        renderHolder.AddComponent<MeshFilter>();
+                        renderHolder.AddComponent<MeshRenderer>();
 
-                yield return null;
+                        renderHolders.Add(coord, renderHolder);
+                        renderHolderEntries.Add(coord, nonAirIndicesInChunk);
+                    }
+
+                    renderHolder.GetComponent<MeshRenderer>().sharedMaterial = blockMaterial;
+                    renderHolder.GetComponent<MeshFilter>().sharedMesh = BlockStatePreview.BuildMesh(visualBuffer);
+
+                    yield return null;
+                }
             }
         
             rebuildingMesh = false;

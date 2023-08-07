@@ -212,18 +212,28 @@ namespace MarkovCraft
                 working = true;
 
                 var resultPalette = exportResult.ResultPalette;
+                var updatedEntries = new HashSet<int>();
                 // Apply export palette overrides
-                for (int resultIndex = 0;resultIndex < resultPalette.Length;resultIndex++)
+                for (int index = 0;index < resultPalette.Length;index++)
                 {
-                    var item = mappingItems[resultIndex];
-                    var itemVal = resultPalette[resultIndex];
+                    var item = mappingItems[index];
+                    var itemVal = resultPalette[index];
 
-                    itemVal.Color = ColorConvert.OpaqueColor32FromHexString(item.GetColorCode());
-                    itemVal.BlockState = item.GetBlockState();
+                    var newColor = ColorConvert.OpaqueRGBFromHexString(item.GetColorCode());
+                    var newBlockState = item.GetBlockState();
+
+                    // Color32s are directly comparable so we have to convert them to rgb int first
+                    if (ColorConvert.GetOpaqueRGB(itemVal.Color) != newColor || itemVal.BlockState != newBlockState)
+                    {
+                        itemVal.Color = ColorConvert.GetOpaqueColor32(newColor);
+                        itemVal.BlockState = newBlockState;
+
+                        updatedEntries.Add(index);
+                    }
                 }
 
                 // Rebuild result mesh to reflect mapping changes
-                exportResult.TryRebuildResultMesh();
+                exportResult.RequestRebuildResultMesh(updatedEntries);
 
                 working = false;
 
@@ -307,18 +317,28 @@ namespace MarkovCraft
                 PlayerPrefs.SetInt(EXPORT_FORMAT_KEY, formatIndex);
 
                 var resultPalette = exportResult.ResultPalette;
+                var updatedEntries = new HashSet<int>();
                 // Apply export palette overrides
-                for (int resultIndex = 0;resultIndex < resultPalette.Length;resultIndex++)
+                for (int index = 0;index < resultPalette.Length;index++)
                 {
-                    var item = mappingItems[resultIndex];
-                    var itemVal = resultPalette[resultIndex];
+                    var item = mappingItems[index];
+                    var itemVal = resultPalette[index];
 
-                    itemVal.Color = ColorConvert.OpaqueColor32FromHexString(item.GetColorCode());
-                    itemVal.BlockState = item.GetBlockState();
+                    var newColor = ColorConvert.OpaqueRGBFromHexString(item.GetColorCode());
+                    var newBlockState = item.GetBlockState();
+
+                    // Color32s are directly comparable so we have to convert them to rgb int first
+                    if (ColorConvert.GetOpaqueRGB(itemVal.Color) != newColor || itemVal.BlockState != newBlockState)
+                    {
+                        itemVal.Color = ColorConvert.GetOpaqueColor32(newColor);
+                        itemVal.BlockState = newBlockState;
+
+                        updatedEntries.Add(index);
+                    }
                 }
 
                 // Rebuild result mesh to reflect mapping changes
-                exportResult.TryRebuildResultMesh();
+                exportResult.RequestRebuildResultMesh(updatedEntries);
 
                 int sizeX = exportResult.SizeX;
                 int sizeY = exportResult.SizeY;
