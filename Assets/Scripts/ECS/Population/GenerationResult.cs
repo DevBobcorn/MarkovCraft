@@ -34,7 +34,6 @@ namespace MarkovCraft
         public int SizeX { get; private set; } = 0;
         public int SizeY { get; private set; } = 0;
         public int SizeZ { get; private set; } = 0;
-        public bool Is2D { get; private set; } = false;
         public CustomMappingItem[] ResultPalette { get; private set; } = { };
         private bool[] AirGrid = { };
 
@@ -50,7 +49,65 @@ namespace MarkovCraft
         public int ResultId { get; set; } = 0;
         private bool rebuildingMesh = false;
 
-        public void SetData(Dictionary<char, CustomMappingItem> fullPalette, byte[] state, char[] legend, int FX, int FY, int FZ, int stepCount, string confModel, int seed)
+        // Set data from MarkovJunior generation
+        public void SetData(Dictionary<char, CustomMappingItem> fullPalette, byte[] state, char[] legend, int sizeX, int sizeY, int sizeZ, int stepCount, string confModel, int seed)
+        {
+            // Generation data
+            ConfiguredModelName = confModel;
+            GenerationSeed = seed;
+            FinalStepCount = stepCount;
+
+            // Get a minimum set of characters in the result
+            byte[] minimumCharIndices = state.ToHashSet().ToArray();
+            // Character index => Result palette index(/Minimum character index)
+            var charIndex2ResultIndex = new Dictionary<byte, int>();
+            for (int mi = 0;mi < minimumCharIndices.Length;mi++)
+            {
+                charIndex2ResultIndex[minimumCharIndices[mi]] = mi;
+            }
+            // Remap block data
+            var blockData = state.Select(ci => charIndex2ResultIndex[ci]).ToArray();
+            // Calculate which indices should be air
+            if (sizeZ != 0 && charIndex2ResultIndex.ContainsKey(0)) // For 3d results, legend[0] is air
+            {
+                AirIndices.Add(charIndex2ResultIndex[0]);
+            }
+            // Calculate result palette
+            var resultPalette = minimumCharIndices.Select(ci => fullPalette[legend[ci]].AsCopy()).ToArray();
+
+            // Call regular set data method
+            SetData(resultPalette, blockData, sizeX, sizeY, sizeZ);
+        }
+
+        // Set data from vox model
+        public void SetData(int[] state, int sizeX, int sizeY, int sizeZ)
+        {
+            // Generation data
+            ConfiguredModelName = "Vox Import";
+            GenerationSeed = 0;
+            FinalStepCount = 0;
+
+            // Get a minimum set of indices in the result, add index 0 (air) if not present
+            int[] minimumVoxIndices = state.ToHashSet().ToArray();
+            // Vox index => Result palette index(/Minimum vox palette index)
+            var voxIndex2ResultIndex = new Dictionary<int, int>();
+            for (int mi = 0;mi < minimumVoxIndices.Length;mi++)
+            {
+                voxIndex2ResultIndex[minimumVoxIndices[mi]] = mi;
+            }
+            Debug.Log($"Vox remapping: {string.Join(", ", voxIndex2ResultIndex.Select(x => $"[{x.Key}, {x.Value}]"))}");
+            // Remap block data
+            var blockData = state.Select(ci => voxIndex2ResultIndex[ci]).ToArray();
+            // Index -1 in loaded vox data is air
+            AirIndices.Add(voxIndex2ResultIndex[-1]);
+            // Calculate result palette
+            var resultPalette = minimumVoxIndices.Select(vi => new CustomMappingItem { Color = Color.cyan }).ToArray();
+
+            // Call regular set data method
+            SetData(resultPalette, blockData, sizeX, sizeY, sizeZ);
+        }
+
+        private void SetData(CustomMappingItem[] resultPalette, int[] blockData, int FX, int FY, int FZ)
         {
             if (completed)
             {
@@ -61,31 +118,11 @@ namespace MarkovCraft
             SizeX = FX;
             SizeY = FY;
             SizeZ = FZ;
-            Is2D = SizeZ == 1;
-            // Get a minimum set of characters in the result
-            byte[] minimumCharIndices = state.ToHashSet().ToArray();
-            // Character index => Result palette index(/Minimum character index)
-            var charIndex2ResultIndex = new Dictionary<byte, int>();
-            for (int mi = 0;mi < minimumCharIndices.Length;mi++)
-            {
-                charIndex2ResultIndex[minimumCharIndices[mi]] = mi;
-            }
-            // Calculate which indices should be air
-            if (!Is2D && charIndex2ResultIndex.ContainsKey(0)) // For 3d results, legend[0] is air
-            {
-                AirIndices.Add(charIndex2ResultIndex[0]);
-            }
-            // Calculate result palette
-            ResultPalette = minimumCharIndices.Select(ci => fullPalette[legend[ci]].AsCopy()).ToArray();
-            // Remap block data
-            BlockData = state.Select(ci => charIndex2ResultIndex[ci]).ToArray();
-            // Other data
-            FinalStepCount = stepCount;
-            ConfiguredModelName = confModel;
-            GenerationSeed = seed;
-
+            // Update result block data
+            ResultPalette = resultPalette;
+            BlockData = blockData;
+            // Calculate air grid for culling
             AirGrid = new bool[BlockData.Length];
-            
             for (int i = 0;i < BlockData.Length;i++)
                 AirGrid[i] = AirIndices.Contains(BlockData[i]);
             

@@ -268,6 +268,8 @@ namespace MarkovCraft
             GenerationText!.text = GetL10nString("status.info.loaded_conf_model", loadedDataVersionName, loadedDataVersionInt, confModelFile);
         }
 
+        private static int nextResultId = 10001;
+
         private IEnumerator RunGeneration()
         {
             if (executing || currentConfModel is null || interpreter is null || BlockMaterial is null || GenerationText == null || GenerationResultPrefab is null)
@@ -292,8 +294,6 @@ namespace MarkovCraft
             System.Random rand = new();
             var seeds = model.Seeds;
 
-            List<GenerationResult> results = new();
-
             int maxX = 0, maxY = 0, maxZ = 0;
             int stepsPerFrame = model.StepsPerRefresh;
 
@@ -308,12 +308,11 @@ namespace MarkovCraft
                 int xCount = (k - 1) % resultPerLine,  yCount = (k - 1) / resultPerLine;
                 
                 var resultObj = Instantiate(GenerationResultPrefab);
-                resultObj.name = $"Result #{k} (Seed: {seed})";
+                var resultId = nextResultId++;
+                resultObj.name = $"Result #{resultId} (Seed: {seed})";
                 var result = resultObj!.GetComponent<GenerationResult>();
                 result.GenerationSeed = seed;
-                result.ResultId = k;
-
-                results.Add(result);
+                result.ResultId = resultId;
                 
                 GenerationText.text = GetL10nString("status.info.generation_start", k);
 
@@ -409,7 +408,7 @@ namespace MarkovCraft
 
                     result.SetData(fullPalette, stateClone, legendClone, dataFrame.FX, dataFrame.FY, dataFrame.FZ, dataFrame.stepCount, confModelFile, seed);
 
-                    Debug.Log($"Iteration #{k} complete. Steps: {dataFrame.stepCount} Frames: {recordedFrames.Count}");
+                    Debug.Log($"Iteration {k} complete. Steps: {dataFrame.stepCount} Frames: {recordedFrames.Count}");
                     ModelGraphUI!.SetActiveNode(-1); // Deselect active node
                     GenerationText.text = GetL10nString("status.info.generation_complete", k);
 
@@ -426,6 +425,35 @@ namespace MarkovCraft
 
             if (executing) // If the execution hasn't been forced stopped
                 StopExecution();
+        }
+
+        private IEnumerator ImportVoxResult(string fileName)
+        {
+            if (executing || BlockMaterial is null || GenerationText == null || GenerationResultPrefab is null)
+            {
+                Debug.LogWarning("Import cannot be initiated");
+                yield break;
+            }
+
+            var resultObj = Instantiate(GenerationResultPrefab);
+            var resultId = nextResultId++;
+            resultObj!.name = $"Result #{resultId} (Imported from vox)";
+            var result = resultObj!.GetComponent<GenerationResult>();
+            result.GenerationSeed = 0;
+            result.ResultId = resultId;
+
+            yield return null;
+
+            var (state, sizeX, sizeY, sizeZ) = VoxHelper.LoadVox(fileName);
+            if (state is null)
+            {
+                Debug.LogWarning("Import failed");
+                yield break;
+            }
+
+            result.UpdateVolume(int3.zero, sizeX, sizeY, sizeZ);
+
+            result.SetData(state, sizeX, sizeY, sizeZ);
         }
 
         void Start()
@@ -493,7 +521,12 @@ namespace MarkovCraft
         void Update()
         {
             if (FPSText != null)
-                FPSText.text = $"FPS:{((int)(1 / Time.unscaledDeltaTime)).ToString().PadLeft(4, ' ')}";
+                FPSText.text = $"FPS:{(int)(1 / Time.unscaledDeltaTime),4}";
+            
+            if (Input.GetKeyDown(KeyCode.V))
+            {
+                StartCoroutine(ImportVoxResult(@"D:\Tools\MagicaVoxel\vox\chr_knight.vox"));
+            }
             
             if (screenManager != null && !screenManager.AllowsMovementInput) return;
             

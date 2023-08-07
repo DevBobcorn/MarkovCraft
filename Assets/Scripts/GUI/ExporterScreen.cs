@@ -135,7 +135,7 @@ namespace MarkovCraft
 
             // Update Preview Image
             var (pixels, sizeX, sizeY) = ResultDetailPanel.RenderPreview(prev.sizeX, prev.sizeY, prev.sizeZ,
-                    prev.blockData, prev.colors, prev.airIndices, exportResult.Is2D ? ResultDetailPanel.PreviewRotation.ZERO : ResultDetailPanel.PreviewRotation.NINETY);
+                    prev.blockData, prev.colors, prev.airIndices, exportResult.SizeZ == 1 ? ResultDetailPanel.PreviewRotation.ZERO : ResultDetailPanel.PreviewRotation.NINETY);
             var tex = MarkovJunior.Graphics.CreateTexture2D(pixels, sizeX, sizeY);
             //tex.filterMode = FilterMode.Point;
             // Update sprite
