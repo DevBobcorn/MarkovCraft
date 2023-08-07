@@ -1,9 +1,14 @@
 #nullable enable
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using Unity.Mathematics;
+
+using MinecraftClient.Mapping;
+using MinecraftClient.Resource;
 
 namespace MarkovCraft
 {
@@ -15,8 +20,11 @@ namespace MarkovCraft
         [SerializeField] public float Margin = 0.5F;
         [SerializeField] private GameObject? volumeColliderHolder;
         [SerializeField] private string blockColliderLayerName = "BlockCollider";
+        [SerializeField] private Material? blockMaterial;
         private GameObject? blockColliderHolder;
         private bool blockColliderAvailable = false;
+
+        private readonly Dictionary<int3, GameObject> renderHolders = new();
 
         private bool completed = false;
         public bool Completed => completed;
@@ -27,6 +35,8 @@ namespace MarkovCraft
         public int SizeZ { get; private set; } = 0;
         public bool Is2D { get; private set; } = false;
         public CustomMappingItem[] ResultPalette { get; private set; } = { };
+        private bool[] AirGrid = { };
+
         public readonly HashSet<int> AirIndices = new();
         public int[] BlockData { get; private set; } = { };
         public int FinalStepCount { get; private set; } = 0;
@@ -37,9 +47,15 @@ namespace MarkovCraft
         // Markov    X  Z  Y
         public int3 UnityPosition { get; private set; } = int3.zero;
         public int ResultId { get; set; } = 0;
+        private bool rebuildingMesh = false;
 
         public void SetData(Dictionary<char, CustomMappingItem> fullPalette, byte[] state, char[] legend, int FX, int FY, int FZ, int stepCount, string confModel, int seed)
         {
+            if (completed)
+            {
+                throw new InvalidOperationException("Result data already presents");
+            }
+
             // Update result final size
             SizeX = FX;
             SizeY = FY;
@@ -67,7 +83,14 @@ namespace MarkovCraft
             ConfiguredModelName = confModel;
             GenerationSeed = seed;
 
+            AirGrid = new bool[BlockData.Length];
+            
+            for (int i = 0;i < BlockData.Length;i++)
+                AirGrid[i] = AirIndices.Contains(BlockData[i]);
+            
             completed = true;
+
+            TryRebuildResultMesh();
         }
 
         public (int sizeX, int sizeY, int sizeZ, int[] blockData, int[] colors, HashSet<int> airIndices) GetPreviewData()
@@ -103,6 +126,126 @@ namespace MarkovCraft
         {
             volumeColliderHolder!.transform.localScale = GetVolumeSize();
             transform.position = GetVolumePosition();
+        }
+
+        public void TryRebuildResultMesh()
+        {
+            if (completed && !rebuildingMesh)
+            {
+                rebuildingMesh = true;
+
+                StartCoroutine(RebuildResultMesh());
+            }
+        }
+
+        private IEnumerator RebuildResultMesh()
+        {
+            int chunkX = Mathf.CeilToInt(SizeX / 16F);
+            int chunkY = Mathf.CeilToInt(SizeY / 16F);
+            int chunkZ = Mathf.CeilToInt(SizeZ / 16F);
+
+            var statesTable = BlockStatePalette.INSTANCE.StatesTable;
+            var packManager = ResourcePackManager.Instance;
+            var stateModelTable = packManager.StateModelTable;
+
+            // Cache mapped data
+            var stateIdPalette = ResultPalette.Select(x =>
+                    BlockStateHelper.GetStateIdFromString(x.BlockState)).ToArray();
+            
+
+            for (int cx = 0;cx < chunkX;cx++) for (int cy = 0;cy < chunkY;cy++) for (int cz = 0;cz < chunkZ;cz++)
+            {
+                GameObject renderHolder;
+                int3 coord = new(cx, cy, cz);
+
+                // Chunk origin
+                int cox = cx << 4;
+                int coy = cy << 4;
+                int coz = cz << 4;
+
+                if (renderHolders.ContainsKey(coord))
+                {
+                    renderHolder = renderHolders[coord];
+                }
+                else
+                {
+                    renderHolder = new($"[{cx} {cy} {cz}]");
+                    // Set as own child
+                    renderHolder.transform.SetParent(transform, false);
+                    renderHolder.transform.localPosition = new Vector3(cox - SizeX / 2F, coz - SizeZ / 2F, coy - SizeY / 2F);
+                    // Add necesary components
+                    renderHolder.AddComponent<MeshFilter>();
+                    renderHolder.AddComponent<MeshRenderer>();
+
+                    renderHolders.Add(coord, renderHolder);
+                }
+
+                // Unity     X  Y  Z
+                // Markov    X  Z  Y
+                // Minecraft Z  Y  X
+
+                var visualBuffer = new VertexBuffer();
+
+                var buildTask = Task.Run(() => {
+                    for (int ix = 0;ix < 16;ix++) for (int iy = 0;iy < 16;iy++) for (int iz = 0;iz < 16;iz++)
+                    {
+                        int x = ix + cox;
+                        int y = iy + coy;
+                        int z = iz + coz;
+
+                        if (x >= SizeX || y >= SizeY || z >= SizeZ) continue;
+                        int pos = x + y * SizeX + z * SizeX * SizeY;
+
+                        int value = BlockData[pos];
+                        if (AirIndices.Contains(value)) continue;
+
+                        int cullFlags = 0b000000;
+
+                        if (z == SizeZ - 1 || AirGrid[x + y * SizeX + (z + 1) * SizeX * SizeY]) // Unity +Y (Up)    | Markov +Z
+                            cullFlags |= 0b000001;
+                        if (z ==         0 || AirGrid[x + y * SizeX + (z - 1) * SizeX * SizeY]) // Unity -Y (Down)  | Markov -Z
+                            cullFlags |= 0b000010;
+                        if (x == SizeX - 1 || AirGrid[(x + 1) + y * SizeX + z * SizeX * SizeY]) // Unity +X (South) | Markov +X
+                            cullFlags |= 0b000100;
+                        if (x ==         0 || AirGrid[(x - 1) + y * SizeX + z * SizeX * SizeY]) // Unity -X (North) | Markov -X
+                            cullFlags |= 0b001000;
+                        if (y == SizeX - 1 || AirGrid[x + (y + 1) * SizeX + z * SizeX * SizeY]) // Unity +Z (East)  | Markov +Y
+                            cullFlags |= 0b010000;
+                        if (y ==         0 || AirGrid[x + (y - 1) * SizeX + z * SizeX * SizeY]) // Unity -Z (East)  | Markov +Y
+                            cullFlags |= 0b100000;
+
+
+                        int stateId = stateIdPalette[value];
+
+                        if (stateId == BlockStateHelper.INVALID_BLOCKSTATE)
+                        {
+                            var cubeTint = ResultPalette[value].Color;
+
+                            CubeGeometry.Build(ref visualBuffer, ResourcePackManager.BLANK_TEXTURE, ix, iz, iy, cullFlags,
+                                    new(cubeTint.r / 255F, cubeTint.g / 255F, cubeTint.b / 255F));
+                        }
+                        else
+                        {
+
+                            if (cullFlags != 0b000000)// If at least one face is visible
+                            {
+                                var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, Location.Zero, statesTable[stateId]);
+                                stateModelTable[stateId].Geometries[0].Build(ref visualBuffer, new(ix, iz, iy), cullFlags, blockTint);
+                            }
+                        }
+                    }
+                });
+
+                while (!buildTask.IsCompleted)
+                    yield return null;
+
+                renderHolder.GetComponent<MeshRenderer>().sharedMaterial = blockMaterial;
+                renderHolder.GetComponent<MeshFilter>().sharedMesh = BlockStatePreview.BuildMesh(visualBuffer);
+
+                yield return null;
+            }
+        
+            rebuildingMesh = false;
         }
 
         public IEnumerator EnableBlockColliders()

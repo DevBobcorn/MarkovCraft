@@ -392,12 +392,14 @@ namespace MarkovCraft
                             // Frame legend index => (meshIndex, meshColor)
                             dataFrame.legend.Select(ch => meshPalette[ch]).ToArray());
                     
+                    /*
                     // The final visualization is persistent
                     BlockInstanceSpawner.VisualizePersistentState(instanceData, materials, blockMeshes);
 
                     if (dataFrame.FX > maxX) maxX = dataFrame.FX;
                     if (dataFrame.FY > maxY) maxY = dataFrame.FY;
                     if (dataFrame.FZ > maxZ) maxZ = dataFrame.FZ;
+                    */
 
                     var stateClone = new byte[dataFrame.state!.Length];
                     Array.Copy(dataFrame.state!, stateClone, stateClone.Length);

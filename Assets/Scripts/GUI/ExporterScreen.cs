@@ -207,11 +207,11 @@ namespace MarkovCraft
         {
             if (working) return;
 
-            if (properlyLoaded) // The editor is properly loaded
+            if (properlyLoaded && exportResult != null) // The editor is properly loaded
             {
                 working = true;
 
-                var resultPalette = exportResult!.ResultPalette;
+                var resultPalette = exportResult.ResultPalette;
                 // Apply export palette overrides
                 for (int resultIndex = 0;resultIndex < resultPalette.Length;resultIndex++)
                 {
@@ -221,6 +221,9 @@ namespace MarkovCraft
                     itemVal.Color = ColorConvert.OpaqueColor32FromHexString(item.GetColorCode());
                     itemVal.BlockState = item.GetBlockState();
                 }
+
+                // Rebuild result mesh to reflect mapping changes
+                exportResult.TryRebuildResultMesh();
 
                 working = false;
 
@@ -313,6 +316,9 @@ namespace MarkovCraft
                     itemVal.Color = ColorConvert.OpaqueColor32FromHexString(item.GetColorCode());
                     itemVal.BlockState = item.GetBlockState();
                 }
+
+                // Rebuild result mesh to reflect mapping changes
+                exportResult.TryRebuildResultMesh();
 
                 int sizeX = exportResult.SizeX;
                 int sizeY = exportResult.SizeY;

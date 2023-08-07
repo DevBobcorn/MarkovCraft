@@ -10,7 +10,6 @@ namespace MarkovCraft
 {
     public static class RecordingExporter
     {
-        private static readonly char SP = Path.DirectorySeparatorChar;
         // Unity     X  Y  Z
         // Markov    X  Z  Y
         // Minecraft Z  Y  X

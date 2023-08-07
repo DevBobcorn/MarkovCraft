@@ -62,7 +62,17 @@ namespace MarkovCraft
             if (BlockStateInput!.interactable) // The blockstate input is not locked
             {
                 BlockStateInput!.SetTextWithoutNotify(blockState); // Avoid updating block preview
-                OnUpdateBlockStateInput(blockState);
+
+                var stateId = BlockStateHelper.GetStateIdFromString(blockState);
+                
+                if (stateId != BlockStateHelper.INVALID_BLOCKSTATE) // Update and show preview
+                {
+                    UpdatePreview(stateId);
+                }
+                else // Hide preview
+                {
+                    UpdatePreview(BlockStateHelper.INVALID_BLOCKSTATE);
+                }
             }
         }
 

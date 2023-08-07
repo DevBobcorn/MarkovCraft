@@ -98,16 +98,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 855e359c2d351d846b98c46ef05800ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GenerationPosition:
-    x: 0
-    y: 0
-    z: 0
-  GenerationSize:
-    x: 25
-    y: 35
-    z: 30
-  Iteration: 0
-  GenerationSeed: 0
   Valid: 1
   Margin: 1
   volumeColliderHolder: {fileID: 2616805721629465012}
+  blockColliderLayerName: BlockCollider
+  blockMaterial: {fileID: 2100000, guid: 7e3ea3dacd3f3c143805a48d2f20257c, type: 2}
+  GenerationSeed: 0
