@@ -31,19 +31,26 @@ namespace MarkovCraft
         [SerializeField] public LayerMask VolumeLayerMask;
         [SerializeField] public LayerMask BlockColliderLayerMask;
         [SerializeField] public VolumeSelection? VolumeSelection;
+        private GenerationResult? selectedResult = null;
         [SerializeField] public GameObject? BlockSelection;
+        // HUD Controls
         [SerializeField] public CanvasGroup? BlockSelectionPanelGroup;
         [SerializeField] public TMP_Text? BlockSelectionText;
         [SerializeField] public ExportItem? BlockSelectionMappingItem;
-
+        [SerializeField] public TMP_Text? VolumeText, GenerationText, FPSText;
+        [SerializeField] public ModelGraph? ModelGraphUI;
+        // HUD Controls - Generation Panel
         [SerializeField] public Toggle? RecordToggle;
-        [SerializeField] public TMP_Text? VolumeText, PlaybackSpeedText, GenerationText, FPSText;
+        [SerializeField] public TMP_Text? PlaybackSpeedText;
         [SerializeField] public TMP_Dropdown? ConfiguredModelDropdown;
         [SerializeField] public Slider? PlaybackSpeedSlider;
-        [SerializeField] public Button? CreateButton, ConfigButton, ExecuteButton, ExportButton;
-        [SerializeField] public ModelGraph? ModelGraphUI;
+        [SerializeField] public Button? CreateButton, ConfigButton, ExecuteButton;
+        // HUD Controls - Import Vox Panel
+        [SerializeField] public TMP_InputField? VoxPathInput;
+        [SerializeField] public Button? VoxImportButton;
+
+        [SerializeField] public Button? ExportButton;
         [SerializeField] public GameObject? GenerationResultPrefab;
-        private GenerationResult? selectedResult = null;
 
         // Character => RGB Color specified in base palette
         // This palette should be loaded for only once
@@ -112,7 +119,7 @@ namespace MarkovCraft
             GenerationText!.text = GetL10nString("status.info.load_conf_model", confModelFile);
 
             ExecuteButton!.interactable = false;
-            var localizedLoadText = GetL10nString("hud.text.load_conf_model");
+            var localizedLoadText = GetL10nString("control.text.load_conf_model");
             ExecuteButton.GetComponentInChildren<TMP_Text>().text = localizedLoadText;
 
             // Clear up scene
@@ -261,7 +268,7 @@ namespace MarkovCraft
             Loading = false;
 
             ExecuteButton!.interactable = true;
-            ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.start_execution");
+            ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.start_execution");
             ExecuteButton.onClick.RemoveAllListeners();
             ExecuteButton.onClick.AddListener(StartExecution);
 
@@ -427,11 +434,24 @@ namespace MarkovCraft
                 StopExecution();
         }
 
-        private IEnumerator ImportVoxResult(string fileName)
+        private IEnumerator ImportVoxResult()
         {
-            if (executing || BlockMaterial is null || GenerationText == null || GenerationResultPrefab is null)
+            if (executing || BlockMaterial is null || VoxPathInput == null || GenerationResultPrefab is null)
             {
                 Debug.LogWarning("Import cannot be initiated");
+                yield break;
+            }
+
+            yield return null;
+
+            // Get and sanitize file name
+            string fileName = VoxPathInput.text.Trim().Trim('"');
+
+            //var (state, sizeX, sizeY, sizeZ) = VoxHelper.LoadVox(fileName);
+            var (state, rgbPalette, sizeX, sizeY, sizeZ) = VoxHelper.LoadVoxWithRGBPalette(fileName);
+            if (state is null)
+            {
+                Debug.LogWarning("Import failed");
                 yield break;
             }
 
@@ -442,18 +462,9 @@ namespace MarkovCraft
             result.GenerationSeed = 0;
             result.ResultId = resultId;
 
-            yield return null;
-
-            var (state, sizeX, sizeY, sizeZ) = VoxHelper.LoadVox(fileName);
-            if (state is null)
-            {
-                Debug.LogWarning("Import failed");
-                yield break;
-            }
-
             result.UpdateVolume(int3.zero, sizeX, sizeY, sizeZ);
 
-            result.SetData(state, sizeX, sizeY, sizeZ);
+            result.SetData(state, rgbPalette, sizeX, sizeY, sizeZ);
         }
 
         void Start()
@@ -462,7 +473,9 @@ namespace MarkovCraft
             StartCoroutine(LoadMCBlockData(
                 () => {
                     ExecuteButton!.interactable = false;
-                    ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.load_resource");
+                    ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.load_resource");
+                    VoxImportButton!.interactable = false;
+                    VoxImportButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.load_resource");
                 },
                 (status) => GenerationText!.text = GetL10nString(status),
                 () => {
@@ -488,6 +501,14 @@ namespace MarkovCraft
                     {
                         ExportButton.onClick.RemoveAllListeners();
                         ExportButton.onClick.AddListener(() => screenManager!.SetActiveScreenByType<ExporterScreen>() );
+                    }
+
+                    if (VoxImportButton != null)
+                    {
+                        VoxImportButton.interactable = true;
+                        VoxImportButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.import_vox");
+                        VoxImportButton.onClick.RemoveAllListeners();
+                        VoxImportButton.onClick.AddListener(() => StartCoroutine(ImportVoxResult()));
                     }
 
                     UpdateConfModelList();
@@ -521,12 +542,7 @@ namespace MarkovCraft
         void Update()
         {
             if (FPSText != null)
-                FPSText.text = $"FPS:{(int)(1 / Time.unscaledDeltaTime),4}";
-            
-            if (Input.GetKeyDown(KeyCode.V))
-            {
-                StartCoroutine(ImportVoxResult(@"D:\Tools\MagicaVoxel\vox\chr_knight.vox"));
-            }
+                FPSText.text = $"FPS:{(int)(1 / Time.unscaledDeltaTime), 4}";
             
             if (screenManager != null && !screenManager.AllowsMovementInput) return;
             
@@ -743,7 +759,7 @@ namespace MarkovCraft
 
             if (ExecuteButton != null)
             {
-                ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.stop_execution");
+                ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.stop_execution");
                 ExecuteButton.onClick.RemoveAllListeners();
                 ExecuteButton.onClick.AddListener(StopExecution);
             }
@@ -767,7 +783,7 @@ namespace MarkovCraft
 
             if (ExecuteButton != null)
             {
-                ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.start_execution");
+                ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.start_execution");
                 ExecuteButton.onClick.RemoveAllListeners();
                 ExecuteButton.onClick.AddListener(StartExecution);
             }

@@ -190,7 +190,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 403911460429824
-    m_Localized: Loading...
+    m_Localized: Loading Model...
     m_Metadata:
       m_Items: []
   - m_Id: 500646488743936
@@ -339,7 +339,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 28284971888611328
-    m_Localized: Loading...
+    m_Localized: Loading Recording...
     m_Metadata:
       m_Items: []
   - m_Id: 28289458426548224
@@ -414,14 +414,6 @@ MonoBehaviour:
     m_Localized: Record (View in Replay)
     m_Metadata:
       m_Items: []
-  - m_Id: 31238120081395712
-    m_Localized: 'Original Mapping<size=24>(As in conf model)</size>:'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 31238213018783744
-    m_Localized: 'Will be exported as:'
-    m_Metadata:
-      m_Items: []
   - m_Id: 31246398375006208
     m_Localized: 'Current Frame: {0} / {1}'
     m_Metadata:
@@ -464,6 +456,26 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 34834354461413376
     m_Localized: Create a new configured model
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37442488849862656
+    m_Localized: Generate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37442532319629312
+    m_Localized: Import Vox
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37442778391056384
+    m_Localized: 'Import File Path:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37442902013972480
+    m_Localized: Type vox file path here...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37455109888086016
+    m_Localized: Import Vox model
     m_Metadata:
       m_Items: []
   references:

@@ -80,7 +80,7 @@ namespace MarkovCraft
         }
 
         // Set data from vox model
-        public void SetData(int[] state, int sizeX, int sizeY, int sizeZ)
+        public void SetData(int[] state, int[]? rgbPalette, int sizeX, int sizeY, int sizeZ)
         {
             // Generation data
             ConfiguredModelName = "Vox Import";
@@ -101,7 +101,12 @@ namespace MarkovCraft
             // Index -1 in loaded vox data is air
             AirIndices.Add(voxIndex2ResultIndex[-1]);
             // Calculate result palette
-            var resultPalette = minimumVoxIndices.Select(vi => new CustomMappingItem { Color = Color.cyan }).ToArray();
+            var resultPalette = rgbPalette is null ?
+                    minimumVoxIndices.Select(vi =>
+                            new CustomMappingItem { Color = Color.cyan }).ToArray() :
+                    minimumVoxIndices.Select(vi =>
+                            new CustomMappingItem { Color = vi == -1 ? Color.black :
+                                    ColorConvert.GetOpaqueColor32(rgbPalette[vi]) }).ToArray();
 
             // Call regular set data method
             SetData(resultPalette, blockData, sizeX, sizeY, sizeZ);

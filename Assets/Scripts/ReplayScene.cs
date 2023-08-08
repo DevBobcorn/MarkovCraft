@@ -68,7 +68,7 @@ namespace MarkovCraft
             StartCoroutine(LoadMCBlockData(
                 () => {
                     ReplayButton!.interactable = false;
-                    ReplayButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.load_resource");
+                    ReplayButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.load_resource");
                 },
                 (status) => ReplayText!.text = GetL10nString(status),
                 () => {
@@ -135,7 +135,7 @@ namespace MarkovCraft
             ReplayText!.text = GetL10nString("status.info.load_recording", recordingFile);
 
             ReplayButton!.interactable = false;
-            ReplayButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.load_recording");
+            ReplayButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.load_recording");
 
             // Clear up scene
             ClearUpScene();
@@ -307,7 +307,7 @@ namespace MarkovCraft
             Loading = false;
 
             ReplayButton!.interactable = true;
-            ReplayButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.start_replay");
+            ReplayButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.start_replay");
             ReplayButton.onClick.RemoveAllListeners();
             ReplayButton.onClick.AddListener(StartReplay);
 
@@ -461,7 +461,7 @@ namespace MarkovCraft
 
             if (ReplayButton != null)
             {
-                ReplayButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.stop_replay");
+                ReplayButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.stop_replay");
                 ReplayButton.onClick.RemoveAllListeners();
                 ReplayButton.onClick.AddListener(StopReplay);
             }
@@ -479,7 +479,7 @@ namespace MarkovCraft
 
             if (ReplayButton != null)
             {
-                ReplayButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("hud.text.start_replay");
+                ReplayButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.start_replay");
                 ReplayButton.onClick.RemoveAllListeners();
                 ReplayButton.onClick.AddListener(StartReplay);
             }
