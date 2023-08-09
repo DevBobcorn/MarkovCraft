@@ -26,19 +26,22 @@ namespace MarkovCraft
         private const string CONFIGURED_MODEL_FOLDER = "configured_models";
         private static readonly Vector3 BLOCK_SELECTION_HIDDEN_POS = new(0F, -100F, 0F);
 
-        [SerializeField] private ScreenManager? screenManager;
+        // Scene game objects
         [SerializeField] public CameraController? CamController;
         [SerializeField] public LayerMask VolumeLayerMask;
         [SerializeField] public LayerMask BlockColliderLayerMask;
         [SerializeField] public VolumeSelection? VolumeSelection;
-        private GenerationResult? selectedResult = null;
         [SerializeField] public GameObject? BlockSelection;
+        [SerializeField] public GameObject? GenerationResultPrefab;
         // HUD Controls
+        [SerializeField] private ScreenManager? screenManager;
         [SerializeField] public CanvasGroup? BlockSelectionPanelGroup;
         [SerializeField] public TMP_Text? BlockSelectionText;
         [SerializeField] public ExportItem? BlockSelectionMappingItem;
         [SerializeField] public TMP_Text? VolumeText, GenerationText, FPSText;
         [SerializeField] public ModelGraph? ModelGraphUI;
+        [SerializeField] public Button? ExportButton;
+        [SerializeField] public TabPanel? ControlTabPanel;
         // HUD Controls - Generation Panel
         [SerializeField] public Toggle? RecordToggle;
         [SerializeField] public TMP_Text? PlaybackSpeedText;
@@ -48,9 +51,6 @@ namespace MarkovCraft
         // HUD Controls - Import Vox Panel
         [SerializeField] public TMP_InputField? VoxPathInput;
         [SerializeField] public Button? VoxImportButton;
-
-        [SerializeField] public Button? ExportButton;
-        [SerializeField] public GameObject? GenerationResultPrefab;
 
         // Character => RGB Color specified in base palette
         // This palette should be loaded for only once
@@ -62,6 +62,7 @@ namespace MarkovCraft
         private readonly Dictionary<int, string> loadedConfModels = new();
         private ConfiguredModel? currentConfModel = null;
         public ConfiguredModel? ConfiguredModel => currentConfModel;
+        private GenerationResult? selectedResult = null;
         // Character => (meshIndex, meshColor)
         private readonly Dictionary<char, int2> meshPalette = new();
         // Character => CustomMappingItem, its items SHOULD NOT be edited once loaded from file
@@ -279,7 +280,7 @@ namespace MarkovCraft
 
         private IEnumerator RunGeneration()
         {
-            if (executing || currentConfModel is null || interpreter is null || BlockMaterial is null || GenerationText == null || GenerationResultPrefab is null)
+            if (executing || currentConfModel is null || currentConfModel.Amount == 0 || interpreter is null)
             {
                 Debug.LogWarning("Generation cannot be initiated");
                 StopExecution();
@@ -294,9 +295,8 @@ namespace MarkovCraft
             var model = currentConfModel;
 
             var resultPerLine = Mathf.CeilToInt(Mathf.Sqrt(model.Amount));
-            resultPerLine = Mathf.Max(resultPerLine, 1);
             
-            Material[] materials = { BlockMaterial };
+            Material[] materials = { BlockMaterial! };
 
             System.Random rand = new();
             var seeds = model.Seeds;
@@ -312,16 +312,16 @@ namespace MarkovCraft
                     break;
                 
                 int seed = seeds != null && k <= seeds.Length ? seeds[k - 1] : rand.Next();
-                int xCount = (k - 1) % resultPerLine,  yCount = (k - 1) / resultPerLine;
+                int xCount = (k - 1) % resultPerLine, yCount = (k - 1) / resultPerLine;
                 
                 var resultObj = Instantiate(GenerationResultPrefab);
                 var resultId = nextResultId++;
-                resultObj.name = $"Result #{resultId} (Seed: {seed})";
+                resultObj!.name = $"Result #{resultId} (Seed: {seed})";
                 var result = resultObj!.GetComponent<GenerationResult>();
                 result.GenerationSeed = seed;
                 result.ResultId = resultId;
                 
-                GenerationText.text = GetL10nString("status.info.generation_start", k);
+                GenerationText!.text = GetL10nString("status.info.generation_start", k);
 
                 (byte[] state, char[] legend, int FX, int FY, int FZ, int stepCount) dataFrame = new();
 
@@ -362,7 +362,7 @@ namespace MarkovCraft
                         // Update generation text
                         GenerationText.text = GetL10nString("status.info.generation_step", k, dataFrame.stepCount, (int)(tick * 1000));
 
-                        var pos = new int3(2 + xCount * (dataFrame.FX + 2), 0, 2 + yCount * (dataFrame.FY + 2));
+                        var pos = new int3(2 + xCount * (maxX + 2), 0, 2 + yCount * (maxY + 2));
                         result.UpdateVolume(pos, dataFrame.FX, dataFrame.FY, dataFrame.FZ);
 
                         var instanceData = BlockDataBuilder.GetInstanceData(dataFrame.state!, dataFrame.FX, dataFrame.FY, dataFrame.FZ, pos,
@@ -391,21 +391,19 @@ namespace MarkovCraft
 
                 if (executing) // Visualize final state (last step)
                 {
-                    var pos = new int3(2 + xCount * (dataFrame.FX + 2), 0, 2 + yCount * (dataFrame.FY + 2));
+                    var pos = new int3(2 + xCount * (maxX + 2), 0, 2 + yCount * (maxY + 2));
                     result.UpdateVolume(pos, dataFrame.FX, dataFrame.FY, dataFrame.FZ);
 
                     var instanceData = BlockDataBuilder.GetInstanceData(dataFrame.state!, dataFrame.FX, dataFrame.FY, dataFrame.FZ, pos,
                             // Frame legend index => (meshIndex, meshColor)
                             dataFrame.legend.Select(ch => meshPalette[ch]).ToArray());
                     
-                    /*
                     // The final visualization is persistent
-                    BlockInstanceSpawner.VisualizePersistentState(instanceData, materials, blockMeshes);
+                    //BlockInstanceSpawner.VisualizePersistentState(instanceData, materials, blockMeshes);
 
                     if (dataFrame.FX > maxX) maxX = dataFrame.FX;
                     if (dataFrame.FY > maxY) maxY = dataFrame.FY;
                     if (dataFrame.FZ > maxZ) maxZ = dataFrame.FZ;
-                    */
 
                     var stateClone = new byte[dataFrame.state!.Length];
                     Array.Copy(dataFrame.state!, stateClone, stateClone.Length);
@@ -436,7 +434,7 @@ namespace MarkovCraft
 
         private IEnumerator ImportVoxResult()
         {
-            if (executing || BlockMaterial is null || VoxPathInput == null || GenerationResultPrefab is null)
+            if (executing)
             {
                 Debug.LogWarning("Import cannot be initiated");
                 yield break;
@@ -444,27 +442,48 @@ namespace MarkovCraft
 
             yield return null;
 
-            // Get and sanitize file name
-            string fileName = VoxPathInput.text.Trim().Trim('"');
+            ClearUpScene();
+            // Delay a bit so that the imported stuffs doesn't get cleared
+            yield return new WaitForSecondsRealtime(0.1F);
 
-            //var (state, sizeX, sizeY, sizeZ) = VoxHelper.LoadVox(fileName);
-            var (state, rgbPalette, sizeX, sizeY, sizeZ) = VoxHelper.LoadVoxWithRGBPalette(fileName);
-            if (state is null)
+            // Get and sanitize file name
+            string fileName = VoxPathInput!.text.Trim().Trim('"');
+
+            var (pieces, rgbPalette) = VoxHelper.LoadFullVox(fileName);
+            if (pieces is null || pieces.Length == 0)
             {
                 Debug.LogWarning("Import failed");
                 yield break;
             }
 
-            var resultObj = Instantiate(GenerationResultPrefab);
-            var resultId = nextResultId++;
-            resultObj!.name = $"Result #{resultId} (Imported from vox)";
-            var result = resultObj!.GetComponent<GenerationResult>();
-            result.GenerationSeed = 0;
-            result.ResultId = resultId;
+            var resultPerLine = Mathf.CeilToInt(Mathf.Sqrt(pieces.Length));
 
-            result.UpdateVolume(int3.zero, sizeX, sizeY, sizeZ);
+            int maxX = 0;
+            int maxY = 0;
 
-            result.SetData(state, rgbPalette, sizeX, sizeY, sizeZ);
+            foreach (var piece in pieces)
+            {
+                if (piece.SizeX > maxX) maxX = piece.SizeX;
+                if (piece.SizeY > maxY) maxY = piece.SizeY;
+            }
+
+            for (int i = 0;i < pieces.Length;i++)
+            {
+                int xCount = i % resultPerLine, yCount = i / resultPerLine;
+                var piece = pieces[i];
+
+                var resultObj = Instantiate(GenerationResultPrefab);
+                var resultId = nextResultId++;
+                resultObj!.name = $"Result #{resultId} (Imported from vox)";
+                var result = resultObj!.GetComponent<GenerationResult>();
+                result.GenerationSeed = 0;
+                result.ResultId = resultId;
+
+                var pos = new int3(2 + xCount * (maxX + 2), 0, 2 + yCount * (maxY + 2));
+                result.UpdateVolume(pos, piece.SizeX, piece.SizeY, piece.SizeZ);
+
+                result.SetData(piece.BlockData, rgbPalette, piece.SizeX, piece.SizeY, piece.SizeZ);
+            }
         }
 
         void Start()
@@ -488,19 +507,28 @@ namespace MarkovCraft
                     if (CreateButton != null)
                     {
                         CreateButton.onClick.RemoveAllListeners();
-                        CreateButton.onClick.AddListener(() => screenManager!.SetActiveScreenByType<ConfiguredModelCreatorScreen>() );
+                        CreateButton.onClick.AddListener(() => {
+                            Hide3dGUI();
+                            screenManager!.SetActiveScreenByType<ConfiguredModelCreatorScreen>();
+                        });
                     }
 
                     if (ConfigButton != null)
                     {
                         ConfigButton.onClick.RemoveAllListeners();
-                        ConfigButton.onClick.AddListener(() => screenManager!.SetActiveScreenByType<ConfiguredModelEditorScreen>() );
+                        ConfigButton.onClick.AddListener(() => {
+                            Hide3dGUI();
+                            screenManager!.SetActiveScreenByType<ConfiguredModelEditorScreen>();
+                        });
                     }
 
                     if (ExportButton != null)
                     {
                         ExportButton.onClick.RemoveAllListeners();
-                        ExportButton.onClick.AddListener(() => screenManager!.SetActiveScreenByType<ExporterScreen>() );
+                        ExportButton.onClick.AddListener(() => {
+                            Hide3dGUI();
+                            screenManager!.SetActiveScreenByType<ExporterScreen>();
+                        });
                     }
 
                     if (VoxImportButton != null)
@@ -511,6 +539,12 @@ namespace MarkovCraft
                         VoxImportButton.onClick.AddListener(() => StartCoroutine(ImportVoxResult()));
                     }
 
+                    if (ControlTabPanel != null)
+                    {
+                        ControlTabPanel.OnSelectionChange.RemoveAllListeners();
+                        ControlTabPanel.OnSelectionChange.AddListener(ClearUpScene);
+                    }
+
                     UpdateConfModelList();
 
                     if (loadedConfModels.Count > 0) // Use first model by default
@@ -519,7 +553,7 @@ namespace MarkovCraft
             );
         }
 
-        public void UpdateBlockSelection(CustomMappingItem? selectedItem, string text = "")
+        private void UpdateBlockSelection(CustomMappingItem? selectedItem, string text = "")
         {
             if (selectedItem is null)
             {
@@ -671,7 +705,7 @@ namespace MarkovCraft
             }
         }
 
-        public void UpdatePlaybackSpeed(float newValue)
+        private void UpdatePlaybackSpeed(float newValue)
         {
             playbackSpeed = newValue;
 
@@ -680,7 +714,7 @@ namespace MarkovCraft
             
         }
 
-        public void UpdateDropdownOption(int newValue)
+        private void UpdateDropdownOption(int newValue)
         {
             if (loadedConfModels.ContainsKey(newValue))
                 SetConfiguredModel(loadedConfModels[newValue]);
@@ -747,7 +781,7 @@ namespace MarkovCraft
                 StartCoroutine(UpdateConfiguredModel(newConfModelFile, newConfModel));
         }
 
-        public void StartExecution()
+        private void StartExecution()
         {
             if (Loading || executing)
             {
@@ -770,7 +804,7 @@ namespace MarkovCraft
             }
         }
 
-        public void StopExecution()
+        private void StopExecution()
         {
             if (Loading)
             {

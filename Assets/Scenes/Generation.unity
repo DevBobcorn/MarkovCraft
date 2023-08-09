@@ -23566,7 +23566,6 @@ MonoBehaviour:
       m_TableCollectionName: GUID:ca01ff9c1eb86df4c93c853003cc7ed6
   BlockMaterial: {fileID: 2100000, guid: 7e3ea3dacd3f3c143805a48d2f20257c, type: 2}
   Loading: 0
-  screenManager: {fileID: 133423228}
   CamController: {fileID: 330585548}
   VolumeLayerMask:
     serializedVersion: 2
@@ -23576,6 +23575,9 @@ MonoBehaviour:
     m_Bits: 1024
   VolumeSelection: {fileID: 434483423}
   BlockSelection: {fileID: 352649356}
+  GenerationResultPrefab: {fileID: 4486798577887638714, guid: 4160e5a4c0a129040a739e80297eceda,
+    type: 3}
+  screenManager: {fileID: 133423228}
   BlockSelectionPanelGroup: {fileID: 504798481}
   BlockSelectionText: {fileID: 558809729}
   BlockSelectionMappingItem: {fileID: 303641958}
@@ -23583,6 +23585,8 @@ MonoBehaviour:
   GenerationText: {fileID: 599961054}
   FPSText: {fileID: 1176279341}
   ModelGraphUI: {fileID: 896529363}
+  ExportButton: {fileID: 967166046}
+  ControlTabPanel: {fileID: 384774581}
   RecordToggle: {fileID: 857930335}
   PlaybackSpeedText: {fileID: 544061883}
   ConfiguredModelDropdown: {fileID: 730640922}
@@ -23592,9 +23596,6 @@ MonoBehaviour:
   ExecuteButton: {fileID: 1237230332}
   VoxPathInput: {fileID: 580551842}
   VoxImportButton: {fileID: 1593101495}
-  ExportButton: {fileID: 967166046}
-  GenerationResultPrefab: {fileID: 4486798577887638714, guid: 4160e5a4c0a129040a739e80297eceda,
-    type: 3}
 --- !u!1 &1318530072
 GameObject:
   m_ObjectHideFlags: 0

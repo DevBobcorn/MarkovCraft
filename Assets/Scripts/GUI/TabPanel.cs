@@ -1,5 +1,6 @@
 #nullable enable
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace MarkovCraft
 {
@@ -9,6 +10,8 @@ namespace MarkovCraft
         [SerializeField] private int defaultTabIndex = 0;
 
         private int selectedTabIndex = -1;
+
+        public readonly UnityEvent OnSelectionChange = new();
 
         void Start()
         {
@@ -36,9 +39,10 @@ namespace MarkovCraft
 
                 // Show selected tab content
                 tabContentAnimators[tabIndex].SetBool("Hidden", false);
-
                 // Update selection
                 selectedTabIndex = tabIndex;
+                // Invoke selection event
+                OnSelectionChange.Invoke();
             }
         }
     }

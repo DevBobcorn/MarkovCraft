@@ -106,19 +106,29 @@ namespace MarkovJunior
             0xbbbbbb, 0xaaaaaa, 0x888888, 0x777777, 0x555555, 0x444444, 0x222222, 0x111111
         };
 
-        public static (int[], int[], int, int, int) LoadVoxWithRGBPalette(string filename)
+        public record VoxPiece
+        {
+            public int SizeX;
+            public int SizeY;
+            public int SizeZ;
+            public int[] BlockData;
+        }
+
+        public static (VoxPiece[], int[]) LoadFullVox(string filename)
         {
             try
             {
                 using FileStream file = File.Open(filename, FileMode.Open);
                 var stream = new BinaryReader(file);
 
-                int[] result = null;
+                var result = new List<VoxPiece>();
                 int[] rgbPalette = new int[256];
+
                 int MX = -1, MY = -1, MZ = -1;
 
                 string magic = new(stream.ReadChars(4));
                 int version = stream.ReadInt32();
+                bool colorPaletteSpecified = false;
 
                 while (stream.BaseStream.Position < stream.BaseStream.Length)
                 {
@@ -144,9 +154,13 @@ namespace MarkovJunior
                         string tail = Encoding.ASCII.GetString(stream.ReadBytes(3));
                         if (tail != "YZI") continue;
 
-                        if (MX <= 0 || MY <= 0 || MZ <= 0) return (null, null, MX, MY, MZ);
-                        result = new int[MX * MY * MZ];
-                        for (int i = 0; i < result.Length; i++) result[i] = -1;
+                        if (MX <= 0 || MY <= 0 || MZ <= 0)
+                        {
+                            UnityEngine.Debug.LogWarning("Reading XYZI field before receiving a valid size!");
+                            return (null, null);
+                        }
+                        var pieceBlockData = new int[MX * MY * MZ];
+                        for (int i = 0; i < pieceBlockData.Length; i++) pieceBlockData[i] = -1;
 
                         //Debug.Log("found XYZI chunk");
                         stream.ReadBytes(8);
@@ -158,31 +172,50 @@ namespace MarkovJunior
                             byte y = stream.ReadByte();
                             byte z = stream.ReadByte();
                             byte colorIndex = stream.ReadByte();
-                            result[x + y * MX + z * MX * MY] = colorIndex;
+                            pieceBlockData[x + y * MX + z * MX * MY] = colorIndex;
                         }
+
+                        result.Add(new VoxPiece { SizeX = MX, SizeY = MY, SizeZ = MZ, BlockData = pieceBlockData });
+
+                        MX = -1;
+                        MY = -1;
+                        MZ = -1;
                     }
                     else if (head == 'R')
                     {
                         string tail = Encoding.ASCII.GetString(stream.ReadBytes(3));
                         if (tail != "GBA") continue;
 
-                        DEFAULT_VOX_PALETTE.CopyTo(rgbPalette, 0);
-                        for (int i = 0;i < rgbPalette.Length;i++)
+                        int chunkSize = stream.ReadInt32(); // Should be 1024 (chunk data size)
+                        //UnityEngine.Debug.Log($"RGBA Chunk size: {chunkSize}");
+                        stream.ReadInt32(); // Should be 0 (children chunk size, unused)
+
+                        for (int i = 1;i < rgbPalette.Length;i++)
                         {
-                            /*
                             byte r = stream.ReadByte();
                             byte g = stream.ReadByte();
                             byte b = stream.ReadByte();
                             byte a = stream.ReadByte();
-                            rgbPalette[i] = (r << 16) + (b << 8) + g;
-                            */
+                            rgbPalette[i] = (r << 16) + (g << 8) + b;
                         }
+
+                        colorPaletteSpecified = true;
                     }
                 }
                 file.Close();
-                return (result, rgbPalette, MX, MY, MZ);
+
+                if (!colorPaletteSpecified) // Color palette not specified, used vox default palette
+                {
+                    DEFAULT_VOX_PALETTE.CopyTo(rgbPalette, 0);
+                }
+
+                return (result.ToArray(), rgbPalette);
             }
-            catch (Exception) { return (null, null, -1, -1, -1); }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogWarning($"An exception occurred: {e}");
+                return (null, null);
+            }
         }
 
         static void WriteString(this BinaryWriter stream, string s) { foreach (char c in s) stream.Write(c); }

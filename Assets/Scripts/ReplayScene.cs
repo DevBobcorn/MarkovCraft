@@ -20,10 +20,13 @@ namespace MarkovCraft
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
 
+        // HUD Controls
         [SerializeField] private ScreenManager? screenManager;
-        [SerializeField] public TMP_Text? PlaybackSpeedText, ReplayText, FPSText;
+        [SerializeField] public TMP_Text? ReplayText, FPSText;
+        // HUD Controls - Replay Panel
         [SerializeField] public TMP_Dropdown? RecordingDropdown;
         [SerializeField] public Slider? PlaybackSpeedSlider;
+        [SerializeField] public TMP_Text? PlaybackSpeedText;
         [SerializeField] public Toggle? OptimizedPlaybackToggle;
         [SerializeField] public Button? ReplayButton; // , ExportButton;
 
@@ -317,7 +320,7 @@ namespace MarkovCraft
         void Update()
         {
             if (FPSText != null)
-                FPSText.text = $"FPS:{((int)(1 / Time.unscaledDeltaTime)).ToString().PadLeft(4, ' ')}";
+                FPSText.text = $"FPS:{(int)(1 / Time.unscaledDeltaTime), 4}";
             
         }
 
