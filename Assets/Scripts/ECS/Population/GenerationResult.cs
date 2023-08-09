@@ -68,7 +68,7 @@ namespace MarkovCraft
             // Remap block data
             var blockData = state.Select(ci => charIndex2ResultIndex[ci]).ToArray();
             // Calculate which indices should be air
-            if (sizeZ != 0 && charIndex2ResultIndex.ContainsKey(0)) // For 3d results, legend[0] is air
+            if (sizeZ != 1 && charIndex2ResultIndex.ContainsKey(0)) // For 3d results, legend[0] is air
             {
                 AirIndices.Add(charIndex2ResultIndex[0]);
             }
