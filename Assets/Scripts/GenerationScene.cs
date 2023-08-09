@@ -40,7 +40,8 @@ namespace MarkovCraft
         [SerializeField] public ExportItem? BlockSelectionMappingItem;
         [SerializeField] public TMP_Text? VolumeText, GenerationText, FPSText;
         [SerializeField] public ModelGraph? ModelGraphUI;
-        [SerializeField] public Button? ExportButton;
+        [SerializeField] public Animator? ResultOperationPanelAnimator;
+        [SerializeField] public Button? RemoveButton, ExportButton;
         [SerializeField] public TabPanel? ControlTabPanel;
         // HUD Controls - Generation Panel
         [SerializeField] public Toggle? RecordToggle;
@@ -498,52 +499,37 @@ namespace MarkovCraft
                 },
                 (status) => GenerationText!.text = GetL10nString(status),
                 () => {
-                    if (PlaybackSpeedSlider != null)
-                    {
-                        PlaybackSpeedSlider.onValueChanged.AddListener(UpdatePlaybackSpeed);
-                        UpdatePlaybackSpeed(PlaybackSpeedSlider.value);
-                    }
+                    PlaybackSpeedSlider!.onValueChanged.AddListener(UpdatePlaybackSpeed);
+                    UpdatePlaybackSpeed(PlaybackSpeedSlider.value);
 
-                    if (CreateButton != null)
-                    {
-                        CreateButton.onClick.RemoveAllListeners();
-                        CreateButton.onClick.AddListener(() => {
-                            Hide3dGUI();
-                            screenManager!.SetActiveScreenByType<ConfiguredModelCreatorScreen>();
-                        });
-                    }
+                    CreateButton!.onClick.RemoveAllListeners();
+                    CreateButton.onClick.AddListener(() => {
+                        Hide3dGUI();
+                        screenManager!.SetActiveScreenByType<ConfiguredModelCreatorScreen>();
+                    });
 
-                    if (ConfigButton != null)
-                    {
-                        ConfigButton.onClick.RemoveAllListeners();
-                        ConfigButton.onClick.AddListener(() => {
-                            Hide3dGUI();
-                            screenManager!.SetActiveScreenByType<ConfiguredModelEditorScreen>();
-                        });
-                    }
+                    ConfigButton!.onClick.RemoveAllListeners();
+                    ConfigButton.onClick.AddListener(() => {
+                        Hide3dGUI();
+                        screenManager!.SetActiveScreenByType<ConfiguredModelEditorScreen>();
+                    });
 
-                    if (ExportButton != null)
-                    {
-                        ExportButton.onClick.RemoveAllListeners();
-                        ExportButton.onClick.AddListener(() => {
-                            Hide3dGUI();
-                            screenManager!.SetActiveScreenByType<ExporterScreen>();
-                        });
-                    }
+                    RemoveButton!.onClick.RemoveAllListeners();
+                    RemoveButton.onClick.AddListener(RemoveSelectedResult);
 
-                    if (VoxImportButton != null)
-                    {
-                        VoxImportButton.interactable = true;
-                        VoxImportButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.import_vox");
-                        VoxImportButton.onClick.RemoveAllListeners();
-                        VoxImportButton.onClick.AddListener(() => StartCoroutine(ImportVoxResult()));
-                    }
+                    ExportButton!.onClick.RemoveAllListeners();
+                    ExportButton.onClick.AddListener(() => {
+                        Hide3dGUI();
+                        screenManager!.SetActiveScreenByType<ExporterScreen>();
+                    });
 
-                    if (ControlTabPanel != null)
-                    {
-                        ControlTabPanel.OnSelectionChange.RemoveAllListeners();
-                        ControlTabPanel.OnSelectionChange.AddListener(ClearUpScene);
-                    }
+                    VoxImportButton!.interactable = true;
+                    VoxImportButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.import_vox");
+                    VoxImportButton.onClick.RemoveAllListeners();
+                    VoxImportButton.onClick.AddListener(() => StartCoroutine(ImportVoxResult()));
+
+                    ControlTabPanel!.OnSelectionChange.RemoveAllListeners();
+                    ControlTabPanel.OnSelectionChange.AddListener(ClearUpScene);
 
                     UpdateConfModelList();
 
@@ -601,7 +587,7 @@ namespace MarkovCraft
                             // Enable block colliders
                             StartCoroutine(selectedResult.EnableBlockColliders());
                             // Show export button
-                            ExportButton?.GetComponent<Animator>()?.SetBool("Hidden", false);
+                            ResultOperationPanelAnimator?.SetBool("Hidden", false);
                         }
                     }
                     else
@@ -635,7 +621,7 @@ namespace MarkovCraft
                                 // Disable block colliders
                                 selectedResult?.DisableBlockColliders();
                                 // Hide export button
-                                ExportButton?.GetComponent<Animator>()?.SetBool("Hidden", true);
+                                ResultOperationPanelAnimator?.SetBool("Hidden", true);
                             }
 
                             // Reset block selection
@@ -673,7 +659,7 @@ namespace MarkovCraft
                 UpdateBlockSelection(null);
 
                 // Hide export button
-                ExportButton?.GetComponent<Animator>()?.SetBool("Hidden", true);
+                ResultOperationPanelAnimator?.SetBool("Hidden", true);
 
                 selectedResult = null;
             }
@@ -688,16 +674,27 @@ namespace MarkovCraft
             return selectedResult;
         }
 
+        private void RemoveSelectedResult()
+        {
+            var selected = GetSelectedResult();
+
+            if (selected != null)
+            {
+                // Update result selection
+                UpdateSelectedResult(null);
+                // Destroy gameobject of the selected result
+                Destroy(selected.gameObject);
+            }
+        }
+
         private void ClearUpScene()
         {
             // Clear up persistent entities
             BlockInstanceSpawner.ClearUpPersistentState();
-
-            // Clear up generation results
+            // Update result selection
             UpdateSelectedResult(null);
-
+            // Clear up generation results
             var results = Component.FindObjectsOfType<GenerationResult>().ToArray();
-
             for (int i = 0;i < results.Length;i++)
             {
                 results[i].Valid = false;

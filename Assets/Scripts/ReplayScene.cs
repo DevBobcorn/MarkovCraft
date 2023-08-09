@@ -75,11 +75,8 @@ namespace MarkovCraft
                 },
                 (status) => ReplayText!.text = GetL10nString(status),
                 () => {
-                    if (PlaybackSpeedSlider != null)
-                    {
-                        PlaybackSpeedSlider.onValueChanged.AddListener(UpdatePlaybackSpeed);
-                        UpdatePlaybackSpeed(PlaybackSpeedSlider.value);
-                    }
+                    PlaybackSpeedSlider!.onValueChanged.AddListener(UpdatePlaybackSpeed);
+                    UpdatePlaybackSpeed(PlaybackSpeedSlider.value);
 
                     var dir = PathHelper.GetRecordingFile(string.Empty);
                     if (Directory.Exists(dir) && RecordingDropdown != null)
@@ -89,7 +86,7 @@ namespace MarkovCraft
                         int index = 0;
                         foreach (var m in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
                         {
-                            var recordingPath = m.Substring(m.LastIndexOf(SP) + 1);
+                            var recordingPath = m[(m.LastIndexOf(SP) + 1)..];
                             options.Add(new(recordingPath));
                             loadedRecordings.Add(index++, recordingPath);
                         }
