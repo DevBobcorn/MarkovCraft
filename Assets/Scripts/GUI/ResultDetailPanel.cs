@@ -9,8 +9,6 @@ namespace MarkovCraft
     [RequireComponent(typeof (CanvasGroup))]
     public class ResultDetailPanel : MonoBehaviour
     {
-        private static readonly char SP = Path.DirectorySeparatorChar;
-
         // Clockwise rotation of preview, in 90 degree increments
         public enum PreviewRotation
         {
@@ -23,6 +21,14 @@ namespace MarkovCraft
         [SerializeField] private Image? detailImage;
         [SerializeField] private Image? coordRefImage;
         [SerializeField] private TMPro.TMP_InputField? imageExportNameInput;
+        
+        private int sizeX = 0;
+        private int sizeY = 0;
+        private int sizeZ = 0;
+        private int[] state = { };
+        private int[] colors = { };
+        HashSet<int> airIndices = new();
+
         private PreviewRotation currentRotation = PreviewRotation.ZERO;
         private Texture2D? texture = null;
 
@@ -73,33 +79,26 @@ namespace MarkovCraft
             // Remove previous texture
             texture = null;
 
-            var result = GetComponentInParent<ResultManipulatorScreen>().GetResult();
-            if (result is not null)
+            bool is2d = sizeZ == 1;
+
+            if (initRotation)
             {
-                var (sizeX, sizeY, sizeZ, state, colors, airIndices) = result.GetPreviewData();
-                bool is2d = sizeZ == 1;
-
-                if (initRotation)
-                {
-                    // Use 90 deg rotation for 3d to keep the orientation consistency
-                    currentRotation = is2d ? PreviewRotation.ZERO : PreviewRotation.NINETY;
-                }
-
-                // Update Preview Image
-                var (pixels, texX, texY) = RenderPreview(sizeX, sizeY, sizeZ, state, colors, airIndices, currentRotation);
-                var tex = MarkovJunior.Graphics.CreateTexture2D(pixels, texX, texY);
-                //tex.filterMode = FilterMode.Point;
-                // Update sprite
-                var sprite = Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2, tex.height / 2));
-                detailImage!.sprite = sprite;
-                detailImage!.SetNativeSize();
-
-                texture = tex;
-
-                return is2d;
+                // Use 90 deg rotation for 3d to keep the orientation consistency
+                currentRotation = is2d ? PreviewRotation.ZERO : PreviewRotation.NINETY;
             }
 
-            return false;
+            // Update Preview Image
+            var (pixels, texX, texY) = RenderPreview(sizeX, sizeY, sizeZ, state, colors, airIndices, currentRotation);
+            var tex = MarkovJunior.Graphics.CreateTexture2D(pixels, texX, texY);
+            //tex.filterMode = FilterMode.Point;
+            // Update sprite
+            var sprite = Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2, tex.height / 2));
+            detailImage!.sprite = sprite;
+            detailImage!.SetNativeSize();
+
+            texture = tex;
+
+            return is2d;
         }
 
         public int[] GetCoordRefData(int coordRefSize)
@@ -199,10 +198,23 @@ namespace MarkovCraft
             {
                 var baseName = manipulator.GetDefaultBaseName();
                 imageExportNameInput!.text = PathHelper.GetExtraDataFile($"{baseName}.png");
+
+                (sizeX, sizeY, sizeZ, state, colors, airIndices) = manipulator.GetResult()!.GetPreviewData();
             }
 
             bool is2d = UpdateDetailPreview(true);
             UpdateCoordRef(is2d);
+        }
+
+        public void UpdateSizeAndState(int sizeX, int sizeY, int sizeZ, int[] state)
+        {
+            // Update preview data
+            this.sizeX = sizeX;
+            this.sizeY = sizeY;
+            this.sizeZ = sizeZ;
+            this.state = state;
+            // Update preview image
+            UpdateDetailPreview(false);
         }
 
         public void Hide()

@@ -29,7 +29,7 @@ namespace MarkovCraft
         // Scene game objects
         [SerializeField] public CameraController? CamController;
         [SerializeField] public LayerMask VolumeLayerMask;
-        [SerializeField] public LayerMask BlockColliderLayerMask;
+        [SerializeField] public LayerMask BlockMeshLayerMask;
         [SerializeField] public VolumeSelection? VolumeSelection;
         [SerializeField] public GameObject? BlockSelection;
         [SerializeField] public GameObject? GenerationResultPrefab;
@@ -42,7 +42,7 @@ namespace MarkovCraft
         [SerializeField] public ModelGraph? ModelGraphUI;
         [SerializeField] public Animator? ResultOperationPanelAnimator;
         [SerializeField] public Button? RemoveButton, ExportButton;
-        [SerializeField] public Button? ScaleButton, StackButton, ExtrudeButton;
+        [SerializeField] public Button? ResizeButton, ExtrudeButton;
         [SerializeField] public TabPanel? ControlTabPanel;
         // HUD Controls - Generation Panel
         [SerializeField] public Toggle? RecordToggle;
@@ -524,14 +524,8 @@ namespace MarkovCraft
                         screenManager!.SetActiveScreenByType<ResultExporterScreen>();
                     });
 
-                    ScaleButton!.onClick.RemoveAllListeners();
-                    ScaleButton.onClick.AddListener(() => {
-                        Hide3dGUI();
-                        screenManager!.SetActiveScreenByType<ResultSizeUpperScreen>();
-                    });
-
-                    StackButton!.onClick.RemoveAllListeners();
-                    StackButton.onClick.AddListener(() => {
+                    ResizeButton!.onClick.RemoveAllListeners();
+                    ResizeButton.onClick.AddListener(() => {
                         Hide3dGUI();
                         screenManager!.SetActiveScreenByType<ResultSizeUpperScreen>();
                     });
@@ -604,7 +598,7 @@ namespace MarkovCraft
                             // Set camera center
                             CamController!.SetCenterPosition(selectedResult.GetVolumePosition());
                             // Enable block colliders
-                            StartCoroutine(selectedResult.EnableBlockColliders());
+                            selectedResult.EnableBlockColliders();
                             // Show export button
                             ResultOperationPanelAnimator?.SetBool("Hidden", false);
                         }
@@ -621,15 +615,26 @@ namespace MarkovCraft
                         var ray = cam.ScreenPointToRay(Input.mousePosition);
 
                         // Volume is still locked, update block selection
-                        if (selectedResult != null && Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 1000F, BlockColliderLayerMask)) // Mouse pointer is over a block
+                        if (selectedResult != null && Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 1000F, BlockMeshLayerMask)) // Mouse pointer is over a block
                         {
                             // Get block position in the volume (local space in volume)
-                            var boxCollider = hit.collider as BoxCollider;
-                            (int x, int y, int z, CustomMappingItem item) = selectedResult.GetColliderPosInVolume(boxCollider!);
+                            var blockPos = hit.point - hit.normal * 0.01F;
 
+                            var (x, y, z, unityPos, item) = selectedResult.GetBlockPosInVolume(blockPos);
                             UpdateBlockSelection(item, $"({x}, {y}, {z})");
+
+                            if (item is null && Input.GetKeyDown(KeyCode.Mouse0)) // Unlock volume
+                            {
+                                // Unlock volume selection
+                                VolumeSelection!.Unlock();
+                                // Disable block colliders
+                                selectedResult?.DisableBlockColliders();
+                                // Hide export button
+                                ResultOperationPanelAnimator?.SetBool("Hidden", true);
+                            }
+
                             // Update cursor position (world space)
-                            BlockSelection!.transform.position = hit.collider.bounds.center;
+                            BlockSelection!.transform.position = unityPos;
                         }
                         else // Mouse pointer is over no block
                         {
@@ -652,7 +657,7 @@ namespace MarkovCraft
             }
         }
 
-        private void UpdateSelectedResult(GenerationResult? newResult)
+        public void UpdateSelectedResult(GenerationResult? newResult)
         {
             if (selectedResult == newResult) return;
 

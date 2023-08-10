@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,15 +13,11 @@ namespace MarkovCraft
 {
     public class GenerationResult : MonoBehaviour
     {
-        private readonly int BLOCK_COLLIDER_COUNT_MAX = 1000000;
-
         [HideInInspector] public bool Valid = true;
         [SerializeField] public float Margin = 0.5F;
         [SerializeField] private GameObject? volumeColliderHolder;
-        [SerializeField] private string blockColliderLayerName = "BlockCollider";
+        [SerializeField] private string blockMeshLayerName = "Block";
         [SerializeField] private Material? blockMaterial;
-        private GameObject? blockColliderHolder;
-        private bool blockColliderAvailable = false;
 
         private readonly Dictionary<int3, GameObject> renderHolders = new();
         private readonly Dictionary<int3, HashSet<int>> renderHolderEntries = new();
@@ -114,11 +109,6 @@ namespace MarkovCraft
 
         private void SetData(CustomMappingItem[] resultPalette, int[] blockData, int FX, int FY, int FZ)
         {
-            if (completed)
-            {
-                throw new InvalidOperationException("Result data already presents");
-            }
-
             // Update result final size
             SizeX = FX;
             SizeY = FY;
@@ -132,6 +122,34 @@ namespace MarkovCraft
                 AirGrid[i] = AirIndices.Contains(BlockData[i]);
             
             completed = true;
+
+            RequestRebuildResultMesh();
+        }
+
+        public void UpdateBlockData(int[] blockData, int FX, int FY, int FZ)
+        {
+            UpdateVolume(UnityPosition, FX, FY, FZ);
+
+            // Update result final size
+            SizeX = FX;
+            SizeY = FY;
+            SizeZ = FZ;
+            // Update result block data
+            BlockData = blockData;
+            // Calculate air grid for culling
+            AirGrid = new bool[BlockData.Length];
+            for (int i = 0;i < BlockData.Length;i++)
+                AirGrid[i] = AirIndices.Contains(BlockData[i]);
+            
+            completed = true;
+
+            renderHolderEntries.Clear();
+            var renderHoldersArr = renderHolders.Values.ToArray();
+            for (int i = 0;i < renderHoldersArr.Length;i++)
+            {
+                Destroy(renderHoldersArr[i]);
+            }
+            renderHolders.Clear();
 
             RequestRebuildResultMesh();
         }
@@ -226,6 +244,8 @@ namespace MarkovCraft
                 var visualBuffer = new VertexBuffer();
                 var nonAirIndicesInChunk = new HashSet<int>();
 
+                int blockMeshLayer = LayerMask.NameToLayer(blockMeshLayerName);
+
                 var buildTask = Task.Run(() => {
                     for (int ix = 0;ix < 16;ix++) for (int iy = 0;iy < 16;iy++) for (int iz = 0;iz < 16;iz++)
                     {
@@ -288,101 +308,66 @@ namespace MarkovCraft
                     }
                     else
                     {
-                        renderHolder = new($"[{cx} {cy} {cz}]");
+                        renderHolder = new($"[{cx} {cy} {cz}]") { layer = blockMeshLayer };
                         // Set as own child
                         renderHolder.transform.SetParent(transform, false);
                         renderHolder.transform.localPosition = new Vector3(cox - SizeX / 2F, coz - SizeZ / 2F, coy - SizeY / 2F);
                         // Add necesary components
                         renderHolder.AddComponent<MeshFilter>();
                         renderHolder.AddComponent<MeshRenderer>();
+                        renderHolder.AddComponent<MeshCollider>();
 
                         renderHolders.Add(coord, renderHolder);
                         renderHolderEntries.Add(coord, nonAirIndicesInChunk);
                     }
 
                     renderHolder.GetComponent<MeshRenderer>().sharedMaterial = blockMaterial;
-                    renderHolder.GetComponent<MeshFilter>().sharedMesh = BlockStatePreview.BuildMesh(visualBuffer);
+                    var mesh = BlockStatePreview.BuildMesh(visualBuffer);
+                    renderHolder.GetComponent<MeshFilter>().sharedMesh = mesh;
+                    renderHolder.GetComponent<MeshCollider>().sharedMesh = mesh;
 
                     yield return null;
+                }
+                else
+                {
+                    if (renderHolders.ContainsKey(coord))
+                    {
+                        Destroy(renderHolders[coord]);
+                        renderHolders.Remove(coord);
+                    }
                 }
             }
         
             rebuildingMesh = false;
         }
 
-        public IEnumerator EnableBlockColliders()
+        public void EnableBlockColliders()
         {
             // Disable volume collider
             volumeColliderHolder!.SetActive(false);
-
-            yield return null;
-
-            if (!blockColliderAvailable) // Collider Holder not present yet
-            {
-                // Neither empty nor too many
-                if (BlockData.Length > 0 && BlockData.Length < BLOCK_COLLIDER_COUNT_MAX)
-                {
-                    blockColliderHolder = new GameObject("Block Colliders");
-                    blockColliderHolder.transform.SetParent(transform, false);
-                    blockColliderHolder.layer = LayerMask.NameToLayer(blockColliderLayerName);
-
-                    // Add a 0.5F to xyz, not a margin (because box collider pivot is at its center)
-                    // Swap z and y size for unity
-                    float3 offset = new(-SizeX / 2F + 0.5F, -SizeZ / 2F + 0.5F, -SizeY / 2F + 0.5F);
-
-                    var colliderPositions = BlockDataBuilder.GetColliderData(BlockData, AirIndices, SizeX, SizeY, SizeZ);
-                    for (int i = 0;i < colliderPositions.Length;i++)
-                    {
-                        if (blockColliderHolder == null)
-                        {
-                            // Gone, give it up
-                            yield break;
-                        }
-
-                        var b = blockColliderHolder.AddComponent<BoxCollider>();
-                        b.center = colliderPositions[i] + offset;
-
-                        if (i % 100 == 0) // Take a break
-                        {
-                            yield return null;
-                        }
-                    }
-
-                    blockColliderAvailable = true;
-                }
-            }
-            else
-            {
-                if (blockColliderHolder != null)
-                {
-                    blockColliderHolder!.SetActive(true);
-                }
-            }
         }
 
-        public (int, int, int, CustomMappingItem) GetColliderPosInVolume(BoxCollider collider)
+        public (int, int, int, float3, CustomMappingItem?) GetBlockPosInVolume(float3 position)
         {
-            float3 offset = new(SizeX / 2F - 0.5F, SizeZ / 2F - 0.5F, SizeY / 2F - 0.5F);
-            float3 pos = ((float3) collider.center) + offset;
+            float3 pos = position - UnityPosition;
 
-            int x = Mathf.RoundToInt(pos.x); // Unity X => Markov X
-            int z = Mathf.RoundToInt(pos.y); // Unity Y => Markov Z
-            int y = Mathf.RoundToInt(pos.z); // Unity Z => Markov Y
+            int x = Mathf.FloorToInt(pos.x); // Unity X => Markov X
+            int z = Mathf.FloorToInt(pos.y); // Unity Y => Markov Z
+            int y = Mathf.FloorToInt(pos.z); // Unity Z => Markov Y
 
-            var c = ResultPalette[BlockData[x + y * SizeX + z * SizeX * SizeY]];
+            var unityPos = UnityPosition + new float3(x, z, y);
+            CustomMappingItem? c = null;
 
-            return (x, y, z, c);
+            if (x >= 0 && y >= 0 && z >= 0 && x < SizeX && y < SizeY && z < SizeZ)
+                c = ResultPalette[BlockData[x + y * SizeX + z * SizeX * SizeY]];
+
+            return (x, y, z, unityPos, c);
         }
-
+        
         public void DisableBlockColliders()
         {
             // Enable volume collider
             volumeColliderHolder!.SetActive(true);
-
-            if (blockColliderAvailable && blockColliderHolder != null) // Collider Holder is present
-            {
-                blockColliderHolder.SetActive(false);
-            }
         }
     }
 }

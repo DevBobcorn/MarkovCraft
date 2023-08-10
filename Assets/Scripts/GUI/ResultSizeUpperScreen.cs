@@ -18,6 +18,12 @@ namespace MarkovCraft
         // Settings Panel
         [SerializeField] public Button? ConfirmButton, CancelButton;
         [SerializeField] public TMP_Dropdown? SizeUpperDropdown;
+        [SerializeField] public TMP_InputField? SizeXInput;
+        [SerializeField] public TMP_InputField? SizeYInput;
+        [SerializeField] public TMP_InputField? SizeZInput;
+        private int scaleX = 0, scaleY = 0, scaleZ = 0;
+        private int scaledX = 0, scaledY = 0, scaledZ = 0;
+        int[] scaledState = { };
         // Result Preview
         [SerializeField] public Image? ResultPreviewImage;
         // Result Detail Panel
@@ -40,7 +46,7 @@ namespace MarkovCraft
 
             // Initialize settings panel
             ConfirmButton!.onClick.RemoveAllListeners();
-            ConfirmButton.onClick.AddListener(() => { });
+            ConfirmButton.onClick.AddListener(ConfirmResize);
             CancelButton!.onClick.RemoveAllListeners();
             CancelButton.onClick.AddListener(() => manager?.SetActiveScreenByType<GenerationScreen>());
 
@@ -48,7 +54,37 @@ namespace MarkovCraft
             SizeUpperDropdown.AddOptions(SIZE_UPPER_KEYS.Select(x =>
                     new TMP_Dropdown.OptionData(GameScene.GetL10nString(x))).ToList());
             SizeUpperDropdown!.onValueChanged.RemoveAllListeners();
-            SizeUpperDropdown!.onValueChanged.AddListener((_) => { });
+            SizeUpperDropdown!.onValueChanged.AddListener((_) => UpdateResizeData());
+
+            // Reset scale size
+            scaleX = scaleY = scaleZ = 1;
+            SizeXInput!.SetTextWithoutNotify("1");
+            SizeYInput!.SetTextWithoutNotify("1");
+            SizeZInput!.SetTextWithoutNotify("1");
+
+            SizeXInput!.GetComponent<IntegerInputValidator>().OnValidateValue!.AddListener(x => {
+                if (scaleX != x)
+                {
+                    scaleX = x;
+                    UpdateResizeData();
+                }
+            });
+
+            SizeYInput!.GetComponent<IntegerInputValidator>().OnValidateValue!.AddListener(y => {
+                if (scaleY != y)
+                {
+                    scaleY = y;
+                    UpdateResizeData();
+                }
+            });
+
+            SizeZInput!.GetComponent<IntegerInputValidator>().OnValidateValue!.AddListener(z => {
+                if (scaleZ != z)
+                {
+                    scaleZ = z;
+                    UpdateResizeData();
+                }
+            });
 
             working = false;
             properlyLoaded = true;
@@ -74,6 +110,71 @@ namespace MarkovCraft
             ResultDetailPanel!.Show();
         }
 
+        public void ConfirmResize()
+        {
+            if (properlyLoaded)
+            {
+                result!.UpdateBlockData(scaledState, scaledX, scaledY, scaledZ);
+
+                if (GameScene.Instance is not GenerationScene game)
+                {
+                    Debug.LogError("Wrong game scene!");
+                    working = false;
+                    return;
+                }
+
+                game.UpdateSelectedResult(null);
+                manager?.SetActiveScreenByType<GenerationScreen>();
+            }
+        }
+
+        public void UpdateResizeData()
+        {
+            if (result == null) return;
+            //Debug.Log($"Updating resize preview: {scaleX}x{scaleY}x{scaleZ}");
+
+            int sizeX = result.SizeX;
+            int sizeY = result.SizeY;
+            int sizeZ = result.SizeZ;
+            scaledX = scaleX * sizeX;
+            scaledY = scaleY * sizeY;
+            scaledZ = scaleZ * sizeZ;
+
+            scaledState = new int[scaledX * scaledY * scaledZ];
+            int[] state = result.BlockData;
+
+            if (SizeUpperDropdown!.value == 0) // Scale up
+            {
+                for (int ix = 0;ix < sizeX;ix++) for (int iy = 0;iy < sizeY;iy++) for (int iz = 0;iz < sizeZ;iz++)
+                {
+                    for (int sx = 0;sx < scaleX;sx++) for (int sy = 0;sy < scaleY;sy++) for (int sz = 0;sz < scaleZ;sz++)
+                    {
+                        int x = sx + ix * scaleX;
+                        int y = sy + iy * scaleY;
+                        int z = sz + iz * scaleZ;
+                        
+                        scaledState[x + y * scaledX + z * scaledX * scaledY] = state[ix + iy * sizeX + iz * sizeX * sizeY];
+                    }
+                }
+            }
+            else // Stack
+            {
+                for (int sx = 0;sx < scaleX;sx++) for (int sy = 0;sy < scaleY;sy++) for (int sz = 0;sz < scaleZ;sz++)
+                {
+                    for (int ix = 0;ix < sizeX;ix++) for (int iy = 0;iy < sizeY;iy++) for (int iz = 0;iz < sizeZ;iz++)
+                    {
+                        int x = sx * sizeX + ix;
+                        int y = sy * sizeY + iy;
+                        int z = sz * sizeZ + iz;
+                        
+                        scaledState[x + y * scaledX + z * scaledX * scaledY] = state[ix + iy * sizeX + iz * sizeX * sizeY];
+                    }
+                }
+            }
+
+            ResultDetailPanel!.UpdateSizeAndState(scaledX, scaledY, scaledZ, scaledState);
+        }
+
         public override void OnShow(ScreenManager manager)
         {
             if (working) return;
@@ -91,7 +192,6 @@ namespace MarkovCraft
             
             // Get selected result data
             result = game.GetSelectedResult();
-            
             if (result is null)
             {
                 Debug.LogWarning("Size upper is not properly loaded!");
@@ -101,6 +201,9 @@ namespace MarkovCraft
                 working = false;
                 return;
             }
+
+            scaledState = new int[result.BlockData.Length];
+            result.BlockData.CopyTo(scaledState, 0);
 
             StartCoroutine(InitializeScreen());
         }

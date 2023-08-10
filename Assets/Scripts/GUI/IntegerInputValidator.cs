@@ -1,5 +1,6 @@
 #nullable enable
 using UnityEngine;
+using UnityEngine.Events;
 using TMPro;
 
 namespace MarkovCraft
@@ -9,32 +10,41 @@ namespace MarkovCraft
     {
         [SerializeField] public int MinValue;
         [SerializeField] public int MaxValue;
+        [SerializeField] public UnityEvent<int>? OnValidateValue = new();
 
         private TMP_InputField? input;
 
         void Start()
         {
             input = GetComponent<TMP_InputField>();
-            input.onEndEdit.RemoveAllListeners();
             input.onEndEdit.AddListener(ValidateNumberInput);
-
         }
 
         private void ValidateNumberInput(string newText)
         {
-            int num;
-
-            if (int.TryParse(newText, out num))
+            if (int.TryParse(newText, out int value))
             {
-                if (num > MaxValue) // Input value too big
+                if (value > MaxValue) // Input value too big
+                {
                     input!.text = MaxValue.ToString();
-                else if (num < MinValue) // Input value too small
+                    OnValidateValue?.Invoke(MaxValue);
+                }
+                else if (value < MinValue) // Input value too small
+                {
                     input!.text = MinValue.ToString();
-                
-                // Input value is valid, no need to update
+                    OnValidateValue?.Invoke(MinValue);
+                }
+                else
+                {
+                    // Input value is valid, no need to update
+                    OnValidateValue?.Invoke(value);
+                }
             }
             else // Input is not even an integer, update to min value
+            {
                 input!.text = MinValue.ToString();
+                OnValidateValue?.Invoke(MinValue);
+            }
         }
     }
 }
