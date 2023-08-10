@@ -213,7 +213,7 @@ namespace MarkovCraft
             {
                 Debug.LogWarning("Editor is not properly loaded!");
 
-                ScreenHeader!.text = GameScene.GetL10nString("editor.text.load_failure");
+                ScreenHeader!.text = GameScene.GetL10nString("screen.text.load_failure");
 
                 working = false;
                 return;
@@ -288,7 +288,7 @@ namespace MarkovCraft
                     var savePath = PathHelper.GetExtraDataFile(CONFIGURED_MODEL_FOLDER);
                     var specifiedName = SaveNameInput!.text;
 
-                    if (ResultExporterScreen.CheckFileName(specifiedName))
+                    if (GameScene.CheckFileName(specifiedName))
                     {
                         saveFileName = specifiedName;
                     }

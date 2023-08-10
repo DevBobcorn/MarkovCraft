@@ -140,7 +140,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 500808737005568
-    m_Key: editor.text.load_failure
+    m_Key: screen.text.load_failure
     m_Metadata:
       m_Items: []
   - m_Id: 501063469670400
@@ -148,7 +148,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 500646488743936
-    m_Key: editor.text.loading
+    m_Key: screen.text.loading
     m_Metadata:
       m_Items: []
   - m_Id: 9929253363712
@@ -188,7 +188,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 504846685741056
-    m_Key: export.text.result_info
+    m_Key: screen.text.result_info
     m_Metadata:
       m_Items: []
   - m_Id: 506229719736320
@@ -231,16 +231,8 @@ MonoBehaviour:
     m_Key: exporter.text.export_path_hint
     m_Metadata:
       m_Items: []
-  - m_Id: 503093638635520
-    m_Key: exporter.text.load_failure
-    m_Metadata:
-      m_Items: []
   - m_Id: 503485516652544
     m_Key: exporter.text.loaded
-    m_Metadata:
-      m_Items: []
-  - m_Id: 502887979327488
-    m_Key: exporter.text.loading
     m_Metadata:
       m_Items: []
   - m_Id: 15596202663936
@@ -437,6 +429,18 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 37455109888086016
     m_Key: control.text.import_vox
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38052168831799296
+    m_Key: screen.text.confirm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38052271571275776
+    m_Key: screen.text.cancel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38052636878376960
+    m_Key: New Entry
     m_Metadata:
       m_Items: []
   m_Metadata:

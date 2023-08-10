@@ -56,6 +56,14 @@ namespace MarkovCraft
             return loadedDataVersionInt;
         }
 
+        public static bool CheckFileName(string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+                return false;
+            
+            return true;
+        }
+
         public static string GetL10nString(string key, params object[] p)
         {
             var str = Instance.L10nTable?.GetTable().GetEntry(key);

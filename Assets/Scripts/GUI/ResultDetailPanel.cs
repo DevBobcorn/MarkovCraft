@@ -73,11 +73,10 @@ namespace MarkovCraft
             // Remove previous texture
             texture = null;
 
-            var exporter = GetComponentInParent<ResultExporterScreen>();
-            
-            if (exporter is not null)
+            var result = GetComponentInParent<ResultManipulatorScreen>().GetResult();
+            if (result is not null)
             {
-                var (sizeX, sizeY, sizeZ, state, colors, airIndices) = exporter.GetResultPreviewData();
+                var (sizeX, sizeY, sizeZ, state, colors, airIndices) = result.GetPreviewData();
                 bool is2d = sizeZ == 1;
 
                 if (initRotation)
@@ -169,21 +168,17 @@ namespace MarkovCraft
 
         public void Save()
         {
-            var exporter = GetComponentInParent<ResultExporterScreen>();
-            var savePath = exporter.GetExportPath();
-            var saveName = imageExportNameInput!.text;
+            var savePath = imageExportNameInput!.text;
 
-            if (ResultExporterScreen.CheckFileName(saveName) && (texture is not null) && (savePath is not null))
+            if (GameScene.CheckFileName(savePath) && (texture is not null))
             {
-                var folder = new DirectoryInfo(savePath);
-
-                if (folder.Exists)
+                var fileInfo = new FileInfo(savePath);
+                if (fileInfo.Directory.Exists) // If the folder exists
                 {
                     var bytes = texture.EncodeToPNG();
-                    var fileName = folder.FullName + SP + saveName;
 
-                    File.WriteAllBytes(fileName, bytes);
-                    Debug.Log($"Preview image saved to {fileName}");
+                    File.WriteAllBytes(savePath, bytes);
+                    Debug.Log($"Preview image saved to {savePath}");
                 }
                 else
                 {
@@ -199,12 +194,11 @@ namespace MarkovCraft
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
 
-            var exporter = GetComponentInParent<ResultExporterScreen>();
-            
-            if (exporter is not null)
+            var manipulator = GetComponentInParent<ResultManipulatorScreen>();
+            if (manipulator is not null)
             {
-                var baseName = exporter.GetDefaultExportBaseName();
-                imageExportNameInput!.text = $"{baseName}.png";
+                var baseName = manipulator.GetDefaultBaseName();
+                imageExportNameInput!.text = PathHelper.GetExtraDataFile($"{baseName}.png");
             }
 
             bool is2d = UpdateDetailPreview(true);

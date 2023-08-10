@@ -206,7 +206,7 @@ namespace MarkovCraft
             working = true;
             properlyLoaded = false;
 
-            ScreenHeader!.text = GameScene.GetL10nString("creator.text.loading");
+            ScreenHeader!.text = GameScene.GetL10nString("screen.text.loading");
 
             StartCoroutine(InitializeScreen());
         }
@@ -239,7 +239,7 @@ namespace MarkovCraft
                     var savePath = PathHelper.GetExtraDataFile(CONFIGURED_MODEL_FOLDER);
                     var specifiedName = SaveNameInput!.text;
 
-                    if (ResultExporterScreen.CheckFileName(specifiedName))
+                    if (GameScene.CheckFileName(specifiedName))
                     {
                         saveFileName = specifiedName;
                     }

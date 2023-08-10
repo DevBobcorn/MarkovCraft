@@ -194,23 +194,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 500646488743936
-    m_Localized: Editor loading...
+    m_Localized: Loading...
     m_Metadata:
       m_Items: []
   - m_Id: 500808737005568
-    m_Localized: Failed to load editor
+    m_Localized: Failed to load screen
     m_Metadata:
       m_Items: []
   - m_Id: 501063469670400
     m_Localized: Editing [{0}]
-    m_Metadata:
-      m_Items: []
-  - m_Id: 502887979327488
-    m_Localized: Exporter loading...
-    m_Metadata:
-      m_Items: []
-  - m_Id: 503093638635520
-    m_Localized: Failed to load exporter
     m_Metadata:
       m_Items: []
   - m_Id: 503485516652544
@@ -476,6 +468,14 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 37455109888086016
     m_Localized: Import Vox model
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38052168831799296
+    m_Localized: Confirm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38052271571275776
+    m_Localized: Cancel
     m_Metadata:
       m_Items: []
   references:

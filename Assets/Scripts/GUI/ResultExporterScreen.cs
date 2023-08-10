@@ -9,7 +9,7 @@ using TMPro;
 
 namespace MarkovCraft
 {
-    public class ResultExporterScreen : BaseScreen
+    public class ResultExporterScreen : ResultManipulatorScreen
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
 
@@ -48,8 +48,10 @@ namespace MarkovCraft
         // Auto Mapping Panel
         [SerializeField] public AutoMappingPanel? AutoMappingPanel;
 
-        private GenerationResult? exportResult = null;
-        private int exportDataVersion = 0;
+        private int dataVersion = 0;
+        private GenerationResult? result = null;
+        public override GenerationResult? GetResult() => result;
+
         // Result palette index => mapping item
         private readonly List<ExportItem> mappingItems = new();
         private bool working = false, properlyLoaded = false;
@@ -57,12 +59,9 @@ namespace MarkovCraft
         // Disable pause for animated inventory
         public override bool ShouldPause() => false;
 
-        private bool CheckWindows() => Application.platform == RuntimePlatform.WindowsEditor ||
-                Application.platform == RuntimePlatform.WindowsPlayer;
-
         private IEnumerator InitializeScreen()
         {
-            if (exportResult is null)
+            if (result is null)
             {
                 Debug.LogWarning($"ERROR: Export screen not correctly initialized!");
                 working = false;
@@ -73,10 +72,10 @@ namespace MarkovCraft
             // Initialize settings panel
             var savedExportPath = PlayerPrefs.GetString(EXPORT_PATH_KEY, PathHelper.GetDefaultExportPath());
             ExportFolderInput!.text = savedExportPath;
-            if (CheckWindows())
+            if (CheckWindowsPlatform())
             {
                 OpenExplorerButton!.onClick.RemoveAllListeners();
-                OpenExplorerButton.onClick.AddListener(ShowExplorer);
+                OpenExplorerButton.onClick.AddListener(() => ShowExplorer(ExportFolderInput!.text.Replace("/", @"\")));
             }
             else // Hide this button
                 OpenExplorerButton!.gameObject.SetActive(false);
@@ -95,11 +94,11 @@ namespace MarkovCraft
             ResultDetailPanel!.Hide();
             
             // Initialize mappings panel
-            for (var index = 0;index < exportResult.ResultPalette.Length;index++)
+            for (var index = 0;index < result.ResultPalette.Length;index++)
             {
                 var newItemObj = Instantiate(MappingItemPrefab);
                 var newItem = newItemObj!.GetComponent<ExportItem>();
-                var itemVal = exportResult.ResultPalette[index];
+                var itemVal = result.ResultPalette[index];
                 // Add item to dictionary and set data
                 mappingItems.Add(newItem);
                 var rgb = ColorConvert.GetRGB(itemVal.Color);
@@ -111,7 +110,7 @@ namespace MarkovCraft
 
             yield return null;
             // Mark air items
-            foreach (var airIndex in exportResult.AirIndices)
+            foreach (var airIndex in result.AirIndices)
             {
                 var item = mappingItems[airIndex];
                 item.gameObject.transform.SetAsLastSibling();
@@ -121,12 +120,12 @@ namespace MarkovCraft
             working = false;
             properlyLoaded = true;
 
-            ScreenHeader!.text = GameScene.GetL10nString("exporter.text.loaded", exportResult.ConfiguredModelName);
+            ScreenHeader!.text = GameScene.GetL10nString("exporter.text.loaded", result.ConfiguredModelName);
             
             // Update Info text
-            InfoText!.text = GameScene.GetL10nString("export.text.result_info", exportResult.ConfiguredModelName,
-                    exportResult.GenerationSeed, exportResult.SizeX, exportResult.SizeY, exportResult.SizeZ);
-            var prev = GetResultPreviewData();
+            InfoText!.text = GameScene.GetL10nString("screen.text.result_info", result.ConfiguredModelName,
+                    result.GenerationSeed, result.SizeX, result.SizeY, result.SizeZ);
+            var prev = result.GetPreviewData();
 
             // Update selected format (and also update default export file name)
             var lastUsedFormatIndex = PlayerPrefs.GetInt(EXPORT_FORMAT_KEY, 0);
@@ -135,7 +134,7 @@ namespace MarkovCraft
 
             // Update Preview Image
             var (pixels, sizeX, sizeY) = ResultDetailPanel.RenderPreview(prev.sizeX, prev.sizeY, prev.sizeZ,
-                    prev.blockData, prev.colors, prev.airIndices, exportResult.SizeZ == 1 ? ResultDetailPanel.PreviewRotation.ZERO : ResultDetailPanel.PreviewRotation.NINETY);
+                    prev.blockData, prev.colors, prev.airIndices, result.SizeZ == 1 ? ResultDetailPanel.PreviewRotation.ZERO : ResultDetailPanel.PreviewRotation.NINETY);
             var tex = MarkovJunior.Graphics.CreateTexture2D(pixels, sizeX, sizeY);
             //tex.filterMode = FilterMode.Point;
             // Update sprite
@@ -150,7 +149,7 @@ namespace MarkovCraft
             working = true;
             properlyLoaded = false;
 
-            ScreenHeader!.text = GameScene.GetL10nString("exporter.text.loading");
+            ScreenHeader!.text = GameScene.GetL10nString("screen.text.loading");
             
             if (GameScene.Instance is not GenerationScene game)
             {
@@ -160,14 +159,14 @@ namespace MarkovCraft
             }
             
             // Get selected result data
-            exportResult = game.GetSelectedResult();
-            exportDataVersion = game.GetDataVersionInt();
+            result = game.GetSelectedResult();
+            dataVersion = game.GetDataVersionInt();
             
-            if (exportResult is null)
+            if (result is null)
             {
                 Debug.LogWarning("Exporter is not properly loaded!");
 
-                ScreenHeader!.text = GenerationScene.GetL10nString("exporter.text.load_failure");
+                ScreenHeader!.text = GenerationScene.GetL10nString("screen.text.load_failure");
 
                 working = false;
                 return;
@@ -190,7 +189,7 @@ namespace MarkovCraft
             mappingItems.Clear();
 
             // Clear export result
-            exportResult = null;
+            result = null;
         }
 
         public void AutoMap()
@@ -201,20 +200,15 @@ namespace MarkovCraft
             AutoMappingPanel!.Hide();
         }
 
-        public (int sizeX, int sizeY, int sizeZ, int[] blockData, int[] colors, HashSet<int> airIndices) GetResultPreviewData()
-        {
-            return exportResult!.GetPreviewData();
-        }
-
         private void ApplyMappings()
         {
             if (working) return;
 
-            if (properlyLoaded && exportResult != null) // The editor is properly loaded
+            if (properlyLoaded && result != null) // The editor is properly loaded
             {
                 working = true;
 
-                var resultPalette = exportResult.ResultPalette;
+                var resultPalette = result.ResultPalette;
                 var updatedEntries = new HashSet<int>();
                 // Apply export palette overrides
                 for (int index = 0;index < resultPalette.Length;index++)
@@ -236,7 +230,7 @@ namespace MarkovCraft
                 }
 
                 // Rebuild result mesh to reflect mapping changes
-                exportResult.RequestRebuildResultMesh(updatedEntries);
+                result.RequestRebuildResultMesh(updatedEntries);
 
                 working = false;
 
@@ -244,34 +238,16 @@ namespace MarkovCraft
             }
         }
 
-        public string GetDefaultExportBaseName()
-        {
-            if (properlyLoaded)
-            {
-                return $"{exportResult!.ConfiguredModelName[0..^4]}_{exportResult!.GenerationSeed}";
-            }
-
-            return "exported";
-        }
-
         public string? GetExportPath()
         {
             return ExportFolderInput?.text;
-        }
-
-        public static bool CheckFileName(string fileName)
-        {
-            if (string.IsNullOrWhiteSpace(fileName))
-                return false;
-            
-            return true;
         }
 
         private void UpdateExportFileName(int selectedFormatIndex)
         {
             if (properlyLoaded)
             {
-                var baseName = $"{exportResult!.ConfiguredModelName[0..^4]}_{exportResult!.GenerationSeed}";
+                var baseName = GetDefaultBaseName();
                 var extName = EXPORT_FORMAT_EXT_NAMES[selectedFormatIndex];
 
                 ExportNameInput!.text = $"{baseName}.{extName}";
@@ -282,7 +258,7 @@ namespace MarkovCraft
         {
             if (working) return;
 
-            if (properlyLoaded && exportResult != null) // The editor is properly loaded
+            if (properlyLoaded && result != null) // The editor is properly loaded
             {
                 working = true;
 
@@ -304,7 +280,7 @@ namespace MarkovCraft
                     }
                 }
 
-                if (!CheckFileName(fileName))
+                if (!GameScene.CheckFileName(fileName))
                 {
                     Debug.LogWarning($"ERROR: Invailid file name: {fileName}");
                     working = false;
@@ -319,7 +295,7 @@ namespace MarkovCraft
                 // Save last used export format
                 PlayerPrefs.SetInt(EXPORT_FORMAT_KEY, formatIndex);
 
-                var resultPalette = exportResult.ResultPalette;
+                var resultPalette = result.ResultPalette;
                 var updatedEntries = new HashSet<int>();
                 // Apply export palette overrides
                 for (int index = 0;index < resultPalette.Length;index++)
@@ -341,22 +317,22 @@ namespace MarkovCraft
                 }
 
                 // Rebuild result mesh to reflect mapping changes
-                exportResult.RequestRebuildResultMesh(updatedEntries);
+                result.RequestRebuildResultMesh(updatedEntries);
 
-                int sizeX = exportResult.SizeX;
-                int sizeY = exportResult.SizeY;
-                int sizeZ = exportResult.SizeZ;
-                var blockData = exportResult.BlockData;
+                int sizeX = result.SizeX;
+                int sizeY = result.SizeY;
+                int sizeZ = result.SizeZ;
+                var blockData = result.BlockData;
 
                 var filePath = $"{dirInfo.FullName}{SP}{fileName}";
 
                 switch (formatIndex)
                 {
                     case 0: // sponge schem
-                        SpongeSchemExporter.Export(sizeX, sizeY, sizeZ, resultPalette, blockData, filePath, exportDataVersion);
+                        SpongeSchemExporter.Export(sizeX, sizeY, sizeZ, resultPalette, blockData, filePath, dataVersion);
                         break;
                     case 1: // nbt structure
-                        NbtStructureExporter.Export(sizeX, sizeY, sizeZ, resultPalette, blockData, filePath, exportDataVersion);
+                        NbtStructureExporter.Export(sizeX, sizeY, sizeZ, resultPalette, blockData, filePath, dataVersion);
                         break;
                     case 2: // mcfunction
                         McFuncExporter.Export(sizeX, sizeY, sizeZ, resultPalette, blockData, filePath);
@@ -368,7 +344,7 @@ namespace MarkovCraft
                             var voxBlockData = blockData.Select(x => (byte) x).ToArray();
                             var zeroAsAir = sizeZ != 1;
                             var resultColorPalette = resultPalette.Select(x => ColorConvert.GetOpaqueRGB(x.Color)).ToArray();
-                            var airIndices = exportResult.AirIndices;
+                            var airIndices = result.AirIndices;
 
                             MarkovJunior.VoxHelper.SaveVox(voxBlockData, (byte) sizeX, (byte) sizeY, (byte) sizeZ, resultColorPalette, airIndices, filePath);
                         }
@@ -382,10 +358,13 @@ namespace MarkovCraft
             }
         }
 
-        public void ShowExplorer()
+        private static bool CheckWindowsPlatform() => Application.platform == RuntimePlatform.WindowsEditor ||
+                Application.platform == RuntimePlatform.WindowsPlayer;
+
+        public static void ShowExplorer(string target)
         {
-            if (CheckWindows())
-                System.Diagnostics.Process.Start("explorer.exe", $"/select,{ExportFolderInput!.text.Replace("/", @"\")}");
+            if (CheckWindowsPlatform())
+                System.Diagnostics.Process.Start("explorer.exe", $"/select,{target}");
         }
 
         public override void ScreenUpdate(ScreenManager manager)
