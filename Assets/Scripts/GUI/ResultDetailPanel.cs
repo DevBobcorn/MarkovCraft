@@ -73,7 +73,7 @@ namespace MarkovCraft
             // Remove previous texture
             texture = null;
 
-            var exporter = GetComponentInParent<ExporterScreen>();
+            var exporter = GetComponentInParent<ResultExporterScreen>();
             
             if (exporter is not null)
             {
@@ -169,11 +169,11 @@ namespace MarkovCraft
 
         public void Save()
         {
-            var exporter = GetComponentInParent<ExporterScreen>();
+            var exporter = GetComponentInParent<ResultExporterScreen>();
             var savePath = exporter.GetExportPath();
             var saveName = imageExportNameInput!.text;
 
-            if (ExporterScreen.CheckFileName(saveName) && (texture is not null) && (savePath is not null))
+            if (ResultExporterScreen.CheckFileName(saveName) && (texture is not null) && (savePath is not null))
             {
                 var folder = new DirectoryInfo(savePath);
 
@@ -199,7 +199,7 @@ namespace MarkovCraft
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
 
-            var exporter = GetComponentInParent<ExporterScreen>();
+            var exporter = GetComponentInParent<ResultExporterScreen>();
             
             if (exporter is not null)
             {

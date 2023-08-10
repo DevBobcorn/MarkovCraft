@@ -9,7 +9,7 @@ using TMPro;
 
 namespace MarkovCraft
 {
-    public class ExporterScreen : BaseScreen
+    public class ResultExporterScreen : BaseScreen
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
 
@@ -188,6 +188,9 @@ namespace MarkovCraft
                 Destroy(array[i].gameObject);
             
             mappingItems.Clear();
+
+            // Clear export result
+            exportResult = null;
         }
 
         public void AutoMap()

@@ -288,7 +288,7 @@ namespace MarkovCraft
                     var savePath = PathHelper.GetExtraDataFile(CONFIGURED_MODEL_FOLDER);
                     var specifiedName = SaveNameInput!.text;
 
-                    if (ExporterScreen.CheckFileName(specifiedName))
+                    if (ResultExporterScreen.CheckFileName(specifiedName))
                     {
                         saveFileName = specifiedName;
                     }

@@ -520,7 +520,7 @@ namespace MarkovCraft
                     ExportButton!.onClick.RemoveAllListeners();
                     ExportButton.onClick.AddListener(() => {
                         Hide3dGUI();
-                        screenManager!.SetActiveScreenByType<ExporterScreen>();
+                        screenManager!.SetActiveScreenByType<ResultExporterScreen>();
                     });
 
                     VoxImportButton!.interactable = true;
