@@ -372,8 +372,9 @@ namespace MarkovCraft
             if (working) return;
             
             if (Input.GetKeyDown(KeyCode.Escape))
+            {
                 manager.SetActiveScreenByType<GenerationScreen>();
-
+            }
         }
     }
 }

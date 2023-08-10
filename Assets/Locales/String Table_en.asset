@@ -39,7 +39,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 10017107255296
-    m_Localized: Initial Size<size=28> (L/W/H)</size>
+    m_Localized: Initial Size <size=28>(L/W/H)</size>
     m_Metadata:
       m_Items: []
   - m_Id: 10133750849536
@@ -206,7 +206,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 503485516652544
-    m_Localized: Exporting generation result of [{0}]
+    m_Localized: Exporting generation result
     m_Metadata:
       m_Items: []
   - m_Id: 504846685741056
@@ -476,6 +476,26 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 38052271571275776
     m_Localized: Cancel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38064857775804416
+    m_Localized: Stack
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38052636878376960
+    m_Localized: Scale Up
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38064712891961344
+    m_Localized: Resizing result
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38069501008744448
+    m_Localized: 'Method:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38073619886575616
+    m_Localized: Scale <size=28>(L/W/H)</size>
     m_Metadata:
       m_Items: []
   references:

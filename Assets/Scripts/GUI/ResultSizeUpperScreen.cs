@@ -10,8 +10,8 @@ namespace MarkovCraft
     public class ResultSizeUpperScreen : ResultManipulatorScreen
     {
         private static readonly string[] SIZE_UPPER_KEYS = {
-            "size_upper.type.scale_up",
-            "size_upper.type.stack"
+            "size_upper.method.scale_up",
+            "size_upper.method.stack"
         };
 
         [SerializeField] public TMP_Text? ScreenHeader, InfoText;
@@ -42,7 +42,7 @@ namespace MarkovCraft
             ConfirmButton!.onClick.RemoveAllListeners();
             ConfirmButton.onClick.AddListener(() => { });
             CancelButton!.onClick.RemoveAllListeners();
-            CancelButton.onClick.AddListener(() => { });
+            CancelButton.onClick.AddListener(() => manager?.SetActiveScreenByType<GenerationScreen>());
 
             SizeUpperDropdown!.ClearOptions();
             SizeUpperDropdown.AddOptions(SIZE_UPPER_KEYS.Select(x =>
@@ -53,7 +53,7 @@ namespace MarkovCraft
             working = false;
             properlyLoaded = true;
 
-            ScreenHeader!.text = GameScene.GetL10nString("size_upper.text.loaded", result.ConfiguredModelName);
+            ScreenHeader!.text = GameScene.GetL10nString("size_upper.text.loaded");
             
             // Update Info text
             InfoText!.text = GameScene.GetL10nString("screen.text.result_info", result.ConfiguredModelName,
@@ -110,8 +110,9 @@ namespace MarkovCraft
             if (working) return;
             
             if (Input.GetKeyDown(KeyCode.Escape))
+            {
                 manager.SetActiveScreenByType<GenerationScreen>();
-
+            }
         }
     }
 }

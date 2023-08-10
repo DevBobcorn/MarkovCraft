@@ -55,6 +55,10 @@ MonoBehaviour:
     m_Key: blockstate_preview.info.no_candidates
     m_Metadata:
       m_Items: []
+  - m_Id: 37455109888086016
+    m_Key: control.text.import_vox
+    m_Metadata:
+      m_Items: []
   - m_Id: 403911460429824
     m_Key: control.text.load_conf_model
     m_Metadata:
@@ -139,16 +143,8 @@ MonoBehaviour:
     m_Key: editor.text.initial_size
     m_Metadata:
       m_Items: []
-  - m_Id: 500808737005568
-    m_Key: screen.text.load_failure
-    m_Metadata:
-      m_Items: []
   - m_Id: 501063469670400
     m_Key: editor.text.loaded
-    m_Metadata:
-      m_Items: []
-  - m_Id: 500646488743936
-    m_Key: screen.text.loading
     m_Metadata:
       m_Items: []
   - m_Id: 9929253363712
@@ -185,10 +181,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 31965499011567616
     m_Key: env.hint.minecraft_axes
-    m_Metadata:
-      m_Items: []
-  - m_Id: 504846685741056
-    m_Key: screen.text.result_info
     m_Metadata:
       m_Items: []
   - m_Id: 506229719736320
@@ -327,6 +319,42 @@ MonoBehaviour:
     m_Key: replay.text.current_frame
     m_Metadata:
       m_Items: []
+  - m_Id: 38052271571275776
+    m_Key: screen.text.cancel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38052168831799296
+    m_Key: screen.text.confirm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 500808737005568
+    m_Key: screen.text.load_failure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 500646488743936
+    m_Key: screen.text.loading
+    m_Metadata:
+      m_Items: []
+  - m_Id: 504846685741056
+    m_Key: screen.text.result_info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38064712891961344
+    m_Key: size_upper.text.loaded
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38069501008744448
+    m_Key: size_upper.text.method
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38052636878376960
+    m_Key: size_upper.method.scale_up
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38064857775804416
+    m_Key: size_upper.method.stack
+    m_Metadata:
+      m_Items: []
   - m_Id: 395821373628416
     m_Key: status.error.download_resource_failure
     m_Metadata:
@@ -427,20 +455,8 @@ MonoBehaviour:
     m_Key: welcome.text.download_res
     m_Metadata:
       m_Items: []
-  - m_Id: 37455109888086016
-    m_Key: control.text.import_vox
-    m_Metadata:
-      m_Items: []
-  - m_Id: 38052168831799296
-    m_Key: screen.text.confirm
-    m_Metadata:
-      m_Items: []
-  - m_Id: 38052271571275776
-    m_Key: screen.text.cancel
-    m_Metadata:
-      m_Items: []
-  - m_Id: 38052636878376960
-    m_Key: New Entry
+  - m_Id: 38073619886575616
+    m_Key: size_upper.text.up_size
     m_Metadata:
       m_Items: []
   m_Metadata:
