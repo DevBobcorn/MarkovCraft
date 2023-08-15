@@ -1,7 +1,6 @@
 #nullable enable
 using System.Linq;
-using MinecraftClient;
-using MinecraftClient.Mapping;
+using CraftSharp;
 
 namespace MarkovCraft
 {

@@ -11,9 +11,8 @@ using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 using Unity.Mathematics;
 
-using MinecraftClient;
-using MinecraftClient.Resource;
-using MinecraftClient.Mapping;
+using CraftSharp;
+using CraftSharp.Resource;
 
 namespace MarkovCraft
 {

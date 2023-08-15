@@ -12,7 +12,7 @@ using Unity.Mathematics;
 using TMPro;
 using Newtonsoft.Json;
 
-using MinecraftClient.Mapping;
+using CraftSharp;
 
 namespace MarkovCraft
 {

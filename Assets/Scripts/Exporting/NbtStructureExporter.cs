@@ -5,7 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using UnityEngine;
 
-using MinecraftClient.Mapping;
+using CraftSharp;
 
 namespace MarkovCraft
 {

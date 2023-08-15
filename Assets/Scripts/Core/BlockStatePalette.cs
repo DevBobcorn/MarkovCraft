@@ -6,9 +6,9 @@ using System.Text;
 using UnityEngine;
 using Unity.Mathematics;
 
-using MinecraftClient.Resource;
+using CraftSharp.Resource;
 
-namespace MinecraftClient.Mapping
+namespace CraftSharp
 {
     public class BlockStatePalette
     {
@@ -31,9 +31,6 @@ namespace MinecraftClient.Mapping
 
         private readonly Dictionary<ResourceLocation, HashSet<int>> stateListTable = new Dictionary<ResourceLocation, HashSet<int>>();
         public Dictionary<ResourceLocation, HashSet<int>> StateListTable { get { return stateListTable; } }
-
-        private readonly Dictionary<ResourceLocation, int> defaultStateTable = new Dictionary<ResourceLocation, int>();
-        public Dictionary<ResourceLocation, int> DefaultStateTable { get { return defaultStateTable; } }
 
         private readonly Dictionary<int, ResourceLocation> blocksTable = new Dictionary<int, ResourceLocation>();
         public Dictionary<int, ResourceLocation> BlocksTable { get { return blocksTable; } }
@@ -58,7 +55,6 @@ namespace MinecraftClient.Mapping
             statesTable.Clear();
             blocksTable.Clear();
             stateListTable.Clear();
-            defaultStateTable.Clear();
             blockColorRules.Clear();
             RenderTypeTable.Clear();
 
@@ -78,12 +74,14 @@ namespace MinecraftClient.Mapping
             }
 
             // First read special block lists...
-            var lists = new Dictionary<string, HashSet<ResourceLocation>>();
-            lists.Add("no_occlusion", new());
-            lists.Add("no_collision", new());
-            lists.Add("water_blocks", new());
-            lists.Add("always_fulls", new());
-            lists.Add("empty_blocks", new());
+            var lists = new Dictionary<string, HashSet<ResourceLocation>>
+            {
+                { "no_occlusion", new() },
+                { "no_collision", new() },
+                { "water_blocks", new() },
+                { "always_fulls", new() },
+                { "empty_blocks", new() }
+            };
 
             Json.JSONData spLists = Json.ParseJson(File.ReadAllText(listsPath, Encoding.UTF8));
             foreach (var pair in lists)
@@ -127,14 +125,6 @@ namespace MinecraftClient.Mapping
                     blocksTable[stateId] = blockId;
                     stateListTable[blockId].Add(stateId);
 
-                    if (state.Properties.ContainsKey("default"))
-                    {
-                        if (state.Properties["default"].StringValue.ToLower() == "true")
-                        {
-                            defaultStateTable[blockId] = stateId;
-                        }
-                    }
-
                     if (state.Properties.ContainsKey("properties"))
                     {
                         // This block state contains block properties
@@ -152,7 +142,7 @@ namespace MinecraftClient.Mapping
 
                         }
 
-                        statesTable[stateId] = new BlockState(blockId, props)
+                        statesTable[stateId] = new(blockId, props)
                         {
                             NoOcclusion = noOcclusion.Contains(blockId),
                             NoCollision = noCollision.Contains(blockId),
@@ -164,7 +154,7 @@ namespace MinecraftClient.Mapping
                     }
                     else
                     {
-                        statesTable[stateId] = new BlockState(blockId)
+                        statesTable[stateId] = new(blockId)
                         {
                             NoOcclusion = noOcclusion.Contains(blockId),
                             NoCollision = noCollision.Contains(blockId),
@@ -174,13 +164,6 @@ namespace MinecraftClient.Mapping
                             FullSolid = (!noOcclusion.Contains(blockId)) && alwaysFulls.Contains(blockId)
                         };
                     }
-                }
-            
-                if (!defaultStateTable.ContainsKey(blockId)) // Default block state of this block is not specified
-                {
-                    var firstStateId = stateListTable[blockId].First();
-                    defaultStateTable[blockId] = firstStateId;
-                    Debug.LogWarning($"Default blockstate of {blockId} is not specified, using first state ({firstStateId})");
                 }
             }
 

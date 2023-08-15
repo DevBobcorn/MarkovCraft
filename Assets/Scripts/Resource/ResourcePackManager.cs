@@ -8,9 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Unity.Mathematics;
 
-using MinecraftClient.Mapping;
-
-namespace MinecraftClient.Resource
+namespace CraftSharp.Resource
 {
     public class ResourcePackManager
     {
@@ -161,7 +159,7 @@ namespace MinecraftClient.Resource
                     var renderType =
                         BlockStatePalette.INSTANCE.RenderTypeTable.GetValueOrDefault(blockId, RenderType.SOLID);
 
-                    StateModelLoader.LoadBlockStateModel(this, blockId, BlockStateFileTable[blockId], renderType);
+                    StateModelLoader.LoadBlockStateModel(blockId, BlockStateFileTable[blockId], renderType);
                 }
                 else
                     Debug.LogWarning($"Block state model definition not assigned for {blockId}!");
@@ -185,7 +183,7 @@ namespace MinecraftClient.Resource
                     if (RawItemModelTable.ContainsKey(itemModelId))
                     {
                         var rawModel = RawItemModelTable[itemModelId];
-                        var tintable = ItemPalette.INSTANCE.IsTintable(numId);
+                        var tintable = ItemPalette.INSTANCE.IsTintable(itemId);
                         var generated = GeneratedItemModels.Contains(itemModelId);
 
                         if (generated) // This model should be generated

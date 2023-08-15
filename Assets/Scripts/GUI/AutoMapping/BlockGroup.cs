@@ -6,8 +6,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-using MinecraftClient;
-using MinecraftClient.Resource;
+using CraftSharp;
+using CraftSharp.Resource;
 
 namespace MarkovCraft
 {

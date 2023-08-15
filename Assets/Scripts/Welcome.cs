@@ -9,7 +9,7 @@ using UnityEngine.Localization.Settings;
 using UnityEngine.SceneManagement;
 using TMPro;
 
-using MinecraftClient.Resource;
+using CraftSharp.Resource;
 
 namespace MarkovCraft
 {

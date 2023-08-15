@@ -4,7 +4,7 @@ using UnityEngine.Rendering;
 using Unity.Collections;
 using Unity.Mathematics;
 
-using MinecraftClient.Resource;
+using CraftSharp.Resource;
 
 namespace MarkovCraft
 {

@@ -1,8 +1,8 @@
 #nullable enable
 using UnityEngine;
 
-using MinecraftClient.Mapping;
-using MinecraftClient.Resource;
+using CraftSharp;
+using CraftSharp.Resource;
 
 namespace MarkovCraft
 {

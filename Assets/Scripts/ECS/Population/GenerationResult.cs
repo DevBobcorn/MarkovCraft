@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Unity.Mathematics;
 
-using MinecraftClient.Mapping;
-using MinecraftClient.Resource;
+using CraftSharp;
+using CraftSharp.Resource;
 
 namespace MarkovCraft
 {

@@ -15,7 +15,7 @@ using UnityEngine.SceneManagement;
 using Unity.Mathematics;
 using TMPro;
 
-using MinecraftClient.Mapping;
+using CraftSharp;
 using MarkovJunior;
 
 namespace MarkovCraft
