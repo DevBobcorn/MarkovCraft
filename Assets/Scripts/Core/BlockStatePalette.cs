@@ -32,6 +32,9 @@ namespace CraftSharp
         private readonly Dictionary<ResourceLocation, HashSet<int>> stateListTable = new Dictionary<ResourceLocation, HashSet<int>>();
         public Dictionary<ResourceLocation, HashSet<int>> StateListTable { get { return stateListTable; } }
 
+        private readonly Dictionary<ResourceLocation, int> defaultStateTable = new Dictionary<ResourceLocation, int>();
+        public Dictionary<ResourceLocation, int> DefaultStateTable { get { return defaultStateTable; } }
+
         private readonly Dictionary<int, ResourceLocation> blocksTable = new Dictionary<int, ResourceLocation>();
         public Dictionary<int, ResourceLocation> BlocksTable { get { return blocksTable; } }
 
@@ -55,6 +58,7 @@ namespace CraftSharp
             statesTable.Clear();
             blocksTable.Clear();
             stateListTable.Clear();
+            defaultStateTable.Clear();
             blockColorRules.Clear();
             RenderTypeTable.Clear();
 
@@ -125,6 +129,14 @@ namespace CraftSharp
                     blocksTable[stateId] = blockId;
                     stateListTable[blockId].Add(stateId);
 
+                    if (state.Properties.ContainsKey("default"))
+                    {
+                        if (state.Properties["default"].StringValue.ToLower() == "true")
+                        {
+                            defaultStateTable[blockId] = stateId;
+                        }
+                    }
+
                     if (state.Properties.ContainsKey("properties"))
                     {
                         // This block state contains block properties
@@ -164,6 +176,13 @@ namespace CraftSharp
                             FullSolid = (!noOcclusion.Contains(blockId)) && alwaysFulls.Contains(blockId)
                         };
                     }
+                }
+            
+                if (!defaultStateTable.ContainsKey(blockId)) // Default block state of this block is not specified
+                {
+                    var firstStateId = stateListTable[blockId].First();
+                    defaultStateTable[blockId] = firstStateId;
+                    Debug.LogWarning($"Default blockstate of {blockId} is not specified, using first state ({firstStateId})");
                 }
             }
 
