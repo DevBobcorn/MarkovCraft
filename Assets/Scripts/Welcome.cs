@@ -59,7 +59,7 @@ namespace MarkovCraft
             if (VersionHolder == null || DownloadButton == null || DownloadInfoText == null) return;
 
             downloadButtonAnimator = DownloadButton.GetComponent<Animator>();
-            DownloadInfoText.text = string.Empty;
+            DownloadInfoText.text = $"v{Application.version}";
 
             if (VersionHolder.Versions.Length <= 0)
                 return;
@@ -123,7 +123,7 @@ namespace MarkovCraft
                         downloadButtonAnimator?.SetBool("Hidden", succeeded);
                         downloadingRes = false;
 
-                        DownloadInfoText!.text = succeeded ? string.Empty :
+                        DownloadInfoText!.text = succeeded ? $"v{Application.version}" :
                                 GetL10nString("status.error.download_resource_failure", version.ResourceVersion);
 
                         // Refresh buttons
