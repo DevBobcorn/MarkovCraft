@@ -271,7 +271,7 @@ namespace MarkovCraft
                             cullFlags |= 0b000100;
                         if (x ==         0 || AirGrid[(x - 1) + y * SizeX + z * SizeX * SizeY]) // Unity -X (North) | Markov -X
                             cullFlags |= 0b001000;
-                        if (y == SizeX - 1 || AirGrid[x + (y + 1) * SizeX + z * SizeX * SizeY]) // Unity +Z (East)  | Markov +Y
+                        if (y == SizeY - 1 || AirGrid[x + (y + 1) * SizeX + z * SizeX * SizeY]) // Unity +Z (East)  | Markov +Y
                             cullFlags |= 0b010000;
                         if (y ==         0 || AirGrid[x + (y - 1) * SizeX + z * SizeX * SizeY]) // Unity -Z (East)  | Markov +Y
                             cullFlags |= 0b100000;
