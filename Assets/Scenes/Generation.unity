@@ -26258,6 +26258,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1317409356}
   - component: {fileID: 1317409357}
+  - component: {fileID: 1317409358}
   m_Layer: 0
   m_Name: '[Generation Control]'
   m_TagString: Untagged
@@ -26296,7 +26297,7 @@ MonoBehaviour:
   L10nTable:
     m_TableReference:
       m_TableCollectionName: GUID:ca01ff9c1eb86df4c93c853003cc7ed6
-  BlockMaterial: {fileID: 2100000, guid: 7e3ea3dacd3f3c143805a48d2f20257c, type: 2}
+  MaterialManager: {fileID: 1317409358}
   Loading: 0
   CamController: {fileID: 330585548}
   VolumeLayerMask:
@@ -26332,6 +26333,23 @@ MonoBehaviour:
   ExecuteButton: {fileID: 1237230332}
   VoxPathInput: {fileID: 580551842}
   VoxImportButton: {fileID: 1593101495}
+--- !u!114 &1317409358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1317409355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a68db3fa1c027d41bcc5a863cebd32f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AtlasSolid: {fileID: 2100000, guid: 14c6bc8a8f8380d4f91066b493db8705, type: 2}
+  AtlasCutout: {fileID: 2100000, guid: 9799fbe4314dcb04a95084e6b0a1626f, type: 2}
+  AtlasCutoutMipped: {fileID: 2100000, guid: 356fe3b2c3144ef4f82484e1a7bebe4e, type: 2}
+  AtlasTranslucent: {fileID: 2100000, guid: 8ee6dff0c60e65743895b69cc4c5bc0a, type: 2}
+  AtlasWater: {fileID: 2100000, guid: 8ee6dff0c60e65743895b69cc4c5bc0a, type: 2}
 --- !u!1 &1318530072
 GameObject:
   m_ObjectHideFlags: 0

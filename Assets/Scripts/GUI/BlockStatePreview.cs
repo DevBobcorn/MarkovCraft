@@ -124,7 +124,6 @@ namespace MarkovCraft
                         $"<color=yellow>{x.ToString()[0..typedLength]}</color>{x.ToString()[typedLength..]}"));
 
                 var palette = BlockStatePalette.INSTANCE;
-                //var stateId = palette.StateListTable[candidates[0]].First();
                 var stateId = palette.DefaultStateTable[candidates[0]];
                 UpdatePreviewObject(stateId, palette.StatesTable[stateId]);
                 
@@ -168,11 +167,12 @@ namespace MarkovCraft
             if (previewObject != null)
             {
                 var visualBuffer = new VertexBuffer();
-
+                var material = GameScene.Instance.MaterialManager!.GetAtlasMaterial(BlockStatePalette.INSTANCE.RenderTypeTable[newState.BlockId]);
                 var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, Location.Zero, newState);
                 ResourcePackManager.Instance.StateModelTable[stateId].Geometries[0].Build(ref visualBuffer, ITEM_CENTER, PREVIEW_CULLFLAG, blockTint);
 
                 previewObject.GetComponent<MeshFilter>().sharedMesh = BuildMesh(visualBuffer);
+                previewObject.GetComponent<MeshRenderer>().sharedMaterial = material;
             }
 
             currentStateId = stateId;

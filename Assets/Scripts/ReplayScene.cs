@@ -13,6 +13,7 @@ using TMPro;
 using Newtonsoft.Json;
 
 using CraftSharp;
+using CraftSharp.Resource;
 
 namespace MarkovCraft
 {
@@ -38,7 +39,7 @@ namespace MarkovCraft
         private bool is2d; // Whether or not the active recording is 2d
         private readonly List<BlockChangeInfo[]> frameData = new(); // Frame data of active recording
         // Recording palette index => (meshIndex, meshColor)
-        private int2[] meshPalette = { };
+        private int3[] meshPalette = { };
         private float playbackSpeed = 1F;
         private bool replaying = false;
 
@@ -105,6 +106,7 @@ namespace MarkovCraft
 
         private void VisualizePalette()
         {
+            var materials = MaterialManager!.GetMaterialArray(BLOCK_RENDER_TYPES);
             int side = Mathf.FloorToInt(Mathf.Sqrt(meshPalette.Length));
 
             for (int index = 0;index < meshPalette.Length;index++)
@@ -118,7 +120,7 @@ namespace MarkovCraft
                 meshFilter.sharedMesh = blockMeshes[item.x];
 
                 var meshRenderer = obj.AddComponent<MeshRenderer>();
-                meshRenderer.sharedMaterial = BlockMaterial;
+                meshRenderer.sharedMaterial = materials[DEFAULT_MATERIAL_INDEX];
                 if (item.x == 0) // Using plain cube mesh, color it
                 {
                     // Set color for its own material, not shared material
@@ -166,7 +168,6 @@ namespace MarkovCraft
                     {
                         Debug.LogWarning($"Failed to parse recording [{fileName}]");
                     }
-                    
                 }
             }
 
@@ -180,11 +181,17 @@ namespace MarkovCraft
 
             // Assign recording palette
             recordingPalette = recData.Palette.ToArray();
-            meshPalette = new int2[recData.Palette.Count];
+            meshPalette = new int3[recData.Palette.Count];
 
             var statePalette = BlockStatePalette.INSTANCE;
             var stateId2Mesh = new Dictionary<int, int>(); // StateId => Mesh index
             blockMeshCount = 1; // #0 is preserved for default cube mesh
+
+            var renderTypeTable = BlockStatePalette.INSTANCE.RenderTypeTable;
+            int getStateMaterial(BlockState blockState)
+            {
+                return GetMaterialIndex(renderTypeTable.GetValueOrDefault(blockState.BlockId, RenderType.SOLID));
+            };
 
             // Fill mesh palette
             for (int index = 0;index < recData.Palette.Count;index++) // Read and assign palette
@@ -202,15 +209,15 @@ namespace MarkovCraft
                         //Debug.Log($"Mapped '{index}' to [{stateId}] {state}");
 
                         if (stateId2Mesh.TryAdd(stateId, blockMeshCount))
-                            meshPalette[index] = new(blockMeshCount++, rgb);
+                            meshPalette[index] = new(blockMeshCount++, getStateMaterial(state), rgb);
                         else // The mesh of this block state is already regestered, just use it
-                            meshPalette[index] = new(stateId2Mesh[stateId], rgb);
+                            meshPalette[index] = new(stateId2Mesh[stateId], getStateMaterial(state), rgb);
                     }
                     else // Default cube mesh with custom color
-                        meshPalette[index] = new(0, rgb);
+                        meshPalette[index] = new(0, DEFAULT_MATERIAL_INDEX, rgb);
                 }
                 else // Default cube mesh with custom color
-                    meshPalette[index] = new(0, rgb);
+                    meshPalette[index] = new(0, DEFAULT_MATERIAL_INDEX, rgb);
                 
                 yield return null;
             }
@@ -348,7 +355,7 @@ namespace MarkovCraft
 
         public IEnumerator ReplayRecording()
         {
-            if (replaying || recordingPalette.Length == 0 || frameData.Count == 0 || BlockMaterial is null || ReplayText == null)
+            if (replaying || recordingPalette.Length == 0 || frameData.Count == 0 || ReplayText == null)
             {
                 Debug.LogWarning("Replay cannot be initiated");
                 StopReplay();
@@ -374,7 +381,7 @@ namespace MarkovCraft
 
         private IEnumerator ReplayRegular()
         {
-            Material[] materials = { BlockMaterial! };
+            var materials = MaterialManager!.GetMaterialArray(BLOCK_RENDER_TYPES);
             var simulationBox = new byte[sizeX * sizeY * sizeZ];
 
             for (int f = 0;f < frameData.Count;f++)
@@ -413,7 +420,7 @@ namespace MarkovCraft
             if (PlaybackSpeedSlider != null)
                 PlaybackSpeedSlider.interactable = false;
 
-            Material[] materials = { BlockMaterial! };
+            var materials = MaterialManager!.GetMaterialArray(BLOCK_RENDER_TYPES);
 
             for (int f = 0;f < frameData.Count;f++)
             {

@@ -102,5 +102,5 @@ MonoBehaviour:
   Margin: 1
   volumeColliderHolder: {fileID: 2616805721629465012}
   blockMeshLayerName: BlockMesh
-  blockMaterial: {fileID: 2100000, guid: 7e3ea3dacd3f3c143805a48d2f20257c, type: 2}
+  blockMaterial: {fileID: 2100000, guid: 9799fbe4314dcb04a95084e6b0a1626f, type: 2}
   GenerationSeed: 0

@@ -18,7 +18,7 @@ namespace MarkovCraft
         public NativeArray<int3> PositionData; // x, y, z
 
         [ReadOnly]
-        public NativeArray<int2> MeshData; // mesh index, color
+        public NativeArray<int3> MeshData; // mesh index, material index, color
 
         [ReadOnly]
         public float LifeTime;
@@ -40,8 +40,8 @@ namespace MarkovCraft
                         new(1F, 1F, 1F)
                     ) });
             
-            Ecb.SetComponent(index, e, new InstanceBlockColorComponent { Value = mesh.x == 0 ? ComputeColor(mesh.y) : WHITE });
-            Ecb.SetComponent(index, e, MaterialMeshInfo.FromRenderMeshArrayIndices(0, mesh.x));
+            Ecb.SetComponent(index, e, new InstanceBlockColorComponent { Value = mesh.x == 0 ? ComputeColor(mesh.z) : WHITE });
+            Ecb.SetComponent(index, e, MaterialMeshInfo.FromRenderMeshArrayIndices(mesh.y, mesh.x));
 
             Ecb.SetComponent(index, e, new RegularBlockInstanceComponent { Timer = 0F, LifeTime = LifeTime, Position = pos });
             
@@ -51,6 +51,5 @@ namespace MarkovCraft
         {
             return new(((rgb & 0xFF0000) >> 16) / 255F, ((rgb & 0xFF00) >> 8) / 255F, (rgb & 0xFF) / 255F, 1F);
         }
-
     }
 }

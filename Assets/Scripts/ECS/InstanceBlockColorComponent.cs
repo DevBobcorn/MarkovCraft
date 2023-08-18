@@ -13,7 +13,7 @@ namespace MarkovCraft
     [UnityEngine.DisallowMultipleComponent]
     public class InstanceBlockColorAuthoring : UnityEngine.MonoBehaviour
     {
-        [Unity.Entities.RegisterBinding(typeof(InstanceBlockColorComponent), nameof(InstanceBlockColorComponent.Value))]
+        [RegisterBinding(typeof(InstanceBlockColorComponent), nameof(InstanceBlockColorComponent.Value))]
         public UnityEngine.Color color;
 
         class InstanceBlockColorBaker : Unity.Entities.Baker<InstanceBlockColorAuthoring>

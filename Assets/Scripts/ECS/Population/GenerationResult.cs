@@ -4,10 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Rendering;
+using Unity.Collections;
 using Unity.Mathematics;
 
 using CraftSharp;
 using CraftSharp.Resource;
+
+
 
 namespace MarkovCraft
 {
@@ -17,7 +21,6 @@ namespace MarkovCraft
         [SerializeField] public float Margin = 0.5F;
         [SerializeField] private GameObject? volumeColliderHolder;
         [SerializeField] private string blockMeshLayerName = "Block";
-        [SerializeField] private Material? blockMaterial;
 
         private readonly Dictionary<int3, GameObject> renderHolders = new();
         private readonly Dictionary<int3, HashSet<int>> renderHolderEntries = new();
@@ -30,7 +33,6 @@ namespace MarkovCraft
         public int SizeY { get; private set; } = 0;
         public int SizeZ { get; private set; } = 0;
         public CustomMappingItem[] ResultPalette { get; private set; } = { };
-        private bool[] AirGrid = { };
 
         public readonly HashSet<int> AirIndices = new();
         public int[] BlockData { get; private set; } = { };
@@ -116,10 +118,6 @@ namespace MarkovCraft
             // Update result block data
             ResultPalette = resultPalette;
             BlockData = blockData;
-            // Calculate air grid for culling
-            AirGrid = new bool[BlockData.Length];
-            for (int i = 0;i < BlockData.Length;i++)
-                AirGrid[i] = AirIndices.Contains(BlockData[i]);
             
             completed = true;
 
@@ -136,10 +134,6 @@ namespace MarkovCraft
             SizeZ = FZ;
             // Update result block data
             BlockData = blockData;
-            // Calculate air grid for culling
-            AirGrid = new bool[BlockData.Length];
-            for (int i = 0;i < BlockData.Length;i++)
-                AirGrid[i] = AirIndices.Contains(BlockData[i]);
             
             completed = true;
 
@@ -211,6 +205,7 @@ namespace MarkovCraft
             int chunkY = Mathf.CeilToInt(SizeY / 16F);
             int chunkZ = Mathf.CeilToInt(SizeZ / 16F);
 
+            var materialManager = GameScene.Instance.GetMaterialManager();
             var statesTable = BlockStatePalette.INSTANCE.StatesTable;
             var packManager = ResourcePackManager.Instance;
             var stateModelTable = packManager.StateModelTable;
@@ -218,6 +213,27 @@ namespace MarkovCraft
             // Cache mapped data
             var stateIdPalette = ResultPalette.Select(x =>
                     BlockStateHelper.GetStateIdFromString(x.BlockState)).ToArray();
+            
+            var renderTypeTable = BlockStatePalette.INSTANCE.RenderTypeTable;
+
+            var renderTypePalette = stateIdPalette.Select(stateId => {
+                        if (stateId == BlockStateHelper.INVALID_BLOCKSTATE)
+                            return GameScene.DEFAULT_MATERIAL_INDEX;
+                        
+                        var stateBlockId = statesTable[stateId].BlockId;
+                        if (renderTypeTable.ContainsKey(stateBlockId))
+                            return GameScene.GetMaterialIndex( renderTypeTable[stateBlockId] );
+
+                        return GameScene.DEFAULT_MATERIAL_INDEX;
+                    }).ToArray();
+            
+            var nonOpaquePalette = stateIdPalette.Select((stateId, idx) => {
+                        if (AirIndices.Contains(idx))
+                            return true;
+                        if (stateId == BlockStateHelper.INVALID_BLOCKSTATE)
+                            return false; // Default pure color cubes, consider them as full opaque blocks
+                        return !statesTable[stateId].FullSolid;
+                    }).ToArray();
             
             bool updateFromExistingMesh = updatedEntries is not null;
 
@@ -241,7 +257,10 @@ namespace MarkovCraft
                 int coy = cy << 4;
                 int coz = cz << 4;
 
-                var visualBuffer = new VertexBuffer();
+                int count = GameScene.BLOCK_RENDER_TYPES.Length, renderTypeMask = 0;
+                var visualBuffer = new VertexBuffer[count];
+                for (int i = 0;i < count;i++)
+                    visualBuffer[i] = new();
                 var nonAirIndicesInChunk = new HashSet<int>();
 
                 int blockMeshLayer = LayerMask.NameToLayer(blockMeshLayerName);
@@ -263,27 +282,32 @@ namespace MarkovCraft
 
                         int cullFlags = 0b000000;
 
-                        if (z == SizeZ - 1 || AirGrid[x + y * SizeX + (z + 1) * SizeX * SizeY]) // Unity +Y (Up)    | Markov +Z
+                        if (z == SizeZ - 1 || nonOpaquePalette[BlockData[x + y * SizeX + (z + 1) * SizeX * SizeY]]) // Unity +Y (Up)    | Markov +Z
                             cullFlags |= 0b000001;
-                        if (z ==         0 || AirGrid[x + y * SizeX + (z - 1) * SizeX * SizeY]) // Unity -Y (Down)  | Markov -Z
+                        if (z ==         0 || nonOpaquePalette[BlockData[x + y * SizeX + (z - 1) * SizeX * SizeY]]) // Unity -Y (Down)  | Markov -Z
                             cullFlags |= 0b000010;
-                        if (x == SizeX - 1 || AirGrid[(x + 1) + y * SizeX + z * SizeX * SizeY]) // Unity +X (South) | Markov +X
+                        if (x == SizeX - 1 || nonOpaquePalette[BlockData[(x + 1) + y * SizeX + z * SizeX * SizeY]]) // Unity +X (South) | Markov +X
                             cullFlags |= 0b000100;
-                        if (x ==         0 || AirGrid[(x - 1) + y * SizeX + z * SizeX * SizeY]) // Unity -X (North) | Markov -X
+                        if (x ==         0 || nonOpaquePalette[BlockData[(x - 1) + y * SizeX + z * SizeX * SizeY]]) // Unity -X (North) | Markov -X
                             cullFlags |= 0b001000;
-                        if (y == SizeY - 1 || AirGrid[x + (y + 1) * SizeX + z * SizeX * SizeY]) // Unity +Z (East)  | Markov +Y
+                        if (y == SizeY - 1 || nonOpaquePalette[BlockData[x + (y + 1) * SizeX + z * SizeX * SizeY]]) // Unity +Z (East)  | Markov +Y
                             cullFlags |= 0b010000;
-                        if (y ==         0 || AirGrid[x + (y - 1) * SizeX + z * SizeX * SizeY]) // Unity -Z (East)  | Markov +Y
+                        if (y ==         0 || nonOpaquePalette[BlockData[x + (y - 1) * SizeX + z * SizeX * SizeY]]) // Unity -Z (East)  | Markov +Y
                             cullFlags |= 0b100000;
 
                         int stateId = stateIdPalette[value];
+                        int renderTypeIndex = renderTypePalette[value];
 
                         if (stateId == BlockStateHelper.INVALID_BLOCKSTATE)
                         {
-                            var cubeTint = ResultPalette[value].Color;
-
-                            CubeGeometry.Build(ref visualBuffer, ResourcePackManager.BLANK_TEXTURE, ix, iz, iy, cullFlags,
-                                    new(cubeTint.r / 255F, cubeTint.g / 255F, cubeTint.b / 255F));
+                            if (cullFlags != 0b000000)// If at least one face is visible
+                            {
+                                var cubeTint = ResultPalette[value].Color;
+                                CubeGeometry.Build(ref visualBuffer[renderTypeIndex], ResourcePackManager.BLANK_TEXTURE, ix, iz, iy, cullFlags,
+                                        new(cubeTint.r / 255F, cubeTint.g / 255F, cubeTint.b / 255F));
+                                
+                                renderTypeMask |= (1 << renderTypeIndex);
+                            }
                         }
                         else
                         {
@@ -291,7 +315,9 @@ namespace MarkovCraft
                             if (cullFlags != 0b000000)// If at least one face is visible
                             {
                                 var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, Location.Zero, statesTable[stateId]);
-                                stateModelTable[stateId].Geometries[0].Build(ref visualBuffer, new(ix, iz, iy), cullFlags, blockTint);
+                                stateModelTable[stateId].Geometries[0].Build(ref visualBuffer[renderTypeIndex], new(ix, iz, iy), cullFlags, blockTint);
+
+                                renderTypeMask |= (1 << renderTypeIndex);
                             }
                         }
                     }
@@ -300,7 +326,7 @@ namespace MarkovCraft
                 while (!buildTask.IsCompleted)
                     yield return null;
 
-                if (visualBuffer.vert.Length > 0) // Mesh is not empty
+                if (renderTypeMask != 0) // Mesh is not empty
                 {
                     if (renderHolders.ContainsKey(coord))
                     {
@@ -321,10 +347,11 @@ namespace MarkovCraft
                         renderHolderEntries.Add(coord, nonAirIndicesInChunk);
                     }
 
-                    renderHolder.GetComponent<MeshRenderer>().sharedMaterial = blockMaterial;
-                    var mesh = BlockStatePreview.BuildMesh(visualBuffer);
+                    var (mesh, materialArr) = BuildMesh(visualBuffer, renderTypeMask);
+
                     renderHolder.GetComponent<MeshFilter>().sharedMesh = mesh;
                     renderHolder.GetComponent<MeshCollider>().sharedMesh = mesh;
+                    renderHolder.GetComponent<MeshRenderer>().sharedMaterials = materialArr;
 
                     yield return null;
                 }
@@ -339,6 +366,111 @@ namespace MarkovCraft
             }
         
             rebuildingMesh = false;
+        }
+
+        public static (Mesh, Material[]) BuildMesh(VertexBuffer[] visualBuffer, int layerMask)
+        {
+            // Count layers, vertices and face indices
+            int layerCount = 0, totalVertCount = 0;
+            for (int layer = 0;layer < visualBuffer.Length;layer++)
+            {
+                if ((layerMask & (1 << layer)) != 0)
+                {
+                    layerCount++;
+                    totalVertCount += visualBuffer[layer].vert.Length;
+                }
+            }
+
+            int triIdxCount = (totalVertCount / 2) * 3;
+
+            var meshDataArr = Mesh.AllocateWritableMeshData(1);
+            var materialArr  = new Material[layerCount];
+            var meshData = meshDataArr[0];
+            meshData.subMeshCount = layerCount;
+
+            var vertAttrs = new NativeArray<VertexAttributeDescriptor>(4, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+            vertAttrs[0] = new(VertexAttribute.Position,  dimension: 3, stream: 0);
+            vertAttrs[1] = new(VertexAttribute.TexCoord0, dimension: 3, stream: 1);
+            vertAttrs[2] = new(VertexAttribute.TexCoord3, dimension: 4, stream: 2);
+            vertAttrs[3] = new(VertexAttribute.Color,     dimension: 3, stream: 3);
+
+            // Set mesh params
+            meshData.SetVertexBufferParams(totalVertCount, vertAttrs);
+            vertAttrs.Dispose();
+
+            // Prepare source data arrays
+            var allVerts = new float3[totalVertCount];
+            var allUVs   = new float3[totalVertCount];
+            var allAnims = new float4[totalVertCount];
+            var allTints = new float3[totalVertCount];
+
+            int vertOffset = 0;
+            for (int layer = 0;layer < visualBuffer.Length;layer++)
+            {
+                if ((layerMask & (1 << layer)) != 0)
+                {
+                    visualBuffer[layer].vert.CopyTo(allVerts, vertOffset);
+                    visualBuffer[layer].txuv.CopyTo(allUVs,   vertOffset);
+                    visualBuffer[layer].uvan.CopyTo(allAnims, vertOffset);
+                    visualBuffer[layer].tint.CopyTo(allTints, vertOffset);
+
+                    vertOffset += visualBuffer[layer].vert.Length;
+                }
+            }
+
+            // Copy the source arrays to mesh data
+            var positions  = meshData.GetVertexData<float3>(0);
+            positions.CopyFrom(allVerts);
+            var texCoords  = meshData.GetVertexData<float3>(1);
+            texCoords.CopyFrom(allUVs);
+            var texAnims   = meshData.GetVertexData<float4>(2);
+            texAnims.CopyFrom(allAnims);
+            var vertColors = meshData.GetVertexData<float3>(3);
+            vertColors.CopyFrom(allTints);
+
+            meshData.SetIndexBufferParams(triIdxCount, IndexFormat.UInt32);
+
+            // Set face data
+            var triIndices = meshData.GetIndexData<uint>();
+            uint vi = 0; int ti = 0;
+            for (;vi < totalVertCount;vi += 4U, ti += 6)
+            {
+                triIndices[ti]     = vi;
+                triIndices[ti + 1] = vi + 3U;
+                triIndices[ti + 2] = vi + 2U;
+                triIndices[ti + 3] = vi;
+                triIndices[ti + 4] = vi + 1U;
+                triIndices[ti + 5] = vi + 3U;
+            }
+
+            var materialManager = GameScene.Instance.GetMaterialManager();
+
+            // Select materials used by the mesh and split submeshes
+            int subMeshIndex = 0;
+            vertOffset = 0;
+            for (int layer = 0;layer < visualBuffer.Length;layer++)
+            {
+                if ((layerMask & (1 << layer)) != 0)
+                {
+                    materialArr[subMeshIndex] = materialManager.GetAtlasMaterial(GameScene.BLOCK_RENDER_TYPES[layer]);
+                    int vertCount = visualBuffer[layer].vert.Length;
+                    meshData.SetSubMesh(subMeshIndex, new((vertOffset / 2) * 3, (vertCount / 2) * 3){ vertexCount = vertCount });
+                    vertOffset += vertCount;
+                    subMeshIndex++;
+                }
+            }
+
+            meshData.subMeshCount = layerCount;
+
+            var mesh = new Mesh();
+
+            Mesh.ApplyAndDisposeWritableMeshData(meshDataArr, mesh);
+
+            mesh.RecalculateBounds();
+            // Recalculate mesh normals
+            mesh.RecalculateNormals();
+
+            return (mesh, materialArr);
         }
 
         public void EnableBlockColliders()

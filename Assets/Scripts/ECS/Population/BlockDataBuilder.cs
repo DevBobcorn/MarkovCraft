@@ -8,10 +8,10 @@ namespace MarkovCraft
     {
         private static bool CheckAir3d(byte index) => index == 0;
 
-        public static (int3[], int2[]) GetInstanceData(byte[] state, int FX, int FY, int FZ, int3 pos, int2[] meshPalette)
+        public static (int3[], int3[]) GetInstanceData(byte[] state, int FX, int FY, int FZ, int3 pos, int3[] meshPalette)
         {
             List<int3> posData = new();
-            List<int2> meshData = new();
+            List<int3> meshData = new();
 
             for (int z = 0; z < FZ; z++) for (int y = 0; y < FY; y++) for (int x = 0; x < FX; x++)
             {

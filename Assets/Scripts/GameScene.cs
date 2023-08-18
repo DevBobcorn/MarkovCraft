@@ -20,6 +20,28 @@ namespace MarkovCraft
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
 
+        public static readonly RenderType[] BLOCK_RENDER_TYPES =
+        {
+            RenderType.SOLID,
+            RenderType.CUTOUT,
+            RenderType.CUTOUT_MIPPED,
+            RenderType.TRANSLUCENT
+        };
+
+        public static int GetMaterialIndex(RenderType renderType)
+        {
+            return renderType switch
+            {
+                RenderType.SOLID         => 0,
+                RenderType.CUTOUT        => 1,
+                RenderType.CUTOUT_MIPPED => 2,
+                RenderType.TRANSLUCENT   => 3,
+                _   => DEFAULT_MATERIAL_INDEX
+            };
+        }
+
+        public const int DEFAULT_MATERIAL_INDEX = 0;
+
         // Dummy world
         public class World : AbstractWorld { }
         public static readonly World DummyWorld = new();
@@ -36,7 +58,7 @@ namespace MarkovCraft
         protected string loadedDataVersionName = "MC 0.0";
         protected int loadedDataVersionInt = 0;
 
-        [SerializeField] public Material? BlockMaterial;
+        [SerializeField] public MaterialManager? MaterialManager;
         [HideInInspector] public bool Loading = false;
 
         private static GameScene? instance;
@@ -48,6 +70,11 @@ namespace MarkovCraft
 
                 return instance!;
             }
+        }
+
+        public MaterialManager GetMaterialManager()
+        {
+            return MaterialManager!;
         }
 
         public int GetDataVersionInt()
@@ -164,7 +191,8 @@ namespace MarkovCraft
                 yield break;
             }
 
-            BlockMaterial!.SetTexture("_BaseMap", packManager.GetAtlasArray(RenderType.SOLID));
+            MaterialManager!.ClearInitializeFlag();
+            MaterialManager.EnsureInitialized();
 
             yield return null;
 

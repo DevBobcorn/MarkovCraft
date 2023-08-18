@@ -15,8 +15,9 @@ using UnityEngine.SceneManagement;
 using Unity.Mathematics;
 using TMPro;
 
-using CraftSharp;
 using MarkovJunior;
+using CraftSharp;
+using CraftSharp.Resource;
 
 namespace MarkovCraft
 {
@@ -65,8 +66,8 @@ namespace MarkovCraft
         private ConfiguredModel? currentConfModel = null;
         public ConfiguredModel? ConfiguredModel => currentConfModel;
         private GenerationResult? selectedResult = null;
-        // Character => (meshIndex, meshColor)
-        private readonly Dictionary<char, int2> meshPalette = new();
+        // Character => (meshIndex, matIndex, meshColor)
+        private readonly Dictionary<char, int3> meshPalette = new();
         // Character => CustomMappingItem, its items SHOULD NOT be edited once loaded from file
         private readonly Dictionary<char, CustomMappingItem> fullPalette = new();
         private Interpreter? interpreter = null;
@@ -216,12 +217,18 @@ namespace MarkovCraft
             // First apply all items in base palette
             foreach (var pair in baseColorPalette)
             {
-                meshPalette.Add( pair.Key, new int2(0, pair.Value) );
-                fullPalette.Add( pair.Key, new CustomMappingItem{
+                meshPalette.Add( pair.Key, new(0, DEFAULT_MATERIAL_INDEX, pair.Value) );
+                fullPalette.Add( pair.Key, new CustomMappingItem {
                         Symbol = pair.Key, Color = ColorConvert.GetOpaqueColor32(pair.Value) } );
             }
 
             blockMeshCount = 1; // #0 is preserved for default cube mesh
+
+            var renderTypeTable = BlockStatePalette.INSTANCE.RenderTypeTable;
+            int getStateMaterial(BlockState blockState)
+            {
+                return GetMaterialIndex(renderTypeTable.GetValueOrDefault(blockState.BlockId, RenderType.SOLID));
+            };
 
             // Read and apply custom mappings
             foreach (var item in confModel.CustomMapping)
@@ -238,15 +245,15 @@ namespace MarkovCraft
                         //Debug.Log($"Mapped '{item.Character}' to [{stateId}] {state}");
 
                         if (stateId2Mesh.TryAdd(stateId, blockMeshCount))
-                            meshPalette[item.Symbol] = new(blockMeshCount++, rgb);
+                            meshPalette[item.Symbol] = new(blockMeshCount++, getStateMaterial(state), rgb);
                         else // The mesh of this block state is already regestered, just use it
-                            meshPalette[item.Symbol] = new(stateId2Mesh[stateId], rgb);
+                            meshPalette[item.Symbol] = new(stateId2Mesh[stateId], getStateMaterial(state), rgb);
                     }
                     else // Default cube mesh with custom color
-                        meshPalette[item.Symbol] = new(0, rgb);
+                        meshPalette[item.Symbol] = new(0, DEFAULT_MATERIAL_INDEX, rgb);
                 }
                 else // Default cube mesh with custom color
-                    meshPalette[item.Symbol] = new(0, rgb);
+                    meshPalette[item.Symbol] = new(0, DEFAULT_MATERIAL_INDEX, rgb);
                 
                 if (fullPalette.ContainsKey(item.Symbol)) // Entry defined in base palette, overwrite it
                 {
@@ -293,13 +300,12 @@ namespace MarkovCraft
             // Delay a bit so that the first frame of generation doesn't get cleared
             yield return new WaitForSecondsRealtime(0.1F);
 
+            var materials = MaterialManager!.GetMaterialArray(BLOCK_RENDER_TYPES);
+
             executing = true;
             var model = currentConfModel;
 
             var resultPerLine = Mathf.CeilToInt(Mathf.Sqrt(model.Amount));
-            
-            Material[] materials = { BlockMaterial! };
-
             System.Random rand = new();
             var seeds = model.Seeds;
 

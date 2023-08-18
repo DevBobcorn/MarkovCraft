@@ -13,19 +13,19 @@ namespace MarkovCraft
     public static class BlockInstanceSpawner
     {
         // Regular block population - persistent
-        public static void VisualizePersistentState((int3[], int2[]) instanceDataRaw, Material[] materials, Mesh[] meshes)
+        public static void VisualizePersistentState((int3[], int3[]) instanceDataRaw, Material[] materials, Mesh[] meshes)
         {
             VisualizeFrameState(instanceDataRaw, materials, meshes, 0F);
         }
 
         // Regular block population - one frame
-        public static void VisualizeFrameState((int3[], int2[]) instanceDataRaw, Material[] materials, Mesh[] meshes, float lifeTime)
+        public static void VisualizeFrameState((int3[], int3[]) instanceDataRaw, Material[] materials, Mesh[] meshes, float lifeTime)
         {
             var entityCount = instanceDataRaw.Item1.Length;
 
             var posData = new NativeArray<int3>(entityCount, Allocator.TempJob);
             posData.CopyFrom(instanceDataRaw.Item1);
-            var meshData = new NativeArray<int2>(entityCount, Allocator.TempJob);
+            var meshData = new NativeArray<int3>(entityCount, Allocator.TempJob);
             meshData.CopyFrom(instanceDataRaw.Item2);
 
             var world = Unity.Entities.World.DefaultGameObjectInjectionWorld;
@@ -79,13 +79,13 @@ namespace MarkovCraft
         }
 
         // Optimized block population - instanced life time
-        public static void VisualizeState((int3[], int2[], float[]) instanceDataRaw, Material[] materials, Mesh[] meshes)
+        public static void VisualizeState((int3[], int3[], float[]) instanceDataRaw, Material[] materials, Mesh[] meshes)
         {
             var entityCount = instanceDataRaw.Item1.Length;
 
             var posData = new NativeArray<int3>(entityCount, Allocator.TempJob);
             posData.CopyFrom(instanceDataRaw.Item1);
-            var meshData = new NativeArray<int2>(entityCount, Allocator.TempJob);
+            var meshData = new NativeArray<int3>(entityCount, Allocator.TempJob);
             meshData.CopyFrom(instanceDataRaw.Item2);
             var lifeTime = new NativeArray<float>(entityCount, Allocator.TempJob);
             lifeTime.CopyFrom(instanceDataRaw.Item3);
