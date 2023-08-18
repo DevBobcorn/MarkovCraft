@@ -39,7 +39,6 @@ namespace MarkovCraft
                     Screen.SetResolution(maxRes.width, maxRes.height, true);
                     Screen.fullScreen = true;
                 }
-                
             }
         }
     }

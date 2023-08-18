@@ -30,7 +30,7 @@ namespace MarkovCraft
 
             initialized = true;
 
-            string localized(string key)
+            static string localized(string key)
             {
                 return GameScene.GetL10nString(key);
             };
@@ -41,17 +41,11 @@ namespace MarkovCraft
             CreateColoredGroupContainingUncoloredVariant(
                     localized("auto_mapper.block_group.terracotta"), "terracotta");
             CreateColoredGroupContainingUncoloredVariant(
-                    localized("auto_mapper.block_group.shulker_box"), "shulker_box");
+                    localized("auto_mapper.block_group.shulker_box"), "shulker_box", false);
             CreateColoredGroup(
                     localized("auto_mapper.block_group.concrete"), "concrete");
             CreateColoredGroup(
-                    localized("auto_mapper.block_group.concrete_powder"), "concrete_powder");
-
-            // Initialize block groups
-            foreach (var group in GetComponentsInChildren<BlockGroup>())
-            {
-                group.Initialize();
-            }
+                    localized("auto_mapper.block_group.concrete_powder"), "concrete_powder", false);
         }
 
         private static readonly string[] COLORS = {
@@ -66,26 +60,26 @@ namespace MarkovCraft
             SkipAssignedBlocks = skip;
         }
 
-        private void CreateColoredGroupContainingUncoloredVariant(string groupName, string blockBaseName)
+        private void CreateColoredGroupContainingUncoloredVariant(string groupName, string blockBaseName, bool defaultSelected = true)
         {
             CreateGroup(groupName, COLORS.Select(x =>
                     new BlockGroupItemInfo { BlockId = $"{x}_{blockBaseName}" })
-                            .Append(new BlockGroupItemInfo { BlockId = blockBaseName }).ToArray());
+                            .Append(new BlockGroupItemInfo { BlockId = blockBaseName }).ToArray(), defaultSelected);
         }
 
-        private void CreateColoredGroup(string groupName, string blockBaseName)
+        private void CreateColoredGroup(string groupName, string blockBaseName, bool defaultSelected = true)
         {
             CreateGroup(groupName, COLORS.Select(x =>
-                    new BlockGroupItemInfo { BlockId = $"{x}_{blockBaseName}" }).ToArray());
+                    new BlockGroupItemInfo { BlockId = $"{x}_{blockBaseName}" }).ToArray(), defaultSelected);
         }
 
-        private void CreateGroup(string groupName, BlockGroupItemInfo[] items)
+        private void CreateGroup(string groupName, BlockGroupItemInfo[] items, bool defaultSelected = true)
         {
             var groupObj = Instantiate(groupPrefab);
             groupObj!.transform.SetParent(groups, false);
 
             var group = groupObj.GetComponent<BlockGroup>();
-            group.SetData(groupName, items);
+            group.SetData(groupName, items, defaultSelected);
         }
 
         private Dictionary<ResourceLocation, Color32> GetSelectedBlocks()
