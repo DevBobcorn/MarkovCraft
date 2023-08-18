@@ -78,7 +78,7 @@ namespace MarkovCraft
         {
             if (interpreter != null && ModelGraphUI != null)
             {
-                var graphPalette = meshPalette.ToDictionary(x => x.Key, x => ColorConvert.GetOpaqueColor32(x.Value.y));
+                var graphPalette = meshPalette.ToDictionary(x => x.Key, x => ColorConvert.GetOpaqueColor32(x.Value.z));
                 ModelGraphGenerator.GenerateGraph(ModelGraphUI, modelName, interpreter.root, graphPalette);
             }
             else
