@@ -23,6 +23,10 @@ MonoBehaviour:
     m_Key: auto_mapper.block_group.concrete_powder
     m_Metadata:
       m_Items: []
+  - m_Id: 41319919402815488
+    m_Key: auto_mapper.block_group.glazed_terracotta
+    m_Metadata:
+      m_Items: []
   - m_Id: 29830818401030144
     m_Key: auto_mapper.block_group.shulker_box
     m_Metadata:
@@ -255,6 +259,18 @@ MonoBehaviour:
     m_Key: mapping_item.text.blockstate_hint
     m_Metadata:
       m_Items: []
+  - m_Id: 41320267089645568
+    m_Key: auto_mapper.block_group.planks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41320300283367424
+    m_Key: auto_mapper.block_group.wood_and_hyphae
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41320307019419648
+    m_Key: auto_mapper.block_group.log_and_stem
+    m_Metadata:
+      m_Items: []
   - m_Id: 2888261594685440
     m_Key: node.name.all
     m_Metadata:
@@ -339,6 +355,14 @@ MonoBehaviour:
     m_Key: screen.text.result_info
     m_Metadata:
       m_Items: []
+  - m_Id: 38052636878376960
+    m_Key: size_upper.method.scale_up
+    m_Metadata:
+      m_Items: []
+  - m_Id: 38064857775804416
+    m_Key: size_upper.method.stack
+    m_Metadata:
+      m_Items: []
   - m_Id: 38064712891961344
     m_Key: size_upper.text.loaded
     m_Metadata:
@@ -347,12 +371,8 @@ MonoBehaviour:
     m_Key: size_upper.text.method
     m_Metadata:
       m_Items: []
-  - m_Id: 38052636878376960
-    m_Key: size_upper.method.scale_up
-    m_Metadata:
-      m_Items: []
-  - m_Id: 38064857775804416
-    m_Key: size_upper.method.stack
+  - m_Id: 38073619886575616
+    m_Key: size_upper.text.up_size
     m_Metadata:
       m_Items: []
   - m_Id: 395821373628416
@@ -453,10 +473,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 355866240786432
     m_Key: welcome.text.download_res
-    m_Metadata:
-      m_Items: []
-  - m_Id: 38073619886575616
-    m_Key: size_upper.text.up_size
     m_Metadata:
       m_Items: []
   m_Metadata:

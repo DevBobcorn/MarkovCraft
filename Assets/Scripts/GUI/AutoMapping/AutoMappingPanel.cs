@@ -1,6 +1,5 @@
 #nullable enable
 using UnityEngine;
-using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,10 +12,7 @@ namespace MarkovCraft
     {
         [SerializeField] private RectTransform? groups;
         [SerializeField] private GameObject? groupPrefab;
-        [SerializeField] private Toggle? skipAssignedBlocksToggle;
-
         [SerializeField] private GameObject? autoMappingEntry;
-
         public bool SkipAssignedBlocks { get; private set; } = true;
 
         private bool initialized = false;
@@ -36,16 +32,37 @@ namespace MarkovCraft
             };
 
             // Batch create groups
+            // - Colored blocks
             CreateColoredGroup(
                     localized("auto_mapper.block_group.wool"), "wool");
             CreateColoredGroupContainingUncoloredVariant(
                     localized("auto_mapper.block_group.terracotta"), "terracotta");
-            CreateColoredGroupContainingUncoloredVariant(
-                    localized("auto_mapper.block_group.shulker_box"), "shulker_box", false);
+            CreateColoredGroup(
+                    localized("auto_mapper.block_group.glazed_terracotta"), "glazed_terracotta", false);
             CreateColoredGroup(
                     localized("auto_mapper.block_group.concrete"), "concrete");
             CreateColoredGroup(
                     localized("auto_mapper.block_group.concrete_powder"), "concrete_powder", false);
+            CreateColoredGroupContainingUncoloredVariant(
+                    localized("auto_mapper.block_group.shulker_box"), "shulker_box", false);
+            
+            // - Wood blocks
+            CreateGroup(localized("auto_mapper.block_group.planks"), WOOD_TYPES.Append("bamboo").Union(HYPHAE_TYPES).Select(x =>
+                    new BlockGroupItemInfo { BlockId = $"{x}_planks" }).ToArray(), false);
+            CreateGroup(localized("auto_mapper.block_group.wood_and_hyphae"),
+                    WOOD_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"{x}_wood", TextureId = $"block/{x}_log" })
+                    .Union(HYPHAE_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"{x}_hyphae", TextureId = $"block/{x}_stem" }))
+                    .Union(WOOD_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"stripped_{x}_wood", TextureId = $"block/stripped_{x}_log" }))
+                    .Union(HYPHAE_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"stripped_{x}_hyphae", TextureId = $"block/stripped_{x}_stem" }))
+                    .ToArray(), false);
+            CreateGroup(localized("auto_mapper.block_group.log_and_stem"),
+                    WOOD_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"{x}_log", TextureId = $"block/{x}_log_top" })
+                    .Append(new BlockGroupItemInfo { BlockId = $"bamboo_block" })
+                    .Union(HYPHAE_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"{x}_stem", TextureId = $"block/{x}_stem_top" }))
+                    .Union(WOOD_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"stripped_{x}_log", TextureId = $"block/stripped_{x}_log_top" }))
+                    .Append(new BlockGroupItemInfo { BlockId = $"stripped_bamboo_block" })
+                    .Union(HYPHAE_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"stripped_{x}_stem", TextureId = $"block/stripped_{x}_stem_top" }))
+                    .ToArray(), false);
         }
 
         private static readonly string[] COLORS = {
@@ -53,6 +70,16 @@ namespace MarkovCraft
             "yellow",      "lime",        "pink",        "gray",
             "light_gray",  "cyan",        "purple",      "blue",
             "brown",       "green",       "red",         "black"
+        };
+
+        private static readonly string[] WOOD_TYPES = {
+            "oak",         "spruce",      "birch",       "jungle",
+            "acacia",      "dark_oak",    "mangrove",    "cherry",
+            "bamboo"
+        };
+
+        private static readonly string[] HYPHAE_TYPES = {
+            "crimson",     "warped"
         };
 
         public void OnSkipAssignedBlocksChanged(bool skip)

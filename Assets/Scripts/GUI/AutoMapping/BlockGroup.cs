@@ -10,6 +10,7 @@ using TMPro;
 using CraftSharp;
 using CraftSharp.Resource;
 using Unity.Mathematics;
+using Unity.Entities.UniversalDelegates;
 
 namespace MarkovCraft
 {
@@ -35,7 +36,11 @@ namespace MarkovCraft
         public void SetData(string groupName, BlockGroupItemInfo[] items, bool defaultSelected)
         {
             groupTitleText!.text = groupName;
-            itemSource = items;
+            var blockTable = BlockStatePalette.INSTANCE.StateListTable;
+
+            // Select only blocks which are present in currently loaded data
+            itemSource = items.Where(x => blockTable.ContainsKey(ResourceLocation.fromString(x.BlockId))).ToArray();
+
             if (defaultSelected)
             {
                 // Items are shown by default
@@ -82,6 +87,20 @@ namespace MarkovCraft
                     var tex = new Texture2D(2, 2) { filterMode = FilterMode.Point };
                     var bytes = File.ReadAllBytes(packManager.TextureFileTable[textureId]);
                     tex.LoadImage(bytes);
+                    // Crop texture if necessary
+                    if (tex.width != tex.height)
+                    {
+                        var shortSide = Mathf.Min(tex.width, tex.height);
+                        var px = new Color32[shortSide * shortSide];
+                        for (int i = 0;i < shortSide;i++) for (int j = 0;j < shortSide;j++)
+                        {
+                            px[i * shortSide + j] = tex.GetPixel(j, i);
+                        }
+
+                        tex = new Texture2D(shortSide, shortSide) { filterMode = FilterMode.Point };
+                        tex.SetPixels32(px);
+                        tex.Apply();
+                    }
                     // Update sprite
                     var sprite = Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2, tex.height / 2));
                     itemTexture.sprite = sprite;

@@ -498,6 +498,22 @@ MonoBehaviour:
     m_Localized: Scale <size=28>(L/W/H)</size>
     m_Metadata:
       m_Items: []
+  - m_Id: 41319919402815488
+    m_Localized: Glazed Terracotta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41320307019419648
+    m_Localized: Log & Stem
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41320300283367424
+    m_Localized: Wood & Hyphae
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41320267089645568
+    m_Localized: Planks
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

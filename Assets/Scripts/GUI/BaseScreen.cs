@@ -12,14 +12,12 @@ namespace MarkovCraft
         {
             GetComponent<Animator>().SetBool("Hidden", false);
             OnShow(this.manager = manager);
-
         }
 
         public void Hide(ScreenManager manager)
         {
             GetComponent<Animator>().SetBool("Hidden", true);
             OnHide(manager);
-
         }
 
         public virtual void OnShow(ScreenManager manager) { }
