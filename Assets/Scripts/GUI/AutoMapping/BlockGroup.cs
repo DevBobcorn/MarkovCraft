@@ -39,7 +39,7 @@ namespace MarkovCraft
             var blockTable = BlockStatePalette.INSTANCE.StateListTable;
 
             // Select only blocks which are present in currently loaded data
-            itemSource = items.Where(x => blockTable.ContainsKey(ResourceLocation.fromString(x.BlockId))).ToArray();
+            itemSource = items.Where(x => blockTable.ContainsKey(ResourceLocation.FromString(x.BlockId))).ToArray();
 
             if (defaultSelected)
             {
@@ -65,7 +65,7 @@ namespace MarkovCraft
                 var itemObj = Instantiate(groupItemPrefab);
                 itemObj!.transform.SetParent(groupItems, false);
 
-                var blockId = ResourceLocation.fromString(item.BlockId);
+                var blockId = ResourceLocation.FromString(item.BlockId);
                 var itemText = itemObj.GetComponentInChildren<TMP_Text>();
                 itemText.text = GameScene.GetL10nBlockName(blockId);
 
@@ -77,7 +77,7 @@ namespace MarkovCraft
                 }
                 else
                 {
-                    textureId = ResourceLocation.fromString(item.TextureId);
+                    textureId = ResourceLocation.FromString(item.TextureId);
                 }
 
                 if (packManager.TextureFileTable.ContainsKey(textureId))

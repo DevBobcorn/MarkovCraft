@@ -15,7 +15,7 @@ namespace MarkovCraft
 
             if (parts.Length == 1) // No predicate specified
             {
-                var blockId = ResourceLocation.fromString(parts[0]);
+                var blockId = ResourceLocation.FromString(parts[0]);
 
                 if (palette.DefaultStateTable.ContainsKey(blockId))
                 {
@@ -29,7 +29,7 @@ namespace MarkovCraft
             }
             else if (parts.Length == 2 && parts[1].EndsWith(']')) // With predicates
             {
-                var blockId = ResourceLocation.fromString(parts[0]);
+                var blockId = ResourceLocation.FromString(parts[0]);
                 var filter = parts[1].Substring(0, parts[1].Length - 1); // Remove trailing ']'
 
                 if (palette.StateListTable.ContainsKey(blockId)) // StateListTable should have the same keys as DefaultStateTable

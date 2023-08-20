@@ -103,7 +103,7 @@ namespace MarkovCraft
 
         public void UpdateHint(string incompleteState)
         {
-            var incompleteBlockId = ResourceLocation.fromString(incompleteState.Split('[')[0]);
+            var incompleteBlockId = ResourceLocation.FromString(incompleteState.Split('[')[0]);
             if (string.IsNullOrEmpty(incompleteBlockId.Path))
             {
                 canvasGroup!.alpha = 0F;

@@ -93,7 +93,7 @@ namespace CraftSharp
                 if (spLists.Properties.ContainsKey(pair.Key))
                 {
                     foreach (var block in spLists.Properties[pair.Key].DataArray)
-                        pair.Value.Add(ResourceLocation.fromString(block.StringValue));
+                        pair.Value.Add(ResourceLocation.FromString(block.StringValue));
                 }
             }
 
@@ -111,7 +111,7 @@ namespace CraftSharp
 
             foreach (KeyValuePair<string, Json.JSONData> item in palette.Properties)
             {
-                ResourceLocation blockId = ResourceLocation.fromString(item.Key);
+                ResourceLocation blockId = ResourceLocation.FromString(item.Key);
 
                 if (stateListTable.ContainsKey(blockId))
                     throw new InvalidDataException($"Duplicate block id {blockId}!");
@@ -211,7 +211,7 @@ namespace CraftSharp
 
                     foreach (var block in dynamicRule.Value.DataArray)
                     {
-                        var blockId = ResourceLocation.fromString(block.StringValue);
+                        var blockId = ResourceLocation.FromString(block.StringValue);
 
                         if (stateListTable.ContainsKey(blockId))
                         {
@@ -231,7 +231,7 @@ namespace CraftSharp
             {
                 foreach (var fixedRule in colorRules.Properties["fixed"].Properties)
                 {
-                    var blockId = ResourceLocation.fromString(fixedRule.Key);
+                    var blockId = ResourceLocation.FromString(fixedRule.Key);
 
                     if (stateListTable.ContainsKey(blockId))
                     {
@@ -259,7 +259,7 @@ namespace CraftSharp
 
                 foreach (var pair in renderTypes.Properties)
                 {
-                    var blockId = ResourceLocation.fromString(pair.Key);
+                    var blockId = ResourceLocation.FromString(pair.Key);
 
                     if (allBlockIds.Contains(blockId))
                     {

@@ -5,11 +5,12 @@ using System.Xml.Linq;
 using UnityEngine;
 
 using MarkovJunior;
+using CraftSharp;
 
 namespace MarkovCraft
 {
     [Serializable]
-    public class CustomMappingItem : Json.JSONSerializable
+    public class CustomMappingItem : Json.IJSONSerializable
     {
         public char Symbol;
         public string BlockState = string.Empty;
