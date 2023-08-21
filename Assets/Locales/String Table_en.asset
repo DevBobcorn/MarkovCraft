@@ -514,6 +514,45 @@ MonoBehaviour:
     m_Localized: Planks
     m_Metadata:
       m_Items: []
+  - m_Id: 42092786344202240
+    m_Localized: '<size=48><b>Controls:</b></size>
+
+      [W][A][S][D]
+
+      [Q][E]
+
+      [Space]
+
+      [L
+      Shift]
+
+      [F11]
+
+      [Esc]
+
+      [C]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42092876748230656
+    m_Localized: '<size=48>_________________</size>
+
+      Move horizontally
+
+      Rotate
+      view
+
+      Move up
+
+      Move down
+
+      Toggle Fullscreen
+
+      Pause
+
+      Config
+      current model'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

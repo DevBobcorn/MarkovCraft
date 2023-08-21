@@ -20,7 +20,7 @@ namespace MarkovCraft
         private Camera? viewCamera;
         public Camera? ViewCamera => viewCamera;
 
-        private bool dragging = false;
+        private bool dragging = false, dragRotating = false;
         private Vector3 lastDragPos = Vector2.zero;
         private Vector3? targetPos = null;
 
@@ -89,8 +89,7 @@ namespace MarkovCraft
             }
             else // Check start dragging
             {
-
-                if (Input.GetMouseButton(1) && !pointerOverUI)
+                if (!dragRotating && Input.GetMouseButton(1) && !pointerOverUI)
                 {
                     dragging = true;
                     lastDragPos = Input.mousePosition;
@@ -102,14 +101,41 @@ namespace MarkovCraft
             float fly = 0F;
             float rot = 0F;
 
-            if (Input.GetKey(KeyCode.E)) // Turn camera counter-clockwise
+            if (dragRotating) // Perform dragging
             {
-                rot += 1F;
-            }
+                if (Input.GetMouseButton(2))
+                {
+                    var curDragPos = Input.mousePosition;
+                    var dragOffset = curDragPos - lastDragPos;
 
-            if (Input.GetKey(KeyCode.Q)) // Turn camera clockwise
+                    rot = dragOffset.x * Time.deltaTime * 30F;
+
+                    lastDragPos = curDragPos;
+                }
+                else
+                {
+                    dragRotating = false;
+                }
+            }
+            else // Check start dragging
             {
-                rot -= 1F;
+                if (!dragging && Input.GetMouseButton(2) && !pointerOverUI)
+                {
+                    dragRotating = true;
+                    lastDragPos = Input.mousePosition;
+                }
+                else
+                {
+                    if (Input.GetKey(KeyCode.E)) // Turn camera counter-clockwise
+                    {
+                        rot += 1F;
+                    }
+
+                    if (Input.GetKey(KeyCode.Q)) // Turn camera clockwise
+                    {
+                        rot -= 1F;
+                    }
+                }
             }
 
             if (Input.GetKey(KeyCode.Space)) // Fly up

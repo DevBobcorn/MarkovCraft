@@ -475,6 +475,14 @@ MonoBehaviour:
     m_Key: welcome.text.download_res
     m_Metadata:
       m_Items: []
+  - m_Id: 42092786344202240
+    m_Key: Generation/Canvas/Generation Screen/Controls Hint Panel/Keys Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 42092876748230656
+    m_Key: Generation/Canvas/Generation Screen/Controls Hint Panel/Hints Text
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

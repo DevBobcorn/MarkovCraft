@@ -7,18 +7,6 @@
 ## > Building & Running
 The program is made and tested with Unity 2022.3.3f1, so it is recommended to use this version of Unity(or a newer version) to build this app.
 
-## > Controls
-Keybindings in *MarkovCraft* are shown below (not yet configurable):
-Key                                                       | Action
----                                                       | :---:
-<kbd>W</kbd> / <kbd>A</kbd> / <kbd>S</kbd> / <kbd>D</kbd> | Move Horizontally
-<kbd>Q</kbd> / <kbd>E</kbd>                               | Rotate clockwise/counter-clockwise
-<kbd>Space</kbd>                                          | Move Up
-<kbd>Left Shift</kbd>                                     | Move Down
-<kbd>F11</kbd>                                            | Toggle Fullscreen
-<kbd>Esc</kbd>                                            | Pause Game
-<kbd>C</kbd>                                              | Configure current model
-
 ## > Localization
 *English (en)* and *Simplified Chinese (zh-Hans)* locales are currently available. Support for other languages might be added later.
 
