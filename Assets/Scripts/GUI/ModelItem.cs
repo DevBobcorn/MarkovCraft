@@ -11,7 +11,6 @@ namespace MarkovCraft
     {
         [SerializeField] private TMP_Text? modelNameText;
         [SerializeField] private Image? modelPreviewImage;
-        [SerializeField] private Image? modelPreviewFrame;
         [SerializeField] [Range(10F, 500F)] private float frameSize = 100F;
 
         //       X,   Y,   Z, Steps, Animated

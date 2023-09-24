@@ -36,6 +36,8 @@ namespace MarkovCraft
         [SerializeField] public BlockStatePreview? BlockStatePreview;
         // Color Picker
         [SerializeField] public MappingItemColorPicker? ColorPicker;
+        // Block Picker
+        [SerializeField] public MappingItemBlockPicker? BlockPicker;
         // Auto Mapping Panel
         [SerializeField] public AutoMappingPanel? AutoMappingPanel;
 
@@ -116,7 +118,8 @@ namespace MarkovCraft
                 int defaultRgb = baseColorPalette[pair.Key];
                 int loadedRgb = ColorConvert.GetRGB(pair.Value.Color);
 
-                newItem.InitializeData(pair.Key, defaultRgb, loadedRgb, pair.Value.BlockState, ColorPicker!, BlockStatePreview!);
+                newItem.InitializeData(pair.Key, defaultRgb, loadedRgb, pair.Value.BlockState,
+                        ColorPicker!, BlockPicker!, BlockStatePreview!);
 
                 newItem.transform.SetParent(GridTransform, false);
                 newItem.transform.localScale = Vector3.one;
@@ -124,12 +127,6 @@ namespace MarkovCraft
 
             // Update which items should be displayed (included in selected model)
             yield return StartCoroutine(UpdateActiveCharSetFromModel(confModel.Model));
-
-            // Hide auto mapping panel
-            AutoMappingPanel?.Hide();
-
-            // Hide color picker
-            ColorPicker?.CloseAndDiscard();
 
             working = false;
             properlyLoaded = true;
@@ -230,6 +227,13 @@ namespace MarkovCraft
                 Destroy(array[i].gameObject);
             
             mappingItems.Clear();
+
+            // Hide auto mapping panel
+            AutoMappingPanel?.Hide();
+            // Hide color picker
+            ColorPicker?.CloseAndDiscard();
+            // Hide block picker
+            BlockPicker?.CloseAndDiscard();
         }
 
         private void ShowActiveCharSet(HashSet<char> charSet)

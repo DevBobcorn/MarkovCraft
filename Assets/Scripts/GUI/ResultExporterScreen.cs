@@ -43,6 +43,8 @@ namespace MarkovCraft
         [SerializeField] public BlockStatePreview? BlockStatePreview;
         // Color Picker
         [SerializeField] public MappingItemColorPicker? ColorPicker;
+        // Block Picker
+        [SerializeField] public MappingItemBlockPicker? BlockPicker;
         // Result Detail Panel
         [SerializeField] public ResultDetailPanel? ResultDetailPanel;
         // Auto Mapping Panel
@@ -102,7 +104,7 @@ namespace MarkovCraft
                 // Add item to dictionary and set data
                 mappingItems.Add(newItem);
                 var rgb = ColorConvert.GetRGB(itemVal.Color);
-                newItem.InitializeData(' ', rgb, rgb, itemVal.BlockState, ColorPicker!, BlockStatePreview!);
+                newItem.InitializeData(' ', rgb, rgb, itemVal.BlockState, ColorPicker!, BlockPicker!, BlockStatePreview!);
                 // Add item to container
                 newItem.transform.SetParent(GridTransform, false);
                 newItem.transform.localScale = Vector3.one;
@@ -190,6 +192,13 @@ namespace MarkovCraft
 
             // Clear export result
             result = null;
+
+            // Hide auto mapping panel
+            AutoMappingPanel?.Hide();
+            // Hide color picker
+            ColorPicker?.CloseAndDiscard();
+            // Hide block picker
+            BlockPicker?.CloseAndDiscard();
         }
 
         public void AutoMap()

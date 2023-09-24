@@ -51,9 +51,9 @@ namespace MarkovCraft
         }
 
         public override void InitializeData(char character, int defoRgb, int rgb, string blockState, 
-                MappingItemColorPicker colorPicker, BlockStatePreview blockStatePreview)
+                MappingItemColorPicker colorPicker, MappingItemBlockPicker blockPicker, BlockStatePreview blockStatePreview)
         {
-            base.InitializeData(character, defoRgb, rgb, blockState, colorPicker, blockStatePreview);
+            base.InitializeData(character, defoRgb, rgb, blockState, colorPicker, blockPicker, blockStatePreview);
 
             // Initialize block state preview
             var stateId = BlockStateHelper.GetStateIdFromString(blockState);

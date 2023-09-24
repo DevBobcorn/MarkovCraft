@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using CraftSharp;
 
 namespace MarkovCraft
 {
@@ -14,10 +15,12 @@ namespace MarkovCraft
         [SerializeField] protected TMP_InputField? BlockStateInput;
 
         [SerializeField] private Button? EditColorButton;
+        [SerializeField] private Button? PickBlockButton;
         [SerializeField] private Button? RevertOverrideButton;
 
         protected BlockStatePreview? blockStatePreview;
         private MappingItemColorPicker? colorPicker;
+        private MappingItemBlockPicker? blockPicker;
         private bool overridesPaletteColor = false;
 
         // RGB color of this item in the base palette
@@ -27,41 +30,37 @@ namespace MarkovCraft
         public char Character => character;
 
         public virtual void InitializeData(char character, int defoRgb, int rgb, string blockState, 
-                MappingItemColorPicker colorPicker, BlockStatePreview blockStatePreview)
+                MappingItemColorPicker colorPicker, MappingItemBlockPicker blockPicker, BlockStatePreview blockStatePreview)
         {
-            if (ColorPreviewImage == null || CharacterText == null || ColorCodeInput == null || BlockStateInput == null
-                    || MarkCornerImage == null || EditColorButton == null || RevertOverrideButton == null)
-            {
-                Debug.LogError("Mapping Item missing components!");
-                return;
-            }
-
             this.character = character;
             defaultRgb = defoRgb & 0xFFFFFF; // Remove alpha channel if presents
 
             // BlockState Preview
             this.blockStatePreview = blockStatePreview;
             // Character display
-            CharacterText.text = character.ToString();
+            CharacterText!.text = character.ToString();
             // Color input
-            ColorCodeInput.text = ColorConvert.GetHexRGBString(rgb);
-            ColorPreviewImage.color = ColorConvert.GetOpaqueColor32(rgb);
+            ColorCodeInput!.text = ColorConvert.GetHexRGBString(rgb);
+            ColorPreviewImage!.color = ColorConvert.GetOpaqueColor32(rgb);
             // Color picker
             this.colorPicker = colorPicker;
             // Black state input
-            BlockStateInput.text = blockState;
+            BlockStateInput!.text = blockState;
+            // Block picker
+            this.blockPicker = blockPicker;
 
             SetOverridesPaletteColor(defoRgb != rgb);
 
             // Assign control events (should get called only once)
-            RevertOverrideButton.onClick.AddListener(OnRevertOverrideButtonClick);
+            RevertOverrideButton!.onClick.AddListener(OnRevertOverrideButtonClick);
             ColorCodeInput.onValueChanged.AddListener(OnColorCodeInputValueChange);
             ColorCodeInput.onEndEdit.AddListener(OnColorCodeInputValidate);
-            EditColorButton.onClick.AddListener(() => OnEditColorButtonClick());
+            EditColorButton!.onClick.AddListener(OnEditColorButtonClick);
 
             BlockStateInput.onSelect.AddListener(OnSelectBlockStateInput);
             BlockStateInput.onValueChanged.AddListener(OnUpdateBlockStateInput);
             BlockStateInput.onEndEdit.AddListener(OnEndEditBlockStateInput);
+            PickBlockButton!.onClick.AddListener(OnPickBlockButtonClick);
         }
 
         private void OnEditColorButtonClick()
@@ -69,6 +68,21 @@ namespace MarkovCraft
             var currentColor = (Color32) ColorPreviewImage!.color;
             currentColor.a = (byte) 255; // Fully opaque
             colorPicker?.OpenAndInitialize(this, currentColor);
+        }
+
+        private void OnPickBlockButtonClick()
+        {
+            var currentStateId = BlockStateHelper.GetStateIdFromString(GetBlockState());
+
+            if (currentStateId != BlockStateHelper.INVALID_BLOCKSTATE) // Initialize with current blockstate
+            {
+                var currentState = BlockStatePalette.INSTANCE.StatesTable[currentStateId];
+                blockPicker?.OpenAndInitialize(this, currentState);
+            }
+            else
+            {
+                blockPicker?.OpenAndInitialize(this, BlockState.AIR_STATE);
+            }
         }
 
         public void SetCharacter(char character)

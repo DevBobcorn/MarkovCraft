@@ -8,6 +8,19 @@ namespace MarkovCraft
     {
         public const int INVALID_BLOCKSTATE = -1;
 
+        public static int GetDefaultStateId(ResourceLocation blockId)
+        {
+            if (BlockStatePalette.INSTANCE.DefaultStateTable.ContainsKey(blockId))
+            {
+                return BlockStatePalette.INSTANCE.DefaultStateTable[blockId];
+            }
+            else
+            {
+                //Debug.LogWarning($"Block with id {blockId} is not present");
+                return INVALID_BLOCKSTATE;
+            }
+        }
+
         public static int GetStateIdFromString(string state)
         {
             var palette = BlockStatePalette.INSTANCE;
@@ -16,16 +29,7 @@ namespace MarkovCraft
             if (parts.Length == 1) // No predicate specified
             {
                 var blockId = ResourceLocation.FromString(parts[0]);
-
-                if (palette.DefaultStateTable.ContainsKey(blockId))
-                {
-                    return palette.DefaultStateTable[blockId];
-                }
-                else
-                {
-                    //Debug.LogWarning($"Block with id {blockId} is not present");
-                    return INVALID_BLOCKSTATE;
-                }
+                return GetDefaultStateId(blockId);
             }
             else if (parts.Length == 2 && parts[1].EndsWith(']')) // With predicates
             {
@@ -43,7 +47,7 @@ namespace MarkovCraft
                     }
 
                     //Debug.LogWarning($"Block with id {blockId} is present, but no state matches predicate [{filter}]. Using default state instead");
-                    return palette.DefaultStateTable[blockId];
+                    return GetDefaultStateId(blockId);
                 }
                 else
                 {
