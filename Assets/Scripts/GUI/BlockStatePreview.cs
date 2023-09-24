@@ -14,6 +14,9 @@ namespace MarkovCraft
     [RequireComponent(typeof (CanvasGroup))]
     public class BlockStatePreview : MonoBehaviour
     {
+        public static readonly bool[] DUMMY_AMBIENT_OCCLUSSION = Enumerable.Repeat(false, 27).ToArray();
+        public static readonly float[] DUMMY_BLOCK_VERT_LIGHT = Enumerable.Repeat(0F, 8).ToArray();
+
         public static readonly float3 ITEM_CENTER = new(-0.5F, -0.5F, -0.5F);
         public const int PREVIEW_CULLFLAG = 0b011001;
 
@@ -48,7 +51,7 @@ namespace MarkovCraft
             vertAttrs[0] = new(VertexAttribute.Position,  dimension: 3, stream: 0);
             vertAttrs[1] = new(VertexAttribute.TexCoord0, dimension: 3, stream: 1);
             vertAttrs[2] = new(VertexAttribute.TexCoord3, dimension: 4, stream: 2);
-            vertAttrs[3] = new(VertexAttribute.Color,     dimension: 3, stream: 3);
+            vertAttrs[3] = new(VertexAttribute.Color,     dimension: 4, stream: 3);
 
             // Set mesh params
             meshData.SetVertexBufferParams(vertexCount, vertAttrs);
@@ -67,7 +70,7 @@ namespace MarkovCraft
             var animInfos = meshData.GetVertexData<float4>(2);
             animInfos.CopyFrom(visualBuffer.uvan);
             // Vertex colors
-            var vertColors = meshData.GetVertexData<float3>(3);
+            var vertColors = meshData.GetVertexData<float4>(3);
             vertColors.CopyFrom(visualBuffer.tint);
 
             // Set face data
@@ -169,7 +172,8 @@ namespace MarkovCraft
                 var visualBuffer = new VertexBuffer();
                 var material = GameScene.Instance.MaterialManager!.GetAtlasMaterial(BlockStatePalette.INSTANCE.RenderTypeTable[newState.BlockId]);
                 var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, Location.Zero, newState);
-                ResourcePackManager.Instance.StateModelTable[stateId].Geometries[0].Build(ref visualBuffer, ITEM_CENTER, PREVIEW_CULLFLAG, blockTint);
+                ResourcePackManager.Instance.StateModelTable[stateId].Geometries[0].Build(ref visualBuffer, ITEM_CENTER,
+                        PREVIEW_CULLFLAG, DUMMY_AMBIENT_OCCLUSSION, DUMMY_BLOCK_VERT_LIGHT, blockTint);
 
                 previewObject.GetComponent<MeshFilter>().sharedMesh = BuildMesh(visualBuffer);
                 previewObject.GetComponent<MeshRenderer>().sharedMaterial = material;

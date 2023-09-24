@@ -1,4 +1,5 @@
 #nullable enable
+using System.Linq;
 using UnityEngine;
 
 using CraftSharp;
@@ -38,8 +39,9 @@ namespace MarkovCraft
                 var visualBuffer = new VertexBuffer();
                 var material = GameScene.Instance.MaterialManager!.GetAtlasMaterial(BlockStatePalette.INSTANCE.RenderTypeTable[newState.BlockId]);
                 var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, Location.Zero, newState);
-                ResourcePackManager.Instance.StateModelTable[stateId].Geometries[0].Build(ref visualBuffer,
-                        BlockStatePreview.ITEM_CENTER, BlockStatePreview.PREVIEW_CULLFLAG, blockTint);
+                ResourcePackManager.Instance.StateModelTable[stateId].Geometries[0].Build(
+                        ref visualBuffer, BlockStatePreview.ITEM_CENTER, BlockStatePreview.PREVIEW_CULLFLAG,
+                        BlockStatePreview.DUMMY_AMBIENT_OCCLUSSION, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
 
                 previewObject.GetComponent<MeshFilter>().sharedMesh = BlockStatePreview.BuildMesh(visualBuffer);
                 previewObject.GetComponent<MeshRenderer>().sharedMaterial = material;

@@ -20,7 +20,7 @@ namespace MarkovCraft
             vertAttrs[0] = new(VertexAttribute.Position,  dimension: 3, stream: 0);
             vertAttrs[1] = new(VertexAttribute.TexCoord0, dimension: 3, stream: 1);
             vertAttrs[2] = new(VertexAttribute.TexCoord3, dimension: 4, stream: 2);
-            vertAttrs[3] = new(VertexAttribute.Color,     dimension: 3, stream: 3);
+            vertAttrs[3] = new(VertexAttribute.Color,     dimension: 4, stream: 3);
 
             var resultMeshes = new Mesh[buffers.Length];
 
@@ -47,7 +47,7 @@ namespace MarkovCraft
                 var animInfos = meshData.GetVertexData<float4>(2);
                 animInfos.CopyFrom(visualBuffer.uvan);
                 // Vertex colors
-                var vertColors = meshData.GetVertexData<float3>(3);
+                var vertColors = meshData.GetVertexData<float4>(3);
                 vertColors.CopyFrom(visualBuffer.tint);
 
                 // Set face data

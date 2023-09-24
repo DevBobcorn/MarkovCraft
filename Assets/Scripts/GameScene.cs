@@ -115,7 +115,7 @@ namespace MarkovCraft
                 buffers[i] = new();
 
             // #0 is default cube mesh
-            CubeGeometry.Build(ref buffers[0], ResourcePackManager.BLANK_TEXTURE, 0, 0, 0, 0b111111, new float3(1F));
+            CubeGeometry.Build(ref buffers[0], float3.zero, ResourcePackManager.BLANK_TEXTURE, 0b111111, new float3(1F));
 
             var modelTable = ResourcePackManager.Instance.StateModelTable;
             
@@ -128,7 +128,8 @@ namespace MarkovCraft
                     var blockGeometry = modelTable[stateId].Geometries[0];
                     var blockTint = statePalette.GetBlockColor(stateId, DummyWorld, Location.Zero, statePalette.FromId(stateId));
 
-                    blockGeometry.Build(ref buffers[pair.Value], float3.zero, 0b111111, blockTint);
+                    blockGeometry.Build(ref buffers[pair.Value], float3.zero, 0b111111, BlockStatePreview.DUMMY_AMBIENT_OCCLUSSION,
+                            BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
                     
                     blockGeometries[pair.Value] = blockGeometry;
                     blockTints[pair.Value] = blockTint;
@@ -136,7 +137,7 @@ namespace MarkovCraft
                 else
                 {
                     Debug.LogWarning($"Model for block state #{stateId} ({statePalette.FromId(stateId)}) is not available. Using cube model instead.");
-                    CubeGeometry.Build(ref buffers[pair.Value], ResourcePackManager.BLANK_TEXTURE, 0, 0, 0, 0b111111, new float3(1F));
+                    CubeGeometry.Build(ref buffers[pair.Value], float3.zero, ResourcePackManager.BLANK_TEXTURE, 0b111111, new float3(1F));
                 }
             }
 

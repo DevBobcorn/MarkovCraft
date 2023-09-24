@@ -303,7 +303,7 @@ namespace MarkovCraft
                             if (cullFlags != 0b000000)// If at least one face is visible
                             {
                                 var cubeTint = ResultPalette[value].Color;
-                                CubeGeometry.Build(ref visualBuffer[renderTypeIndex], ResourcePackManager.BLANK_TEXTURE, ix, iz, iy, cullFlags,
+                                CubeGeometry.Build(ref visualBuffer[renderTypeIndex], new(ix, iz, iy), ResourcePackManager.BLANK_TEXTURE, cullFlags,
                                         new(cubeTint.r / 255F, cubeTint.g / 255F, cubeTint.b / 255F));
                                 
                                 renderTypeMask |= (1 << renderTypeIndex);
@@ -311,11 +311,11 @@ namespace MarkovCraft
                         }
                         else
                         {
-
                             if (cullFlags != 0b000000)// If at least one face is visible
                             {
                                 var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, Location.Zero, statesTable[stateId]);
-                                stateModelTable[stateId].Geometries[0].Build(ref visualBuffer[renderTypeIndex], new(ix, iz, iy), cullFlags, blockTint);
+                                stateModelTable[stateId].Geometries[0].Build(ref visualBuffer[renderTypeIndex], new(ix, iz, iy), cullFlags,
+                                        BlockStatePreview.DUMMY_AMBIENT_OCCLUSSION, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
 
                                 renderTypeMask |= (1 << renderTypeIndex);
                             }
@@ -392,7 +392,7 @@ namespace MarkovCraft
             vertAttrs[0] = new(VertexAttribute.Position,  dimension: 3, stream: 0);
             vertAttrs[1] = new(VertexAttribute.TexCoord0, dimension: 3, stream: 1);
             vertAttrs[2] = new(VertexAttribute.TexCoord3, dimension: 4, stream: 2);
-            vertAttrs[3] = new(VertexAttribute.Color,     dimension: 3, stream: 3);
+            vertAttrs[3] = new(VertexAttribute.Color,     dimension: 4, stream: 3);
 
             // Set mesh params
             meshData.SetVertexBufferParams(totalVertCount, vertAttrs);
@@ -402,7 +402,7 @@ namespace MarkovCraft
             var allVerts = new float3[totalVertCount];
             var allUVs   = new float3[totalVertCount];
             var allAnims = new float4[totalVertCount];
-            var allTints = new float3[totalVertCount];
+            var allTints = new float4[totalVertCount];
 
             int vertOffset = 0;
             for (int layer = 0;layer < visualBuffer.Length;layer++)
@@ -425,7 +425,7 @@ namespace MarkovCraft
             texCoords.CopyFrom(allUVs);
             var texAnims   = meshData.GetVertexData<float4>(2);
             texAnims.CopyFrom(allAnims);
-            var vertColors = meshData.GetVertexData<float3>(3);
+            var vertColors = meshData.GetVertexData<float4>(3);
             vertColors.CopyFrom(allTints);
 
             meshData.SetIndexBufferParams(triIdxCount, IndexFormat.UInt32);
