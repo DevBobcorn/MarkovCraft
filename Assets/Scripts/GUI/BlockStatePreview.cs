@@ -21,10 +21,10 @@ namespace MarkovCraft
         public const int PREVIEW_CULLFLAG = 0b011001;
 
         [HideInInspector] public int currentStateId = -1;
-        [SerializeField] public GameObject? previewObject;
+        [SerializeField] private GameObject? previewObject;
+        [SerializeField] private TMP_Text? descText;
 
         private CanvasGroup? canvasGroup;
-        private TMP_Text? descText;
 
         void Start()
         {
@@ -134,8 +134,8 @@ namespace MarkovCraft
             }
             else
             {
-                previewObject!.SetActive(false);
                 descText!.text = GameScene.GetL10nString("blockstate_preview.info.no_candidates");
+                previewObject!.SetActive(false);
             }
         }
 
@@ -154,7 +154,7 @@ namespace MarkovCraft
                 var newState = BlockStatePalette.INSTANCE.StatesTable[stateId];
                 var blockName = GameScene.GetL10nBlockName(newState.BlockId);
 
-                descText!.text = $"[{stateId}] {blockName}\n{newState}";
+                descText!.text = $"{blockName}\n{newState}";
                 UpdatePreviewObject(stateId, newState);
 
                 previewObject!.SetActive(true);

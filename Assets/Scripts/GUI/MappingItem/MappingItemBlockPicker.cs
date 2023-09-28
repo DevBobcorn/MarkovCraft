@@ -1,12 +1,11 @@
 #nullable enable
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Events;
 
 using CraftSharp;
-using CraftSharp.Resource;
 
 namespace MarkovCraft
 {
@@ -14,11 +13,17 @@ namespace MarkovCraft
     {
         // Block list
         [SerializeField] public GameObject? BlockListItemPrefab;
+        [SerializeField] public ScrollRect? BlockListScrollView;
         [SerializeField] public RectTransform? GridTransform;
+        // Blockstate panel
+        [SerializeField] private BlockStatePreview? blockStatePreview;
+        [SerializeField] private RectTransform? propertyListTransform;
+        [SerializeField] private GameObject? propertyPrefab;
 
         private readonly Dictionary<ResourceLocation, BlockListItem> blockListItems = new();
 
         private MappingItem? activeItem = null;
+        private int selectedBlockStateId = 0;
         private BlockState selectedBlockState = BlockState.AIR_STATE;
 
         private void SelectBlock(ResourceLocation blockId)
@@ -27,24 +32,49 @@ namespace MarkovCraft
 
             if (defaultStateId != BlockStateHelper.INVALID_BLOCKSTATE)
             {
-                SelectBlockState(BlockStatePalette.INSTANCE.StatesTable[defaultStateId]);
+                SelectBlockState(defaultStateId, BlockStatePalette.INSTANCE.StatesTable[defaultStateId]);
             }
             else
             {
-                SelectBlockState(BlockState.AIR_STATE);
+                SelectBlockState(0, BlockState.AIR_STATE);
             }
         }
 
-        private void SelectBlockState(BlockState blockState)
+        private void SelectBlockState(int blockStateId, BlockState blockState)
         {
-            if (selectedBlockState == blockState)
+            if (selectedBlockStateId == blockStateId)
             {
                 // Target already selected
                 return;
             }
 
             // Select our target
+            selectedBlockStateId = blockStateId;
             selectedBlockState = blockState;
+            blockStatePreview!.UpdatePreview(selectedBlockStateId);
+
+            // Prepare blockstate properties
+            foreach (var prop in propertyListTransform!)
+            {
+                Destroy((prop as Transform)!.gameObject);
+            }
+
+            foreach (var pair in selectedBlockState.Properties)
+            {
+                var propObj = GameObject.Instantiate(propertyPrefab);
+                var prop = propObj!.GetComponent<BlockStateProperty>();
+                
+                prop.SetData(pair.Key, new string[] { "A" });
+
+                propObj.transform.SetParent(propertyListTransform, false);
+            }
+        }
+
+        private IEnumerator ScrollBlockList(float pos)
+        {
+            yield return new WaitForEndOfFrame();
+
+            BlockListScrollView!.verticalNormalizedPosition = 1F - pos;
         }
 
         private void Open()
@@ -68,9 +98,11 @@ namespace MarkovCraft
             {
                 Destroy(block.gameObject);
             }
+            // Hide blockstate preview
+            blockStatePreview!.UpdatePreview(BlockStateHelper.INVALID_BLOCKSTATE);
         }
 
-        public void OpenAndInitialize(MappingItem item, BlockState initialBlockState)
+        public void OpenAndInitialize(MappingItem item, int initialBlockStateId, BlockState initialBlockState)
         {
             if (activeItem != null) // Opened by an item while editing another one
             {
@@ -111,8 +143,15 @@ namespace MarkovCraft
             // Update selected blockstate
             if (blockListItems.ContainsKey(initialBlockState.BlockId))
             {
-                SelectBlockState(initialBlockState);
-                blockListItems[initialBlockState.BlockId].VisualSelect();
+                var target = blockListItems[initialBlockState.BlockId];
+                var pos = blockListItems.Keys.ToList().IndexOf(initialBlockState.BlockId);
+                var len = blockListItems.Count;
+                var posInList = pos / (float) len;
+
+                StartCoroutine(ScrollBlockList(posInList));
+
+                SelectBlockState(initialBlockStateId, initialBlockState);
+                target.VisualSelect();
             }
             else if (index > 0) // If the model list is not empty
             {
@@ -132,7 +171,8 @@ namespace MarkovCraft
 
         private void ApplyToItem(MappingItem item)
         {
-            item.SetBlockState(selectedBlockState.ToString());
+            var table = BlockStatePalette.INSTANCE.StatesTable;
+            item.SetBlockState(table[selectedBlockStateId].ToString());
         }
 
         public void CloseAndApply()

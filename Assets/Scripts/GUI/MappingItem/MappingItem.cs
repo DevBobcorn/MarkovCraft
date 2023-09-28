@@ -77,11 +77,11 @@ namespace MarkovCraft
             if (currentStateId != BlockStateHelper.INVALID_BLOCKSTATE) // Initialize with current blockstate
             {
                 var currentState = BlockStatePalette.INSTANCE.StatesTable[currentStateId];
-                blockPicker?.OpenAndInitialize(this, currentState);
+                blockPicker?.OpenAndInitialize(this, currentStateId, currentState);
             }
             else
             {
-                blockPicker?.OpenAndInitialize(this, BlockState.AIR_STATE);
+                blockPicker?.OpenAndInitialize(this, currentStateId, BlockState.AIR_STATE);
             }
         }
 
