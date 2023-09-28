@@ -53,6 +53,8 @@ namespace MarkovCraft
             selectedBlockState = blockState;
             blockStatePreview!.UpdatePreview(selectedBlockStateId);
 
+            var allProps = BlockStatePalette.INSTANCE.GetBlockProperties(blockState.BlockId);
+
             // Prepare blockstate properties
             foreach (var prop in propertyListTransform!)
             {
@@ -64,7 +66,16 @@ namespace MarkovCraft
                 var propObj = GameObject.Instantiate(propertyPrefab);
                 var prop = propObj!.GetComponent<BlockStateProperty>();
                 
-                prop.SetData(pair.Key, new string[] { "A" });
+                prop.SetData(pair.Key, allProps[pair.Key].ToArray());
+                prop.SelectValue(pair.Value);
+                prop.SetCallback((key, val) =>
+                {
+                    //Debug.Log($"Blockstate property updated: {key}={val}");
+                    var (newStateId, newState) = BlockStatePalette.INSTANCE.GetBlockStateWithProperty
+                            (selectedBlockStateId, selectedBlockState, key, val);
+                    
+                    SelectBlockState(newStateId, newState);
+                });
 
                 propObj.transform.SetParent(propertyListTransform, false);
             }

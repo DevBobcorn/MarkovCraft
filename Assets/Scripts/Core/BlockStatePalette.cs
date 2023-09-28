@@ -50,7 +50,50 @@ namespace CraftSharp
             if (blockColorRules.ContainsKey(stateId))
                 return blockColorRules[stateId].Invoke(world, loc, state);
             return BlockGeometry.DEFAULT_COLOR;
-        } 
+        }
+
+        public Dictionary<string, HashSet<string>> GetBlockProperties(ResourceLocation blockId)
+        {
+            Dictionary<string, HashSet<string>> result = new();
+
+            foreach (var stateId in stateListTable[blockId]) // For each possible state of this block
+            {
+                foreach (var pair in statesTable[stateId].Properties) // For each property in this state
+                {
+                    if (!result.ContainsKey(pair.Key))
+                    {
+                        result.Add(pair.Key, new HashSet<string>());
+                    }
+
+                    result[pair.Key].Add(pair.Value);
+                }
+            }
+
+            return result;
+        }
+
+        public (int, BlockState) GetBlockStateWithProperty(int sourceId, BlockState source, string key, string value)
+        {
+            var blockId = source.BlockId;
+            // Copy properties from source blockstate, with the
+            // property of specified key set to given value
+            var props = new Dictionary<string, string>(source.Properties)
+            {
+                [key] = value
+            };
+
+            var predicate = new BlockStatePredicate(props);
+
+            foreach (var stateId in stateListTable[blockId]) // For each blockstate of this block
+            {
+                if (predicate.check(statesTable[stateId]))
+                {
+                    return (stateId, statesTable[stateId]);
+                }
+            }
+
+            return (sourceId, source);
+        }
 
         public void PrepareData(string dataVersion, DataLoadFlag flag)
         {
