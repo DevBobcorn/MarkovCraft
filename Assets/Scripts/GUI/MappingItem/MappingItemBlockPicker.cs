@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 using CraftSharp;
+using Unity.Entities.UniversalDelegates;
 
 namespace MarkovCraft
 {
@@ -53,35 +54,38 @@ namespace MarkovCraft
             selectedBlockState = blockState;
             blockStatePreview!.UpdatePreview(selectedBlockStateId);
 
-            var allProps = BlockStatePalette.INSTANCE.GetBlockProperties(blockState.BlockId);
-
-            // Prepare blockstate properties
-            foreach (var prop in propertyListTransform!)
+            if (selectedBlockStateId != 0)
             {
-                Destroy((prop as Transform)!.gameObject);
-            }
+                var allProps = BlockStatePalette.INSTANCE.GetBlockProperties(blockState.BlockId);
 
-            foreach (var pair in selectedBlockState.Properties)
-            {
-                var propObj = GameObject.Instantiate(propertyPrefab);
-                var prop = propObj!.GetComponent<BlockStateProperty>();
-                
-                prop.SetData(pair.Key, allProps[pair.Key].ToArray());
-                prop.SelectValue(pair.Value);
-                prop.SetCallback((key, val) =>
+                // Prepare blockstate properties
+                foreach (var prop in propertyListTransform!)
                 {
-                    //Debug.Log($"Blockstate property updated: {key}={val}");
-                    var (newStateId, newState) = BlockStatePalette.INSTANCE.GetBlockStateWithProperty
-                            (selectedBlockStateId, selectedBlockState, key, val);
-                    
-                    SelectBlockState(newStateId, newState);
-                });
+                    Destroy((prop as Transform)!.gameObject);
+                }
 
-                propObj.transform.SetParent(propertyListTransform, false);
+                foreach (var pair in selectedBlockState.Properties)
+                {
+                    var propObj = GameObject.Instantiate(propertyPrefab);
+                    var prop = propObj!.GetComponent<BlockStateProperty>();
+                    
+                    prop.SetData(pair.Key, allProps[pair.Key].ToArray());
+                    prop.SelectValue(pair.Value);
+                    prop.SetCallback((key, val) =>
+                    {
+                        //Debug.Log($"Blockstate property updated: {key}={val}");
+                        var (newStateId, newState) = BlockStatePalette.INSTANCE.GetBlockStateWithProperty
+                                (selectedBlockStateId, selectedBlockState, key, val);
+                        
+                        SelectBlockState(newStateId, newState);
+                    });
+
+                    propObj.transform.SetParent(propertyListTransform, false);
+                }
             }
         }
 
-        private IEnumerator ScrollBlockList(float pos)
+        private IEnumerator InitSelection(float pos)
         {
             yield return new WaitForEndOfFrame();
 
@@ -111,6 +115,10 @@ namespace MarkovCraft
             }
             // Hide blockstate preview
             blockStatePreview!.UpdatePreview(BlockStateHelper.INVALID_BLOCKSTATE);
+
+            SelectBlockState(0, BlockState.AIR_STATE);
+
+            activeItem = null;
         }
 
         public void OpenAndInitialize(MappingItem item, int initialBlockStateId, BlockState initialBlockState)
@@ -154,22 +162,14 @@ namespace MarkovCraft
             // Update selected blockstate
             if (blockListItems.ContainsKey(initialBlockState.BlockId))
             {
-                var target = blockListItems[initialBlockState.BlockId];
+                var target = blockListItems[initialBlockState.BlockId]!;
                 var pos = blockListItems.Keys.ToList().IndexOf(initialBlockState.BlockId);
-                var len = blockListItems.Count;
-                var posInList = pos / (float) len;
+                var posInList = pos / (float) blockListItems.Count;
 
-                StartCoroutine(ScrollBlockList(posInList));
+                StartCoroutine(InitSelection(posInList));
 
                 SelectBlockState(initialBlockStateId, initialBlockState);
                 target.VisualSelect();
-            }
-            else if (index > 0) // If the model list is not empty
-            {
-                // Select default blockstate of first block in the list
-                var pair = blockListItems.First();
-                SelectBlock(pair.Key);
-                pair.Value.VisualSelect();
             }
 
             Open();
