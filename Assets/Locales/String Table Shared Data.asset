@@ -483,6 +483,10 @@ MonoBehaviour:
     m_Key: Generation/Canvas/Generation Screen/Controls Hint Panel/Hints Text
     m_Metadata:
       m_Items: []
+  - m_Id: 56152742248226816
+    m_Key: mapping_item.text..search_block
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

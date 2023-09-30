@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
+
 
 using CraftSharp;
-using Unity.Entities.UniversalDelegates;
 
 namespace MarkovCraft
 {
@@ -17,6 +18,7 @@ namespace MarkovCraft
         [SerializeField] public ScrollRect? BlockListScrollView;
         [SerializeField] public RectTransform? GridTransform;
         // Blockstate panel
+        [SerializeField] public TMP_InputField? BlockSearchInput;
         [SerializeField] private BlockStatePreview? blockStatePreview;
         [SerializeField] private RectTransform? propertyListTransform;
         [SerializeField] private GameObject? propertyPrefab;
@@ -121,6 +123,29 @@ namespace MarkovCraft
             activeItem = null;
         }
 
+        private void UpdateBlockList(string search)
+        {
+            search = search.Trim().ToLower();
+
+            if (search == string.Empty) // Not searching, include all items into list
+            {
+                foreach (var item in blockListItems.Values)
+                {
+                    item.gameObject.SetActive(true);
+                }
+
+                return;
+            }
+
+            foreach (var pair in blockListItems)
+            {
+                foreach (var item in blockListItems.Values)
+                {
+                    item.gameObject.SetActive(item.MatchesSearch(search));
+                }
+            }
+        }
+
         public void OpenAndInitialize(MappingItem item, int initialBlockStateId, BlockState initialBlockState)
         {
             if (activeItem != null) // Opened by an item while editing another one
@@ -171,6 +196,11 @@ namespace MarkovCraft
                 SelectBlockState(initialBlockStateId, initialBlockState);
                 target.VisualSelect();
             }
+
+            // Clear search box
+            BlockSearchInput!.onValueChanged.RemoveAllListeners();
+            BlockSearchInput!.text = string.Empty;
+            BlockSearchInput.onValueChanged.AddListener((text) => UpdateBlockList(text));
 
             Open();
         }

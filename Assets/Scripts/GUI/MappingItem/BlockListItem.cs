@@ -14,14 +14,20 @@ namespace MarkovCraft
 
         private ResourceLocation blockId = ResourceLocation.INVALID;
         public ResourceLocation BlockId => blockId;
+        // Save identifier string and localized name for search matching
+        private string blockIdString = string.Empty;
+        private string localizedNameLower = string.Empty;
 
         public void SetBlockId(ResourceLocation blockId, int defaultStateId)
         {
             this.blockId = blockId;
+            blockIdString = blockId.ToString();
             
             // Update preview object
             if (blockId != ResourceLocation.INVALID && previewObject != null)
             {
+                localizedNameLower = GameScene.GetL10nBlockName(blockId).ToLower();
+
                 var defaultState = BlockStatePalette.INSTANCE.StatesTable[defaultStateId];
                 var visualBuffer = new VertexBuffer();
 
@@ -33,6 +39,17 @@ namespace MarkovCraft
                 previewObject.GetComponent<MeshFilter>().sharedMesh = BlockStatePreview.BuildMesh(visualBuffer);
                 previewObject.GetComponent<MeshRenderer>().sharedMaterial = material;
             }
+        }
+
+        public bool MatchesSearch(string search)
+        {
+            if (blockIdString.Contains(search)) // Block identifier matches
+            {
+                return true;
+            }
+
+            // Check if localized block name matches
+            return localizedNameLower.Contains(search);
         }
 
         public void VisualSelect()

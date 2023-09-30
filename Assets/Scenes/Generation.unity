@@ -11006,8 +11006,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 268621692}
   m_HandleRect: {fileID: 268621691}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 1
+  m_Value: 1
+  m_Size: 0.25531915
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -32958,6 +32958,21 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3772370507487960656, guid: 7783e3f432b1a6749989f252f518c451,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3772370507487960656, guid: 7783e3f432b1a6749989f252f518c451,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3772370507487960656, guid: 7783e3f432b1a6749989f252f518c451,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4329793278311767476, guid: 7783e3f432b1a6749989f252f518c451,
         type: 3}
       propertyPath: m_Pivot.x
@@ -36270,8 +36285,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1968043859}
   m_HandleRect: {fileID: 1968043858}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 1
+  m_Value: 1
+  m_Size: 0.27083334
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -41304,6 +41319,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 775659446}
     m_Modifications:
+    - target: {fileID: 658407952084873560, guid: 7783e3f432b1a6749989f252f518c451,
+        type: 3}
+      propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1317409355}
     - target: {fileID: 3618270397680843605, guid: 7783e3f432b1a6749989f252f518c451,
         type: 3}
       propertyPath: m_AnchorMax.x
