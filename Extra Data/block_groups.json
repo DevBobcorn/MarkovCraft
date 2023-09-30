@@ -1,0 +1,234 @@
+{
+    "wool": {
+        "default_selected": true,
+        "blocks": {
+            "minecraft:white_wool": "",
+            "minecraft:orange_wool": "",
+            "minecraft:magenta_wool": "",
+            "minecraft:light_blue_wool": "",
+            "minecraft:yellow_wool": "",
+            "minecraft:lime_wool": "",
+            "minecraft:pink_wool": "",
+            "minecraft:gray_wool": "",
+            "minecraft:light_gray_wool": "",
+            "minecraft:cyan_wool": "",
+            "minecraft:purple_wool": "",
+            "minecraft:blue_wool": "",
+            "minecraft:brown_wool": "",
+            "minecraft:green_wool": "",
+            "minecraft:red_wool": "",
+            "minecraft:black_wool": ""
+        },
+        "names": {
+            "en": "Wool",
+            "zh-Hans": "羊毛"
+        }
+    },
+    "terracotta": {
+        "default_selected": true,
+        "blocks": {
+            "minecraft:white_terracotta": "",
+            "minecraft:orange_terracotta": "",
+            "minecraft:magenta_terracotta": "",
+            "minecraft:light_blue_terracotta": "",
+            "minecraft:yellow_terracotta": "",
+            "minecraft:lime_terracotta": "",
+            "minecraft:pink_terracotta": "",
+            "minecraft:gray_terracotta": "",
+            "minecraft:light_gray_terracotta": "",
+            "minecraft:cyan_terracotta": "",
+            "minecraft:purple_terracotta": "",
+            "minecraft:blue_terracotta": "",
+            "minecraft:brown_terracotta": "",
+            "minecraft:green_terracotta": "",
+            "minecraft:red_terracotta": "",
+            "minecraft:black_terracotta": "",
+            "minecraft:terracotta": ""
+        },
+        "names": {
+            "en": "Terracotta",
+            "zh-Hans": "陶瓦"
+        }
+    },
+    "glazed_terracotta": {
+        "default_selected": false,
+        "blocks": {
+            "minecraft:white_glazed_terracotta": "",
+            "minecraft:orange_glazed_terracotta": "",
+            "minecraft:magenta_glazed_terracotta": "",
+            "minecraft:light_blue_glazed_terracotta": "",
+            "minecraft:yellow_glazed_terracotta": "",
+            "minecraft:lime_glazed_terracotta": "",
+            "minecraft:pink_glazed_terracotta": "",
+            "minecraft:gray_glazed_terracotta": "",
+            "minecraft:light_gray_glazed_terracotta": "",
+            "minecraft:cyan_glazed_terracotta": "",
+            "minecraft:purple_glazed_terracotta": "",
+            "minecraft:blue_glazed_terracotta": "",
+            "minecraft:brown_glazed_terracotta": "",
+            "minecraft:green_glazed_terracotta": "",
+            "minecraft:red_glazed_terracotta": "",
+            "minecraft:black_glazed_terracotta": ""
+        },
+        "names": {
+            "en": "Glazed Terracotta",
+            "zh-Hans": "带釉陶瓦"
+        }
+    },
+    "concrete": {
+        "default_selected": true,
+        "blocks": {
+            "minecraft:white_concrete": "",
+            "minecraft:orange_concrete": "",
+            "minecraft:magenta_concrete": "",
+            "minecraft:light_blue_concrete": "",
+            "minecraft:yellow_concrete": "",
+            "minecraft:lime_concrete": "",
+            "minecraft:pink_concrete": "",
+            "minecraft:gray_concrete": "",
+            "minecraft:light_gray_concrete": "",
+            "minecraft:cyan_concrete": "",
+            "minecraft:purple_concrete": "",
+            "minecraft:blue_concrete": "",
+            "minecraft:brown_concrete": "",
+            "minecraft:green_concrete": "",
+            "minecraft:red_concrete": "",
+            "minecraft:black_concrete": ""
+        },
+        "names": {
+            "en": "Concrete",
+            "zh-Hans": "混凝土"
+        }
+    },
+    "concrete_powder": {
+        "default_selected": false,
+        "blocks": {
+            "minecraft:white_concrete_powder": "",
+            "minecraft:orange_concrete_powder": "",
+            "minecraft:magenta_concrete_powder": "",
+            "minecraft:light_blue_concrete_powder": "",
+            "minecraft:yellow_concrete_powder": "",
+            "minecraft:lime_concrete_powder": "",
+            "minecraft:pink_concrete_powder": "",
+            "minecraft:gray_concrete_powder": "",
+            "minecraft:light_gray_concrete_powder": "",
+            "minecraft:cyan_concrete_powder": "",
+            "minecraft:purple_concrete_powder": "",
+            "minecraft:blue_concrete_powder": "",
+            "minecraft:brown_concrete_powder": "",
+            "minecraft:green_concrete_powder": "",
+            "minecraft:red_concrete_powder": "",
+            "minecraft:black_concrete_powder": ""
+        },
+        "names": {
+            "en": "Concrete Powder",
+            "zh-Hans": "混凝土粉末"
+        }
+    },
+    "shulker_box": {
+        "default_selected": false,
+        "blocks": {
+            "minecraft:white_shulker_box": "",
+            "minecraft:orange_shulker_box": "",
+            "minecraft:magenta_shulker_box": "",
+            "minecraft:light_blue_shulker_box": "",
+            "minecraft:yellow_shulker_box": "",
+            "minecraft:lime_shulker_box": "",
+            "minecraft:pink_shulker_box": "",
+            "minecraft:gray_shulker_box": "",
+            "minecraft:light_gray_shulker_box": "",
+            "minecraft:cyan_shulker_box": "",
+            "minecraft:purple_shulker_box": "",
+            "minecraft:blue_shulker_box": "",
+            "minecraft:brown_shulker_box": "",
+            "minecraft:green_shulker_box": "",
+            "minecraft:red_shulker_box": "",
+            "minecraft:black_shulker_box": "",
+            "minecraft:shulker_box": ""
+        },
+        "names": {
+            "en": "Shulker Box",
+            "zh-Hans": "潜影盒"
+        }
+    },
+    "planks": {
+        "default_selected": false,
+        "blocks": {
+            "oak_planks": "",
+            "spruce_planks": "",
+            "birch_planks": "",
+            "jungle_planks": "",
+            "acacia_planks": "",
+            "dark_oak_planks": "",
+            "mangrove_planks": "",
+            "cherry_planks": "",
+            "bamboo_planks": "",
+            "crimson_planks": "",
+            "warped_planks": ""
+        },
+        "names": {
+            "en": "Planks",
+            "zh-Hans": "木板"
+        }
+    },
+    "wood_and_hyphae": {
+        "default_selected": false,
+        "blocks": {
+            "oak_wood": "block/oak_log",
+            "spruce_wood": "block/spruce_log",
+            "birch_wood": "block/birch_log",
+            "jungle_wood": "block/jungle_log",
+            "acacia_wood": "block/acacia_log",
+            "dark_oak_wood": "block/dark_oak_log",
+            "mangrove_wood": "block/mangrove_log",
+            "cherry_wood": "block/cherry_log",
+            "crimson_hyphae": "block/crimson_stem",
+            "warped_hyphae": "block/warped_stem",
+            "stripped_oak_wood": "block/stripped_oak_log",
+            "stripped_spruce_wood": "block/stripped_spruce_log",
+            "stripped_birch_wood": "block/stripped_birch_log",
+            "stripped_jungle_wood": "block/stripped_jungle_log",
+            "stripped_acacia_wood": "block/stripped_acacia_log",
+            "stripped_dark_oak_wood": "block/stripped_dark_oak_log",
+            "stripped_mangrove_wood": "block/stripped_mangrove_log",
+            "stripped_cherry_wood": "block/stripped_cherry_log",
+            "stripped_crimson_hyphae": "block/stripped_crimson_stem",
+            "stripped_warped_hyphae": "block/stripped_warped_stem"
+        },
+        "names": {
+            "en": "Wood & Hyphae",
+            "zh-Hans": "木头与菌核"
+        }
+    },
+    "log_and_stem": {
+        "default_selected": false,
+        "blocks": {
+            "oak_log": "block/oak_log_top",
+            "spruce_log": "block/spruce_log_top",
+            "birch_log": "block/birch_log_top",
+            "jungle_log": "block/jungle_log_top",
+            "acacia_log": "block/acacia_log_top",
+            "dark_oak_log": "block/dark_oak_log_top",
+            "mangrove_log": "block/mangrove_log_top",
+            "cherry_log": "block/cherry_log_top",
+            "bamboo_block": "",
+            "crimson_stem": "block/crimson_stem_top",
+            "warped_stem": "block/warped_stem_top",
+            "stripped_oak_log": "block/stripped_oak_log_top",
+            "stripped_spruce_log": "block/stripped_spruce_log_top",
+            "stripped_birch_log": "block/stripped_birch_log_top",
+            "stripped_jungle_log": "block/stripped_jungle_log_top",
+            "stripped_acacia_log": "block/stripped_acacia_log_top",
+            "stripped_dark_oak_log": "block/stripped_dark_oak_log_top",
+            "stripped_mangrove_log": "block/stripped_mangrove_log_top",
+            "stripped_cherry_log": "block/stripped_cherry_log_top",
+            "stripped_bamboo_block": "",
+            "stripped_crimson_stem": "block/stripped_crimson_stem_top",
+            "stripped_warped_stem": "block/stripped_warped_stem_top"
+        },
+        "names": {
+            "en": "Log & Stem",
+            "zh-Hans": "原木与菌柄"
+        }
+    }
+}

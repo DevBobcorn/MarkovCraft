@@ -5,12 +5,12 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Mathematics;
 using TMPro;
 
 using CraftSharp;
 using CraftSharp.Resource;
-using Unity.Mathematics;
-using Unity.Entities.UniversalDelegates;
+using System.Text;
 
 namespace MarkovCraft
 {
@@ -21,7 +21,7 @@ namespace MarkovCraft
         [SerializeField] public string TextureId = string.Empty;
     }
 
-    public class BlockGroup : MonoBehaviour
+    public class BlockGroup : MonoBehaviour, Json.IJSONSerializable
     {
         [SerializeField] private TMP_Text? groupTitleText;
         [SerializeField] private TMP_Text? selectedCountText;
@@ -30,13 +30,18 @@ namespace MarkovCraft
         [SerializeField] private GameObject? groupItemPrefab;
         [SerializeField] private BlockGroupItemInfo[] itemSource = { };
         private bool groupShown = false;
+        private bool defaultSelected;
 
         private (ResourceLocation blockId, Color32 color, Toggle toggle)[] itemInfo = { };
+
+
 
         public void SetData(string groupName, BlockGroupItemInfo[] items, bool defaultSelected)
         {
             groupTitleText!.text = groupName;
             var blockTable = BlockStatePalette.INSTANCE.StateListTable;
+
+            this.defaultSelected = defaultSelected;
 
             // Select only blocks which are present in currently loaded data
             itemSource = items.Where(x => blockTable.ContainsKey(ResourceLocation.FromString(x.BlockId))).ToArray();
@@ -73,7 +78,7 @@ namespace MarkovCraft
 
                 if (string.IsNullOrWhiteSpace(item.TextureId))
                 {
-                    textureId = new ResourceLocation($"block/{item.BlockId}");
+                    textureId = new ResourceLocation(blockId.Namespace, $"block/{blockId.Path}");
                 }
                 else
                 {
@@ -199,6 +204,25 @@ namespace MarkovCraft
                     mapping.Add(blockId, color);
                 }
             }
+        }
+
+        public string ToJson()
+        {
+            var sb = new StringBuilder("{");
+
+            sb.Append("\"default_selected\":");
+            sb.Append(defaultSelected.ToString().ToLower());
+
+            sb.Append(",\"blocks\":{");
+            sb.Append(string.Join(", ", itemSource.Select(x => $"\"{x.BlockId}\":\"{x.TextureId}\"")));
+            sb.Append("}");
+
+            sb.Append(",\"names\":{");
+            sb.Append("}");
+
+            sb.Append("}");
+
+            return sb.ToString();
         }
     }
 }

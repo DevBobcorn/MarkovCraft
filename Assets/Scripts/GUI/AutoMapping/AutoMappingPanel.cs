@@ -1,7 +1,9 @@
 #nullable enable
-using UnityEngine;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using UnityEngine;
+using UnityEngine.Localization.Settings;
 
 using CraftSharp;
 
@@ -26,43 +28,79 @@ namespace MarkovCraft
 
             initialized = true;
 
-            static string localized(string key)
-            {
-                return GameScene.GetL10nString(key);
-            };
+            var path = PathHelper.GetExtraDataFile("block_groups.json");
 
-            // Batch create groups
-            // - Colored blocks
-            CreateColoredGroup(
-                    localized("auto_mapper.block_group.wool"), "wool");
-            CreateColoredGroupContainingUncoloredVariant(
-                    localized("auto_mapper.block_group.terracotta"), "terracotta");
-            CreateColoredGroup(
-                    localized("auto_mapper.block_group.glazed_terracotta"), "glazed_terracotta", false);
-            CreateColoredGroup(
-                    localized("auto_mapper.block_group.concrete"), "concrete");
-            CreateColoredGroup(
-                    localized("auto_mapper.block_group.concrete_powder"), "concrete_powder", false);
-            CreateColoredGroupContainingUncoloredVariant(
-                    localized("auto_mapper.block_group.shulker_box"), "shulker_box", false);
-            
-            // - Wood blocks
-            CreateGroup(localized("auto_mapper.block_group.planks"), WOOD_TYPES.Append("bamboo").Union(HYPHAE_TYPES).Select(x =>
-                    new BlockGroupItemInfo { BlockId = $"{x}_planks" }).ToArray(), false);
-            CreateGroup(localized("auto_mapper.block_group.wood_and_hyphae"),
-                    WOOD_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"{x}_wood", TextureId = $"block/{x}_log" })
-                    .Union(HYPHAE_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"{x}_hyphae", TextureId = $"block/{x}_stem" }))
-                    .Union(WOOD_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"stripped_{x}_wood", TextureId = $"block/stripped_{x}_log" }))
-                    .Union(HYPHAE_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"stripped_{x}_hyphae", TextureId = $"block/stripped_{x}_stem" }))
-                    .ToArray(), false);
-            CreateGroup(localized("auto_mapper.block_group.log_and_stem"),
-                    WOOD_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"{x}_log", TextureId = $"block/{x}_log_top" })
-                    .Append(new BlockGroupItemInfo { BlockId = $"bamboo_block" })
-                    .Union(HYPHAE_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"{x}_stem", TextureId = $"block/{x}_stem_top" }))
-                    .Union(WOOD_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"stripped_{x}_log", TextureId = $"block/stripped_{x}_log_top" }))
-                    .Append(new BlockGroupItemInfo { BlockId = $"stripped_bamboo_block" })
-                    .Union(HYPHAE_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"stripped_{x}_stem", TextureId = $"block/stripped_{x}_stem_top" }))
-                    .ToArray(), false);
+            if (File.Exists(path)) // Block group definition is present
+            {
+                // Load block groups from file
+                var data = Json.ParseJson(File.ReadAllText(path));
+
+                var langCode = LocalizationSettings.SelectedLocale.Identifier.Code;
+
+                foreach (var pair in data.Properties)
+                {
+                    var groupData = pair.Value;
+
+                    var blocks = groupData.Properties["blocks"].Properties
+                            .Select(x => new BlockGroupItemInfo {
+                                    BlockId = x.Key, TextureId = x.Value.StringValue }).ToArray();
+                    
+                    var defaultSel = false;
+                    if (groupData.Properties.ContainsKey("default_selected"))
+                    {
+                        defaultSel = groupData.Properties["default_selected"].StringValue.ToLower() == "true";
+                    }
+
+                    var groupName = pair.Key;
+                    if (groupData.Properties.ContainsKey("names") && groupData.Properties["names"].Properties.ContainsKey(langCode))
+                    {
+                        groupName = groupData.Properties["names"].Properties[langCode].StringValue;
+                    }
+
+                    CreateGroup(groupName, blocks, defaultSel);
+                }
+            }
+            else
+            {
+                // Generate block groups
+                static string localized(string key)
+                {
+                    return GameScene.GetL10nString(key);
+                };
+
+                // Batch create groups
+                // - Colored blocks
+                CreateColoredGroup(
+                        localized("auto_mapper.block_group.wool"), "wool");
+                CreateColoredGroupContainingUncoloredVariant(
+                        localized("auto_mapper.block_group.terracotta"), "terracotta");
+                CreateColoredGroup(
+                        localized("auto_mapper.block_group.glazed_terracotta"), "glazed_terracotta", false);
+                CreateColoredGroup(
+                        localized("auto_mapper.block_group.concrete"), "concrete");
+                CreateColoredGroup(
+                        localized("auto_mapper.block_group.concrete_powder"), "concrete_powder", false);
+                CreateColoredGroupContainingUncoloredVariant(
+                        localized("auto_mapper.block_group.shulker_box"), "shulker_box", false);
+                
+                // - Wood blocks
+                CreateGroup(localized("auto_mapper.block_group.planks"), WOOD_TYPES.Append("bamboo").Union(HYPHAE_TYPES).Select(x =>
+                        new BlockGroupItemInfo { BlockId = $"{x}_planks" }).ToArray(), false);
+                CreateGroup(localized("auto_mapper.block_group.wood_and_hyphae"),
+                        WOOD_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"{x}_wood", TextureId = $"block/{x}_log" })
+                        .Union(HYPHAE_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"{x}_hyphae", TextureId = $"block/{x}_stem" }))
+                        .Union(WOOD_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"stripped_{x}_wood", TextureId = $"block/stripped_{x}_log" }))
+                        .Union(HYPHAE_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"stripped_{x}_hyphae", TextureId = $"block/stripped_{x}_stem" }))
+                        .ToArray(), false);
+                CreateGroup(localized("auto_mapper.block_group.log_and_stem"),
+                        WOOD_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"{x}_log", TextureId = $"block/{x}_log_top" })
+                        .Append(new BlockGroupItemInfo { BlockId = $"bamboo_block" })
+                        .Union(HYPHAE_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"{x}_stem", TextureId = $"block/{x}_stem_top" }))
+                        .Union(WOOD_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"stripped_{x}_log", TextureId = $"block/stripped_{x}_log_top" }))
+                        .Append(new BlockGroupItemInfo { BlockId = $"stripped_bamboo_block" })
+                        .Union(HYPHAE_TYPES.Select(x => new BlockGroupItemInfo { BlockId = $"stripped_{x}_stem", TextureId = $"block/stripped_{x}_stem_top" }))
+                        .ToArray(), false);
+            }
         }
 
         private static readonly string[] COLORS = {
