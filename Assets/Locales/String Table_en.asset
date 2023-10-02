@@ -557,6 +557,34 @@ MonoBehaviour:
     m_Localized: Search Block...
     m_Metadata:
       m_Items: []
+  - m_Id: 57307968150376448
+    m_Localized: Options
+    m_Metadata:
+      m_Items: []
+  - m_Id: 57308020432375808
+    m_Localized: Environment
+    m_Metadata:
+      m_Items: []
+  - m_Id: 57308049813475328
+    m_Localized: Directional Light
+    m_Metadata:
+      m_Items: []
+  - m_Id: 57308116733595648
+    m_Localized: '- Direction: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 57308144239841280
+    m_Localized: '- Elevation Angle: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 57308225911328768
+    m_Localized: '- Intensity: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 57308269905383424
+    m_Localized: Background Color
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
