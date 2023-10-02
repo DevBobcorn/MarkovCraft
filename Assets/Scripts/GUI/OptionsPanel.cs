@@ -7,16 +7,18 @@ namespace MarkovCraft
 {
     public class OptionsPanel : MonoBehaviour
     {
+        [SerializeField] private SpriteRenderer? background;
         [SerializeField] private Light? directionalLight;
 
         [SerializeField] private CanvasGroup? canvasGroup;
-
         [SerializeField] private TMP_Text? directionText;
         [SerializeField] private Slider? directionSlider;
         [SerializeField] private TMP_Text? elevAngleText;
         [SerializeField] private Slider? elevAngleSlider;
         [SerializeField] private TMP_Text? intensityText;
         [SerializeField] private Slider? intensitySlider;
+
+        [SerializeField] private WrappedColorPicker? backgroundColorPicker;
 
         void Start()
         {
@@ -48,6 +50,11 @@ namespace MarkovCraft
 
             elevAngleSlider!.value = directionalLight.transform.eulerAngles.x;
             elevAngleText!.text = GameScene.GetL10nString("options.text.elevangle", elevAngleSlider.value);
+
+            backgroundColorPicker!.Initialize(background!.color);
+
+            backgroundColorPicker.onColorChange.RemoveAllListeners();
+            backgroundColorPicker.onColorChange.AddListener(color => background!.color = color);
         }
 
         public void ShowPanel()

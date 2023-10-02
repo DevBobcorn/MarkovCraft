@@ -5974,7 +5974,7 @@ MonoBehaviour:
         m_VariantData:
         - localeIdentifier:
             m_Code: en
-          value: 959.8883
+          value: 0
         - localeIdentifier:
             m_Code: zh-Hans
           value: 0
@@ -7778,7 +7778,8 @@ Transform:
   m_LocalPosition: {x: -112, y: 112, z: -105}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 374068818}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 30, y: 45, z: 0}
 --- !u!114 &330585547
@@ -9089,6 +9090,91 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 370400926}
   m_CullTransparentMesh: 1
+--- !u!1 &374068817
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 374068818}
+  - component: {fileID: 374068819}
+  m_Layer: 0
+  m_Name: Background
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &374068818
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 374068817}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 999}
+  m_LocalScale: {x: 1000, y: 1000, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 330585546}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &374068819
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 374068817}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6,
+    type: 3}
+  m_Color: {r: 0.60784316, g: 0.7490196, b: 0.7647059, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
 --- !u!1 &374224380
 GameObject:
   m_ObjectHideFlags: 0
@@ -19821,7 +19907,7 @@ MonoBehaviour:
         m_VariantData:
         - localeIdentifier:
             m_Code: en
-          value: 939.8883
+          value: 0
         - localeIdentifier:
             m_Code: zh-Hans
           value: 0
@@ -22703,6 +22789,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98ff52c9176a23e49bf021f678961d8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  background: {fileID: 374068819}
   directionalLight: {fileID: 410087040}
   canvasGroup: {fileID: 949508966}
   directionText: {fileID: 794124639}
@@ -22711,6 +22798,7 @@ MonoBehaviour:
   elevAngleSlider: {fileID: 1974304419}
   intensityText: {fileID: 630013388}
   intensitySlider: {fileID: 506430382}
+  backgroundColorPicker: {fileID: 6825726676984081760}
 --- !u!225 &949508966
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -44596,7 +44684,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6825726676984081759}
-  - component: {fileID: 7198767666238295808}
+  - component: {fileID: 6825726676984081760}
   m_Layer: 5
   m_Name: Background ColorPicker
   m_TagString: Untagged
@@ -44621,7 +44709,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: SetPointerFocus
           m_Mode: 3
@@ -44633,7 +44721,7 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
@@ -44649,7 +44737,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
@@ -45279,7 +45367,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: SetPointerFocus
           m_Mode: 3
@@ -45291,7 +45379,7 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
@@ -45307,7 +45395,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
@@ -45517,7 +45605,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: SetPointerFocus
           m_Mode: 3
@@ -45529,7 +45617,7 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
@@ -45545,7 +45633,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
@@ -46444,7 +46532,7 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 6825726676984081760}
         m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
         m_MethodName: FinishTypeHex
         m_Mode: 0
@@ -46474,7 +46562,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 6825726676984081760}
         m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
         m_MethodName: TypeHex
         m_Mode: 0
@@ -47103,7 +47191,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: SetPointerFocus
           m_Mode: 3
@@ -47115,7 +47203,7 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
@@ -47131,7 +47219,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
@@ -47178,7 +47266,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: SetPointerFocus
           m_Mode: 3
@@ -47190,7 +47278,7 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
@@ -47206,7 +47294,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
@@ -48580,7 +48668,7 @@ PrefabInstance:
     - target: {fileID: 5377710885810934018, guid: 9b4b966fa6167fa4d8c923e17727adb3,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8003665571991733412, guid: 9b4b966fa6167fa4d8c923e17727adb3,
         type: 3}
@@ -48595,18 +48683,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4488671076320385030}
-    - targetCorrespondingSourceObject: {fileID: 2677920158729650142, guid: 9b4b966fa6167fa4d8c923e17727adb3,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
     - targetCorrespondingSourceObject: {fileID: 3586222523769014070, guid: 9b4b966fa6167fa4d8c923e17727adb3,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4488671076320385033}
-    - targetCorrespondingSourceObject: {fileID: 3586222523769014070, guid: 9b4b966fa6167fa4d8c923e17727adb3,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 9b4b966fa6167fa4d8c923e17727adb3, type: 3}
 --- !u!1 &4488671076320385028 stripped
 GameObject:
@@ -49245,7 +49325,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: SetPointerFocus
           m_Mode: 3
@@ -49257,7 +49337,7 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
@@ -49273,7 +49353,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
@@ -50904,6 +50984,99 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -25}
   m_SizeDelta: {x: 385, y: -50}
   m_Pivot: {x: 1, y: 0.5}
+--- !u!114 &6825726676984081760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 153938331425899497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c844ed348be23584d83f61b629e52052, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pickers:
+  - image: {fileID: 5090766706089877970}
+    dynamicSprite: {fileID: 21300000, guid: ce940996bbf9aaf48b93e33ebcc08831, type: 3}
+    staticSpriteHor: {fileID: 0}
+    staticSpriteVer: {fileID: 0}
+    dynamicMaterial: {fileID: 2100000, guid: 5a7edd6b3c7402d4fbbce95f42cb4e59, type: 2}
+  - image: {fileID: 4951552541239418711}
+    dynamicSprite: {fileID: 21300000, guid: 3f18f8476b7bfc642a7ba293296dc40f, type: 3}
+    staticSpriteHor: {fileID: 21300000, guid: bc967bfc7c2890e4592ec6dcf19b2f85, type: 3}
+    staticSpriteVer: {fileID: 21300000, guid: 105d974d9051ab648934ad37b726eae0, type: 3}
+    dynamicMaterial: {fileID: 2100000, guid: 6eb6019ca127d14498e17d16878735d3, type: 2}
+  - image: {fileID: 4491399578274013668}
+    dynamicSprite: {fileID: 21300000, guid: 3f18f8476b7bfc642a7ba293296dc40f, type: 3}
+    staticSpriteHor: {fileID: 21300000, guid: 625e9db95c19dd944b30be0f13a26ac4, type: 3}
+    staticSpriteVer: {fileID: 21300000, guid: 64e41b89dacc6f34b88c92461a57ba6c, type: 3}
+    dynamicMaterial: {fileID: 2100000, guid: cfcf9ea5967f09a40beea73edd8f599b, type: 2}
+  - image: {fileID: 6724710038837319984}
+    dynamicSprite: {fileID: 21300000, guid: 3f18f8476b7bfc642a7ba293296dc40f, type: 3}
+    staticSpriteHor: {fileID: 21300000, guid: ce8e79a561b9da84ca97f3611de971c6, type: 3}
+    staticSpriteVer: {fileID: 21300000, guid: 5dfa32a4a93d66c4a852930f0a0eec72, type: 3}
+    dynamicMaterial: {fileID: 2100000, guid: 6dab8dd95d4139a45a42fc4dce6aaf8f, type: 2}
+  - image: {fileID: 6959093721396963350}
+    dynamicSprite: {fileID: 21300000, guid: ce940996bbf9aaf48b93e33ebcc08831, type: 3}
+    staticSpriteHor: {fileID: 21300000, guid: 4c9493db1a727c74db400395af579322, type: 3}
+    staticSpriteVer: {fileID: 21300000, guid: 1555365ed99e2374d9809212b2e2c44c, type: 3}
+    dynamicMaterial: {fileID: 2100000, guid: 9792630606da3c24da6fa1d0b99ce0be, type: 2}
+  - image: {fileID: 6650779482602241478}
+    dynamicSprite: {fileID: 21300000, guid: 3f18f8476b7bfc642a7ba293296dc40f, type: 3}
+    staticSpriteHor: {fileID: 21300000, guid: 84dcdd9406cd22242b9866f5bf40bad1, type: 3}
+    staticSpriteVer: {fileID: 21300000, guid: 6c235027860285543abef7854f2753eb, type: 3}
+    dynamicMaterial: {fileID: 2100000, guid: d8552a1e19dbe4a4b8ce9d73fc9898e2, type: 2}
+  - image: {fileID: 2286672090574926866}
+    dynamicSprite: {fileID: 21300000, guid: 3f18f8476b7bfc642a7ba293296dc40f, type: 3}
+    staticSpriteHor: {fileID: 21300000, guid: 37ca5b92906dcc14a8e63015bc575e28, type: 3}
+    staticSpriteVer: {fileID: 21300000, guid: 3698d76f9da5da44c9d73aaa44f36ced, type: 3}
+    dynamicMaterial: {fileID: 2100000, guid: b41123d4b01adad489a444189028560f, type: 2}
+  - image: {fileID: 7152099757052634449}
+    dynamicSprite: {fileID: 21300000, guid: 3f18f8476b7bfc642a7ba293296dc40f, type: 3}
+    staticSpriteHor: {fileID: 0}
+    staticSpriteVer: {fileID: 0}
+    dynamicMaterial: {fileID: 2100000, guid: bc7178f404a41c442b1e62a08fb9fa7d, type: 2}
+  hexInput: {fileID: 1858462472662338217}
+  modeDropdown: {fileID: 8370436924882331915}
+  mode: 0
+  staticSpriteMain:
+  - {fileID: 21300000, guid: 9eeaa26afcff5404d9a837ac9bf644d7, type: 3}
+  - {fileID: 21300000, guid: 818f373e223bc044b95f83ad796bbec0, type: 3}
+  - {fileID: 21300000, guid: 8d715e03313d85d4bb6050236b75c861, type: 3}
+  - {fileID: 21300000, guid: dda233eaa062e434cae0d844b2310202, type: 3}
+  - {fileID: 21300000, guid: 7f7bf995d8f4ffc489061658bbbe371d, type: 3}
+  - {fileID: 21300000, guid: 70f194dd3b5bc754d9a1153445b604f4, type: 3}
+  startingColor: {r: 0.22352941, g: 0.77254903, b: 0.73333335, a: 1}
+  staticMode: 0
+  multiInstance: 1
+  onColorChange:
+    m_PersistentCalls:
+      m_Calls: []
+  advancedSettings:
+    mainStatic: 1
+    r:
+      range: {x: 0, y: 1}
+      overrideStatic: 0
+    g:
+      range: {x: 0, y: 1}
+      overrideStatic: 0
+    b:
+      range: {x: 0, y: 1}
+      overrideStatic: 0
+    h:
+      range: {x: 0, y: 1}
+      overrideStatic: 0
+    s:
+      range: {x: 0, y: 1}
+      overrideStatic: 0
+    v:
+      range: {x: 0, y: 1}
+      overrideStatic: 0
+    a:
+      range: {x: 1, y: 1}
+      overrideStatic: 0
+  initialColorPreview: {fileID: 5858193148263020006}
 --- !u!222 &6842654113746777859
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -51203,98 +51376,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &7198767666238295808
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 153938331425899497}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31629c56f6f83234a90f6296f902f9c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pickers:
-  - image: {fileID: 5090766706089877970}
-    dynamicSprite: {fileID: 21300000, guid: ce940996bbf9aaf48b93e33ebcc08831, type: 3}
-    staticSpriteHor: {fileID: 0}
-    staticSpriteVer: {fileID: 0}
-    dynamicMaterial: {fileID: 2100000, guid: 5a7edd6b3c7402d4fbbce95f42cb4e59, type: 2}
-  - image: {fileID: 4951552541239418711}
-    dynamicSprite: {fileID: 21300000, guid: 3f18f8476b7bfc642a7ba293296dc40f, type: 3}
-    staticSpriteHor: {fileID: 21300000, guid: bc967bfc7c2890e4592ec6dcf19b2f85, type: 3}
-    staticSpriteVer: {fileID: 21300000, guid: 105d974d9051ab648934ad37b726eae0, type: 3}
-    dynamicMaterial: {fileID: 2100000, guid: 6eb6019ca127d14498e17d16878735d3, type: 2}
-  - image: {fileID: 4491399578274013668}
-    dynamicSprite: {fileID: 21300000, guid: 3f18f8476b7bfc642a7ba293296dc40f, type: 3}
-    staticSpriteHor: {fileID: 21300000, guid: 625e9db95c19dd944b30be0f13a26ac4, type: 3}
-    staticSpriteVer: {fileID: 21300000, guid: 64e41b89dacc6f34b88c92461a57ba6c, type: 3}
-    dynamicMaterial: {fileID: 2100000, guid: cfcf9ea5967f09a40beea73edd8f599b, type: 2}
-  - image: {fileID: 6724710038837319984}
-    dynamicSprite: {fileID: 21300000, guid: 3f18f8476b7bfc642a7ba293296dc40f, type: 3}
-    staticSpriteHor: {fileID: 21300000, guid: ce8e79a561b9da84ca97f3611de971c6, type: 3}
-    staticSpriteVer: {fileID: 21300000, guid: 5dfa32a4a93d66c4a852930f0a0eec72, type: 3}
-    dynamicMaterial: {fileID: 2100000, guid: 6dab8dd95d4139a45a42fc4dce6aaf8f, type: 2}
-  - image: {fileID: 6959093721396963350}
-    dynamicSprite: {fileID: 21300000, guid: ce940996bbf9aaf48b93e33ebcc08831, type: 3}
-    staticSpriteHor: {fileID: 21300000, guid: 4c9493db1a727c74db400395af579322, type: 3}
-    staticSpriteVer: {fileID: 21300000, guid: 1555365ed99e2374d9809212b2e2c44c, type: 3}
-    dynamicMaterial: {fileID: 2100000, guid: 9792630606da3c24da6fa1d0b99ce0be, type: 2}
-  - image: {fileID: 6650779482602241478}
-    dynamicSprite: {fileID: 21300000, guid: 3f18f8476b7bfc642a7ba293296dc40f, type: 3}
-    staticSpriteHor: {fileID: 21300000, guid: 84dcdd9406cd22242b9866f5bf40bad1, type: 3}
-    staticSpriteVer: {fileID: 21300000, guid: 6c235027860285543abef7854f2753eb, type: 3}
-    dynamicMaterial: {fileID: 2100000, guid: d8552a1e19dbe4a4b8ce9d73fc9898e2, type: 2}
-  - image: {fileID: 2286672090574926866}
-    dynamicSprite: {fileID: 21300000, guid: 3f18f8476b7bfc642a7ba293296dc40f, type: 3}
-    staticSpriteHor: {fileID: 21300000, guid: 37ca5b92906dcc14a8e63015bc575e28, type: 3}
-    staticSpriteVer: {fileID: 21300000, guid: 3698d76f9da5da44c9d73aaa44f36ced, type: 3}
-    dynamicMaterial: {fileID: 2100000, guid: b41123d4b01adad489a444189028560f, type: 2}
-  - image: {fileID: 7152099757052634449}
-    dynamicSprite: {fileID: 21300000, guid: 3f18f8476b7bfc642a7ba293296dc40f, type: 3}
-    staticSpriteHor: {fileID: 0}
-    staticSpriteVer: {fileID: 0}
-    dynamicMaterial: {fileID: 2100000, guid: bc7178f404a41c442b1e62a08fb9fa7d, type: 2}
-  hexInput: {fileID: 1858462472662338217}
-  modeDropdown: {fileID: 8370436924882331915}
-  mode: 0
-  staticSpriteMain:
-  - {fileID: 21300000, guid: 9eeaa26afcff5404d9a837ac9bf644d7, type: 3}
-  - {fileID: 21300000, guid: 818f373e223bc044b95f83ad796bbec0, type: 3}
-  - {fileID: 21300000, guid: 8d715e03313d85d4bb6050236b75c861, type: 3}
-  - {fileID: 21300000, guid: dda233eaa062e434cae0d844b2310202, type: 3}
-  - {fileID: 21300000, guid: 7f7bf995d8f4ffc489061658bbbe371d, type: 3}
-  - {fileID: 21300000, guid: 70f194dd3b5bc754d9a1153445b604f4, type: 3}
-  startingColor: {r: 1, g: 0, b: 0, a: 1}
-  staticMode: 0
-  multiInstance: 1
-  onColorChange:
-    m_PersistentCalls:
-      m_Calls: []
-  advancedSettings:
-    mainStatic: 1
-    r:
-      range: {x: 0, y: 1}
-      overrideStatic: 0
-    g:
-      range: {x: 0, y: 1}
-      overrideStatic: 0
-    b:
-      range: {x: 0, y: 1}
-      overrideStatic: 0
-    h:
-      range: {x: 0, y: 1}
-      overrideStatic: 0
-    s:
-      range: {x: 0, y: 1}
-      overrideStatic: 0
-    v:
-      range: {x: 0, y: 1}
-      overrideStatic: 0
-    a:
-      range: {x: 1, y: 1}
-      overrideStatic: 0
 --- !u!224 &7206235733653048715
 RectTransform:
   m_ObjectHideFlags: 0
@@ -52222,7 +52303,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 6825726676984081760}
         m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
         m_MethodName: ChangeMode
         m_Mode: 0
@@ -52672,7 +52753,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: SetPointerFocus
           m_Mode: 3
@@ -52684,7 +52765,7 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
@@ -52700,7 +52781,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: 6825726676984081760}
           m_TargetAssemblyTypeName: FlexibleColorPicker, Assembly-CSharp
           m_MethodName: PointerUpdate
           m_Mode: 0
