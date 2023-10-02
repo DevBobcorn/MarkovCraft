@@ -1,7 +1,8 @@
 #nullable enable
+using System.Linq;
 using UnityEngine;
-using TMPro;
 using UnityEngine.UI;
+using TMPro;
 
 namespace MarkovCraft
 {
@@ -9,8 +10,10 @@ namespace MarkovCraft
     {
         [SerializeField] private SpriteRenderer? background;
         [SerializeField] private Light? directionalLight;
+        [SerializeField] private Transform? environmentContainer;
 
         [SerializeField] private CanvasGroup? canvasGroup;
+        [SerializeField] private TMP_Dropdown? environmentDropdown;
         [SerializeField] private TMP_Text? directionText;
         [SerializeField] private Slider? directionSlider;
         [SerializeField] private TMP_Text? elevAngleText;
@@ -19,6 +22,13 @@ namespace MarkovCraft
         [SerializeField] private Slider? intensitySlider;
 
         [SerializeField] private WrappedColorPicker? backgroundColorPicker;
+
+        private static readonly string[] environmentNameKeys = {
+            "environment.name.none",
+            "environment.name.ground"
+        };
+
+        [SerializeField] private GameObject[] environmentPrefabs = { };
 
         void Start()
         {
@@ -52,9 +62,25 @@ namespace MarkovCraft
             elevAngleText!.text = GameScene.GetL10nString("options.text.elevangle", elevAngleSlider.value);
 
             backgroundColorPicker!.Initialize(background!.color);
-
-            backgroundColorPicker.onColorChange.RemoveAllListeners();
             backgroundColorPicker.onColorChange.AddListener(color => background!.color = color);
+
+            environmentDropdown!.AddOptions(environmentNameKeys.Select(x =>
+                    new TMP_Dropdown.OptionData(GameScene.GetL10nString(x))).ToList());
+
+            environmentDropdown!.onValueChanged.AddListener(index =>
+            {
+                // Clear previous environment
+                foreach (Transform child in environmentContainer!)
+	                GameObject.Destroy(child.gameObject);
+                
+                // Create new environment object
+                var envPrefab = environmentPrefabs[index];
+                if (envPrefab != null)
+                {
+                    var envObj = GameObject.Instantiate(envPrefab);
+                    envObj.transform.SetParent(environmentContainer, false);
+                }
+            });
         }
 
         public void ShowPanel()

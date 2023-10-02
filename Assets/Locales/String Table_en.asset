@@ -585,6 +585,14 @@ MonoBehaviour:
     m_Localized: 'Background Color:'
     m_Metadata:
       m_Items: []
+  - m_Id: 57369856359993344
+    m_Localized: Ground
+    m_Metadata:
+      m_Items: []
+  - m_Id: 57369839603748864
+    m_Localized: None (Solid Background)
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

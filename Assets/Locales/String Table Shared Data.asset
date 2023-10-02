@@ -515,6 +515,14 @@ MonoBehaviour:
     m_Key: options.text.background_color
     m_Metadata:
       m_Items: []
+  - m_Id: 57369839603748864
+    m_Key: environment.name.none
+    m_Metadata:
+      m_Items: []
+  - m_Id: 57369856359993344
+    m_Key: environment.name.ground
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
