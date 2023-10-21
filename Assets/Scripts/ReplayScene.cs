@@ -201,9 +201,7 @@ namespace MarkovCraft
                 // Assign in mesh palette
                 if (!string.IsNullOrWhiteSpace(item.BlockState))
                 {
-                    int stateId = BlockStateHelper.GetStateIdFromString(item.BlockState);
-                    
-                    if (stateId != BlockStateHelper.INVALID_BLOCKSTATE)
+                    if (BlockStatePalette.TryGetStateIdFromString(item.BlockState, out int stateId))
                     {
                         var state = statePalette.StatesTable[stateId];
                         //Debug.Log($"Mapped '{index}' to [{stateId}] {state}");
@@ -214,10 +212,14 @@ namespace MarkovCraft
                             meshPalette[index] = new(stateId2Mesh[stateId], getStateMaterial(state), rgb);
                     }
                     else // Default cube mesh with custom color
+                    {
                         meshPalette[index] = new(0, DEFAULT_MATERIAL_INDEX, rgb);
+                    }
                 }
                 else // Default cube mesh with custom color
+                {
                     meshPalette[index] = new(0, DEFAULT_MATERIAL_INDEX, rgb);
+                }
                 
                 yield return null;
             }

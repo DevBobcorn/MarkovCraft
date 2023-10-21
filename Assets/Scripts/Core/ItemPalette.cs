@@ -11,6 +11,7 @@ namespace CraftSharp
 {
     public class ItemPalette
     {
+        private static readonly char SP = Path.DirectorySeparatorChar;
         public static readonly ItemPalette INSTANCE = new();
 
         private readonly Dictionary<int, Item> itemsTable = new();
@@ -68,7 +69,7 @@ namespace CraftSharp
             itemsTable.Clear();
             dictId.Clear();
 
-            string itemsPath = PathHelper.GetExtraDataFile($"items-{dataVersion}.json");
+            string itemsPath = PathHelper.GetExtraDataFile($"items{SP}items-{dataVersion}.json");
             string listsPath  = PathHelper.GetExtraDataFile("item_lists.json");
             string colorsPath = PathHelper.GetExtraDataFile("item_colors.json");
 
@@ -168,11 +169,14 @@ namespace CraftSharp
                         float3[] ruleFunc(ItemStack itemStack) => new float3[] { fixedColor };
 
                         if (!itemColorRules.TryAdd(itemId, ruleFunc))
+                        {
                             Debug.LogWarning($"Failed to apply fixed color rules to {itemId} ({numId})!");
-                        
+                        }
                     }
                     else
-                        Debug.LogWarning($"Applying fixed color rules to undefined item {itemId}!");
+                    {
+                        //Debug.LogWarning($"Applying fixed color rules to undefined item {itemId}!");
+                    }
                 }
             }
 
@@ -199,7 +203,9 @@ namespace CraftSharp
                         
                     }
                     else
-                        Debug.LogWarning($"Applying fixed multi-color rules to undefined item {itemId}!");
+                    {
+                        //Debug.LogWarning($"Applying fixed multi-color rules to undefined item {itemId}!");
+                    }
                 }
             }
 

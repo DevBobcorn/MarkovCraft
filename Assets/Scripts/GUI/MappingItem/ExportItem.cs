@@ -1,5 +1,4 @@
 #nullable enable
-using System.Linq;
 using UnityEngine;
 
 using CraftSharp;
@@ -9,12 +8,12 @@ namespace MarkovCraft
 {
     public class ExportItem : MappingItem
     {
-        [HideInInspector] public int currentStateId = -1;
+        [HideInInspector] public int currentStateId = 0;
         [SerializeField] public GameObject? previewObject;
 
         private void UpdatePreview(int stateId)
         {
-            if (stateId == BlockStateHelper.INVALID_BLOCKSTATE) // Hide away
+            if (stateId == 0) // Hide away
             {
                 previewObject!.SetActive(false);
             }
@@ -38,7 +37,7 @@ namespace MarkovCraft
             {
                 var visualBuffer = new VertexBuffer();
                 var material = GameScene.Instance.MaterialManager!.GetAtlasMaterial(BlockStatePalette.INSTANCE.RenderTypeTable[newState.BlockId]);
-                var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, Location.Zero, newState);
+                var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero, newState);
                 ResourcePackManager.Instance.StateModelTable[stateId].Geometries[0].Build(
                         ref visualBuffer, BlockStatePreview.ITEM_CENTER, BlockStatePreview.PREVIEW_CULLFLAG,
                         BlockStatePreview.DUMMY_AMBIENT_OCCLUSSION, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
@@ -56,8 +55,7 @@ namespace MarkovCraft
             base.InitializeData(character, defoRgb, rgb, blockState, colorPicker, blockPicker, blockStatePreview);
 
             // Initialize block state preview
-            var stateId = BlockStateHelper.GetStateIdFromString(blockState);
-            UpdatePreview(stateId);
+            UpdatePreview(BlockStatePalette.GetStateIdFromString(blockState, 0));
         }
 
         public override void SetBlockState(string blockState)
@@ -65,17 +63,8 @@ namespace MarkovCraft
             if (BlockStateInput!.interactable) // The blockstate input is not locked
             {
                 BlockStateInput!.SetTextWithoutNotify(blockState); // Avoid updating block preview
-
-                var stateId = BlockStateHelper.GetStateIdFromString(blockState);
-                
-                if (stateId != BlockStateHelper.INVALID_BLOCKSTATE) // Update and show preview
-                {
-                    UpdatePreview(stateId);
-                }
-                else // Hide preview
-                {
-                    UpdatePreview(BlockStateHelper.INVALID_BLOCKSTATE);
-                }
+                // Update block state preview
+                UpdatePreview(BlockStatePalette.GetStateIdFromString(blockState, 0));
             }
         }
 
@@ -83,23 +72,26 @@ namespace MarkovCraft
         {
             base.TagAsSpecial(blockState);
             // Update block state preview
-            var stateId = BlockStateHelper.GetStateIdFromString(blockState);
-            UpdatePreview(stateId);
+            UpdatePreview(BlockStatePalette.GetStateIdFromString(blockState, 0));
         }
 
         protected override void OnSelectBlockStateInput(string blockState)
         {
-            var stateId = BlockStateHelper.GetStateIdFromString(blockState);
-            // Update and show preview
-            blockStatePreview?.UpdatePreview(stateId);
-            UpdatePreview(stateId);
+            if (BlockStatePalette.TryGetStateIdFromString(blockState, out int stateId)) // Update and show preview
+            {
+                blockStatePreview?.UpdatePreview(stateId);
+                UpdatePreview(stateId);
+            }
+            else // Hide preview
+            {
+                blockStatePreview?.UpdatePreview(0);
+                UpdatePreview(0);
+            }
         }
 
         protected override void OnUpdateBlockStateInput(string blockState)
         {
-            var stateId = BlockStateHelper.GetStateIdFromString(blockState);
-
-            if (stateId != BlockStateHelper.INVALID_BLOCKSTATE) // Update and show preview
+            if (BlockStatePalette.TryGetStateIdFromString(blockState, out int stateId)) // Update and show preview
             {
                 blockStatePreview?.UpdatePreview(stateId);
                 UpdatePreview(stateId);
@@ -107,7 +99,7 @@ namespace MarkovCraft
             else // Hide preview
             {
                 blockStatePreview?.UpdateHint(blockState);
-                UpdatePreview(BlockStateHelper.INVALID_BLOCKSTATE);
+                UpdatePreview(0);
             }
         }
     }

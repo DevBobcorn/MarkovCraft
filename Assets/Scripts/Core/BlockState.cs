@@ -24,7 +24,14 @@ namespace CraftSharp
             }
         }
         public bool LikeAir   = false;
-        public bool FullSolid = true;
+        // A block can have full collider box even if it doesn't collide with player,
+        // in this case the collider is used for raycast detection. (e.g. Tall Grass)
+        public bool FullCollider = false;
+        public bool FaceOcclusionSolid => FullCollider && !NoOcclusion;
+        public bool AmbientOcclusionSolid => FullCollider && !NoCollision;
+
+        public byte LightBlockageLevel = 0;
+        public byte LightEmissionLevel = 0;
 
         public static BlockState FromString(string state)
         {
@@ -52,7 +59,6 @@ namespace CraftSharp
                 // Simple, only a block id
                 return new BlockState(ResourceLocation.FromString(state), props);
             }
-
         }
 
         public BlockState(ResourceLocation blockId)
@@ -82,7 +88,6 @@ namespace CraftSharp
             }
             else return BlockId.ToString();
         }
-
     }
 }
 

@@ -40,9 +40,8 @@ namespace MarkovCraft
             for (int resultIndex = 0;resultIndex < resultPalette.Length;resultIndex++)
             {
                 var stateStr = resultPalette[resultIndex].BlockState;
-                var stateId = BlockStateHelper.GetStateIdFromString(stateStr);
-                if (stateId == BlockStateHelper.INVALID_BLOCKSTATE)
-                    stateId = 0; // Replace invalid blockstates with air
+                // Replace invalid blockstates with air
+                int stateId = BlockStatePalette.GetStateIdFromString(stateStr, 0);
                 var blockState = statePalette.StatesTable[stateId];
 
                 if (exportPalette.Contains(blockState))

@@ -31,16 +31,8 @@ namespace MarkovCraft
 
         private void SelectBlock(ResourceLocation blockId)
         {
-            var defaultStateId = BlockStateHelper.GetDefaultStateId(blockId);
-
-            if (defaultStateId != BlockStateHelper.INVALID_BLOCKSTATE)
-            {
-                SelectBlockState(defaultStateId, BlockStatePalette.INSTANCE.StatesTable[defaultStateId]);
-            }
-            else
-            {
-                SelectBlockState(0, BlockState.AIR_STATE);
-            }
+            var defaultStateId = BlockStatePalette.GetDefaultStateId(blockId);
+            SelectBlockState(defaultStateId, BlockStatePalette.INSTANCE.StatesTable[defaultStateId]);
         }
 
         private void SelectBlockState(int blockStateId, BlockState blockState)
@@ -116,7 +108,7 @@ namespace MarkovCraft
                 Destroy(block.gameObject);
             }
             // Hide blockstate preview
-            blockStatePreview!.UpdatePreview(BlockStateHelper.INVALID_BLOCKSTATE);
+            blockStatePreview!.UpdatePreview(0);
 
             SelectBlockState(0, BlockState.AIR_STATE);
 

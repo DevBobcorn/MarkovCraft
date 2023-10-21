@@ -72,16 +72,14 @@ namespace MarkovCraft
 
         private void OnPickBlockButtonClick()
         {
-            var currentStateId = BlockStateHelper.GetStateIdFromString(GetBlockState());
-
-            if (currentStateId != BlockStateHelper.INVALID_BLOCKSTATE) // Initialize with current blockstate
+            if (BlockStatePalette.TryGetStateIdFromString(GetBlockState(), out int currentStateId)) // Initialize with current blockstate
             {
                 var currentState = BlockStatePalette.INSTANCE.StatesTable[currentStateId];
                 blockPicker?.OpenAndInitialize(this, currentStateId, currentState);
             }
             else
             {
-                blockPicker?.OpenAndInitialize(this, currentStateId, BlockState.AIR_STATE);
+                blockPicker?.OpenAndInitialize(this, 0, BlockState.AIR_STATE);
             }
         }
 
@@ -118,22 +116,20 @@ namespace MarkovCraft
 
         protected virtual void OnSelectBlockStateInput(string blockState)
         {
-            var stateId = BlockStateHelper.GetStateIdFromString(blockState);
             // Update and show preview
+            int stateId = BlockStatePalette.GetStateIdFromString(blockState, 0);
             blockStatePreview?.UpdatePreview(stateId);
         }
 
         protected virtual void OnEndEditBlockStateInput(string _)
         {
             // Hide preview
-            blockStatePreview?.UpdatePreview(BlockStateHelper.INVALID_BLOCKSTATE);
+            blockStatePreview?.UpdatePreview(0);
         }
 
         protected virtual void OnUpdateBlockStateInput(string blockState)
         {
-            var stateId = BlockStateHelper.GetStateIdFromString(blockState);
-
-            if (stateId != BlockStateHelper.INVALID_BLOCKSTATE) // Update and show preview
+            if (BlockStatePalette.TryGetStateIdFromString(blockState, out int stateId)) // Update and show preview
             {
                 blockStatePreview?.UpdatePreview(stateId);
             }
@@ -195,6 +191,5 @@ namespace MarkovCraft
             ColorCodeInput.text = ColorConvert.GetHexRGBString(defaultRgb);
             ColorPreviewImage.color = ColorConvert.GetOpaqueColor32(defaultRgb);
         }
-
     }
 }

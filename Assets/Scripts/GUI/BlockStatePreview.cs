@@ -35,8 +35,9 @@ namespace MarkovCraft
             previewObject!.SetActive(false);
 
             if (previewObject == null)
+            {
                 Debug.LogWarning("Preview Object of BlockState Preview not assigned!");
-
+            }
         }
 
         public static Mesh BuildMesh(VertexBuffer visualBuffer)
@@ -117,7 +118,7 @@ namespace MarkovCraft
             canvasGroup!.alpha = 1F;
             previewObject!.SetActive(true);
 
-            var candidates = BlockStateHelper.GetBlockIdCandidates(incompleteBlockId);
+            var candidates = BlockStatePalette.GetBlockIdCandidates(incompleteBlockId);
 
             if (candidates.Length > 0) // Display candidates
             {
@@ -141,7 +142,7 @@ namespace MarkovCraft
 
         public void UpdatePreview(int stateId)
         {
-            if (stateId == BlockStateHelper.INVALID_BLOCKSTATE) // Hide away
+            if (stateId == 0) // Hide away
             {
                 canvasGroup!.alpha = 0F;
                 previewObject!.SetActive(false);
@@ -171,7 +172,7 @@ namespace MarkovCraft
             {
                 var visualBuffer = new VertexBuffer();
                 var material = GameScene.Instance.MaterialManager!.GetAtlasMaterial(BlockStatePalette.INSTANCE.RenderTypeTable[newState.BlockId]);
-                var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, Location.Zero, newState);
+                var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero, newState);
                 ResourcePackManager.Instance.StateModelTable[stateId].Geometries[0].Build(ref visualBuffer, ITEM_CENTER,
                         PREVIEW_CULLFLAG, DUMMY_AMBIENT_OCCLUSSION, DUMMY_BLOCK_VERT_LIGHT, blockTint);
 

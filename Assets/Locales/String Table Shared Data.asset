@@ -392,35 +392,35 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 373039294226432
-    m_Key: status.info.build_blockstate_geometry
+    m_Key: resource.info.build_blockstate_geometry
     m_Metadata:
       m_Items: []
   - m_Id: 28289458426548224
-    m_Key: status.info.build_item_geometry
+    m_Key: resource.info.build_item_geometry
     m_Metadata:
       m_Items: []
   - m_Id: 372130187223040
-    m_Key: status.info.create_texture
+    m_Key: resource.info.create_texture
     m_Metadata:
       m_Items: []
   - m_Id: 387367691001856
-    m_Key: status.info.download_jar
+    m_Key: resource.info.download_jar
     m_Metadata:
       m_Items: []
   - m_Id: 752739912949760
-    m_Key: status.info.download_lang_text
+    m_Key: resource.info.download_lang_text
     m_Metadata:
       m_Items: []
   - m_Id: 387295406366720
-    m_Key: status.info.download_manifest
+    m_Key: resource.info.download_manifest
     m_Metadata:
       m_Items: []
   - m_Id: 394586876715008
-    m_Key: status.info.extract_asset
+    m_Key: resource.info.extract_asset
     m_Metadata:
       m_Items: []
   - m_Id: 371970807865344
-    m_Key: status.info.gather_resource
+    m_Key: resource.info.gather_resource
     m_Metadata:
       m_Items: []
   - m_Id: 380621543088128
@@ -436,15 +436,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 749456838270976
-    m_Key: status.info.get_asset_index
+    m_Key: resource.info.get_asset_index
     m_Metadata:
       m_Items: []
   - m_Id: 387306810679296
-    m_Key: status.info.get_version_info
+    m_Key: resource.info.get_version_info
     m_Metadata:
       m_Items: []
   - m_Id: 372310307414016
-    m_Key: status.info.load_block_model
+    m_Key: resource.info.load_block_model
     m_Metadata:
       m_Items: []
   - m_Id: 367166845001728
@@ -464,7 +464,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 28680962999521280
-    m_Key: status.info.resource_loaded
+    m_Key: resource.info.resource_loaded
     m_Metadata:
       m_Items: []
   - m_Id: 708494963417088

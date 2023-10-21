@@ -237,9 +237,7 @@ namespace MarkovCraft
 
                 if (!string.IsNullOrWhiteSpace(item.BlockState))
                 {
-                    int stateId = BlockStateHelper.GetStateIdFromString(item.BlockState);
-                    
-                    if (stateId != BlockStateHelper.INVALID_BLOCKSTATE)
+                    if (BlockStatePalette.TryGetStateIdFromString(item.BlockState, out int stateId))
                     {
                         var state = statePalette.StatesTable[stateId];
                         //Debug.Log($"Mapped '{item.Character}' to [{stateId}] {state}");
@@ -250,10 +248,14 @@ namespace MarkovCraft
                             meshPalette[item.Symbol] = new(stateId2Mesh[stateId], getStateMaterial(state), rgb);
                     }
                     else // Default cube mesh with custom color
+                    {
                         meshPalette[item.Symbol] = new(0, DEFAULT_MATERIAL_INDEX, rgb);
+                    }
                 }
                 else // Default cube mesh with custom color
+                {
                     meshPalette[item.Symbol] = new(0, DEFAULT_MATERIAL_INDEX, rgb);
+                }
                 
                 if (fullPalette.ContainsKey(item.Symbol)) // Entry defined in base palette, overwrite it
                 {

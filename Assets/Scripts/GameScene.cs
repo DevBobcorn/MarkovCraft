@@ -126,7 +126,7 @@ namespace MarkovCraft
                 if (modelTable.ContainsKey(stateId))
                 {
                     var blockGeometry = modelTable[stateId].Geometries[0];
-                    var blockTint = statePalette.GetBlockColor(stateId, DummyWorld, Location.Zero, statePalette.FromId(stateId));
+                    var blockTint = statePalette.GetBlockColor(stateId, DummyWorld, BlockLoc.Zero, statePalette.FromId(stateId));
 
                     blockGeometry.Build(ref buffers[pair.Value], float3.zero, 0b111111, BlockStatePreview.DUMMY_AMBIENT_OCCLUSSION,
                             BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
