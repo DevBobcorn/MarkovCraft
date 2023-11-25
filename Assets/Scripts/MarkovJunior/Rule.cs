@@ -5,6 +5,8 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Collections.Generic;
 
+using MarkovCraft;
+
 namespace MarkovJunior
 {
     class Rule
@@ -185,7 +187,7 @@ namespace MarkovJunior
 
             string filepath(string name)
             {
-                string result = PathHelper.GetExtraDataFile($"rules{SP}");
+                string result = MarkovGlobal.GetDataFile($"rules{SP}");
                 if (gout.folder != null) result += $"{gout.folder}{SP}";
                 result += name;
                 result += gin.MZ == 1 ? ".png" : ".vox";

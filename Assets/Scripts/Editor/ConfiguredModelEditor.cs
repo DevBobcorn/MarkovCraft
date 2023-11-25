@@ -4,6 +4,8 @@ using UnityEditor;
 using System.IO;
 using System.Xml.Linq;
 
+using CraftSharp;
+
 namespace MarkovCraft
 {
     [CustomEditor(typeof (ConfiguredModel))]

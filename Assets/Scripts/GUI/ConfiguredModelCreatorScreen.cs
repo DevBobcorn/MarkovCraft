@@ -80,8 +80,7 @@ namespace MarkovCraft
         private IEnumerator InitializeScreen()
         {
             // Initialize settings panel
-            //var modelDir = PathHelper.GetExtraDataFile("models");
-            var modelsPath = PathHelper.GetExtraDataFile("models.xml");
+            var modelsPath = MarkovGlobal.GetDataFile("models.xml");
 
             int index = 0;
             
@@ -146,8 +145,8 @@ namespace MarkovCraft
 
         private IEnumerator LoadPreviews()
         {
-            var prevDir = PathHelper.GetExtraDataFile("model_previews");
-            var prev3dDir = PathHelper.GetExtraDataFile($"model_previews{SP}3d");
+            var prevDir = MarkovGlobal.GetDataFile("model_previews");
+            var prev3dDir = MarkovGlobal.GetDataFile($"model_previews{SP}3d");
             var pairs = modelItems.ToArray();
 
             var wait = new WaitForSecondsRealtime(0.03F);
@@ -236,7 +235,7 @@ namespace MarkovCraft
                     int.TryParse(StepsPerRefreshInput!.text, out model.StepsPerRefresh);
                     model.Seeds = SeedsInput!.text.Split(' ').Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => int.Parse(x)).ToArray();
                     
-                    var savePath = PathHelper.GetExtraDataFile(CONFIGURED_MODEL_FOLDER);
+                    var savePath = MarkovGlobal.GetDataFile(CONFIGURED_MODEL_FOLDER);
                     var specifiedName = SaveNameInput!.text;
 
                     if (GameScene.CheckFileName(specifiedName))

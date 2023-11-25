@@ -72,7 +72,7 @@ namespace MarkovCraft
             }
 
             // Initialize settings panel
-            var savedExportPath = PlayerPrefs.GetString(EXPORT_PATH_KEY, PathHelper.GetDefaultExportPath());
+            var savedExportPath = PlayerPrefs.GetString(EXPORT_PATH_KEY, MarkovGlobal.GetDefaultExportPath());
             ExportFolderInput!.text = savedExportPath;
             if (CheckWindowsPlatform())
             {

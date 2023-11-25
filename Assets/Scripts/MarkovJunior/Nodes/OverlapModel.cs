@@ -40,7 +40,7 @@ namespace MarkovJunior
             periodic = true;
 
             name = xelem.Get<string>("sample");
-            (int[] bitmap, int SMX, int SMY, _) = Graphics.LoadBitmap(PathHelper.GetExtraDataFile($"samples{SP}{name}.png"));
+            (int[] bitmap, int SMX, int SMY, _) = Graphics.LoadBitmap(MarkovGlobal.GetDataFile($"samples{SP}{name}.png"));
             if (bitmap == null)
             {
                 Interpreter.WriteLine($"couldn't read sample {name}");

@@ -197,7 +197,7 @@ namespace MarkovCraft
             if (manipulator is not null)
             {
                 var baseName = manipulator.GetDefaultBaseName();
-                imageExportNameInput!.text = PathHelper.GetExtraDataFile($"{baseName}.png");
+                imageExportNameInput!.text = MarkovGlobal.GetDataFile($"{baseName}.png");
 
                 (sizeX, sizeY, sizeZ, state, colors, airIndices) = manipulator.GetResult()!.GetPreviewData();
             }

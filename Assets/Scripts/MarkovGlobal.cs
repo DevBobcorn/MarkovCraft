@@ -1,12 +1,16 @@
 #nullable enable
+using System.IO;
 using System.Threading;
 using UnityEngine;
+
+using CraftSharp;
 
 namespace MarkovCraft
 {
     public class MarkovGlobal : MonoBehaviour
     {
         public const int WINDOWED_APP_WIDTH = 1600, WINDOWED_APP_HEIGHT = 900;
+        private static readonly char SP = Path.DirectorySeparatorChar;
 
         private static Thread? unityThread;
         public static Thread UnityThread => unityThread!;
@@ -40,6 +44,26 @@ namespace MarkovCraft
                     Screen.fullScreen = true;
                 }
             }
+        }
+
+        public static string GetDataDirectory()
+        {
+            return PathHelper.GetExtraDataDirectory();
+        }
+
+        public static string GetDataFile(string fileName)
+        {
+            return PathHelper.GetExtraDataFile(fileName);
+        }
+
+        public static string GetRecordingFile(string fileName)
+        {
+            return Directory.GetParent(Application.dataPath).FullName + $"{SP}Recordings{SP}{fileName}";
+        }
+
+        public static string GetDefaultExportPath()
+        {
+            return Directory.GetParent(Application.dataPath).FullName + $"{SP}Exported";
         }
     }
 }

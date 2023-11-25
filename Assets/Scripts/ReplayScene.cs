@@ -79,7 +79,7 @@ namespace MarkovCraft
                     PlaybackSpeedSlider!.onValueChanged.AddListener(UpdatePlaybackSpeed);
                     UpdatePlaybackSpeed(PlaybackSpeedSlider.value);
 
-                    var dir = PathHelper.GetRecordingFile(string.Empty);
+                    var dir = MarkovGlobal.GetRecordingFile(string.Empty);
                     if (Directory.Exists(dir) && RecordingDropdown != null)
                     {
                         var options = new List<TMP_Dropdown.OptionData>();
@@ -142,7 +142,7 @@ namespace MarkovCraft
             // Clear up scene
             ClearUpScene();
 
-            string fileName = PathHelper.GetRecordingFile(recordingFile);
+            string fileName = MarkovGlobal.GetRecordingFile(recordingFile);
             var succeeded = false;
 
             RecordingData? recData = null;

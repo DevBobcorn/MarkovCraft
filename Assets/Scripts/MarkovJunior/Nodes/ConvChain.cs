@@ -33,7 +33,7 @@ namespace MarkovJunior
             }
 
             string name = xelem.Get<string>("sample");
-            string filename = PathHelper.GetExtraDataFile($"samples{SP}{name}.png");
+            string filename = MarkovGlobal.GetDataFile($"samples{SP}{name}.png");
             int[] bitmap;
             (bitmap, SMX, SMY, _) = Graphics.LoadBitmap(filename);
             if (bitmap == null)

@@ -9,6 +9,7 @@ using UnityEngine.Localization.Settings;
 using UnityEngine.SceneManagement;
 using TMPro;
 
+using CraftSharp;
 using CraftSharp.Resource;
 
 namespace MarkovCraft
@@ -42,8 +43,8 @@ namespace MarkovCraft
             if (VersionText != null)
                 VersionText.text = $"< {version.Name} >";
             
-            var newResPath = PathHelper.GetPackDirectoryNamed($"vanilla-{version.ResourceVersion}");
-            var resPresent = Directory.Exists(newResPath);
+            var newResPath = PathHelper.GetPackFile($"vanilla-{version.ResourceVersion}", "pack.mcmeta");
+            var resPresent = File.Exists(newResPath);
 
             downloadButtonAnimator?.SetBool("Hidden", resPresent);
 

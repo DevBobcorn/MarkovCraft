@@ -28,7 +28,7 @@ namespace MarkovJunior
             overlapz = xelem.Get("overlapz", 0);
 
             XDocument xdoc;
-            string filepath = PathHelper.GetExtraDataFile($"tilesets{SP}{name}.xml");
+            string filepath = MarkovGlobal.GetDataFile($"tilesets{SP}{name}.xml");
             try { xdoc = XDocument.Load(filepath, LoadOptions.SetLineInfo); }
             catch (Exception)
             {
@@ -42,7 +42,7 @@ namespace MarkovJunior
             string firstFileName = $"{tilesname}/{xfirsttile.Get<string>("name")}.vox";
             int[] firstData;
             int SY;
-            (firstData, S, SY, SZ) = VoxHelper.LoadVox(PathHelper.GetExtraDataFile($"tilesets{SP}{firstFileName}"));
+            (firstData, S, SY, SZ) = VoxHelper.LoadVox(MarkovGlobal.GetDataFile($"tilesets{SP}{firstFileName}"));
             if (firstData == null)
             {
                 Interpreter.WriteLine($"couldn't read {firstFileName}");
@@ -84,7 +84,7 @@ namespace MarkovJunior
                 string tilename = xtile.Get<string>("name");
                 double weight = xtile.Get("weight", 1.0);
 
-                string filename = PathHelper.GetExtraDataFile($"tilesets{SP}{tilesname}{SP}{tilename}.vox");
+                string filename = MarkovGlobal.GetDataFile($"tilesets{SP}{tilesname}{SP}{tilename}.vox");
                 int[] vox = VoxHelper.LoadVox(filename).Item1;
                 if (vox == null)
                 {
