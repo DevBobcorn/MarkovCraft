@@ -7,7 +7,7 @@
       "dependencies": {
         "com.unity.mathematics": "1.2.6"
       },
-      "hash": "c95f5e34dd148647d4e1739ddd29a6e226f533c9"
+      "hash": "177fa09745d9f3dc8357b02c7619b1ba913f5223"
     },
     "com.devbobcorn.craftsharp-resource": {
       "version": "https://github.com/DevBobcorn/CraftSharp-Resource.git",
@@ -17,7 +17,7 @@
         "com.unity.mathematics": "1.2.6",
         "com.devbobcorn.craftsharp": "1.0.0"
       },
-      "hash": "9b88118fe7bb4e7bcb9ea072431f4794f8418709"
+      "hash": "24b793a53ac27855e6c6b39bf1f666641286007a"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
@@ -74,17 +74,18 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.entities": {
-      "version": "1.0.11",
+      "version": "1.0.16",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.burst": "1.8.4",
+        "com.unity.burst": "1.8.8",
         "com.unity.serialization": "3.1.1",
         "com.unity.collections": "2.1.4",
         "com.unity.mathematics": "1.2.6",
         "com.unity.modules.assetbundle": "1.0.0",
         "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.test-framework.performance": "3.0.2",
         "com.unity.nuget.mono-cecil": "1.11.4",
         "com.unity.scriptablebuildpipeline": "1.20.2",
         "com.unity.profiling.core": "1.0.2"
@@ -92,13 +93,13 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.entities.graphics": {
-      "version": "1.0.11",
+      "version": "1.0.16",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.entities": "1.0.11",
+        "com.unity.entities": "1.0.16",
         "com.unity.modules.particlesystem": "1.0.0",
-        "com.unity.render-pipelines.core": "14.0.6"
+        "com.unity.render-pipelines.core": "14.0.7"
       },
       "url": "https://packages.unity.com"
     },
@@ -135,7 +136,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.localization": {
-      "version": "1.4.4",
+      "version": "1.4.5",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -243,6 +244,16 @@
       "dependencies": {
         "com.unity.ext.nunit": "1.0.6",
         "com.unity.modules.imgui": "1.0.0",
+        "com.unity.modules.jsonserialize": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.test-framework.performance": {
+      "version": "3.0.2",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.test-framework": "1.1.31",
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
