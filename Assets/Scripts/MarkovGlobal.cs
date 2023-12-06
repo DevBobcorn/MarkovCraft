@@ -58,12 +58,12 @@ namespace MarkovCraft
 
         public static string GetRecordingFile(string fileName)
         {
-            return Directory.GetParent(Application.dataPath).FullName + $"{SP}Recordings{SP}{fileName}";
+            return PathHelper.GetRootDirectory() + $"{SP}Recordings{SP}{fileName}";
         }
 
         public static string GetDefaultExportPath()
         {
-            return Directory.GetParent(Application.dataPath).FullName + $"{SP}Exported";
+            return PathHelper.GetRootDirectory() + $"{SP}Exported";
         }
     }
 }

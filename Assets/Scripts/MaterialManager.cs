@@ -50,23 +50,23 @@ namespace CraftSharp
 
             // Solid
             var solid = new Material(AtlasSolid!);
-            solid.SetTexture("_BaseMap", packManager.GetAtlasArray(RenderType.SOLID));
+            solid.SetTexture("_BaseMap", packManager.GetAtlasArray(false));
             atlasMaterials.Add(RenderType.SOLID, solid);
 
             defaultAtlasMaterial = solid;
 
             // Cutout & Cutout Mipped
             var cutout = new Material(AtlasCutout!);
-            cutout.SetTexture("_BaseMap", packManager.GetAtlasArray(RenderType.CUTOUT));
+            cutout.SetTexture("_BaseMap", packManager.GetAtlasArray(false));
             atlasMaterials.Add(RenderType.CUTOUT, cutout);
 
             var cutoutMipped = new Material(AtlasCutoutMipped!);
-            cutoutMipped.SetTexture("_BaseMap", packManager.GetAtlasArray(RenderType.CUTOUT_MIPPED));
+            cutoutMipped.SetTexture("_BaseMap", packManager.GetAtlasArray(true));
             atlasMaterials.Add(RenderType.CUTOUT_MIPPED, cutoutMipped);
 
             // Translucent
             var translucent = new Material(AtlasTranslucent!);
-            translucent.SetTexture("_BaseMap", packManager.GetAtlasArray(RenderType.TRANSLUCENT));
+            translucent.SetTexture("_BaseMap", packManager.GetAtlasArray(false));
             atlasMaterials.Add(RenderType.TRANSLUCENT, translucent);
 
             // Water
