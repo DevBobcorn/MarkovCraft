@@ -1,8 +1,0 @@
-<markov values="BRW" origin="True">
-  <one in="RB" out="WR"/>
-  <one in="WB" out="WR"/>
-</markov>
-
-<!--
-Saw it here: ....
--->
