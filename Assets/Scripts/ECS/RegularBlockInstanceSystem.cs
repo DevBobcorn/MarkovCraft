@@ -19,8 +19,6 @@ namespace MarkovCraft
 
         }
 
-        private const float FADE_TIME = 0.2F;
-
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {

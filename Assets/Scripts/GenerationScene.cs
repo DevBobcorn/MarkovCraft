@@ -222,7 +222,7 @@ namespace MarkovCraft
                         Symbol = pair.Key, Color = ColorConvert.GetOpaqueColor32(pair.Value) } );
             }
 
-            blockMeshCount = 1; // #0 is preserved for default cube mesh
+            nextBlockMeshIndex = 1; // #0 is preserved for default cube mesh
 
             var renderTypeTable = BlockStatePalette.INSTANCE.RenderTypeTable;
             int getStateMaterial(BlockState blockState)
@@ -242,8 +242,8 @@ namespace MarkovCraft
                         var state = statePalette.StatesTable[stateId];
                         //Debug.Log($"Mapped '{item.Character}' to [{stateId}] {state}");
 
-                        if (stateId2Mesh.TryAdd(stateId, blockMeshCount))
-                            meshPalette[item.Symbol] = new(blockMeshCount++, getStateMaterial(state), rgb);
+                        if (stateId2Mesh.TryAdd(stateId, nextBlockMeshIndex))
+                            meshPalette[item.Symbol] = new(nextBlockMeshIndex++, getStateMaterial(state), rgb);
                         else // The mesh of this block state is already regestered, just use it
                             meshPalette[item.Symbol] = new(stateId2Mesh[stateId], getStateMaterial(state), rgb);
                     }
@@ -274,7 +274,7 @@ namespace MarkovCraft
             yield return null;
 
             // Generate block meshes
-            GenerateBlockMeshes(stateId2Mesh);
+            GenerateBlockMeshes(stateId2Mesh, appendEmptyMesh: true);
             yield return null;
 
             Loading = false;
@@ -291,7 +291,7 @@ namespace MarkovCraft
 
         private IEnumerator RunGeneration()
         {
-            if (executing || currentConfModel is null || currentConfModel.Amount == 0 || interpreter is null)
+            if (executing || currentConfModel == null || currentConfModel.Amount == 0 || interpreter is null)
             {
                 Debug.LogWarning("Generation cannot be initiated");
                 StopExecution();
@@ -340,6 +340,19 @@ namespace MarkovCraft
                 bool hasNext = true;
                 var recordedFrames = new List<GenerationFrameRecord>();
 
+                var pos = new int3(2 + xCount * (maxX + 2), 0, 2 + yCount * (maxY + 2));
+
+                // EXPERIMENTAL START: Use a grid box for the whole generation process
+                // Markov coordinates. These are size of the grid box, not that of the model nor the frame
+                int gridX = 25, gridY = 30, gridZ = 35;
+                BlockInstanceSpawner.InitializeGrid(pos, gridX, gridY, gridZ, materials, blockMeshes);
+
+                // An array to track the last block change done to a cell
+                var lastGridBox = new char[gridX * gridY * gridZ];
+                // Initialize the array with ' '
+                Array.Fill(lastGridBox, ' ');
+                // EXPERIMENTAL END
+
                 while (hasNext)
                 {
                     bool frameCompleted = false;
@@ -370,15 +383,51 @@ namespace MarkovCraft
                     if (model.Animated) // Visualize this step
                     {
                         // Update generation text
-                        GenerationText.text = GetL10nString("status.info.generation_step", k, dataFrame.stepCount, (int)(tick * 1000));
+                        GenerationText.text = GetL10nString("status.info.generation_step", k, dataFrame.stepCount, (int) (tick * 1000));
 
-                        var pos = new int3(2 + xCount * (maxX + 2), 0, 2 + yCount * (maxY + 2));
+                        //pos = new int3(2 + xCount * (maxX + 2), 0, 2 + yCount * (maxY + 2));
                         result.UpdateVolume(pos, dataFrame.FX, dataFrame.FY, dataFrame.FZ);
 
+                        // EXPERIMENTAL START: Find out changed cells and updates them
+                        // Frame legend index => (meshIndex, matIndex, meshColor)
+                        var frameMeshPalette = dataFrame.legend.Select(ch => meshPalette[ch]).ToArray();
+
+                        List<int> updateIdentifiers = new();
+                        List<int3> updateNewValues = new();
+
+                        var frameStateMapped = dataFrame.state.Select(v => dataFrame.legend![v]).ToArray();
+                        var frameMeshMapping = dataFrame.legend.Select(ch => meshPalette[ch]).ToArray();
+
+                        for (int x = 0; x < math.min(gridX, dataFrame.FX); x++)
+                            for (int y = 0; y < math.min(gridY, dataFrame.FY); y++)
+                                for (int z = 0; z < math.min(gridZ, dataFrame.FZ); z++)
+                                {
+                                    int gridBoxIndex = x + y * gridX + z * gridX * gridY;
+                                    int frameStateIndex = x + y * dataFrame.FX + z * dataFrame.FX * dataFrame.FY;
+
+                                    var newChar = frameStateMapped[frameStateIndex];
+
+                                    if (lastGridBox[gridBoxIndex] != newChar) // This cell has changed, update it
+                                    {
+                                        updateIdentifiers.Add(gridBoxIndex);
+                                        updateNewValues.Add(frameMeshMapping[newChar]);
+
+                                        lastGridBox[gridBoxIndex] = newChar;
+                                    }
+                                }
+                        
+                        if (updateIdentifiers.Count > 0) // Do the update
+                        {
+                            //BlockInstanceSpawner.UpdateGrid(updateIdentifiers.ToArray(), updateNewValues.ToArray());
+                        }
+                        // EXPERIMENTAL END
+
+                        /* MODIFIED START
                         var instanceData = BlockDataBuilder.GetInstanceData(dataFrame.state!, dataFrame.FX, dataFrame.FY, dataFrame.FZ, pos,
-                                // Frame legend index => (meshIndex, meshColor)
+                                // Frame legend index => (meshIndex, matIndex, meshColor)
                                 dataFrame.legend.Select(ch => meshPalette[ch]).ToArray());
                         BlockInstanceSpawner.VisualizeFrameState(instanceData, materials, blockMeshes, tick);
+                        MODIFIED END*/
 
                         if (record)
                         {
@@ -401,12 +450,14 @@ namespace MarkovCraft
 
                 if (executing) // Visualize final state (last step)
                 {
-                    var pos = new int3(2 + xCount * (maxX + 2), 0, 2 + yCount * (maxY + 2));
+                    pos = new int3(2 + xCount * (maxX + 2), 0, 2 + yCount * (maxY + 2));
                     result.UpdateVolume(pos, dataFrame.FX, dataFrame.FY, dataFrame.FZ);
 
+                    /* MODIFIED START
                     var instanceData = BlockDataBuilder.GetInstanceData(dataFrame.state!, dataFrame.FX, dataFrame.FY, dataFrame.FZ, pos,
                             // Frame legend index => (meshIndex, meshColor)
                             dataFrame.legend.Select(ch => meshPalette[ch]).ToArray());
+                    MODIFIED END*/
                     
                     // The final visualization is persistent
                     //BlockInstanceSpawner.VisualizePersistentState(instanceData, materials, blockMeshes);
@@ -421,6 +472,7 @@ namespace MarkovCraft
                     var legendClone = new char[dataFrame.legend!.Length];
                     Array.Copy(dataFrame.legend!, legendClone, legendClone.Length);
 
+                    // Set Data and generate result mesh
                     result.SetData(fullPalette, stateClone, legendClone, dataFrame.FX, dataFrame.FY, dataFrame.FZ, dataFrame.stepCount, confModelFile, seed);
 
                     Debug.Log($"Iteration {k} complete. Steps: {dataFrame.stepCount} Frames: {recordedFrames.Count}");
@@ -436,6 +488,9 @@ namespace MarkovCraft
                         StartCoroutine(RecordingExporter.SaveRecording(fullPalette, recordingName, maxX, maxY, maxZ, recordedFrames.ToArray()));
                     }
                 }
+
+                // Cleaning up
+                //BlockInstanceSpawner.ClearUpPersistentState();
             }
 
             if (executing) // If the execution hasn't been forced stopped

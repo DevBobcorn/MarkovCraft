@@ -30,14 +30,22 @@ namespace MarkovCraft
 
             foreach (var comp in SystemAPI.Query<RefRW<RegularBlockInstanceComponent>>())
             {
-                var pos = comp.ValueRO.Position;
+                //var pos = comp.ValueRO.Position;
                 comp.ValueRW.LifeTime = FADE_TIME; // math.max(1, 25 + pos.x + pos.z - pos.y) * 0.01F;
                 comp.ValueRW.Timer = FADE_TIME;
             }
 
             foreach (var comp in SystemAPI.Query<RefRW<OptimizedBlockInstanceComponent>>())
             {
-                var pos = comp.ValueRO.Position;
+                //var pos = comp.ValueRO.Position;
+                comp.ValueRW.LifeTime = FADE_TIME; // math.max(1, 25 + pos.x + pos.z - pos.y) * 0.01F;
+                // Reset playtime, but avoid playing fade-in animation
+                comp.ValueRW.Timer = FADE_TIME;
+            }
+
+            foreach (var comp in SystemAPI.Query<RefRW<LowCostBlockInstanceComponent>>())
+            {
+                //var pos = comp.ValueRO.Position;
                 comp.ValueRW.LifeTime = FADE_TIME; // math.max(1, 25 + pos.x + pos.z - pos.y) * 0.01F;
                 // Reset playtime, but avoid playing fade-in animation
                 comp.ValueRW.Timer = FADE_TIME;

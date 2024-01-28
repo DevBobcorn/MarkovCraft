@@ -185,7 +185,7 @@ namespace MarkovCraft
 
             var statePalette = BlockStatePalette.INSTANCE;
             var stateId2Mesh = new Dictionary<int, int>(); // StateId => Mesh index
-            blockMeshCount = 1; // #0 is preserved for default cube mesh
+            nextBlockMeshIndex = 1; // #0 is preserved for default cube mesh
 
             var renderTypeTable = BlockStatePalette.INSTANCE.RenderTypeTable;
             int getStateMaterial(BlockState blockState)
@@ -206,8 +206,8 @@ namespace MarkovCraft
                         var state = statePalette.StatesTable[stateId];
                         //Debug.Log($"Mapped '{index}' to [{stateId}] {state}");
 
-                        if (stateId2Mesh.TryAdd(stateId, blockMeshCount))
-                            meshPalette[index] = new(blockMeshCount++, getStateMaterial(state), rgb);
+                        if (stateId2Mesh.TryAdd(stateId, nextBlockMeshIndex))
+                            meshPalette[index] = new(nextBlockMeshIndex++, getStateMaterial(state), rgb);
                         else // The mesh of this block state is already regestered, just use it
                             meshPalette[index] = new(stateId2Mesh[stateId], getStateMaterial(state), rgb);
                     }
@@ -225,7 +225,7 @@ namespace MarkovCraft
             }
 
             // Generate block meshes
-            GenerateBlockMeshes(stateId2Mesh);
+            GenerateBlockMeshes(stateId2Mesh, appendEmptyMesh: true);
             yield return null;
 
             sizeX = recData.SizeX;

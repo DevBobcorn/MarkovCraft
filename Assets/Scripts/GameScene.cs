@@ -47,9 +47,7 @@ namespace MarkovCraft
         public static readonly World DummyWorld = new();
         // Palettes and resources
         protected Mesh[] blockMeshes = { };
-        protected BlockGeometry?[] blockGeometries = { };
-        protected float3[] blockTints = { };
-        protected int blockMeshCount = 0;
+        protected int nextBlockMeshIndex = 0;
 
         // Unity config and asset files
         [SerializeField] protected VersionHolder? VersionHolder;
@@ -103,13 +101,13 @@ namespace MarkovCraft
 
         public virtual void Hide3dGUI() { }
 
-        protected void GenerateBlockMeshes(Dictionary<int, int> stateId2Mesh) // StateId => Mesh index
+        protected void GenerateBlockMeshes(Dictionary<int, int> stateId2Mesh, bool appendEmptyMesh = false) // StateId => Mesh index
         {
             var statePalette = BlockStatePalette.INSTANCE;
-            var buffers = new VertexBuffer[blockMeshCount];
+            var buffers = new VertexBuffer[nextBlockMeshIndex];
 
-            blockGeometries = new BlockGeometry[blockMeshCount];
-            blockTints = new float3[blockMeshCount];
+            var blockGeometries = new BlockGeometry[nextBlockMeshIndex];
+            var blockTints = new float3[nextBlockMeshIndex];
             
             for (int i = 0;i < buffers.Length;i++)
                 buffers[i] = new();
@@ -141,8 +139,14 @@ namespace MarkovCraft
                 }
             }
 
-            // Set result to blockMeshes
+            // Set result to blockMeshes, and append an empty mesh
             blockMeshes = BlockMeshGenerator.GenerateMeshes(buffers);
+
+            // Append an empty mesh. This empty mesh will be used as mesh for air block
+            if (appendEmptyMesh)
+            {
+                blockMeshes = blockMeshes.Append(new Mesh()).ToArray();
+            }
         }
 
         protected IEnumerator LoadMCBlockData(Action? prepare = null, Action<string>? update = null, Action? callback = null)
