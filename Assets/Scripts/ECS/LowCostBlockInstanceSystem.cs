@@ -1,15 +1,14 @@
 using Unity.Burst;
 using Unity.Entities;
-using Unity.Transforms;
-
 using Unity.Mathematics;
-using UnityEngine;
 using Unity.Rendering;
 
 namespace MarkovCraft
 {
     public partial struct LowCostBlockInstanceSystem : ISystem
     {
+        BufferTypeHandle<BlockMeshBufferElement> blockMeshBufferHandle;
+
         private static readonly float4 WHITE = new(1F);
 
         [BurstCompile]
@@ -17,57 +16,50 @@ namespace MarkovCraft
         {
             state.RequireForUpdate<LowCostBlockInstanceComponent>();
             
+            blockMeshBufferHandle = state.GetBufferTypeHandle<BlockMeshBufferElement>(true);
         }
 
         [BurstCompile]
-        public void OnDestroy(ref SystemState state)
-        {
-
-        }
+        public void OnDestroy(ref SystemState state) { }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // An EntityCommandBuffer created from an EntityCommandBufferSystem singleton will be
-            // played back and disposed by the EntityCommandBufferSystem the next time it updates.
-            var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
-            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            blockMeshBufferHandle.Update(ref state);
 
-            foreach (var (comp, mmm, ccc, entity) in
+            var myQuery = SystemAPI.QueryBuilder().WithAll<BlockMeshBufferElement>().Build();
+            var chunks = myQuery.ToArchetypeChunkArray(state.WorldUpdateAllocator);
+
+            if (chunks.Length <= 0) return;
+            var accessor = chunks[0].GetBufferAccessor(ref blockMeshBufferHandle);
+
+            if (accessor.Length <= 0) return;
+            var gridDataBuffer = accessor[0];
+
+            DynamicBuffer<int3> bufferAsInt3s = gridDataBuffer.Reinterpret<int3>();
+
+            foreach (var (comp, mmm, ccc) in
                     SystemAPI.Query<
                         RefRW<LowCostBlockInstanceComponent>,
                         RefRW<MaterialMeshInfo>,
                         RefRW<InstanceBlockColorComponent>
-                    >().WithEntityAccess())
+                    >())
             {
-                comp.ValueRW.Timer += SystemAPI.Time.DeltaTime; // Time left increases
+                var dataIndex = comp.ValueRO.DataIndex;
+                if (dataIndex >= bufferAsInt3s.Length) continue;
 
-                // mesh index, material index, color
-                int3 mesh = new( ((int) SystemAPI.Time.ElapsedTime) % 20, 0, 0xFFFFFF);
+                int3 meshData = bufferAsInt3s[dataIndex]; // mesh index, material index, color
 
-                ecb.SetComponent(entity, MaterialMeshInfo.FromRenderMeshArrayIndices(mesh.y, mesh.x));
-
-                // Update mesh
-                if (mmm.ValueRO.Mesh != -mesh.x - 1)
+                // Update mesh and material
+                if (mmm.ValueRW.Material != -meshData.y - 1)
                 {
-                    mmm.ValueRW.Mesh = -mesh.x - 1;
-                    mmm.ValueRW.Material = -mesh.y - 1;
-
-                    //ecb.SetComponent(entity, MaterialMeshInfo.FromRenderMeshArrayIndices(mesh.y, mesh.x));
-
-                    ccc.ValueRW.Value = mesh.x == 0 ? ComputeColor(mesh.z) : WHITE;
+                    mmm.ValueRW.Material = -meshData.y - 1;
                 }
 
-                float lt = comp.ValueRO.LifeTime;
-
-                if (lt <= 0F) // Persistent entities
-                    continue;
-
-                if (comp.ValueRO.Timer > lt + 0.1F) // Entity expired, destroy them a bit later here to prevent glitches
+                if (mmm.ValueRO.Mesh != -meshData.x - 1)
                 {
-                    // Making a structural change would invalidate the query we are iterating through,
-                    // so instead we record a command to destroy the entity later.
-                    ecb.DestroyEntity(entity);
+                    mmm.ValueRW.Mesh = -meshData.x - 1;
+                    ccc.ValueRW.Value = meshData.x == 0 ? ComputeColor(meshData.z) : WHITE;
                 }
             }
         }

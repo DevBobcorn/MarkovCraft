@@ -6,9 +6,7 @@ namespace MarkovCraft
 {
     public struct LowCostBlockInstanceComponent : IComponentData
     {
-        public float LifeTime;
-        public float Timer;
-        public int Identifier;
+        public int DataIndex;
         public int3 Position; // Unity coordinates
     }
 }

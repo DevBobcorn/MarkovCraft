@@ -146,23 +146,22 @@ namespace MarkovCraft
             entityManager.DestroyEntity(prototype);
         }
 
-        // LowCost block population - initial grid
-        public static void InitializeGrid(int3 pos, int MX, int MY, int MZ, Material[] materials, Mesh[] meshes)
-        {
-            // MX, MY, MZ are Markov coordinates
-            // Convert them to Unity coordinates
-            int sizeX = MX;
-            int sizeY = MZ;
-            int sizeZ = MY;
+        private static Entity gridStorageEntity = Entity.Null;
 
-            var entityCount = sizeX * sizeY * sizeZ; // Unity coordinates
+        // LowCost block population - initialize grid
+        public static void InitializeGrid(int3 pos, int3 size, Material[] materials, Mesh[] meshes, int3[] initData)
+        {
+            var entityCount = size.x * size.y * size.z; // Unity coordinates
             var posArray = new int3[entityCount];
 
-            for (int x = 0; x < sizeX; x++)
-                for (int y = 0; y < sizeY; y++)
-                    for (int z = 0; z < sizeZ; z++)
+            for (int x = 0; x < size.x; x++)
+                for (int y = 0; y < size.y; y++)
+                    for (int z = 0; z < size.z; z++)
                     {
-                        posArray[x + y * sizeX + z * sizeX * sizeY] = new int3(x, y, z) + pos; // Unity coordinates
+                        // In the index we use Markov coordinates, so that we can pass arrays
+                        // directly into the buffer without having to convert them.
+                        // While on the right-hand side we use Unity coordinates for rendering.
+                        posArray[x + y * size.x + z * size.x * size.y] = new int3(x, z, y) + pos;
                     }
 
             var posData = new NativeArray<int3>(entityCount, Allocator.TempJob);
@@ -193,7 +192,19 @@ namespace MarkovCraft
             
             entityManager.AddComponentData(prototype, new InstanceBlockColorComponent());
             entityManager.AddComponentData(prototype, new LowCostBlockInstanceComponent());
-            
+
+            // Create data storage
+            gridStorageEntity = entityManager.CreateEntity();
+
+            var gridDataBuffer = entityManager.AddBuffer<BlockMeshBufferElement>(gridStorageEntity);
+            gridDataBuffer.Length = entityCount;
+
+            // Reinterpret the buffer for later convenience
+            DynamicBuffer<int3> bufferAsInt3s = gridDataBuffer.Reinterpret<int3>();
+            bufferAsInt3s.CopyFrom(initData);
+
+            Debug.Log($"Dynamic buffer created for grid. Size: {size.x}x{size.y}x{size.z} ({entityCount})");
+
             #endregion
 
             // Spawn most of the entities in a Burst job by cloning a pre-created prototype entity,
@@ -219,13 +230,40 @@ namespace MarkovCraft
             entityManager.DestroyEntity(prototype);
         }
 
+        // LowCost block population - update grid
+        public static void UpdateGrid(int3[] gridMeshData)
+        {
+            var world = Unity.Entities.World.DefaultGameObjectInjectionWorld;
+            var entityManager = world.EntityManager;
+
+            var gridDataBuffer = entityManager.GetBuffer<BlockMeshBufferElement>(gridStorageEntity);
+
+            DynamicBuffer<int3> bufferAsInt3s = gridDataBuffer.Reinterpret<int3>();
+            bufferAsInt3s.CopyFrom(gridMeshData);
+        }
+
+        // LowCost block population - clear grid
+        public static void ClearGrid()
+        {
+            var world = World.DefaultGameObjectInjectionWorld;
+            var entityManager = world.EntityManager;
+
+            var clearTagEntity = entityManager.CreateEntity();
+            entityManager.AddComponentData(clearTagEntity, new LowCostClearTagComponent());
+
+            entityManager.DestroyEntity(gridStorageEntity);
+            gridStorageEntity = Entity.Null;
+
+            Debug.Log($"Dynamic buffer destroyed for grid.");
+        }
+
         public static void ClearUpPersistentState()
         {
             var world = World.DefaultGameObjectInjectionWorld;
             var entityManager = world.EntityManager;
 
-            var markovEntity = entityManager.CreateEntity();
-            entityManager.AddComponentData(markovEntity, new ClearTagComponent());
+            var clearTagEntity = entityManager.CreateEntity();
+            entityManager.AddComponentData(clearTagEntity, new ClearTagComponent());
         }
     }
 }

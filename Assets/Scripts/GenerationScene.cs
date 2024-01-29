@@ -18,6 +18,7 @@ using TMPro;
 using MarkovJunior;
 using CraftSharp;
 using CraftSharp.Resource;
+using Unity.Entities.UniversalDelegates;
 
 namespace MarkovCraft
 {
@@ -311,7 +312,7 @@ namespace MarkovCraft
             System.Random rand = new();
             var seeds = model.Seeds;
 
-            int maxX = 0, maxY = 0, maxZ = 0;
+            int3 maxFrameSize = int3.zero;
             int stepsPerFrame = model.StepsPerRefresh;
 
             var record = RecordToggle?.isOn ?? false;
@@ -340,18 +341,8 @@ namespace MarkovCraft
                 bool hasNext = true;
                 var recordedFrames = new List<GenerationFrameRecord>();
 
-                var pos = new int3(2 + xCount * (maxX + 2), 0, 2 + yCount * (maxY + 2));
-
-                // EXPERIMENTAL START: Use a grid box for the whole generation process
-                // Markov coordinates. These are size of the grid box, not that of the model nor the frame
-                int gridX = 25, gridY = 30, gridZ = 35;
-                BlockInstanceSpawner.InitializeGrid(pos, gridX, gridY, gridZ, materials, blockMeshes);
-
-                // An array to track the last block change done to a cell
-                var lastGridBox = new char[gridX * gridY * gridZ];
-                // Initialize the array with ' '
-                Array.Fill(lastGridBox, ' ');
-                // EXPERIMENTAL END
+                var pos = new int3(2 + xCount * (maxFrameSize.x + 2), 0, 2 + yCount * (maxFrameSize.y + 2));
+                var lastFrameSize = int3.zero;
 
                 while (hasNext)
                 {
@@ -380,69 +371,62 @@ namespace MarkovCraft
 
                     float tick = 1F / playbackSpeed;
 
+                    var frameSize = new int3(dataFrame.FX, dataFrame.FY, dataFrame.FZ); // Markov coordinates
+                    var frameSizeChanged = !lastFrameSize.Equals(frameSize);
+
+                    if (frameSizeChanged) // Frame size changed, update related values
+                    {
+                        lastFrameSize = frameSize;
+                        maxFrameSize = math.max(maxFrameSize, frameSize);
+
+                        pos = new int3(2 + xCount * (maxFrameSize.x + 2), 0, 2 + yCount * (maxFrameSize.y + 2));
+                        result.UpdateVolume(pos, dataFrame.FX, dataFrame.FY, dataFrame.FZ);
+                    }
+
                     if (model.Animated) // Visualize this step
                     {
                         // Update generation text
                         GenerationText.text = GetL10nString("status.info.generation_step", k, dataFrame.stepCount, (int) (tick * 1000));
 
-                        //pos = new int3(2 + xCount * (maxX + 2), 0, 2 + yCount * (maxY + 2));
-                        result.UpdateVolume(pos, dataFrame.FX, dataFrame.FY, dataFrame.FZ);
+                        var stateChar = dataFrame.state.Select(v => dataFrame.legend[v]).ToArray();
 
-                        // EXPERIMENTAL START: Find out changed cells and updates them
-                        // Frame legend index => (meshIndex, matIndex, meshColor)
-                        var frameMeshPalette = dataFrame.legend.Select(ch => meshPalette[ch]).ToArray();
-
-                        List<int> updateIdentifiers = new();
-                        List<int3> updateNewValues = new();
-
-                        var frameStateMapped = dataFrame.state.Select(v => dataFrame.legend![v]).ToArray();
-                        var frameMeshMapping = dataFrame.legend.Select(ch => meshPalette[ch]).ToArray();
-
-                        for (int x = 0; x < math.min(gridX, dataFrame.FX); x++)
-                            for (int y = 0; y < math.min(gridY, dataFrame.FY); y++)
-                                for (int z = 0; z < math.min(gridZ, dataFrame.FZ); z++)
-                                {
-                                    int gridBoxIndex = x + y * gridX + z * gridX * gridY;
-                                    int frameStateIndex = x + y * dataFrame.FX + z * dataFrame.FX * dataFrame.FY;
-
-                                    var newChar = frameStateMapped[frameStateIndex];
-
-                                    if (lastGridBox[gridBoxIndex] != newChar) // This cell has changed, update it
-                                    {
-                                        updateIdentifiers.Add(gridBoxIndex);
-                                        updateNewValues.Add(frameMeshMapping[newChar]);
-
-                                        lastGridBox[gridBoxIndex] = newChar;
-                                    }
-                                }
+                        int3[] gridData;
                         
-                        if (updateIdentifiers.Count > 0) // Do the update
+                        if (frameSize.z == 1) // 2d mode, byte 0 is not air
                         {
-                            //BlockInstanceSpawner.UpdateGrid(updateIdentifiers.ToArray(), updateNewValues.ToArray());
+                            gridData = stateChar.Select(x => meshPalette[x]).ToArray();
                         }
-                        // EXPERIMENTAL END
-
-                        /* MODIFIED START
-                        var instanceData = BlockDataBuilder.GetInstanceData(dataFrame.state!, dataFrame.FX, dataFrame.FY, dataFrame.FZ, pos,
-                                // Frame legend index => (meshIndex, matIndex, meshColor)
-                                dataFrame.legend.Select(ch => meshPalette[ch]).ToArray());
-                        BlockInstanceSpawner.VisualizeFrameState(instanceData, materials, blockMeshes, tick);
-                        MODIFIED END*/
-
-                        if (record)
+                        else // 3d mode, byte 0 is air
                         {
-                            // Record the data frame
-                            recordedFrames.Add(new GenerationFrameRecord(new int3(dataFrame.FX, dataFrame.FY, dataFrame.FZ),
-                                    dataFrame.state.Select(v => dataFrame.legend[v]).ToArray()));
+                            // The last element in mesh array is empty, used for air blocks
+                            var airMeshData = new int3(blockMeshes.Length - 1, 0, 0); // mesh index, material index, color
+                            gridData = dataFrame.state.Select(v => v == 0 ? airMeshData : meshPalette[dataFrame.legend[v]]).ToArray();
+                        }
+
+                        if (frameSizeChanged) // Size changed
+                        {
+                            // Regenerate block grid
+                            BlockInstanceSpawner.ClearGrid();
+                            yield return null;
+
+                            // Initialize with new content
+                            BlockInstanceSpawner.InitializeGrid(pos, frameSize, materials, blockMeshes, gridData);
+                            yield return null;
+                        }
+                        else // Size remains the same, just update content
+                        {
+                            BlockInstanceSpawner.UpdateGrid(gridData);
+                            yield return null;
+                        }
+
+                        if (record) // Record the data frame
+                        {
+                            recordedFrames.Add(new GenerationFrameRecord(frameSize, stateChar));
                         }
                         
-                        if (dataFrame.FX > maxX) maxX = dataFrame.FX;
-                        if (dataFrame.FY > maxY) maxY = dataFrame.FY;
-                        if (dataFrame.FZ > maxZ) maxZ = dataFrame.FZ;
-
                         // Update active node on graph
+                        // TODO: Make this thing more performant
                         ModelGraphGenerator.UpdateGraph(ModelGraphUI!, interpreter.current);
-                        //RedrawModelGraphAsImage("Working...");
                     }
 
                     yield return new WaitForSeconds(tick);
@@ -450,47 +434,29 @@ namespace MarkovCraft
 
                 if (executing) // Visualize final state (last step)
                 {
-                    pos = new int3(2 + xCount * (maxX + 2), 0, 2 + yCount * (maxY + 2));
-                    result.UpdateVolume(pos, dataFrame.FX, dataFrame.FY, dataFrame.FZ);
-
-                    /* MODIFIED START
-                    var instanceData = BlockDataBuilder.GetInstanceData(dataFrame.state!, dataFrame.FX, dataFrame.FY, dataFrame.FZ, pos,
-                            // Frame legend index => (meshIndex, meshColor)
-                            dataFrame.legend.Select(ch => meshPalette[ch]).ToArray());
-                    MODIFIED END*/
-                    
-                    // The final visualization is persistent
-                    //BlockInstanceSpawner.VisualizePersistentState(instanceData, materials, blockMeshes);
-
-                    if (dataFrame.FX > maxX) maxX = dataFrame.FX;
-                    if (dataFrame.FY > maxY) maxY = dataFrame.FY;
-                    if (dataFrame.FZ > maxZ) maxZ = dataFrame.FZ;
-
                     var stateClone = new byte[dataFrame.state!.Length];
                     Array.Copy(dataFrame.state!, stateClone, stateClone.Length);
 
                     var legendClone = new char[dataFrame.legend!.Length];
                     Array.Copy(dataFrame.legend!, legendClone, legendClone.Length);
 
-                    // Set Data and generate result mesh
+                    // Set result data and generate final mesh
                     result.SetData(fullPalette, stateClone, legendClone, dataFrame.FX, dataFrame.FY, dataFrame.FZ, dataFrame.stepCount, confModelFile, seed);
 
                     Debug.Log($"Iteration {k} complete. Steps: {dataFrame.stepCount} Frames: {recordedFrames.Count}");
                     ModelGraphUI!.SetActiveNode(-1); // Deselect active node
                     GenerationText.text = GetL10nString("status.info.generation_complete", k);
 
-                    if (record)
+                    if (record) // Save the recording file
                     {
-                        // Record the data frame
-                        recordedFrames.Add(new GenerationFrameRecord(new int3(dataFrame.FX, dataFrame.FY, dataFrame.FZ),
-                                dataFrame.state.Select(v => dataFrame.legend![v]).ToArray()));
-                        var recordingName = (currentConfModel?.Model ?? "Untitled") + $"_#{k}";
-                        StartCoroutine(RecordingExporter.SaveRecording(fullPalette, recordingName, maxX, maxY, maxZ, recordedFrames.ToArray()));
+                        var fileName = (currentConfModel?.Model ?? "Untitled") + $"_#{k}";
+                        StartCoroutine(RecordingExporter.SaveRecording(fullPalette, fileName,
+                                maxFrameSize.x, maxFrameSize.y, maxFrameSize.z, recordedFrames.ToArray()));
                     }
                 }
 
-                // Cleaning up
-                //BlockInstanceSpawner.ClearUpPersistentState();
+                // Clear block grid after an iteration is completed
+                BlockInstanceSpawner.ClearGrid();
             }
 
             if (executing) // If the execution hasn't been forced stopped
