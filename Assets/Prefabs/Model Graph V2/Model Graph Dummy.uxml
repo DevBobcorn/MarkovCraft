@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Scope Node" src="project://database/Assets/Prefabs/Model%20Graph%20V2/Scope%20Node.uxml?fileID=9197481963319205126&amp;guid=3c84bc92b1452d74d9e9cc955de10f92&amp;type=3#Scope Node" />
+    <ui:Template name="Rule Node" src="project://database/Assets/Prefabs/Model%20Graph%20V2/Rule%20Node.uxml?fileID=9197481963319205126&amp;guid=6cb2ff81adebcb34bb9c205ad48a0674&amp;type=3#Rule Node" />
+    <ui:Template name="Rule Preview" src="project://database/Assets/Prefabs/Model%20Graph%20V2/Rule%20Preview.uxml?fileID=9197481963319205126&amp;guid=6e07c3e5c7511cc4c85990cf6dde907f&amp;type=3#Rule Preview" />
+    <ui:Instance template="Scope Node" name="Scope Node" style="margin-bottom: 5px;">
+        <ui:Instance template="Rule Node" name="Rule Node">
+            <ui:Instance template="Rule Preview" name="Rule Preview" />
+        </ui:Instance>
+        <ui:Instance template="Rule Node" name="Rule Node">
+            <ui:Instance template="Rule Preview" name="Rule Preview" />
+            <ui:Instance template="Rule Preview" name="Rule Preview" />
+        </ui:Instance>
+        <ui:Instance template="Scope Node" name="Scope Node">
+            <ui:Instance template="Rule Node" name="Rule Node">
+            <ui:Instance template="Rule Preview" name="Rule Preview" />
+        </ui:Instance>
+        </ui:Instance>
+    </ui:Instance>
+</ui:UXML>
