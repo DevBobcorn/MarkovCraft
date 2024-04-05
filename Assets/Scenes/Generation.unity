@@ -11226,7 +11226,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 268621691}
   m_Direction: 2
   m_Value: 1
-  m_Size: 1
+  m_Size: 0.25518242
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -17177,7 +17177,7 @@ PrefabInstance:
     - target: {fileID: 8743287456755922985, guid: 3f3bcff5b12e0ac46ad837692e786270,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -0.000061035156
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -27374,6 +27374,7 @@ MonoBehaviour:
   GenerationText: {fileID: 599961054}
   FPSText: {fileID: 1176279341}
   ModelGraphUI: {fileID: 896529363}
+  ModelGraphUIv2: {fileID: 1654135308}
   ResultOperationPanelAnimator: {fileID: 1847558701}
   RemoveButton: {fileID: 1595227873}
   ExportButton: {fileID: 967166046}
@@ -32581,7 +32582,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1654135306
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32596,7 +32597,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PanelSettings: {fileID: 11400000, guid: 9dc7a4115cf510e41b17de89d61c16ea, type: 2}
   m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: d0cb38150c8b245479711460b5c48636,
+  sourceAsset: {fileID: 9197481963319205126, guid: 507c52a7d994aca4a831bb3891560e25,
     type: 3}
   m_SortingOrder: 0
 --- !u!4 &1654135307
@@ -32623,9 +32624,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1654135305}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f2518d8d33b89194ebd46e2cc131ab36, type: 3}
+  m_Script: {fileID: 11500000, guid: e07323e2659b7564bb4641cf27573595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ScopeGraphNodeDocAsset: {fileID: 9197481963319205126, guid: 3c84bc92b1452d74d9e9cc955de10f92,
+    type: 3}
+  RuleGraphNodeDocAsset: {fileID: 9197481963319205126, guid: 6cb2ff81adebcb34bb9c205ad48a0674,
+    type: 3}
+  PathGraphNodeDocAsset: {fileID: 0}
 --- !u!1 &1654822534
 GameObject:
   m_ObjectHideFlags: 0
@@ -33492,7 +33498,7 @@ PrefabInstance:
     - target: {fileID: 3560615264387792779, guid: 7783e3f432b1a6749989f252f518c451,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -279.99997
+      value: -280
       objectReference: {fileID: 0}
     - target: {fileID: 3618270397680843605, guid: 7783e3f432b1a6749989f252f518c451,
         type: 3}
@@ -36906,8 +36912,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1968043859}
   m_HandleRect: {fileID: 1968043858}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 1
+  m_Value: 1
+  m_Size: 0.27070224
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -41167,7 +41173,7 @@ PrefabInstance:
     - target: {fileID: 8743287456755922985, guid: 3f3bcff5b12e0ac46ad837692e786270,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -0.000061035156
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -41902,7 +41908,7 @@ PrefabInstance:
     - target: {fileID: 3560615264387792779, guid: 7783e3f432b1a6749989f252f518c451,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -279.99997
+      value: -280
       objectReference: {fileID: 0}
     - target: {fileID: 3618270397680843605, guid: 7783e3f432b1a6749989f252f518c451,
         type: 3}
