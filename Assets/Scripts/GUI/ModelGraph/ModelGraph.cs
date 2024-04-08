@@ -199,9 +199,6 @@ namespace MarkovCraft
 
                         ruleNodeCmp!.AddRulePreview(r, inPreview, outPreview);
                     }
-
-                    // Assign this graph node
-                    graph.GraphNodes.TryAdd(nodeNumId, nodeCmp);
                 }
                 else if (node is PathNode pathNode)
                 {
@@ -215,9 +212,6 @@ namespace MarkovCraft
                     var pathColor = palette[characters[pathNode.value]];
 
                     pathNodeCmp!.SetPreviews(froms, tos, ons, pathColor);
-
-                    // Assign this graph node
-                    graph.GraphNodes.TryAdd(nodeNumId, nodeCmp);
                 }
                 else
                 {

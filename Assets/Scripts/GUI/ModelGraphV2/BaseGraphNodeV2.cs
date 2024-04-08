@@ -5,7 +5,7 @@ namespace MarkovCraft
 {
     public class BaseGraphNodeV2
     {
-        private VisualElement? m_NodeElement;
+        protected VisualElement? m_NodeElement;
 
         public string NodeName = string.Empty;
         public string SourceXml = string.Empty;

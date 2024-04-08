@@ -19,8 +19,11 @@ namespace MarkovCraft
         [SerializeField] public VisualTreeAsset? RuleGraphNodeDocAsset;
         [SerializeField] public VisualTreeAsset? PathGraphNodeDocAsset;
 
+        [SerializeField] public VisualTreeAsset? RulePreviewDocAsset;
+
         //[SerializeField] public RectTransform? GraphContentTransform;
-        private VisualElement m_GraphContent;
+
+        private VisualElement? m_GraphContent;
 
         public VisualElement GetGraphContent() {
             if (m_GraphContent == null) {
@@ -160,21 +163,18 @@ namespace MarkovCraft
                     nodeElem = graph.ScopeGraphNodeDocAsset!.CloneTree();
                     transform.Add(nodeElem);
 
+                    nodeCmp = new(nodeElem);
+
                     foreach (var child in branch.nodes) // Generate child nodes
                         generate(graph, child, nodeElem);
                 }
-                // temp
-                else {
-                    nodeElem = graph.RuleGraphNodeDocAsset!.CloneTree();
-                    transform.Add(nodeElem);
-                }
-                // temp
-                /*
                 else if (node is RuleNode ruleNode)
                 {
-                    var nodeObj = GameObject.Instantiate(graph.RuleGraphNodePrefab, transform);
-                    nodeCmp = nodeObj!.GetComponent<RuleGraphNode>();
-                    var ruleNodeCmp = nodeCmp as RuleGraphNode;
+                    nodeElem = graph.RuleGraphNodeDocAsset!.CloneTree();
+                    transform.Add(nodeElem);
+
+                    nodeCmp = new RuleGraphNodeV2(nodeElem);
+                    var ruleNodeCmp = nodeCmp as RuleGraphNodeV2;
 
                     for (int r = 0; r < ruleNode.rules.Length; r++)
                     {
@@ -185,12 +185,18 @@ namespace MarkovCraft
                         var inPreview  = getPreview(rule.binput, rule.IMX, rule.IMY, rule.IMZ, characters, TILE_SIZE);
                         var outPreview = getPreview(rule.output, rule.OMX, rule.OMY, rule.OMZ, characters, TILE_SIZE);
 
-                        ruleNodeCmp!.AddRulePreview(r, inPreview, outPreview);
+                        ruleNodeCmp!.AddRulePreview(graph.RulePreviewDocAsset!, r, inPreview, outPreview);
                     }
-
-                    // Assign this graph node
-                    graph.GraphNodes.TryAdd(nodeNumId, nodeCmp);
                 }
+                // temp
+                else {
+                    nodeElem = graph.RuleGraphNodeDocAsset!.CloneTree();
+                    transform.Add(nodeElem);
+
+                    nodeCmp = new(nodeElem);
+                }
+                // temp
+                /*
                 else if (node is PathNode pathNode)
                 {
                     var nodeObj = GameObject.Instantiate(graph.PathGraphNodePrefab, transform);
@@ -213,8 +219,6 @@ namespace MarkovCraft
                     nodeCmp = nodeObj!.GetComponent<BaseGraphNode>();
                 }
                 */
-
-                nodeCmp = new(nodeElem);
 
                 // Set node data
                 nodeCmp.SetNodeName($"{nodeName} <color=#888888>#{node.numId}</color>");
