@@ -20,6 +20,7 @@ namespace MarkovCraft
                 ruleInPreview.GetComponent<LayoutElement>().minHeight = inPrev.height;
 
                 ruleInPreview.texture = inPrev;
+                ruleInPreview.SetNativeSize();
             }
             
             if (ruleOutPreview != null)

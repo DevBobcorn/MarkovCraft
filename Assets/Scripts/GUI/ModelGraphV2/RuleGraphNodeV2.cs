@@ -34,7 +34,7 @@ namespace MarkovCraft
             var rulePreview = asset.CloneTree();
             m_NodeElement!.Add(rulePreview);
 
-            var rulePrev = new RulePreviewV2(m_NodeElement);
+            var rulePrev = new RulePreviewV2(rulePreview);
             rulePrev.SetRuleActive(false);
             rulePrev.SetPreviews(inPreview, outPreview);
 

@@ -145,11 +145,12 @@ namespace MarkovCraft
                 var texture = new Texture2D(texWidth, texHeight);
                 texture.SetPixels32(bitmap);
                 texture.filterMode = FilterMode.Point;
+                texture.wrapMode = TextureWrapMode.Clamp;
                 texture.Apply();
 
                 return texture;
             };
-            void generate(ModelGraphV2 graph, Node node, VisualElement transform)
+            void generate(ModelGraphV2 graph, Node node, VisualElement parent)
             {
                 var nodeName = GameScene.GetL10nString(GetNodeNameKey(node));
                 var nodeNumId = node.numId;
@@ -161,8 +162,7 @@ namespace MarkovCraft
                 if (node is Branch branch)
                 {
                     nodeElem = graph.ScopeGraphNodeDocAsset!.CloneTree();
-                    transform.Add(nodeElem);
-
+                    parent.Add(nodeElem);
                     nodeCmp = new(nodeElem);
 
                     foreach (var child in branch.nodes) // Generate child nodes
@@ -171,7 +171,7 @@ namespace MarkovCraft
                 else if (node is RuleNode ruleNode)
                 {
                     nodeElem = graph.RuleGraphNodeDocAsset!.CloneTree();
-                    transform.Add(nodeElem);
+                    parent.Add(nodeElem);
 
                     nodeCmp = new RuleGraphNodeV2(nodeElem);
                     var ruleNodeCmp = nodeCmp as RuleGraphNodeV2;
@@ -188,14 +188,6 @@ namespace MarkovCraft
                         ruleNodeCmp!.AddRulePreview(graph.RulePreviewDocAsset!, r, inPreview, outPreview);
                     }
                 }
-                // temp
-                else {
-                    nodeElem = graph.RuleGraphNodeDocAsset!.CloneTree();
-                    transform.Add(nodeElem);
-
-                    nodeCmp = new(nodeElem);
-                }
-                // temp
                 /*
                 else if (node is PathNode pathNode)
                 {
@@ -213,19 +205,18 @@ namespace MarkovCraft
                     // Assign this graph node
                     graph.GraphNodes.TryAdd(nodeNumId, nodeCmp);
                 }
+                */
                 else
                 {
-                    var nodeObj = GameObject.Instantiate(graph.RuleGraphNodePrefab, transform);
-                    nodeCmp = nodeObj!.GetComponent<BaseGraphNode>();
+                    nodeElem = graph.RuleGraphNodeDocAsset!.CloneTree();
+                    parent.Add(nodeElem);
+                    nodeCmp = new(nodeElem);
                 }
-                */
 
                 // Set node data
-                nodeCmp.SetNodeName($"{nodeName} <color=#888888>#{node.numId}</color>");
-                
-                //nodeElem.SetNodeActive(false);
-
-                //nodeCmp.SetSourceXml(node.sourceXml);
+                nodeCmp.SetNodeName($"{nodeName} <color=#AAAAAA>#{node.numId}</color>");
+                nodeCmp.SetNodeActive(false);
+                nodeCmp.SetSourceXml(node.sourceXml);
 
                 // Assign this graph node
                 graph.GraphNodes.TryAdd(nodeNumId, nodeCmp);
@@ -240,7 +231,6 @@ namespace MarkovCraft
 
         public static void UpdateGraph(ModelGraphV2 graph, Branch? current)
         {
-            /*
             if (current is null)
             {
                 graph.SetActiveNode(-1);
@@ -258,11 +248,10 @@ namespace MarkovCraft
                     var currentNode = current.nodes[current.n];
                     graph.SetActiveNode(currentNode.numId);
 
-                    if (currentNode is RuleNode ruleNode && graph.ActiveNode is RuleGraphNode ruleGraphNode) // Set active branch
+                    if (currentNode is RuleNode ruleNode && graph.ActiveNode is RuleGraphNodeV2 ruleGraphNode) // Set active branch
                         ruleGraphNode.SetActiveRules(GetActiveRules(ruleNode));
                 }
             }
-            */
         }
 
         private static readonly Dictionary<Type, string> NodeNameDict = new()

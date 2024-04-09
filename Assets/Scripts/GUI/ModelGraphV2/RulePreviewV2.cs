@@ -6,11 +6,11 @@ namespace MarkovCraft
 {
     public class RulePreviewV2
     {
-        //[SerializeField] GameObject? activeHint;
-        //[SerializeField] RawImage? ruleInPreview;
-        //[SerializeField] RawImage? ruleOutPreview;
-
         protected VisualElement? m_RuleElement;
+
+        // Cache frequently accessed children elements
+        // to eliminate redundant queries
+        private VisualElement? m_ActiveHint;
 
         public RulePreviewV2(VisualElement ruleElement)
         {
@@ -19,8 +19,8 @@ namespace MarkovCraft
 
         public void SetRuleActive(bool active)
         {
-            //activeHint?.SetActive(active);
-            
+            (m_ActiveHint ??= m_RuleElement.Q(name: "active_hint")).style.display =
+                    active ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         public void SetPreviews(Texture2D inPrev, Texture2D outPrev)
@@ -31,21 +31,11 @@ namespace MarkovCraft
             if (ruleInPreview != null)
             {
                 ruleInPreview.image = inPrev;
-
-                ruleInPreview.style.top = StyleKeyword.Auto;
-                ruleInPreview.style.bottom = StyleKeyword.Auto;
-                ruleInPreview.style.left = StyleKeyword.Auto;
-                ruleInPreview.style.right = StyleKeyword.Auto;
             }
 
             if (ruleOutPreview != null)
             {
                 ruleOutPreview.image = outPrev;
-
-                ruleOutPreview.style.top = StyleKeyword.Auto;
-                ruleOutPreview.style.bottom = StyleKeyword.Auto;
-                ruleOutPreview.style.left = StyleKeyword.Auto;
-                ruleOutPreview.style.right = StyleKeyword.Auto;
             }
         }
 

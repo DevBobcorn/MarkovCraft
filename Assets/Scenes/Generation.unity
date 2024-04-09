@@ -16571,6 +16571,7 @@ RectTransform:
   - {fileID: 926882344}
   - {fileID: 1176279340}
   - {fileID: 896529359}
+  - {fileID: 1654135307}
   - {fileID: 599961053}
   - {fileID: 504798478}
   - {fileID: 1847558698}
@@ -32577,7 +32578,7 @@ GameObject:
   - component: {fileID: 1654135306}
   - component: {fileID: 1654135308}
   m_Layer: 5
-  m_Name: UIDocument
+  m_Name: Model Graph V2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32608,12 +32609,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1654135305}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 732912707}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1654135308
 MonoBehaviour:
@@ -42261,4 +42262,3 @@ SceneRoots:
   - {fileID: 133423227}
   - {fileID: 473348580}
   - {fileID: 655396118}
-  - {fileID: 1654135307}

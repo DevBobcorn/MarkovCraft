@@ -222,7 +222,6 @@ namespace MarkovCraft
                 // Set node data
                 nodeCmp.SetNodeName($"{nodeName} <color=#888888>#{node.numId}</color>");
                 nodeCmp.SetNodeActive(false);
-
                 nodeCmp.SetSourceXml(node.sourceXml);
 
                 // Assign this graph node
