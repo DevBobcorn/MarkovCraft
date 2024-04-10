@@ -32632,7 +32632,8 @@ MonoBehaviour:
     type: 3}
   RuleGraphNodeDocAsset: {fileID: 9197481963319205126, guid: 6cb2ff81adebcb34bb9c205ad48a0674,
     type: 3}
-  PathGraphNodeDocAsset: {fileID: 0}
+  PathGraphNodeDocAsset: {fileID: 9197481963319205126, guid: e522730709f570b429068cdb93cea9ba,
+    type: 3}
   RulePreviewDocAsset: {fileID: 9197481963319205126, guid: 6e07c3e5c7511cc4c85990cf6dde907f,
     type: 3}
 --- !u!1 &1654822534

@@ -6,7 +6,7 @@ namespace MarkovCraft
 {
     public class RulePreviewV2
     {
-        protected VisualElement? m_RuleElement;
+        protected readonly VisualElement m_RuleElement;
 
         // Cache frequently accessed children elements
         // to eliminate redundant queries

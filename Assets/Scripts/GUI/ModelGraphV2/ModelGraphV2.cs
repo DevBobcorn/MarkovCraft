@@ -1,10 +1,8 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Xml.Linq;
 using UnityEngine;
-using TMPro;
 
 using CraftSharp;
 using MarkovJunior;
@@ -20,8 +18,6 @@ namespace MarkovCraft
         [SerializeField] public VisualTreeAsset? PathGraphNodeDocAsset;
 
         [SerializeField] public VisualTreeAsset? RulePreviewDocAsset;
-
-        //[SerializeField] public RectTransform? GraphContentTransform;
 
         private VisualElement? m_GraphContent;
 
