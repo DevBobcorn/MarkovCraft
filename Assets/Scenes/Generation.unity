@@ -18319,22 +18319,22 @@ PrefabInstance:
     - target: {fileID: 6815418630969242273, guid: 48ba22333b89a5c40ac70c02a1cbb280,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6815418630969242273, guid: 48ba22333b89a5c40ac70c02a1cbb280,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6815418630969242273, guid: 48ba22333b89a5c40ac70c02a1cbb280,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 6815418630969242273, guid: 48ba22333b89a5c40ac70c02a1cbb280,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -50
       objectReference: {fileID: 0}
     - target: {fileID: 7877119718854296343, guid: 48ba22333b89a5c40ac70c02a1cbb280,
         type: 3}
@@ -20198,7 +20198,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &896529359
 RectTransform:
   m_ObjectHideFlags: 0
@@ -27374,7 +27374,6 @@ MonoBehaviour:
   VolumeText: {fileID: 926882345}
   GenerationText: {fileID: 599961054}
   FPSText: {fileID: 1176279341}
-  ModelGraphUI: {fileID: 896529363}
   ModelGraphUIv2: {fileID: 1654135308}
   ResultOperationPanelAnimator: {fileID: 1847558701}
   RemoveButton: {fileID: 1595227873}
@@ -36163,7 +36162,7 @@ RectTransform:
   m_Father: {fileID: 1730469244}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -41345,22 +41344,22 @@ PrefabInstance:
     - target: {fileID: 6815418630969242273, guid: 48ba22333b89a5c40ac70c02a1cbb280,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6815418630969242273, guid: 48ba22333b89a5c40ac70c02a1cbb280,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6815418630969242273, guid: 48ba22333b89a5c40ac70c02a1cbb280,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 6815418630969242273, guid: 48ba22333b89a5c40ac70c02a1cbb280,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -50
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

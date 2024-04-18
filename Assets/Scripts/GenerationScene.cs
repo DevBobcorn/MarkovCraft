@@ -41,7 +41,7 @@ namespace MarkovCraft
         [SerializeField] public TMP_Text? BlockSelectionText;
         [SerializeField] public ExportItem? BlockSelectionMappingItem;
         [SerializeField] public TMP_Text? VolumeText, GenerationText, FPSText;
-        [SerializeField] public ModelGraph? ModelGraphUI;
+        //[SerializeField] public ModelGraph? ModelGraphUI;
         [SerializeField] public ModelGraphV2? ModelGraphUIv2;
         [SerializeField] public Animator? ResultOperationPanelAnimator;
         [SerializeField] public Button? RemoveButton, ExportButton;
@@ -78,6 +78,7 @@ namespace MarkovCraft
 
         private void GenerateProcedureGraph(string modelName)
         {
+            /*
             if (interpreter != null && ModelGraphUI != null)
             {
                 var graphPalette = meshPalette.ToDictionary(x => x.Key, x => ColorConvert.GetOpaqueColor32(x.Value.z));
@@ -85,6 +86,7 @@ namespace MarkovCraft
             }
             else
                 ModelGraphUI?.gameObject.SetActive(false);
+            */
 
             if (interpreter != null && ModelGraphUIv2 != null)
             {
@@ -140,7 +142,7 @@ namespace MarkovCraft
             ClearUpScene();
 
             // Clear up current model graph
-            ModelGraphUI?.ClearUp();
+            //ModelGraphUI?.ClearUp();
             ModelGraphUIv2?.ClearUp();
 
             string fileName = PathHelper.GetExtraDataFile($"models{SP}{confModel.Model}.xml");
@@ -435,8 +437,7 @@ namespace MarkovCraft
                         }
                         
                         // Update active node on graph
-                        // TODO: Make this thing more performant
-                        ModelGraphGenerator.UpdateGraph(ModelGraphUI!, interpreter.current);
+                        //ModelGraphGenerator.UpdateGraph(ModelGraphUI!, interpreter.current);
                         ModelGraphGeneratorV2.UpdateGraph(ModelGraphUIv2!, interpreter.current);
                     }
 
@@ -455,7 +456,7 @@ namespace MarkovCraft
                     result.SetData(fullPalette, stateClone, legendClone, dataFrame.FX, dataFrame.FY, dataFrame.FZ, dataFrame.stepCount, confModelFile, seed);
 
                     Debug.Log($"Iteration {k} complete. Steps: {dataFrame.stepCount} Frames: {recordedFrames.Count}");
-                    ModelGraphUI!.SetActiveNode(-1); // Deselect active node
+                    //ModelGraphUI!.SetActiveNode(-1); // Deselect active node
                     ModelGraphUIv2!.SetActiveNode(-1); // Deselect active node
                     GenerationText.text = GetL10nString("status.info.generation_complete", k);
 
@@ -875,7 +876,7 @@ namespace MarkovCraft
             }
 
             executing = false;
-            ModelGraphUI?.SetActiveNode(-1);
+            //ModelGraphUI?.SetActiveNode(-1);
             ModelGraphUIv2?.SetActiveNode(-1);
 
             if (ExecuteButton != null)

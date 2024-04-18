@@ -7,6 +7,7 @@ using UnityEngine;
 using CraftSharp;
 using MarkovJunior;
 using UnityEngine.UIElements;
+using System.Linq;
 
 namespace MarkovCraft
 {
@@ -184,12 +185,13 @@ namespace MarkovCraft
                         ruleNodeCmp!.AddRulePreview(graph.RulePreviewDocAsset!, r, inPreview, outPreview);
                     }
                 }
-                /*
                 else if (node is PathNode pathNode)
                 {
-                    var nodeObj = GameObject.Instantiate(graph.PathGraphNodePrefab, transform);
-                    nodeCmp = nodeObj!.GetComponent<PathGraphNode>();
-                    var pathNodeCmp = nodeCmp as PathGraphNode;
+                    nodeElem = graph.PathGraphNodeDocAsset!.CloneTree();
+                    parent.Add(nodeElem);
+
+                    nodeCmp = new PathGraphNodeV2(nodeElem);
+                    var pathNodeCmp = nodeCmp as PathGraphNodeV2;
 
                     var froms = Helper.NonZeroPositions(pathNode.start).Select(b => palette[characters[b]]).ToArray();
                     var tos = Helper.NonZeroPositions(pathNode.finish).Select(b => palette[characters[b]]).ToArray();
@@ -197,11 +199,7 @@ namespace MarkovCraft
                     var pathColor = palette[characters[pathNode.value]];
 
                     pathNodeCmp!.SetPreviews(froms, tos, ons, pathColor);
-
-                    // Assign this graph node
-                    graph.GraphNodes.TryAdd(nodeNumId, nodeCmp);
                 }
-                */
                 else
                 {
                     nodeElem = graph.RuleGraphNodeDocAsset!.CloneTree();
