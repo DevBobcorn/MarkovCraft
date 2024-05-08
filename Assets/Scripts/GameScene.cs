@@ -43,7 +43,6 @@ namespace MarkovCraft
         public const int DEFAULT_MATERIAL_INDEX = 0;
 
         // Dummy world
-        public class World : AbstractWorld { }
         public static readonly World DummyWorld = new();
         // Palettes and resources
         protected Mesh[] blockMeshes = { };
