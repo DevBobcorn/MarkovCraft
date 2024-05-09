@@ -1,13 +1,15 @@
 #panel {
-    transition-property: opacity;
+    transition-property: left, opacity;
     transition-timing-function: ease-out;
-    transition-duration: 0.2s;
+    transition-duration: 0.3s;
     opacity: 0;
+    left: -900px;
 }
 
 #panel.shown {
-    transition-property: opacity;
+    transition-property: left, opacity;
     transition-timing-function: ease-out;
-    transition-duration: 0.2s;
+    transition-duration: 0.3s;
     opacity: 1;
+    left: 0px;
 }

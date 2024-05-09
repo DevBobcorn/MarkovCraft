@@ -88,6 +88,9 @@ namespace MarkovCraft
             canvasGroup!.alpha = 1F;
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
+
+            // Hide model graph
+            GameScene.Instance.HideSpecialGUI();
         }
 
         public void HidePanel()
@@ -95,6 +98,9 @@ namespace MarkovCraft
             canvasGroup!.alpha = 0F;
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
+
+            // Show model graph
+            GameScene.Instance.ShowSpecialGUI();
         }
     }
 }

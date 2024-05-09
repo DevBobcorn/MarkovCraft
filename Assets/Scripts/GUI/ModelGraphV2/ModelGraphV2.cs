@@ -72,14 +72,16 @@ namespace MarkovCraft
         {
             if (GraphNodes.Count == 0) return;
 
-            GetComponent<UIDocument>().rootVisualElement.Q("panel").AddToClassList("shown");
-            //Debug.Log("Show: " + string.Join(",", GetComponent<UIDocument>().rootVisualElement.GetClasses()));
+            var elem = GetComponent<UIDocument>().rootVisualElement;
+            elem.Q("panel").AddToClassList("shown");
+            //elem.pickingMode = PickingMode.Position;
         }
 
         public void HidePanel()
         {
-            GetComponent<UIDocument>().rootVisualElement.Q("panel").RemoveFromClassList("shown");
-            //Debug.Log("Hide: " + string.Join(",", GetComponent<UIDocument>().rootVisualElement.GetClasses()));
+            var elem = GetComponent<UIDocument>().rootVisualElement;
+            elem.Q("panel").RemoveFromClassList("shown");
+            //elem.pickingMode = PickingMode.Ignore;
         }
 
         public void ClearUp()
