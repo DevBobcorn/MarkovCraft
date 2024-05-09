@@ -78,16 +78,6 @@ namespace MarkovCraft
 
         private void GenerateProcedureGraph(string modelName)
         {
-            /*
-            if (interpreter != null && ModelGraphUI != null)
-            {
-                var graphPalette = meshPalette.ToDictionary(x => x.Key, x => ColorConvert.GetOpaqueColor32(x.Value.z));
-                ModelGraphGenerator.GenerateGraph(ModelGraphUI, modelName, interpreter.root, graphPalette);
-            }
-            else
-                ModelGraphUI?.gameObject.SetActive(false);
-            */
-
             if (interpreter != null && ModelGraphUIv2 != null)
             {
                 var graphPalette = meshPalette.ToDictionary(x => x.Key, x => ColorConvert.GetOpaqueColor32(x.Value.z));
@@ -112,9 +102,17 @@ namespace MarkovCraft
             }
         }
 
-        public override void Hide3dGUI()
+        public override void HideSpecialGUI()
+        {
+            // Hide UI Toolkit Model Graph (V2) which doesn't use proper rendering
+            ModelGraphUIv2?.HidePanel();
+        }
+
+        public override void ShowSpecialGUI()
         {
             UpdateBlockSelection(null);
+            // Also show UI Toolkit Model Graph (V2) if it is ready
+            ModelGraphUIv2?.ShowPanelIfNotEmpty();
         }
 
         public Dictionary<char, int> GetBaseColorPalette()
@@ -547,13 +545,13 @@ namespace MarkovCraft
 
                     CreateButton!.onClick.RemoveAllListeners();
                     CreateButton.onClick.AddListener(() => {
-                        Hide3dGUI();
+                        HideSpecialGUI();
                         screenManager!.SetActiveScreenByType<ConfiguredModelCreatorScreen>();
                     });
 
                     ConfigButton!.onClick.RemoveAllListeners();
                     ConfigButton.onClick.AddListener(() => {
-                        Hide3dGUI();
+                        HideSpecialGUI();
                         screenManager!.SetActiveScreenByType<ConfiguredModelEditorScreen>();
                     });
 
@@ -562,19 +560,19 @@ namespace MarkovCraft
 
                     ExportButton!.onClick.RemoveAllListeners();
                     ExportButton.onClick.AddListener(() => {
-                        Hide3dGUI();
+                        HideSpecialGUI();
                         screenManager!.SetActiveScreenByType<ResultExporterScreen>();
                     });
 
                     ResizeButton!.onClick.RemoveAllListeners();
                     ResizeButton.onClick.AddListener(() => {
-                        Hide3dGUI();
+                        HideSpecialGUI();
                         screenManager!.SetActiveScreenByType<ResultSizeUpperScreen>();
                     });
 
                     ExtrudeButton!.onClick.RemoveAllListeners();
                     ExtrudeButton.onClick.AddListener(() => {
-                        Hide3dGUI();
+                        HideSpecialGUI();
                         //screenManager!.SetActiveScreenByType<ResultSizeUpperScreen>();
                     });
 

@@ -12,6 +12,14 @@ namespace MarkovCraft
             game = GameScene.Instance;
         }
 
+        public override void OnShow(ScreenManager manager) 
+        {
+            base.OnShow(manager);
+
+            // Show model graph if available
+            game!.ShowSpecialGUI();
+        }
+
         public override bool AllowsMovementInput() => true;
 
         public override void ScreenUpdate(ScreenManager manager)
@@ -20,7 +28,7 @@ namespace MarkovCraft
             {
                 if (!game!.Loading)
                 {
-                    game!.Hide3dGUI();
+                    game!.HideSpecialGUI();
                     manager.SetActiveScreenByType<ConfiguredModelEditorScreen>();
                 }
             }
@@ -28,7 +36,7 @@ namespace MarkovCraft
             {
                 if (!game!.Loading)
                 {
-                    game!.Hide3dGUI();
+                    game!.HideSpecialGUI();
                     manager.SetActiveScreenByType<PauseScreen>();
                 }
             }

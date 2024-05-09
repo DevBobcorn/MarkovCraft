@@ -1,0 +1,13 @@
+#panel {
+    transition-property: opacity;
+    transition-timing-function: ease-out;
+    transition-duration: 0.2s;
+    opacity: 0;
+}
+
+#panel.shown {
+    transition-property: opacity;
+    transition-timing-function: ease-out;
+    transition-duration: 0.2s;
+    opacity: 1;
+}

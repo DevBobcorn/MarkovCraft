@@ -98,7 +98,9 @@ namespace MarkovCraft
                 Instance.L10nBlockNameTable.GetValueOrDefault($"block.{blockId.Namespace}.{blockId.Path}", $"block.{blockId.Namespace}.{blockId.Path}");
 
 
-        public virtual void Hide3dGUI() { }
+        public virtual void ShowSpecialGUI() { }
+
+        public virtual void HideSpecialGUI() { }
 
         protected void GenerateBlockMeshes(Dictionary<int, int> stateId2Mesh, bool appendEmptyMesh = false) // StateId => Mesh index
         {

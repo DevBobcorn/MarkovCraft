@@ -68,6 +68,20 @@ namespace MarkovCraft
                 item.Value.SetNodeNameVisible(nodeNamesVisible);
         }
 
+        public void ShowPanelIfNotEmpty()
+        {
+            if (GraphNodes.Count == 0) return;
+
+            GetComponent<UIDocument>().rootVisualElement.Q("panel").AddToClassList("shown");
+            //Debug.Log("Show: " + string.Join(",", GetComponent<UIDocument>().rootVisualElement.GetClasses()));
+        }
+
+        public void HidePanel()
+        {
+            GetComponent<UIDocument>().rootVisualElement.Q("panel").RemoveFromClassList("shown");
+            //Debug.Log("Hide: " + string.Join(",", GetComponent<UIDocument>().rootVisualElement.GetClasses()));
+        }
+
         public void ClearUp()
         {
             GraphNodes.Clear();
@@ -76,7 +90,8 @@ namespace MarkovCraft
             // Remove all children of the container element
             GetGraphContent().Clear();
 
-            // TODO: Reset size
+            // Hide away
+            HidePanel();
         }
 
         void Start()
@@ -222,6 +237,9 @@ namespace MarkovCraft
             
             // Start generation
             generate(graph, root, graph.GetGraphContent());
+
+            // Show the graph
+            graph.ShowPanelIfNotEmpty();
         }
 
         public static void UpdateGraph(ModelGraphV2 graph, Branch? current)
