@@ -16,8 +16,8 @@ namespace MarkovCraft
         {
             base.OnShow(manager);
 
-            // Show model graph if available
-            game!.ShowSpecialGUI();
+            // Show model graph if available (don't use game reference here as it might has not been set)
+            GameScene.Instance.ShowSpecialGUI();
         }
 
         public override bool AllowsMovementInput() => true;
