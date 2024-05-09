@@ -36,7 +36,8 @@ namespace MarkovCraft
 
         public void SetNodeNameVisible(bool visible)
         {
-            //nameText!.gameObject.SetActive(visible);
+            //m_NameText!.visible = visible;
+            m_NameText!.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         public void SetNodeName(string nodeName)

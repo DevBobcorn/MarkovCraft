@@ -58,7 +58,7 @@ namespace MarkovCraft
 
                 var color = meshData.x == 0 ? ComputeColor(meshData.z) : WHITE;
 
-                if (mmm.ValueRO.Mesh != -meshData.x - 1 || !ccc.ValueRW.Value.Equals(color) )
+                if (mmm.ValueRO.Mesh != -meshData.x - 1 || !ccc.ValueRO.Value.Equals(color) )
                 {
                     mmm.ValueRW.Mesh = -meshData.x - 1;
                     ccc.ValueRW.Value = color;

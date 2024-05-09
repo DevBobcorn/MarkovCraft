@@ -26,6 +26,7 @@ namespace MarkovCraft
         public BaseGraphNode? ActiveNode => activeNode;
 
         private bool adjustingWidth = false, nodeNamesVisible = true;
+        public bool NodeNamesVisible => nodeNamesVisible;
         private RectTransform? ownTransform;
 
         public void AdjustWidth() => adjustingWidth = true;
@@ -223,6 +224,9 @@ namespace MarkovCraft
                 nodeCmp.SetNodeName($"{nodeName} <color=#888888>#{node.numId}</color>");
                 nodeCmp.SetNodeActive(false);
                 nodeCmp.SetSourceXml(node.sourceXml);
+
+                // Set node name visibility
+                nodeCmp.SetNodeNameVisible(graph.NodeNamesVisible);
 
                 // Assign this graph node
                 graph.GraphNodes.TryAdd(nodeNumId, nodeCmp);

@@ -25,7 +25,7 @@ namespace MarkovCraft
         public VisualElement GetGraphContent() {
             if (m_GraphContent == null) {
                 m_GraphContent = GetComponent<UIDocument>().rootVisualElement
-                        .Q(name = "panel").Q(name = "graph_content");
+                        .Q("panel").Q("graph_content");
             }
 
             return m_GraphContent;
@@ -35,14 +35,13 @@ namespace MarkovCraft
         private BaseGraphNodeV2? activeNode = null;
         public BaseGraphNodeV2? ActiveNode => activeNode;
 
-        private bool adjustingWidth = false, nodeNamesVisible = true;
-
-        public void AdjustWidth() => adjustingWidth = true;
+        private bool nodeNamesVisible = true;
+        public bool NodeNamesVisible => nodeNamesVisible;
 
         public void SetNameText(string graphName)
         {
-            (GetComponent<UIDocument>().rootVisualElement.Q(name = "panel")
-                    .Q(name = "graph_name_text") as Label)!.text = graphName;
+            (GetComponent<UIDocument>().rootVisualElement.Q("panel")
+                    .Q("graph_name_text") as Label)!.text = graphName;
         }
 
         public void SetActiveNode(int nodeNumId)
@@ -78,14 +77,16 @@ namespace MarkovCraft
             GetGraphContent().Clear();
 
             // TODO: Reset size
-            
-            AdjustWidth();
+        }
+
+        void Start()
+        {
+            (GetComponent<UIDocument>().rootVisualElement.Q("panel")
+                    .Q("display_node_names_button") as Button)!.clicked += ToggleNodeNamesVisibility;
         }
 
         void Update()
         {
-            if (!adjustingWidth) return;
-
             // TODO: Adjust size
         }
     }
@@ -212,15 +213,15 @@ namespace MarkovCraft
                 nodeCmp.SetNodeActive(false);
                 nodeCmp.SetSourceXml(node.sourceXml);
 
+                // Set node name visibility
+                nodeCmp.SetNodeNameVisible(graph.NodeNamesVisible);
+
                 // Assign this graph node
                 graph.GraphNodes.TryAdd(nodeNumId, nodeCmp);
             };
             
             // Start generation
             generate(graph, root, graph.GetGraphContent());
-
-            // Adjust own width to fit graph content
-            graph.AdjustWidth();
         }
 
         public static void UpdateGraph(ModelGraphV2 graph, Branch? current)
