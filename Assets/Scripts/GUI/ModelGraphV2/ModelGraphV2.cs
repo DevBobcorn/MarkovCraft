@@ -115,7 +115,7 @@ namespace MarkovCraft
 
         static ModelGraphGeneratorV2()
         {
-            XElement settings = XDocument.Load(PathHelper.GetExtraDataFile("settings.xml")).Root;
+            XElement settings = XDocument.Load(MarkovGlobal.GetDataFile("settings.xml")).Root;
             D3 = settings.Get("d3", true);
             INACTIVE = ColorConvert.OpaqueColor32FromHexString(settings.Get("inactive", "666666"));
             ACTIVE = ColorConvert.OpaqueColor32FromHexString(settings.Get("active", "FFFFFF"));

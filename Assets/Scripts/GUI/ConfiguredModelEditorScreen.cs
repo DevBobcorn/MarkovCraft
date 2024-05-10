@@ -60,7 +60,7 @@ namespace MarkovCraft
         private IEnumerator InitializeScreen(string confModelFile)
         {
             // Initialize settings panel
-            var dir = PathHelper.GetExtraDataFile("models");
+            var dir = MarkovGlobal.GetDataFile("models");
             int index = 0, selectedIndex = -1;
             var options = new List<TMP_Dropdown.OptionData>();
 
@@ -140,7 +140,7 @@ namespace MarkovCraft
         {
             working = true;
 
-            string modelFileName = PathHelper.GetExtraDataFile($"models{SP}{modelName}.xml");
+            string modelFileName = MarkovGlobal.GetDataFile($"models{SP}{modelName}.xml");
             XDocument? modelDoc = null;
 
             if (File.Exists(modelFileName))
@@ -291,7 +291,7 @@ namespace MarkovCraft
                         BlockState = x.GetBlockState()
                     }).ToArray();
                     
-                    var savePath = PathHelper.GetExtraDataFile(CONFIGURED_MODEL_FOLDER);
+                    var savePath = MarkovGlobal.GetDataFile(CONFIGURED_MODEL_FOLDER);
                     var specifiedName = SaveNameInput!.text;
 
                     if (GameScene.CheckFileName(specifiedName))

@@ -43,7 +43,7 @@ namespace MarkovCraft
 
                 if (modelObj is not null)
                 {
-                    var path = PathHelper.GetExtraDataFile($"{CONFIGURED_MODEL_FOLDER}{SP}{XDocFileName}");
+                    var path = MarkovGlobal.GetDataFile($"{CONFIGURED_MODEL_FOLDER}{SP}{XDocFileName}");
                     
                     if (File.Exists(path))
                     {
@@ -66,7 +66,7 @@ namespace MarkovCraft
 
                 if (modelObj is not null)
                 {
-                    var path = PathHelper.GetExtraDataFile($"{CONFIGURED_MODEL_FOLDER}{SP}{XDocFileName}");
+                    var path = MarkovGlobal.GetDataFile($"{CONFIGURED_MODEL_FOLDER}{SP}{XDocFileName}");
                     var xdoc = ConfiguredModel.GetXMLDoc(modelObj);
                     xdoc.Save(path);
 

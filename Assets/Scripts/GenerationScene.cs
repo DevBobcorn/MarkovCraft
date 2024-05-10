@@ -91,7 +91,7 @@ namespace MarkovCraft
         {
             if (!baseColorPaletteLoaded)
             {
-                XDocument.Load(PathHelper.GetExtraDataFile("palette.xml")).Root.Elements("color").ToList().ForEach(x =>
+                XDocument.Load(MarkovGlobal.GetDataFile("palette.xml")).Root.Elements("color").ToList().ForEach(x =>
                 {
                     var character = x.Get<char>("symbol");
                     var rgb = ColorConvert.RGBFromHexString(x.Get<string>("value"));
@@ -143,7 +143,7 @@ namespace MarkovCraft
             //ModelGraphUI?.ClearUp();
             ModelGraphUIv2?.ClearUp();
 
-            string fileName = PathHelper.GetExtraDataFile($"models{SP}{confModel.Model}.xml");
+            string fileName = MarkovGlobal.GetDataFile($"models{SP}{confModel.Model}.xml");
             Debug.Log($"{confModelFile} ({confModel.Model}) > {fileName}");
 
             XDocument? modelDoc = null;
@@ -783,7 +783,7 @@ namespace MarkovCraft
 
         private void UpdateConfModelList()
         {
-            var dir = PathHelper.GetExtraDataFile(CONFIGURED_MODEL_FOLDER);
+            var dir = MarkovGlobal.GetDataFile(CONFIGURED_MODEL_FOLDER);
 
             if (Directory.Exists(dir))
             {
@@ -832,7 +832,7 @@ namespace MarkovCraft
             
             confModelFile = newConfModelFile;
 
-            var xdoc = XDocument.Load($"{PathHelper.GetExtraDataFile(CONFIGURED_MODEL_FOLDER)}/{confModelFile}");
+            var xdoc = XDocument.Load($"{MarkovGlobal.GetDataFile(CONFIGURED_MODEL_FOLDER)}/{confModelFile}");
             var newConfModel = ConfiguredModel.CreateFromXMLDoc(xdoc);
 
             // Assign new configured model
