@@ -20,6 +20,11 @@ namespace MarkovCraft
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
 
+        private const string MARKOV_CRAFT_BUILTIN_FILE_NAME = "MarkovCraftBuiltin";
+        private const int    MARKOV_CRAFT_BUILTIN_VERSION = 2077;
+        private const string VANILLAFIX_FILE_NAME = "VanillaFix";
+        private const int    VANILLAFIX_VERSION = 2077;
+
         public static readonly RenderType[] BLOCK_RENDER_TYPES =
         {
             RenderType.SOLID,
@@ -166,6 +171,13 @@ namespace MarkovCraft
 
             // Wait for splash animation to complete...
             yield return new WaitForSecondsRealtime(0.5F);
+
+            // Generate default data or check update
+            var extraDataDir = PathHelper.GetExtraDataDirectory();
+            yield return StartCoroutine(BuiltinResourceHelper.ReadyBuiltinResource(
+                    MARKOV_CRAFT_BUILTIN_FILE_NAME, MARKOV_CRAFT_BUILTIN_VERSION, extraDataDir,
+                    (status) => Loom.QueueOnMainThread(() => update?.Invoke(status)),
+                    () => { }, (succeed) => { }));
 
             // First load all possible Block States...
             var loadFlag = new DataLoadFlag();

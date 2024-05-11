@@ -7,7 +7,7 @@ using System.Text;
 
 namespace MarkovCraft
 {
-    public static class DataHelper
+    public static class NBTDataHelper
     {
         /// <summary>
         /// Read some data from a cache of bytes and remove it from the cache

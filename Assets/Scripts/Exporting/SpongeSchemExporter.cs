@@ -61,7 +61,7 @@ namespace MarkovCraft
             // Append structure data
             var blocksData = new List<byte>();
             // Varint count of block data array
-            blocksData.AddRange(DataHelper.GetInt(height * width * length));
+            blocksData.AddRange(NBTDataHelper.GetInt(height * width * length));
             // Sponge schem uses Y-Z-X order
             for (int mcy = 0;mcy < height;mcy++) for (int mcz = 0;mcz < length;mcz++) for (int mcx = 0;mcx < width;mcx++)
             {
@@ -101,7 +101,7 @@ namespace MarkovCraft
             schemObj.Add("BlockData", blocksData.ToArray());
             
             // Turn dictionary object into byte array
-            var nbtBlob = DataHelper.GetNbt(schemObj);
+            var nbtBlob = NBTDataHelper.GetNbt(schemObj);
 
             // Compress nbt blob and save it
             using (var compressedStream = File.Open(filePath, FileMode.Create))

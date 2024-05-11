@@ -74,7 +74,7 @@ namespace MarkovCraft
             nbtObj.Add("DataVersion", dataVersionInt);
 
             // Turn dictionary object into byte array
-            var nbtBlob = DataHelper.GetNbt(nbtObj);
+            var nbtBlob = NBTDataHelper.GetNbt(nbtObj);
 
             // Compress nbt blob and save it
             using (var compressedStream = File.Open(filePath, FileMode.Create))
