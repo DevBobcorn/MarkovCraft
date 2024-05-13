@@ -1,10 +1,8 @@
 #if UNITY_EDITOR
-using UnityEngine;
-using UnityEditor;
 using System.IO;
 using System.Xml.Linq;
-
-using CraftSharp;
+using UnityEngine;
+using UnityEditor;
 
 namespace MarkovCraft
 {

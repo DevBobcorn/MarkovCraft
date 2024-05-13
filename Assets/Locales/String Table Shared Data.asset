@@ -523,6 +523,26 @@ MonoBehaviour:
     m_Key: environment.name.ground
     m_Metadata:
       m_Items: []
+  - m_Id: 138431833176973312
+    m_Key: screen.text.resource_info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 138434806934315008
+    m_Key: res_packs_manager.text.loaded
+    m_Metadata:
+      m_Items: []
+  - m_Id: 138435480455651328
+    m_Key: res_packs_manager.text.open_folder
+    m_Metadata:
+      m_Items: []
+  - m_Id: 138436082707374080
+    m_Key: res_packs_manager.text.packs_path
+    m_Metadata:
+      m_Items: []
+  - m_Id: 138436716181495808
+    m_Key: res_packs_manager.text.apply_packs
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

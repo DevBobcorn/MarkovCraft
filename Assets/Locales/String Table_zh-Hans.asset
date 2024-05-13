@@ -528,6 +528,33 @@ MonoBehaviour:
     m_Localized: "\u5730\u9762\u53C2\u7167\u7269"
     m_Metadata:
       m_Items: []
+  - m_Id: 138431833176973312
+    m_Localized: 'Minecraft Version:
+
+      <u>{0}</u>
+
+
+      Pack Format:
+
+      <u>{1}</u>'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 138434806934315008
+    m_Localized: "\u8D44\u6E90\u5305\u7BA1\u7406"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 138435480455651328
+    m_Localized: "\u6253\u5F00\u76EE\u5F55"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 138436082707374080
+    m_Localized: "\u8D44\u6E90\u5305\u8DEF\u5F84\uFF1A"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 138436716181495808
+    m_Localized: "\u5E94\u7528\u8D44\u6E90\u5305"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
