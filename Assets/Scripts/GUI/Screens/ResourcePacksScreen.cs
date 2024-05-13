@@ -65,10 +65,10 @@ namespace MarkovCraft
             working = false;
             properlyLoaded = true;
 
-            ScreenHeader!.text = GameScene.GetL10nString("res_packs_manager.text.loaded");
+            ScreenHeader!.text = WelcomeScene.GetL10nString("res_packs_manager.text.loaded");
             
             // Update Info text
-            InfoText!.text = GameScene.GetL10nString("screen.text.resource_info");
+            InfoText!.text = WelcomeScene.GetL10nString("screen.text.resource_info", "1.100.2", 456);
         }
 
         public override void OnShow(ScreenManager manager)
@@ -77,16 +77,10 @@ namespace MarkovCraft
             working = true;
             properlyLoaded = false;
 
-            ScreenHeader!.text = GameScene.GetL10nString("screen.text.loading");
+            ScreenHeader!.text = WelcomeScene.GetL10nString("screen.text.loading");
             
-            if (GameScene.Instance is not GenerationScene game)
-            {
-                Debug.LogError("Wrong game scene!");
-                working = false;
-                return;
-            }
-            
-            dataVersion = game.GetDataVersionInt();
+            var welcomeScene = WelcomeScene.Instance;
+            //dataVersion = welcomeScene.GetDataVersionInt();
 
             StartCoroutine(InitializeScreen());
         }
@@ -129,7 +123,7 @@ namespace MarkovCraft
             
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                manager.SetActiveScreenByType<GenerationScreen>();
+                manager.SetActiveScreenByType<WelcomeScreen>();
             }
         }
     }
