@@ -609,7 +609,11 @@ MonoBehaviour:
     m_Localized: 'Packs Path:'
     m_Metadata:
       m_Items: []
-  - m_Id: 138436716181495808
+  - m_Id: 138934396959760384
+    m_Localized: Resource Packs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 138936328512249856
     m_Localized: Apply Packs
     m_Metadata:
       m_Items: []

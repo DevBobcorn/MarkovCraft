@@ -33,6 +33,7 @@ namespace MarkovCraft
             // Initialize settings panel
             var resPacksPath = PathHelper.GetPacksDirectory();
             PacksFolderInput!.text = resPacksPath;
+            PacksFolderInput.enabled = false;
             if (CheckWindowsPlatform())
             {
                 OpenExplorerButton!.onClick.RemoveAllListeners();

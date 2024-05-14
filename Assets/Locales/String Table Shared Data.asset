@@ -539,8 +539,12 @@ MonoBehaviour:
     m_Key: res_packs_manager.text.packs_path
     m_Metadata:
       m_Items: []
-  - m_Id: 138436716181495808
-    m_Key: res_packs_manager.text.apply_packs
+  - m_Id: 138934396959760384
+    m_Key: res_packs_manager.text.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 138936328512249856
+    m_Key: res_packs_manager.text.apply
     m_Metadata:
       m_Items: []
   m_Metadata:
