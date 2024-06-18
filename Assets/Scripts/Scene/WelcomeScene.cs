@@ -87,6 +87,11 @@ namespace MarkovCraft
             UpdateSelectedVersion();
         }
 
+        public string GetResourceVersion()
+        {
+            return VersionHolder!.Versions[VersionHolder.SelectedVersion].ResourceVersion;
+        }
+
         public void PrevVersion()
         {
             if (VersionHolder == null || downloadingRes) return;

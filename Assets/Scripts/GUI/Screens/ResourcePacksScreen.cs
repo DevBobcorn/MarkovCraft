@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using CraftSharp;
+using System.Linq;
 
 namespace MarkovCraft
 {
@@ -20,8 +21,7 @@ namespace MarkovCraft
 
         // Resource Packs Panel
         [SerializeField] public RectTransform? GridTransform;
-
-        private int dataVersion = 0;
+        [SerializeField] public GameObject? ResourcePackItemPrefab;
 
         private bool working = false, properlyLoaded = false;
 
@@ -44,22 +44,80 @@ namespace MarkovCraft
             
             ApplyPacksButton!.onClick.RemoveAllListeners();
             ApplyPacksButton.onClick.AddListener(ApplyPacks);
+
+            // Collect available pack overrides (filter out vanilla resources for other versions)
+            var selectedResVersion = WelcomeScene.Instance.GetResourceVersion();
+            Debug.Log($"Base resource: {selectedResVersion}");
+
+            var packNames = Directory.GetDirectories(PathHelper.GetPacksDirectory())
+                    .Select(x => new DirectoryInfo(x).Name)
+                    .Where(x => !x.StartsWith("vanilla-1.") || x == $"vanilla-{selectedResVersion}");
+            
+            // Clean up
+            foreach(Transform child in GridTransform!)
+            {
+                Destroy(child.gameObject);
+            }
             
             // Initialize resource packs panel
-            /*
-            for (var index = 0;index < result.ResultPalette.Length;index++)
+            foreach (var packName in packNames)
             {
-                var newItemObj = Instantiate(MappingItemPrefab);
-                var newItem = newItemObj!.GetComponent<ExportItem>();
-                var itemVal = result.ResultPalette[index];
+                var newItemObj = Instantiate(ResourcePackItemPrefab);
+                var newItem = newItemObj!.GetComponent<ResourcePackItem>();
+
                 // Add item to dictionary and set data
-                mappingItems.Add(newItem);
-                var rgb = ColorConvert.GetRGB(itemVal.Color);
-                newItem.InitializeData(' ', rgb, rgb, itemVal.BlockState, ColorPicker!, BlockPicker!, BlockStatePreview!);
+                //mappingItems.Add(newItem);
+
+                // Get pack info
+                var packMetaPath = PathHelper.GetPackFile(packName, "pack.mcmeta");
+                if (!File.Exists(packMetaPath))
+                {
+                    continue; // Not a valid resource pack
+                }
+                string meta = File.ReadAllText(packMetaPath);
+                Json.JSONData metaData = Json.ParseJson(meta);
+
+                var packFormat = "0";
+                var description = "<No description>";
+
+                if (metaData.Properties.ContainsKey("pack"))
+                {
+                    Json.JSONData packData = metaData.Properties["pack"];
+                    if (packData.Properties.ContainsKey("pack_format"))
+                    {
+                        packFormat = packData.Properties["pack_format"].StringValue;
+                        description = string.Empty;
+
+                        if (packData.Properties.ContainsKey("description"))
+                        {
+                            description = packData.Properties["description"].StringValue;
+                        }
+                    }
+                    else
+                    {
+                        continue; // No a valid resource pack
+                    }
+                }
+
+                // Get pack icon
+                Sprite? sprite = null;
+                var packPngPath = PathHelper.GetPackFile(packName, "pack.png");
+                if (File.Exists(packPngPath))
+                {
+                    var tex = new Texture2D(2, 2) { filterMode = FilterMode.Point };
+                    var bytes = File.ReadAllBytes(packPngPath);
+                    tex.LoadImage(bytes);
+
+                    sprite = Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2, tex.height / 2));
+                }
+
+                // Initialize item data
+                newItem.SetPackData(packName, packFormat, description, sprite);
+                
                 // Add item to container
                 newItem.transform.SetParent(GridTransform, false);
                 newItem.transform.localScale = Vector3.one;
-            } */
+            }
 
             yield return null;
 
@@ -69,7 +127,7 @@ namespace MarkovCraft
             ScreenHeader!.text = WelcomeScene.GetL10nString("res_packs_manager.text.loaded");
             
             // Update Info text
-            InfoText!.text = WelcomeScene.GetL10nString("screen.text.resource_info", "1.100.2", 456);
+            InfoText!.text = WelcomeScene.GetL10nString("screen.text.resource_info", selectedResVersion, 456);
         }
 
         public override void OnShow(ScreenManager manager)
