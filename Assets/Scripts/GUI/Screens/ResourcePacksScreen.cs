@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
@@ -51,7 +52,7 @@ namespace MarkovCraft
             // Collect available pack overrides (filter out vanilla resources for other versions)
             var selectedResVersion = WelcomeScene.Instance.GetResourceVersion();
             var selectedPackFormat = WelcomeScene.Instance.GetResPackFormatInt();
-            Debug.Log($"Base resource: {selectedResVersion}");
+            //Debug.Log($"Base resource: {selectedResVersion}");
 
             var packNames = Directory.GetDirectories(PathHelper.GetPacksDirectory())
                     .Select(x => new DirectoryInfo(x).Name)
@@ -62,6 +63,8 @@ namespace MarkovCraft
             {
                 Destroy(child.gameObject);
             }
+
+            var packDict = new Dictionary<string, ResourcePackItem>();
             
             // Initialize resource packs panel
             foreach (var packName in packNames)
@@ -121,6 +124,20 @@ namespace MarkovCraft
                 // Add item to container
                 newItem.transform.SetParent(GridTransform, false);
                 newItem.transform.localScale = Vector3.one;
+                packDict.Add(packName.StartsWith(VANILLA_PREFIX) ?
+                        MarkovGlobal.VANILLA_RESPACK_SYMBOL : packName, newItem);
+            }
+
+            // Update selected packs in loading order [Base -> Overrides]
+            var selectedResPacks = MarkovGlobal.LoadSelectedResPacks();
+            foreach (var pack in selectedResPacks)
+            {
+                if (packDict.ContainsKey(pack))
+                {
+                    packDict[pack].SelectPack(false);
+                    // Move this pack to top
+                    packDict[pack].transform.SetAsFirstSibling();
+                }
             }
 
             yield return null;
@@ -141,27 +158,17 @@ namespace MarkovCraft
             properlyLoaded = false;
 
             ScreenHeader!.text = WelcomeScene.GetL10nString("screen.text.loading");
-            
-            var welcomeScene = WelcomeScene.Instance;
-            //dataVersion = welcomeScene.GetDataVersionInt();
 
             StartCoroutine(InitializeScreen());
         }
 
         public override void OnHide(ScreenManager manager)
         {
-            // The export palette is not destroyed. If exporter is screen is opened again
-            // before the selected generation result is changed, the old export palette
-            // containing cached mapping items will still be used
-            
-            /*
-            var array = mappingItems.ToArray();
-
-            for (int i = 0;i < array.Length;i++)
-                Destroy(array[i].gameObject);
-            
-            mappingItems.Clear();
-            */
+            // Clean up
+            foreach(Transform child in GridTransform!)
+            {
+                Destroy(child.gameObject);
+            }
         }
 
         private void ApplyPacks()
@@ -173,6 +180,19 @@ namespace MarkovCraft
                 working = true;
 
                 // Apply selected resource packs
+                var updatedPacks = new List<string>();
+
+                for (int i = GridTransform!.childCount - 1; i >= 0; i--)
+                {
+                    var item = GridTransform.GetChild(i).GetComponent<ResourcePackItem>();
+                    if (item.Selected)
+                    {
+                        updatedPacks.Add(item.PackName.StartsWith(VANILLA_PREFIX) ?
+                                MarkovGlobal.VANILLA_RESPACK_SYMBOL : item.PackName);
+                    }
+                }
+
+                MarkovGlobal.SaveSelectedResPacks(updatedPacks.ToArray());
 
                 working = false;
 

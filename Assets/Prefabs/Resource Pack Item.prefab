@@ -176,6 +176,8 @@ MonoBehaviour:
   packIconImage: {fileID: 4824297801795406048}
   packIconFrameImage: {fileID: 4990476037437705584}
   packToggle: {fileID: 3275785785317611397}
+  moveUpButton: {fileID: 7024955215681887757}
+  moveDownButton: {fileID: 3446473537684294058}
 --- !u!1 &569291754510218096
 GameObject:
   m_ObjectHideFlags: 0
@@ -296,7 +298,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 969054032141079196}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8944204555571271746}
+        m_TargetAssemblyTypeName: MarkovCraft.ResourcePackItem, Assembly-CSharp
+        m_MethodName: MoveUp
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &859050852019573869
 GameObject:
   m_ObjectHideFlags: 0
@@ -789,7 +803,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spriteImage: {fileID: 4430489463636501110}
-  disableIcon: {fileID: 21300000, guid: 79f344049a5acfb4b90ab2291c722c85, type: 3}
+  deselectIcon: {fileID: 21300000, guid: 79f344049a5acfb4b90ab2291c722c85, type: 3}
 --- !u!1 &6410340317889125378
 GameObject:
   m_ObjectHideFlags: 0
@@ -986,7 +1000,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5509270120826842387}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8944204555571271746}
+        m_TargetAssemblyTypeName: MarkovCraft.ResourcePackItem, Assembly-CSharp
+        m_MethodName: MoveDown
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &8625900456095090451
 GameObject:
   m_ObjectHideFlags: 0

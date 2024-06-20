@@ -11,7 +11,7 @@ namespace MarkovCraft
         private static readonly Color32 HIDDEN = new Color32(255, 255, 255, 0);
         private static readonly Color32 NORMAL = new Color32(50, 50, 50, 255);
         [SerializeField] private Image? spriteImage;
-        [SerializeField] private Sprite? disableIcon;
+        [SerializeField] private Sprite? deselectIcon;
 
         private event Action? OnToggle;
 
@@ -49,11 +49,11 @@ namespace MarkovCraft
             }
         }
 
-        public void SetEnabled(bool enabled)
+        public void SetSelected(bool selected)
         {
             if (spriteImage != null)
             {
-                spriteImage.overrideSprite = enabled ? disableIcon : null;
+                spriteImage.overrideSprite = selected ? deselectIcon : null;
             }
         }
 

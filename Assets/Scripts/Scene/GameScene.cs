@@ -188,8 +188,12 @@ namespace MarkovCraft
             // Load resource packs...
             packManager.ClearPacks();
             // Collect packs
-            packManager.AddPack(new($"vanilla-{resVersion}"));
-            packManager.AddPack(new($"vanilla_fix"));
+            var selected = MarkovGlobal.LoadSelectedResPacks();
+            foreach (var packName in selected)
+            {
+                packManager.AddPack(new ResourcePack(packName == MarkovGlobal.
+                        VANILLA_RESPACK_SYMBOL ? $"vanilla-{resVersion}" : packName));
+            }
             // Load valid packs...
             loadFlag.Finished = false;
             Task.Run(() => packManager.LoadPacks(loadFlag,

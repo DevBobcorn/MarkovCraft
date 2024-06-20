@@ -4,6 +4,7 @@ using System.Threading;
 using UnityEngine;
 
 using CraftSharp;
+using System.Linq;
 
 namespace MarkovCraft
 {
@@ -16,6 +17,9 @@ namespace MarkovCraft
         public const int    MARKOV_CRAFT_BUILTIN_VERSION = 1;
         public const string VANILLAFIX_FILE_NAME = "VanillaFix";
         public const int    VANILLAFIX_VERSION = 1;
+
+        public const string SELECTED_RESPACKS_FILE_NAME = "selected_respacks.txt";
+        public const string VANILLA_RESPACK_SYMBOL = "$VANILLA";
 
         private static Thread? unityThread;
         public static Thread UnityThread => unityThread!;
@@ -31,6 +35,28 @@ namespace MarkovCraft
             var global = new GameObject("Markov Global");
             global.AddComponent<MarkovGlobal>();
             DontDestroyOnLoad(global);
+        }
+
+        public static string[] LoadSelectedResPacks()
+        {
+            var txtPath = PathHelper.GetPackDirectoryNamed(SELECTED_RESPACKS_FILE_NAME);
+
+            if (File.Exists(txtPath))
+            {
+                return File.ReadAllLines(txtPath).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+            }
+            else
+            {
+                // Packs will be listed in order for loading [Base -> Overrides]
+                return new string[] { VANILLA_RESPACK_SYMBOL, "vanilla_fix" };
+            }
+        }
+
+        public static void SaveSelectedResPacks(string[] packs)
+        {
+            var txtPath = PathHelper.GetPackDirectoryNamed(SELECTED_RESPACKS_FILE_NAME);
+
+            File.WriteAllLines(txtPath, packs);
         }
 
         void Update()

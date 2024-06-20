@@ -19,6 +19,9 @@ namespace MarkovCraft
         [SerializeField] private Image? packIconFrameImage;
         [SerializeField] private ResourcePackToggle? packToggle;
 
+        [SerializeField] private Button? moveUpButton;
+        [SerializeField] private Button? moveDownButton;
+
         private string packName = string.Empty;
         public string PackName => packName;
         private string packFormat = "0";
@@ -50,7 +53,7 @@ namespace MarkovCraft
             }
 
             // Deselect on start
-            DeselectPack();
+            DeselectPack(false);
 
             // Toggle event
             packToggle!.ClearToggleEvents();
@@ -61,30 +64,87 @@ namespace MarkovCraft
         {
             if (selected)
             {
-                DeselectPack();
+                DeselectPack(true);
             }
             else
             {
-                SelectPack();
+                SelectPack(true);
             }
         }
 
-        public void SelectPack()
+        public void SelectPack(bool updateSlots)
         {
             packIconFrameImage!.color = Color.white;
             GetComponent<Image>().color = SELECTED_COLOR;
 
             selected = true;
-            packToggle?.SetEnabled(true);
+            packToggle?.SetSelected(true);
+
+            var parent = transform.parent;
+            var curIndex = transform.GetSiblingIndex();
+
+            // Enable move buttons
+            moveUpButton!.interactable = true;
+            moveDownButton!.interactable = true;
+
+            if (!updateSlots) return;
+
+            // Move up to below lowest selected pack or top
+            while (curIndex > 0 && !parent.GetChild(curIndex - 1).GetComponent<ResourcePackItem>().Selected)
+            {
+                curIndex -= 1; // Move up 1 slot
+            }
+            transform.SetSiblingIndex(curIndex);
         }
 
-        public void DeselectPack()
+        public void DeselectPack(bool updateSlots)
         {
             packIconFrameImage!.color = Color.gray;
             GetComponent<Image>().color = DESELECTED_COLOR;
 
             selected = false;
-            packToggle?.SetEnabled(false);
+            packToggle?.SetSelected(false);
+
+            var parent = transform.parent;
+            var curIndex = transform.GetSiblingIndex();
+
+            // Disable move buttons
+            moveUpButton!.interactable = false;
+            moveDownButton!.interactable = false;
+
+            if (!updateSlots) return;
+
+            // Move down to above highest unselected pack or bottom
+            while (curIndex < parent.childCount - 1 && parent.GetChild(curIndex + 1).GetComponent<ResourcePackItem>().Selected)
+            {
+                curIndex += 1; // Move down 1 slot
+            }
+            transform.SetSiblingIndex(curIndex);
+        }
+
+        public void MoveUp()
+        {
+            if (Selected) // Only movable if selected
+            {
+                var curIndex = transform.GetSiblingIndex();
+                if (curIndex > 0)
+                {
+                    transform.SetSiblingIndex(curIndex - 1);
+                }
+            }
+        }
+
+        public void MoveDown()
+        {
+            if (Selected) // Only movable if selected
+            {
+                var curIndex = transform.GetSiblingIndex();
+                var parent = transform.parent;
+                if (curIndex < parent.childCount - 1 && parent.GetChild(curIndex + 1).GetComponent<ResourcePackItem>().Selected)
+                {
+                    transform.SetSiblingIndex(curIndex + 1);
+                }
+            }
         }
 
         public void SetClickEvent(UnityAction action)

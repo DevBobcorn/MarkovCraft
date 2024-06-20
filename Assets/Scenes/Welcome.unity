@@ -1617,12 +1617,12 @@ GameObject:
   - component: {fileID: 696505381}
   - component: {fileID: 696505380}
   m_Layer: 5
-  m_Name: Pack Preview Image (1)
+  m_Name: Pack Preview Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &696505379
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1821,7 +1821,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 786119539}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
@@ -3014,7 +3014,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1347870389
 RectTransform:
   m_ObjectHideFlags: 0
