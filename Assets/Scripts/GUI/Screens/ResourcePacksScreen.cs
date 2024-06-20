@@ -13,6 +13,9 @@ namespace MarkovCraft
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
 
+        // Vanilla resource pack name prefix e.g. vanilla-1.16.5
+        private static readonly string VANILLA_PREFIX = "vanilla-1.";
+
         [SerializeField] public TMP_Text? ScreenHeader, InfoText;
         // Settings Panel
         [SerializeField] public TMP_InputField? PacksFolderInput;
@@ -52,7 +55,7 @@ namespace MarkovCraft
 
             var packNames = Directory.GetDirectories(PathHelper.GetPacksDirectory())
                     .Select(x => new DirectoryInfo(x).Name)
-                    .Where(x => !x.StartsWith("vanilla-1.") || x == $"vanilla-{selectedResVersion}");
+                    .Where(x => !x.StartsWith(VANILLA_PREFIX) || x == $"vanilla-{selectedResVersion}");
             
             // Clean up
             foreach(Transform child in GridTransform!)

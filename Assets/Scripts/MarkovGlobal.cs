@@ -12,6 +12,11 @@ namespace MarkovCraft
         public const int WINDOWED_APP_WIDTH = 1600, WINDOWED_APP_HEIGHT = 900;
         private static readonly char SP = Path.DirectorySeparatorChar;
 
+        public const string MARKOV_CRAFT_BUILTIN_FILE_NAME = "MarkovCraftBuiltin";
+        public const int    MARKOV_CRAFT_BUILTIN_VERSION = 1;
+        public const string VANILLAFIX_FILE_NAME = "VanillaFix";
+        public const int    VANILLAFIX_VERSION = 1;
+
         private static Thread? unityThread;
         public static Thread UnityThread => unityThread!;
 

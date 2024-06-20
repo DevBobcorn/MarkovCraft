@@ -74,6 +74,12 @@ namespace MarkovCraft
 
         void Start()
         {
+            // Generate vanilla_fix or check update
+            var vanillaFixDir = PathHelper.GetPackDirectoryNamed("vanilla_fix");
+            StartCoroutine(BuiltinResourceHelper.ReadyBuiltinResource(
+                    MarkovGlobal.VANILLAFIX_FILE_NAME, MarkovGlobal.VANILLAFIX_VERSION, vanillaFixDir,
+                    (status) => { }, () => { }, (succeed) => { }));
+            
             if (VersionHolder == null || DownloadButton == null || DownloadInfoText == null) return;
 
             downloadButtonAnimator = DownloadButton.GetComponent<Animator>();
