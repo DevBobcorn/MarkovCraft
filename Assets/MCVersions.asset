@@ -15,22 +15,27 @@ MonoBehaviour:
   Versions:
   - Name: MC 1.13.2
     DataVersionInt: 1631
+    ResPackFormatInt: 4
     DataVersion: 1.13
     ResourceVersion: 1.13.2
   - Name: MC 1.16.5
     DataVersionInt: 2586
+    ResPackFormatInt: 6
     DataVersion: 1.16
     ResourceVersion: 1.16.5
   - Name: MC 1.18.2
     DataVersionInt: 2975
+    ResPackFormatInt: 8
     DataVersion: 1.18
     ResourceVersion: 1.18.2
   - Name: MC 1.19.4
     DataVersionInt: 3337
+    ResPackFormatInt: 13
     DataVersion: 1.19
     ResourceVersion: 1.19.4
   - Name: MC 1.20.1
     DataVersionInt: 3465
+    ResPackFormatInt: 15
     DataVersion: 1.20
     ResourceVersion: 1.20.1
-  SelectedVersion: 1
+  SelectedVersion: 0

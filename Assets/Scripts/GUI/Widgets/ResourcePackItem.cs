@@ -1,5 +1,4 @@
 #nullable enable
-using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
@@ -18,7 +17,7 @@ namespace MarkovCraft
         [SerializeField] private TMP_Text? packFormatText;
         [SerializeField] private Image? packIconImage;
         [SerializeField] private Image? packIconFrameImage;
-        [SerializeField] [Range(10F, 500F)] private float frameSize = 100F;
+        [SerializeField] private ResourcePackToggle? packToggle;
 
         private string packName = string.Empty;
         public string PackName => packName;
@@ -52,6 +51,10 @@ namespace MarkovCraft
 
             // Deselect on start
             DeselectPack();
+
+            // Toggle event
+            packToggle!.ClearToggleEvents();
+            packToggle.AddToggleHandler(TogglePack);
         }
 
         public void TogglePack()
@@ -72,14 +75,16 @@ namespace MarkovCraft
             GetComponent<Image>().color = SELECTED_COLOR;
 
             selected = true;
+            packToggle?.SetEnabled(true);
         }
 
         public void DeselectPack()
         {
-            packIconFrameImage!.color = Color.black;
+            packIconFrameImage!.color = Color.gray;
             GetComponent<Image>().color = DESELECTED_COLOR;
 
             selected = false;
+            packToggle?.SetEnabled(false);
         }
 
         public void SetClickEvent(UnityAction action)

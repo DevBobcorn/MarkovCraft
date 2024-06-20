@@ -47,6 +47,7 @@ namespace MarkovCraft
 
             // Collect available pack overrides (filter out vanilla resources for other versions)
             var selectedResVersion = WelcomeScene.Instance.GetResourceVersion();
+            var selectedPackFormat = WelcomeScene.Instance.GetResPackFormatInt();
             Debug.Log($"Base resource: {selectedResVersion}");
 
             var packNames = Directory.GetDirectories(PathHelper.GetPacksDirectory())
@@ -127,7 +128,7 @@ namespace MarkovCraft
             ScreenHeader!.text = WelcomeScene.GetL10nString("res_packs_manager.text.loaded");
             
             // Update Info text
-            InfoText!.text = WelcomeScene.GetL10nString("screen.text.resource_info", selectedResVersion, 456);
+            InfoText!.text = WelcomeScene.GetL10nString("screen.text.resource_info", selectedResVersion, selectedPackFormat);
         }
 
         public override void OnShow(ScreenManager manager)
@@ -172,7 +173,7 @@ namespace MarkovCraft
 
                 working = false;
 
-                manager?.SetActiveScreenByType<GenerationScreen>();
+                manager?.SetActiveScreenByType<WelcomeScreen>();
             }
         }
 

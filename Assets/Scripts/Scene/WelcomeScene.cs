@@ -92,6 +92,11 @@ namespace MarkovCraft
             return VersionHolder!.Versions[VersionHolder.SelectedVersion].ResourceVersion;
         }
 
+        public int GetResPackFormatInt()
+        {
+            return VersionHolder!.Versions[VersionHolder.SelectedVersion].ResPackFormatInt;
+        }
+
         public void PrevVersion()
         {
             if (VersionHolder == null || downloadingRes) return;

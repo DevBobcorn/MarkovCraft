@@ -9,6 +9,7 @@ namespace MarkovCraft
     {
         public string Name;
         public int DataVersionInt;
+        public int ResPackFormatInt;
         public string DataVersion;
         public string ResourceVersion;
     }
