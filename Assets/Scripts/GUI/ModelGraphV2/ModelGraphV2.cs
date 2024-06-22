@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 using UnityEngine;
 
-using CraftSharp;
 using MarkovJunior;
 using UnityEngine.UIElements;
 using System.Linq;
@@ -56,7 +55,28 @@ namespace MarkovCraft
             {
                 activeNode.SetNodeActive(true);
 
-                // TODO: Auto scroll
+                // Perform auto scroll
+                var scroll = (m_GraphContent as ScrollView)!;
+                var activeNodeElem = activeNode.NodeElement;
+
+                var aPos = activeNodeElem.ChangeCoordinatesTo(scroll, Vector2.zero).y;
+                var aHgt = activeNodeElem.resolvedStyle.height;
+
+                //var vPos = 0; // -scroll.scrollOffset.y;
+                var vHgt = scroll.resolvedStyle.height;
+
+                aHgt = Mathf.Min(aHgt, vHgt);
+
+                if (0 > aPos)
+                {
+                    // Scroll to the active node (top aligned)
+                    scroll.scrollOffset = new(0, scroll.scrollOffset.y + aPos);
+                }
+                else if (vHgt < aPos + aHgt)
+                {
+                    // Scroll to the active node (bottom aligned)
+                    scroll.scrollOffset = new(0, scroll.scrollOffset.y + aPos + aHgt - vHgt);
+                }
             }
         }
 

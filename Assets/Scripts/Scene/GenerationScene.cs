@@ -17,8 +17,6 @@ using TMPro;
 
 using MarkovJunior;
 using CraftSharp;
-using CraftSharp.Resource;
-using Unity.Entities.UniversalDelegates;
 
 namespace MarkovCraft
 {
@@ -78,13 +76,32 @@ namespace MarkovCraft
 
         private void GenerateProcedureGraph(string modelName)
         {
-            if (interpreter != null && ModelGraphUIv2 != null)
+            if (ModelGraphUIv2 != null)
             {
-                var graphPalette = meshPalette.ToDictionary(x => x.Key, x => ColorConvert.GetOpaqueColor32(x.Value.z));
-                ModelGraphGeneratorV2.GenerateGraph(ModelGraphUIv2, modelName, interpreter.root, graphPalette);
+                if (interpreter != null)
+                {
+                    var graphPalette = meshPalette.ToDictionary(x => x.Key, x => ColorConvert.GetOpaqueColor32(x.Value.z));
+                    ModelGraphGeneratorV2.GenerateGraph(ModelGraphUIv2, modelName, interpreter.root, graphPalette);
+                }
+                else
+                {
+                    ModelGraphUIv2.gameObject.SetActive(false);
+                }
             }
-            else
-                ModelGraphUIv2?.gameObject.SetActive(false);
+            
+            /* MODEL GRAPH V1
+            if (ModelGraphUI != null)
+            {
+                if (interpreter != null)
+                {
+                    var graphPalette = meshPalette.ToDictionary(x => x.Key, x => ColorConvert.GetOpaqueColor32(x.Value.z));
+                    ModelGraphGenerator.GenerateGraph(ModelGraphUI, modelName, interpreter.root, graphPalette);
+                }
+                else
+                {
+                    ModelGraphUI.gameObject.SetActive(false);
+                }
+            } */
         }
 
         private void EnsureBasePaletteLoaded()
@@ -105,14 +122,20 @@ namespace MarkovCraft
         public override void HideSpecialGUI()
         {
             // Hide UI Toolkit Model Graph (V2) which doesn't use proper rendering
-            ModelGraphUIv2?.HidePanel();
+            if (ModelGraphUIv2 != null)
+            {
+                ModelGraphUIv2.HidePanel();
+            }
         }
 
         public override void ShowSpecialGUI()
         {
             UpdateBlockSelection(null);
             // Also show UI Toolkit Model Graph (V2) if it is ready
-            ModelGraphUIv2?.ShowPanelIfNotEmpty();
+            if (ModelGraphUIv2 != null)
+            {
+                ModelGraphUIv2.ShowPanelIfNotEmpty();
+            }
         }
 
         public Dictionary<char, int> GetBaseColorPalette()
@@ -140,8 +163,16 @@ namespace MarkovCraft
             ClearUpScene();
 
             // Clear up current model graph
-            //ModelGraphUI?.ClearUp();
-            ModelGraphUIv2?.ClearUp();
+            if (ModelGraphUIv2 != null)
+            {
+                ModelGraphUIv2.ClearUp();
+            }
+            
+            /* MODEL GRAPH V1
+            if (ModelGraphUI != null)
+            {
+                ModelGraphUI.ClearUp();
+            } */
 
             string fileName = MarkovGlobal.GetDataFile($"models{SP}{confModel.Model}.xml");
             Debug.Log($"{confModelFile} ({confModel.Model}) > {fileName}");
@@ -435,7 +466,7 @@ namespace MarkovCraft
                         }
                         
                         // Update active node on graph
-                        //ModelGraphGenerator.UpdateGraph(ModelGraphUI!, interpreter.current);
+                        // MODEL GRAPH V1ModelGraphGenerator.UpdateGraph(ModelGraphUI!, interpreter.current);
                         ModelGraphGeneratorV2.UpdateGraph(ModelGraphUIv2!, interpreter.current);
                     }
 
@@ -454,7 +485,7 @@ namespace MarkovCraft
                     result.SetData(fullPalette, stateClone, legendClone, dataFrame.FX, dataFrame.FY, dataFrame.FZ, dataFrame.stepCount, confModelFile, seed);
 
                     Debug.Log($"Iteration {k} complete. Steps: {dataFrame.stepCount} Frames: {recordedFrames.Count}");
-                    //ModelGraphUI!.SetActiveNode(-1); // Deselect active node
+                    // MODEL GRAPH V1 ModelGraphUI!.SetActiveNode(-1); // Deselect active node
                     ModelGraphUIv2!.SetActiveNode(-1); // Deselect active node
                     GenerationText.text = GetL10nString("status.info.generation_complete", k);
 

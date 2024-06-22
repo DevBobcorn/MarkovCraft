@@ -179,7 +179,8 @@ namespace MarkovCraft
 
         private void UpdateVolumeCollider()
         {
-            volumeColliderHolder!.transform.localScale = GetVolumeSize();
+            if (volumeColliderHolder != null)
+                volumeColliderHolder.transform.localScale = GetVolumeSize();
             transform.position = GetVolumePosition();
         }
 

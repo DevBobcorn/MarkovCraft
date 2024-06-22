@@ -12,6 +12,7 @@ namespace MarkovCraft
         private static readonly StyleColor WHITE_COLOR = new(Color.white);
 
         protected readonly VisualElement m_NodeElement;
+        public VisualElement NodeElement => m_NodeElement;
 
         // Cache frequently accessed children elements
         // to eliminate redundant queries
