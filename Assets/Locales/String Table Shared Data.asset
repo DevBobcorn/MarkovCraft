@@ -571,6 +571,22 @@ MonoBehaviour:
     m_Key: rcon.text.port_hint
     m_Metadata:
       m_Items: []
+  - m_Id: 153356215804403712
+    m_Key: rcon.text.preview_show
+    m_Metadata:
+      m_Items: []
+  - m_Id: 153356370695856128
+    m_Key: rcon.text.preview_stop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 153357393258782720
+    m_Key: rcon.text.connection_error
+    m_Metadata:
+      m_Items: []
+  - m_Id: 153357513119408128
+    m_Key: rcon.text.wrong_password
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

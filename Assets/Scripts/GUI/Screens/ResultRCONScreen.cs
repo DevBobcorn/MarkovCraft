@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 namespace MarkovCraft
 {
@@ -11,6 +12,7 @@ namespace MarkovCraft
         [SerializeField] public TMP_Text? ScreenHeader, InfoText;
         // Settings Panel
         [SerializeField] public Button? ConfirmButton, CancelButton;
+        [SerializeField] public TMP_Text? PreviewButtonText;
         [SerializeField] public TMP_InputField? PosXInput;
         [SerializeField] public TMP_InputField? PosYInput;
         [SerializeField] public TMP_InputField? PosZInput;
@@ -30,6 +32,11 @@ namespace MarkovCraft
 
         private GenerationResult? result = null;
         public override GenerationResult? GetResult() => result;
+
+        private RCONClient? client = null;
+        private bool areaPreview = false;
+        private float lastPreviewTime = 0F;
+        private const float PREVIEW_INTERVAL = 0.8F;
 
         private bool working = false, properlyLoaded = false;
 
@@ -94,6 +101,111 @@ namespace MarkovCraft
             ResultDetailPanel!.Show();
         }
 
+        private bool ConnectRCON()
+        {
+            if (client == null)
+            {
+                var host = HostInput!.text;
+                var port = int.Parse(PortInput!.text);
+                var password = PasswordInput!.text;
+                PlayerPrefs.SetString(RCON_HOST_KEY, host);
+                PlayerPrefs.SetInt(RCON_PORT_KEY, port);
+                PlayerPrefs.SetString(RCON_PASSWORD_KEY, password);
+                PlayerPrefs.Save();
+                
+                try
+                {
+                    client = new RCONClient(host, port);
+                }
+                catch
+                {
+                    ScreenHeader!.text = GameScene.GetL10nString("rcon.text.connection_error");
+                    client?.Dispose();
+                    client = null;
+                    return false;
+                }
+
+                if (client.Authenticate(password))
+                {
+                    ScreenHeader!.text = GameScene.GetL10nString("rcon.text.loaded");
+                    return true;
+                }
+                else
+                {
+                    ScreenHeader!.text = GameScene.GetL10nString("rcon.text.wrong_password");
+                    client.Dispose();
+                    client = null;
+                    return false;
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public void ToggleAreaPreview()
+        {
+            areaPreview = !areaPreview;
+
+            if (areaPreview) // Turned it on
+            {
+                if (!ConnectRCON()) // Turn it back off if connection failed
+                {
+                    areaPreview = false;
+                }
+            }
+
+            if (areaPreview)
+            {
+                PreviewButtonText!.text = GameScene.GetL10nString("rcon.text.preview_stop");
+            }
+            else
+            {
+                PreviewButtonText!.text = GameScene.GetL10nString("rcon.text.preview_show");
+            }
+        }
+
+        void Update()
+        {
+            if (areaPreview && Time.unscaledTime - lastPreviewTime > PREVIEW_INTERVAL)
+            {
+                lastPreviewTime = Time.unscaledTime;
+                if (client != null && result != null)
+                {
+                    int sx = result.SizeY, sy = result.SizeZ, sz = result.SizeX;
+                    float xi = posX, yi = posY + 0.2F, zi = posZ;
+                    // Markov Y (Minecraft X)
+                    for (int i = 0; i <= sx * 2; i++)
+                    {
+                        var x = xi + i * 0.5F;
+                        client.SendCommand($"particle end_rod {x:0.00} {yi     :0.00} {zi     :0.00}", out Message _);
+                        client.SendCommand($"particle end_rod {x:0.00} {yi + sy:0.00} {zi     :0.00}", out Message _);
+                        client.SendCommand($"particle end_rod {x:0.00} {yi     :0.00} {zi + sz:0.00}", out Message _);
+                        client.SendCommand($"particle end_rod {x:0.00} {yi + sy:0.00} {zi + sz:0.00}", out Message _);
+                    }
+                    // Markov Z (Minecraft Y)
+                    for (int i = 0; i <= sy * 2; i++)
+                    {
+                        var y = yi + i * 0.5F;
+                        client.SendCommand($"particle end_rod {xi     :0.00} {y:0.00} {zi     :0.00}", out Message _);
+                        client.SendCommand($"particle end_rod {xi + sx:0.00} {y:0.00} {zi     :0.00}", out Message _);
+                        client.SendCommand($"particle end_rod {xi     :0.00} {y:0.00} {zi + sz:0.00}", out Message _);
+                        client.SendCommand($"particle end_rod {xi + sx:0.00} {y:0.00} {zi + sz:0.00}", out Message _);
+                    }
+                    // Markov X (Minecraft Z)
+                    for (int i = 0; i <= sz * 2; i++)
+                    {
+                        var z = zi + i * 0.5F;
+                        client.SendCommand($"particle end_rod {xi     :0.00} {yi     :0.00} {z:0.00}", out Message _);
+                        client.SendCommand($"particle end_rod {xi + sx:0.00} {yi     :0.00} {z:0.00}", out Message _);
+                        client.SendCommand($"particle end_rod {xi     :0.00} {yi + sy:0.00} {z:0.00}", out Message _);
+                        client.SendCommand($"particle end_rod {xi + sx:0.00} {yi + sy:0.00} {z:0.00}", out Message _);
+                    }
+                }
+            }
+        }
+
         public void ConfirmRCON()
         {
             if (properlyLoaded)
@@ -105,32 +217,11 @@ namespace MarkovCraft
                     return;
                 }
 
-                var host = HostInput!.text;
-                var port = int.Parse(PortInput!.text);
-                var password = PasswordInput!.text;
-
                 PlayerPrefs.SetInt(OUTPUT_POSX_KEY, posX);
                 PlayerPrefs.SetInt(OUTPUT_POSY_KEY, posY);
                 PlayerPrefs.SetInt(OUTPUT_POSZ_KEY, posZ);
-                PlayerPrefs.SetString(RCON_HOST_KEY, host);
-                PlayerPrefs.SetInt(RCON_PORT_KEY, port);
-                PlayerPrefs.SetString(RCON_PASSWORD_KEY, password);
                 PlayerPrefs.Save();
 
-                using var client = new RCONClient(host, port);
-                var accepted = client.Authenticate(password);
-
-                if (accepted)
-                {
-                    for (int i = 0; i < 100; i++)
-                    {
-                        client.SendCommand($"particle end_rod {posX} {posY + i * 0.1F:0.00} {posZ}", out Message _);
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("RCON Authenication failed.");
-                }
                 //game.UpdateSelectedResult(null);
                 //manager?.SetActiveScreenByType<GenerationScreen>();
             }
@@ -157,13 +248,25 @@ namespace MarkovCraft
             {
                 Debug.LogWarning("RCON is not properly loaded!");
 
-                ScreenHeader!.text = GenerationScene.GetL10nString("screen.text.load_failure");
+                ScreenHeader!.text = GameScene.GetL10nString("screen.text.load_failure");
 
                 working = false;
                 return;
             }
 
+            // Initialize button text
+            PreviewButtonText!.text = GameScene.GetL10nString("rcon.text.preview_show");
+
             StartCoroutine(InitializeScreen());
+        }
+
+        public override void OnHide(ScreenManager manager)
+        {
+            areaPreview = false;
+
+            // Dispose client if present
+            client?.Dispose();
+            client = null;
         }
 
         public override void ScreenUpdate(ScreenManager manager)

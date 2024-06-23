@@ -622,7 +622,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 152978060346302464
-    m_Localized: Output Position
+    m_Localized: Output Pos
     m_Metadata:
       m_Items: []
   - m_Id: 152978779472306176
@@ -639,6 +639,22 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 152989711372034048
     m_Localized: Port
+    m_Metadata:
+      m_Items: []
+  - m_Id: 153356215804403712
+    m_Localized: Area Prev
+    m_Metadata:
+      m_Items: []
+  - m_Id: 153356370695856128
+    m_Localized: Stop Prev
+    m_Metadata:
+      m_Items: []
+  - m_Id: 153357393258782720
+    m_Localized: Connection Error
+    m_Metadata:
+      m_Items: []
+  - m_Id: 153357513119408128
+    m_Localized: Wrong Password
     m_Metadata:
       m_Items: []
   references:
