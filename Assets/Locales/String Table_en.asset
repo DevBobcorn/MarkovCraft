@@ -617,6 +617,30 @@ MonoBehaviour:
     m_Localized: Apply Packs
     m_Metadata:
       m_Items: []
+  - m_Id: 152976124796641280
+    m_Localized: RCON Output
+    m_Metadata:
+      m_Items: []
+  - m_Id: 152978060346302464
+    m_Localized: Output Position
+    m_Metadata:
+      m_Items: []
+  - m_Id: 152978779472306176
+    m_Localized: RCON Server Info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 152979660590718976
+    m_Localized: RCON Password
+    m_Metadata:
+      m_Items: []
+  - m_Id: 152979817201836032
+    m_Localized: Address
+    m_Metadata:
+      m_Items: []
+  - m_Id: 152989711372034048
+    m_Localized: Port
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

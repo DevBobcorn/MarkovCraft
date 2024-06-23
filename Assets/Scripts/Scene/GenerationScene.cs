@@ -43,7 +43,7 @@ namespace MarkovCraft
         [SerializeField] public ModelGraphV2? ModelGraphUIv2;
         [SerializeField] public Animator? ResultOperationPanelAnimator;
         [SerializeField] public Button? RemoveButton, ExportButton;
-        [SerializeField] public Button? ResizeButton, ExtrudeButton;
+        [SerializeField] public Button? ResizeButton, ExtrudeButton, RCONButton;
         [SerializeField] public TabPanel? ControlTabPanel;
         // HUD Controls - Generation Panel
         [SerializeField] public Toggle? RecordToggle;
@@ -605,6 +605,12 @@ namespace MarkovCraft
                     ExtrudeButton.onClick.AddListener(() => {
                         HideSpecialGUI();
                         //screenManager!.SetActiveScreenByType<ResultSizeUpperScreen>();
+                    });
+
+                    RCONButton!.onClick.RemoveAllListeners();
+                    RCONButton.onClick.AddListener(() => {
+                        HideSpecialGUI();
+                        screenManager!.SetActiveScreenByType<ResultRCONScreen>();
                     });
 
                     VoxImportButton!.interactable = true;

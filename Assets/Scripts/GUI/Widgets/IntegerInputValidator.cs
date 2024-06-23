@@ -8,8 +8,8 @@ namespace MarkovCraft
     [RequireComponent(typeof (TMP_InputField))]
     public class IntegerInputValidator : MonoBehaviour
     {
-        [SerializeField] public int MinValue;
-        [SerializeField] public int MaxValue;
+        [SerializeField] public int MinValue = int.MinValue;
+        [SerializeField] public int MaxValue = int.MaxValue;
         [SerializeField] public UnityEvent<int>? OnValidateValue = new();
 
         private TMP_InputField? input;

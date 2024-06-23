@@ -547,6 +547,30 @@ MonoBehaviour:
     m_Key: res_packs_manager.text.apply
     m_Metadata:
       m_Items: []
+  - m_Id: 152976124796641280
+    m_Key: rcon.text.loaded
+    m_Metadata:
+      m_Items: []
+  - m_Id: 152978060346302464
+    m_Key: rcon.text.output_pos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 152978779472306176
+    m_Key: rcon.text.server_info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 152979660590718976
+    m_Key: rcon.text.password_hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 152979817201836032
+    m_Key: rcon.text.address_hint
+    m_Metadata:
+      m_Items: []
+  - m_Id: 152989711372034048
+    m_Key: rcon.text.port_hint
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
