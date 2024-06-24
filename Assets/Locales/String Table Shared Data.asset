@@ -476,11 +476,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 42092786344202240
-    m_Key: Generation/Canvas/Generation Screen/Controls Hint Panel/Keys Text
+    m_Key: control.text.keys
     m_Metadata:
       m_Items: []
   - m_Id: 42092876748230656
-    m_Key: Generation/Canvas/Generation Screen/Controls Hint Panel/Hints Text
+    m_Key: control.text.actions
     m_Metadata:
       m_Items: []
   - m_Id: 56152742248226816
