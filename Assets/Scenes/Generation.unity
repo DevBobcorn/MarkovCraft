@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 410087040}
-  m_IndirectSpecularColor: {r: 0.18346274, g: 0.22903894, b: 0.3058684, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -34649,14 +34649,14 @@ MonoBehaviour:
   m_VerticalScrollbarEventHandler: {fileID: 0}
   m_LayoutGroup: {fileID: 0}
   m_ScrollSensitivity: 1
-  m_ContentType: 2
+  m_ContentType: 9
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 4
+  m_KeyboardType: 0
   m_LineType: 0
   m_HideMobileInput: 0
   m_HideSoftKeyboard: 0
-  m_CharacterValidation: 2
+  m_CharacterValidation: 0
   m_RegexValue: 
   m_GlobalPointSize: 14
   m_CharacterLimit: 0
@@ -35719,14 +35719,14 @@ MonoBehaviour:
   m_VerticalScrollbarEventHandler: {fileID: 0}
   m_LayoutGroup: {fileID: 0}
   m_ScrollSensitivity: 1
-  m_ContentType: 2
+  m_ContentType: 9
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 4
+  m_KeyboardType: 0
   m_LineType: 0
   m_HideMobileInput: 0
   m_HideSoftKeyboard: 0
-  m_CharacterValidation: 2
+  m_CharacterValidation: 0
   m_RegexValue: 
   m_GlobalPointSize: 14
   m_CharacterLimit: 0
@@ -43401,14 +43401,14 @@ MonoBehaviour:
   m_VerticalScrollbarEventHandler: {fileID: 0}
   m_LayoutGroup: {fileID: 0}
   m_ScrollSensitivity: 1
-  m_ContentType: 2
+  m_ContentType: 9
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 4
+  m_KeyboardType: 0
   m_LineType: 0
   m_HideMobileInput: 0
   m_HideSoftKeyboard: 0
-  m_CharacterValidation: 2
+  m_CharacterValidation: 0
   m_RegexValue: 
   m_GlobalPointSize: 14
   m_CharacterLimit: 0
