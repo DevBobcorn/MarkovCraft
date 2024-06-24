@@ -43,7 +43,7 @@ namespace MarkovCraft
         public static string GetL10nString(string key, params object[] p)
         {
             var str = Instance.L10nTable?.GetTable().GetEntry(key);
-            if (str is null) return $"<{key}>";
+            if (str == null) return $"<{key}>";
             return string.Format(str.Value, p);
         }
 

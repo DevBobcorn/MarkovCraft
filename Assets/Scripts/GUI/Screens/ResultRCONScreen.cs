@@ -3,15 +3,15 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System;
+using System.Collections.Generic;
 
 namespace MarkovCraft
 {
-    public class ResultRCONScreen : ResultManipulatorScreen
+    public class ResultRCONScreen : ResultManipulatorWithItemRemapScreen
     {
         [SerializeField] public TMP_Text? ScreenHeader, InfoText;
         // Settings Panel
-        [SerializeField] public Button? ConfirmButton, CancelButton;
+        [SerializeField] public Button? OutputButton, ApplyMappingButton;
         [SerializeField] public TMP_Text? PreviewButtonText;
         [SerializeField] public TMP_InputField? PosXInput;
         [SerializeField] public TMP_InputField? PosYInput;
@@ -27,22 +27,15 @@ namespace MarkovCraft
         private const string RCON_PASSWORD_KEY = "RCONPassword";
         // Result Preview
         [SerializeField] public Image? ResultPreviewImage;
-        // Result Detail Panel
-        [SerializeField] public ResultDetailPanel? ResultDetailPanel;
-
-        private GenerationResult? result = null;
-        public override GenerationResult? GetResult() => result;
 
         private RCONClient? client = null;
         private bool areaPreview = false;
         private float lastPreviewTime = 0F;
         private const float PREVIEW_INTERVAL = 0.8F;
 
-        private bool working = false, properlyLoaded = false;
-
         private IEnumerator InitializeScreen()
         {
-            if (result is null)
+            if (result == null)
             {
                 Debug.LogWarning($"ERROR: Size upper screen not correctly initialized!");
                 working = false;
@@ -51,10 +44,10 @@ namespace MarkovCraft
             }
 
             // Initialize settings panel
-            ConfirmButton!.onClick.RemoveAllListeners();
-            ConfirmButton.onClick.AddListener(ConfirmRCON);
-            CancelButton!.onClick.RemoveAllListeners();
-            CancelButton.onClick.AddListener(() => manager?.SetActiveScreenByType<GenerationScreen>());
+            OutputButton!.onClick.RemoveAllListeners();
+            OutputButton.onClick.AddListener(ConfirmOutput);
+            ApplyMappingButton!.onClick.RemoveAllListeners();
+            ApplyMappingButton.onClick.AddListener(ApplyMappings);
 
             // Load and set output position
             posX = PlayerPrefs.GetInt(OUTPUT_POSX_KEY, 0);
@@ -77,11 +70,6 @@ namespace MarkovCraft
             PosYInput!.GetComponent<IntegerInputValidator>().OnValidateValue!.AddListener(y => posY = y);
             PosZInput!.GetComponent<IntegerInputValidator>().OnValidateValue!.AddListener(z => posZ = z);
 
-            working = false;
-            properlyLoaded = true;
-
-            ScreenHeader!.text = GameScene.GetL10nString("rcon.text.loaded");
-            
             // Update Info text
             InfoText!.text = GameScene.GetL10nString("screen.text.result_info", result.ConfiguredModelName,
                     result.GenerationSeed, result.SizeX, result.SizeY, result.SizeZ);
@@ -97,8 +85,13 @@ namespace MarkovCraft
             ResultPreviewImage!.sprite = sprite;
             ResultPreviewImage!.SetNativeSize();
 
-            // Initialize result detail panel
-            ResultDetailPanel!.Show();
+            // Initialize remap components
+            InitializeRemap();
+
+            working = false;
+            properlyLoaded = true;
+
+            ScreenHeader!.text = GameScene.GetL10nString("rcon.text.loaded");
         }
 
         private bool ConnectRCON()
@@ -128,6 +121,7 @@ namespace MarkovCraft
                 if (client.Authenticate(password))
                 {
                     ScreenHeader!.text = GameScene.GetL10nString("rcon.text.loaded");
+                    Debug.Log("RCON connected");
                     return true;
                 }
                 else
@@ -150,6 +144,11 @@ namespace MarkovCraft
 
             if (areaPreview) // Turned it on
             {
+                PlayerPrefs.SetInt(OUTPUT_POSX_KEY, posX);
+                PlayerPrefs.SetInt(OUTPUT_POSY_KEY, posY);
+                PlayerPrefs.SetInt(OUTPUT_POSZ_KEY, posZ);
+                PlayerPrefs.Save();
+
                 if (!ConnectRCON()) // Turn it back off if connection failed
                 {
                     areaPreview = false;
@@ -206,7 +205,23 @@ namespace MarkovCraft
             }
         }
 
-        public void ConfirmRCON()
+        private string[] GetPrintCommands(int px, int py, int pz, int sx, int sy, int sz,
+                CustomMappingItem[] resultPalette, HashSet<int> airIndicies, int[] blockData)
+        {
+            string[] commands = new string[sx * sy * sz];
+
+            for (int mcy = 0; mcy < sy; mcy++) for (int mcx = 0; mcx < sx; mcx++) for (int mcz = 0; mcz < sz; mcz++)
+            {
+                int resultIndex = blockData[mcz + mcx * sz + mcy * sz * sx];
+                var blockState = airIndicies.Contains(resultIndex) ? "air" : resultPalette[resultIndex].BlockState;
+                
+                commands[mcz + mcx * sz + mcy * sz * sx] = $"setblock {px + mcx} {py + mcy} {pz + mcz} {blockState}";
+            }
+
+            return commands;
+        }
+
+        public void ConfirmOutput()
         {
             if (properlyLoaded)
             {
@@ -224,6 +239,19 @@ namespace MarkovCraft
 
                 //game.UpdateSelectedResult(null);
                 //manager?.SetActiveScreenByType<GenerationScreen>();
+
+                if (ConnectRCON() && client != null)
+                {
+                    // MarkovCraft => Minecraft
+                    int sx = result!.SizeY, sy = result.SizeZ, sz = result.SizeX;
+                    var commands = GetPrintCommands(posX, posY, posZ, sx, sy, sz,
+                            result.ResultPalette, result.AirIndices, result.BlockData);
+
+                    foreach (var command in commands)
+                    {
+                        client.SendCommand(command, out Message _);
+                    }
+                }
             }
         }
 
@@ -244,7 +272,7 @@ namespace MarkovCraft
             
             // Get selected result data
             result = game.GetSelectedResult();
-            if (result is null)
+            if (result == null)
             {
                 Debug.LogWarning("RCON is not properly loaded!");
 
@@ -265,8 +293,15 @@ namespace MarkovCraft
             areaPreview = false;
 
             // Dispose client if present
-            client?.Dispose();
-            client = null;
+            if (client != null)
+            {
+                client?.Dispose();
+                client = null;
+                Debug.Log("RCON disconnected");
+            }
+
+            // Finalize remap logic
+            FinalizeRemap();
         }
 
         public override void ScreenUpdate(ScreenManager manager)

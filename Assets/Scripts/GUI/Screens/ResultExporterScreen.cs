@@ -9,7 +9,7 @@ using TMPro;
 
 namespace MarkovCraft
 {
-    public class ResultExporterScreen : ResultManipulatorScreen
+    public class ResultExporterScreen : ResultManipulatorWithItemRemapScreen
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
 
@@ -36,34 +36,15 @@ namespace MarkovCraft
         [SerializeField] public TMP_Dropdown? ExportFormatDropdown;
         // Result Preview
         [SerializeField] public Image? ResultPreviewImage;
-        // Mapping Items Panel
-        [SerializeField] public RectTransform? GridTransform;
-        [SerializeField] public GameObject? MappingItemPrefab;
-        // BlockState Preview
-        [SerializeField] public BlockStatePreview? BlockStatePreview;
-        // Color Picker
-        [SerializeField] public MappingItemColorPicker? ColorPicker;
-        // Block Picker
-        [SerializeField] public MappingItemBlockPicker? BlockPicker;
-        // Result Detail Panel
-        [SerializeField] public ResultDetailPanel? ResultDetailPanel;
-        // Auto Mapping Panel
-        [SerializeField] public AutoMappingPanel? AutoMappingPanel;
 
         private int dataVersion = 0;
-        private GenerationResult? result = null;
-        public override GenerationResult? GetResult() => result;
-
-        // Result palette index => mapping item
-        private readonly List<ExportItem> mappingItems = new();
-        private bool working = false, properlyLoaded = false;
 
         // Disable pause for animated inventory
         public override bool ShouldPause() => false;
 
         private IEnumerator InitializeScreen()
         {
-            if (result is null)
+            if (result == null)
             {
                 Debug.LogWarning($"ERROR: Export screen not correctly initialized!");
                 working = false;
@@ -93,37 +74,6 @@ namespace MarkovCraft
             ExportFormatDropdown!.onValueChanged.RemoveAllListeners();
             ExportFormatDropdown!.onValueChanged.AddListener(UpdateExportFileName);
 
-            ResultDetailPanel!.Hide();
-            
-            // Initialize mappings panel
-            for (var index = 0;index < result.ResultPalette.Length;index++)
-            {
-                var newItemObj = Instantiate(MappingItemPrefab);
-                var newItem = newItemObj!.GetComponent<ExportItem>();
-                var itemVal = result.ResultPalette[index];
-                // Add item to dictionary and set data
-                mappingItems.Add(newItem);
-                var rgb = ColorConvert.GetRGB(itemVal.Color);
-                newItem.InitializeData(' ', rgb, rgb, itemVal.BlockState, ColorPicker!, BlockPicker!, BlockStatePreview!);
-                // Add item to container
-                newItem.transform.SetParent(GridTransform, false);
-                newItem.transform.localScale = Vector3.one;
-            }
-
-            yield return null;
-            // Mark air items
-            foreach (var airIndex in result.AirIndices)
-            {
-                var item = mappingItems[airIndex];
-                item.gameObject.transform.SetAsLastSibling();
-                item.TagAsSpecial("minecraft:air");
-            }
-
-            working = false;
-            properlyLoaded = true;
-
-            ScreenHeader!.text = GameScene.GetL10nString("exporter.text.loaded", result.ConfiguredModelName);
-            
             // Update Info text
             InfoText!.text = GameScene.GetL10nString("screen.text.result_info", result.ConfiguredModelName,
                     result.GenerationSeed, result.SizeX, result.SizeY, result.SizeZ);
@@ -143,6 +93,14 @@ namespace MarkovCraft
             var sprite = Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2, tex.height / 2));
             ResultPreviewImage!.sprite = sprite;
             ResultPreviewImage!.SetNativeSize();
+
+            // Initialize remap logic
+            InitializeRemap();
+
+            working = false;
+            properlyLoaded = true;
+
+            ScreenHeader!.text = GameScene.GetL10nString("exporter.text.loaded", result.ConfiguredModelName);
         }
 
         public override void OnShow(ScreenManager manager)
@@ -164,7 +122,7 @@ namespace MarkovCraft
             result = game.GetSelectedResult();
             dataVersion = game.GetDataVersionInt();
             
-            if (result is null)
+            if (result == null)
             {
                 Debug.LogWarning("Exporter is not properly loaded!");
 
@@ -179,72 +137,8 @@ namespace MarkovCraft
 
         public override void OnHide(ScreenManager manager)
         {
-            // The export palette is not destroyed. If exporter is screen is opened again
-            // before the selected generation result is changed, the old export palette
-            // containing cached mapping items will still be used
-            
-            var array = mappingItems.ToArray();
-
-            for (int i = 0;i < array.Length;i++)
-                Destroy(array[i].gameObject);
-            
-            mappingItems.Clear();
-
-            // Clear export result
-            result = null;
-
-            // Hide auto mapping panel
-            AutoMappingPanel?.Hide();
-            // Hide color picker
-            ColorPicker?.CloseAndDiscard();
-            // Hide block picker
-            BlockPicker?.CloseAndDiscard();
-        }
-
-        public void AutoMap()
-        {
-            // Do auto mapping
-            AutoMappingPanel!.AutoMap(mappingItems.Select(x => x as MappingItem).ToList());
-            // Hide auto mapping panel
-            AutoMappingPanel!.Hide();
-        }
-
-        private void ApplyMappings()
-        {
-            if (working) return;
-
-            if (properlyLoaded && result != null) // The editor is properly loaded
-            {
-                working = true;
-
-                var resultPalette = result.ResultPalette;
-                var updatedEntries = new HashSet<int>();
-                // Apply export palette overrides
-                for (int index = 0;index < resultPalette.Length;index++)
-                {
-                    var item = mappingItems[index];
-                    var itemVal = resultPalette[index];
-
-                    var newColor = ColorConvert.OpaqueRGBFromHexString(item.GetColorCode());
-                    var newBlockState = item.GetBlockState();
-
-                    // Color32s are directly comparable so we have to convert them to rgb int first
-                    if (ColorConvert.GetOpaqueRGB(itemVal.Color) != newColor || itemVal.BlockState != newBlockState)
-                    {
-                        itemVal.Color = ColorConvert.GetOpaqueColor32(newColor);
-                        itemVal.BlockState = newBlockState;
-
-                        updatedEntries.Add(index);
-                    }
-                }
-
-                // Rebuild result mesh to reflect mapping changes
-                result.RequestRebuildResultMesh(updatedEntries);
-
-                working = false;
-
-                manager?.SetActiveScreenByType<GenerationScreen>();
-            }
+            // Finalize remap logic
+            FinalizeRemap();
         }
 
         public string? GetExportPath()

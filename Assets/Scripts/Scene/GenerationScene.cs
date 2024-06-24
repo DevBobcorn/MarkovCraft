@@ -194,7 +194,7 @@ namespace MarkovCraft
                     modelDoc = task.Result;
             }
             
-            if (modelDoc is null)
+            if (modelDoc == null)
             {
                 Debug.LogWarning($"ERROR: Couldn't open xml file at {fileName}");
                 Loading = false;
@@ -333,7 +333,7 @@ namespace MarkovCraft
 
         private IEnumerator RunGeneration()
         {
-            if (executing || currentConfModel == null || currentConfModel.Amount == 0 || interpreter is null)
+            if (executing || currentConfModel == null || currentConfModel.Amount == 0 || interpreter == null)
             {
                 Debug.LogWarning("Generation cannot be initiated");
                 StopExecution();
@@ -523,7 +523,7 @@ namespace MarkovCraft
             string fileName = VoxPathInput!.text.Trim().Trim('"');
 
             var (pieces, rgbPalette) = VoxHelper.LoadFullVox(fileName);
-            if (pieces is null || pieces.Length == 0)
+            if (pieces == null || pieces.Length == 0)
             {
                 Debug.LogWarning("Import failed");
                 yield break;
@@ -631,7 +631,7 @@ namespace MarkovCraft
 
         private void UpdateBlockSelection(CustomMappingItem? selectedItem, string text = "")
         {
-            if (selectedItem is null)
+            if (selectedItem == null)
             {
                 BlockSelectionMappingItem!.SetBlockState(string.Empty);
                 BlockSelectionPanelGroup!.alpha = 0F;
@@ -700,7 +700,7 @@ namespace MarkovCraft
                             var (x, y, z, unityPos, item) = selectedResult.GetBlockPosInVolume(blockPos);
                             UpdateBlockSelection(item, $"({x}, {y}, {z})");
 
-                            if (item is null && Input.GetKeyDown(KeyCode.Mouse0)) // Unlock volume
+                            if (item == null && Input.GetKeyDown(KeyCode.Mouse0)) // Unlock volume
                             {
                                 // Unlock volume selection
                                 VolumeSelection!.Unlock();

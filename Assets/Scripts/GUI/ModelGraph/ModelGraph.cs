@@ -240,7 +240,7 @@ namespace MarkovCraft
 
         public static void UpdateGraph(ModelGraph graph, Branch? current)
         {
-            if (current is null)
+            if (current == null)
             {
                 graph.SetActiveNode(-1);
                 return;

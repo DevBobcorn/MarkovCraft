@@ -171,7 +171,7 @@ namespace MarkovCraft
                 }
             }
 
-            if (!succeeded || recData is null)
+            if (!succeeded || recData == null)
             {
                 Debug.LogWarning($"ERROR: Couldn't open json file at {fileName}");
                 Loading = false;

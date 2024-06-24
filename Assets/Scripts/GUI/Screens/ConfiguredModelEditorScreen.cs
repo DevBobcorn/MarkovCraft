@@ -157,7 +157,7 @@ namespace MarkovCraft
                     modelDoc = task2.Result;
             }
             
-            if (modelDoc is null)
+            if (modelDoc == null)
             {
                 Debug.LogWarning($"ERROR: Couldn't open xml file at {modelFileName}");
                 working = false;
@@ -181,7 +181,7 @@ namespace MarkovCraft
             if (working || !properlyLoaded) return;
 
             var modelName = ModelDropdown?.options[newValue].text;
-            if (modelName is null) return;
+            if (modelName == null) return;
 
             // Update which items should be displayed (included in selected model)
             StartCoroutine(UpdateActiveCharSetFromModel(modelName));

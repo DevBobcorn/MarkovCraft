@@ -36,7 +36,7 @@ namespace MarkovCraft
 
         private IEnumerator InitializeScreen()
         {
-            if (result is null)
+            if (result == null)
             {
                 Debug.LogWarning($"ERROR: Size upper screen not correctly initialized!");
                 working = false;
@@ -192,7 +192,7 @@ namespace MarkovCraft
             
             // Get selected result data
             result = game.GetSelectedResult();
-            if (result is null)
+            if (result == null)
             {
                 Debug.LogWarning("Size upper is not properly loaded!");
 

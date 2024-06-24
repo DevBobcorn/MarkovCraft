@@ -98,7 +98,7 @@ namespace MarkovCraft
             // Index -1 in loaded vox data is air
             AirIndices.Add(voxIndex2ResultIndex[-1]);
             // Calculate result palette
-            var resultPalette = rgbPalette is null ?
+            var resultPalette = rgbPalette == null ?
                     minimumVoxIndices.Select(vi =>
                             new CustomMappingItem { Color = Color.cyan }).ToArray() :
                     minimumVoxIndices.Select(vi =>

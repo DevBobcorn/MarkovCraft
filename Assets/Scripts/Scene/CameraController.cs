@@ -26,7 +26,7 @@ namespace MarkovCraft
 
         public void SetCenterPosition(Vector3 newCenter)
         {
-            var ray = viewCamera is null ?
+            var ray = viewCamera == null ?
                     new Ray(transform.position, transform.forward) :
                     viewCamera.ViewportPointToRay(VIEWPORT_ROTATE_CENTER);
             REFERENCE_PLANE.Raycast(ray, out float dist);
@@ -152,7 +152,7 @@ namespace MarkovCraft
 
             if (rot != 0F) // Turn camera
             {
-                var ray = viewCamera is null ?
+                var ray = viewCamera == null ?
                         new Ray(transform.position, transform.forward) :
                         viewCamera.ViewportPointToRay(VIEWPORT_ROTATE_CENTER);
                 REFERENCE_PLANE.Raycast(ray, out float dist);
@@ -164,7 +164,7 @@ namespace MarkovCraft
                 transform.localEulerAngles = new Vector3(eulers.x, eulers.y + rot * turnSpeed * Time.deltaTime, eulers.z);
 
                 // Get ray direction after the rotation
-                var newRayDirection = viewCamera is null ? transform.forward:
+                var newRayDirection = viewCamera == null ? transform.forward:
                         viewCamera.ViewportPointToRay(VIEWPORT_ROTATE_CENTER).direction;
 
                 // Update current position

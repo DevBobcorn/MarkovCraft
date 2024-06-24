@@ -587,6 +587,10 @@ MonoBehaviour:
     m_Key: rcon.text.wrong_password
     m_Metadata:
       m_Items: []
+  - m_Id: 153719591176937472
+    m_Key: rcon.text.output
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
