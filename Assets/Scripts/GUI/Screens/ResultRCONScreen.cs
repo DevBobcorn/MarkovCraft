@@ -45,7 +45,7 @@ namespace MarkovCraft
 
             // Initialize settings panel
             OutputButton!.onClick.RemoveAllListeners();
-            OutputButton.onClick.AddListener(ConfirmOutput);
+            OutputButton.onClick.AddListener(PerformOutput);
             ApplyMappingButton!.onClick.RemoveAllListeners();
             ApplyMappingButton.onClick.AddListener(ApplyMappings);
 
@@ -221,7 +221,7 @@ namespace MarkovCraft
             return commands;
         }
 
-        public void ConfirmOutput()
+        public void PerformOutput()
         {
             if (properlyLoaded)
             {
@@ -232,13 +232,37 @@ namespace MarkovCraft
                     return;
                 }
 
+                if (working) return;
+                working = true;
+
                 PlayerPrefs.SetInt(OUTPUT_POSX_KEY, posX);
                 PlayerPrefs.SetInt(OUTPUT_POSY_KEY, posY);
                 PlayerPrefs.SetInt(OUTPUT_POSZ_KEY, posZ);
                 PlayerPrefs.Save();
 
-                //game.UpdateSelectedResult(null);
-                //manager?.SetActiveScreenByType<GenerationScreen>();
+                var resultPalette = result!.ResultPalette;
+                var updatedEntries = new HashSet<int>();
+                // Apply export palette overrides
+                for (int index = 0;index < resultPalette.Length;index++)
+                {
+                    var item = mappingItems[index];
+                    var itemVal = resultPalette[index];
+
+                    var newColor = ColorConvert.OpaqueRGBFromHexString(item.GetColorCode());
+                    var newBlockState = item.GetBlockState();
+
+                    // Color32s are directly comparable so we have to convert them to rgb int first
+                    if (ColorConvert.GetOpaqueRGB(itemVal.Color) != newColor || itemVal.BlockState != newBlockState)
+                    {
+                        itemVal.Color = ColorConvert.GetOpaqueColor32(newColor);
+                        itemVal.BlockState = newBlockState;
+
+                        updatedEntries.Add(index);
+                    }
+                }
+
+                // Rebuild result mesh to reflect mapping changes
+                result.RequestRebuildResultMesh(updatedEntries);
 
                 if (ConnectRCON() && client != null)
                 {
@@ -247,11 +271,13 @@ namespace MarkovCraft
                     var commands = GetPrintCommands(posX, posY, posZ, sx, sy, sz,
                             result.ResultPalette, result.AirIndices, result.BlockData);
 
-                    foreach (var command in commands)
+                    for (int i = 0; i < commands.Length && client != null; i++)
                     {
-                        client.SendCommand(command, out Message _);
+                        client.SendCommand(commands[i], out Message _);
                     }
                 }
+
+                working = false;
             }
         }
 
