@@ -55,7 +55,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 10613512118272
-    m_Localized: Animate Generation
+    m_Localized: Animate
     m_Metadata:
       m_Items: []
   - m_Id: 10715106549760
@@ -391,7 +391,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 30379949334925312
-    m_Localized: Steps / Refresh
+    m_Localized: step/it
     m_Metadata:
       m_Items: []
   - m_Id: 30470153584447488

@@ -43,7 +43,7 @@ namespace MarkovCraft
         [SerializeField] public ModelGraphV2? ModelGraphUIv2;
         [SerializeField] public Animator? ResultOperationPanelAnimator;
         [SerializeField] public Button? RemoveButton, ExportButton;
-        [SerializeField] public Button? ResizeButton, ExtrudeButton, RCONButton;
+        [SerializeField] public Button? ResizeButton, ExtrudeButton, RCONButton, UnlockButton;
         [SerializeField] public TabPanel? ControlTabPanel;
         // HUD Controls - Generation Panel
         [SerializeField] public Toggle? RecordToggle;
@@ -613,6 +613,11 @@ namespace MarkovCraft
                         screenManager!.SetActiveScreenByType<ResultRCONScreen>();
                     });
 
+                    UnlockButton!.onClick.RemoveAllListeners();
+                    UnlockButton.onClick.AddListener(() => {
+                        UnlockSelectedResult();
+                    });
+
                     VoxImportButton!.interactable = true;
                     VoxImportButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.import_vox");
                     VoxImportButton.onClick.RemoveAllListeners();
@@ -700,30 +705,20 @@ namespace MarkovCraft
                             var (x, y, z, unityPos, item) = selectedResult.GetBlockPosInVolume(blockPos);
                             UpdateBlockSelection(item, $"({x}, {y}, {z})");
 
-                            if (item == null && Input.GetKeyDown(KeyCode.Mouse0)) // Unlock volume
+                            /* if (item == null && Input.GetKeyDown(KeyCode.Mouse0)) // Unlock volume
                             {
-                                // Unlock volume selection
-                                VolumeSelection!.Unlock();
-                                // Disable block colliders
-                                selectedResult?.DisableBlockColliders();
-                                // Hide export button
-                                ResultOperationPanelAnimator?.SetBool("Hidden", true);
-                            }
+                                UnlockSelectedResult();
+                            } */
 
                             // Update cursor position (world space)
                             BlockSelection!.transform.position = unityPos;
                         }
                         else // Mouse pointer is over no block
                         {
-                            if (Input.GetKeyDown(KeyCode.Mouse0)) // Unlock volume
+                            /* if (Input.GetKeyDown(KeyCode.Mouse0)) // Unlock volume
                             {
-                                // Unlock volume selection
-                                VolumeSelection!.Unlock();
-                                // Disable block colliders
-                                selectedResult?.DisableBlockColliders();
-                                // Hide export button
-                                ResultOperationPanelAnimator?.SetBool("Hidden", true);
-                            }
+                                UnlockSelectedResult();
+                            } */
 
                             // Reset block selection
                             BlockSelection!.transform.position = BLOCK_SELECTION_HIDDEN_POS;
@@ -764,6 +759,16 @@ namespace MarkovCraft
 
                 selectedResult = null;
             }
+        }
+
+        private void UnlockSelectedResult()
+        {
+            // Unlock volume selection
+            VolumeSelection!.Unlock();
+            // Disable block colliders
+            selectedResult?.DisableBlockColliders();
+            // Hide export button
+            ResultOperationPanelAnimator?.SetBool("Hidden", true);
         }
 
         public GenerationResult? GetSelectedResult()
