@@ -109,25 +109,27 @@ namespace MarkovCraft
 
             var blockGeometries = new BlockGeometry[nextBlockMeshIndex];
             var blockTints = new float3[nextBlockMeshIndex];
-            
-            for (int i = 0;i < buffers.Length;i++)
-                buffers[i] = new();
 
             // #0 is default cube mesh
-            CubeGeometry.Build(ref buffers[0], float3.zero, ResourcePackManager.BLANK_TEXTURE, 0b111111, new float3(1F));
+            uint vertOffsetCube = 0;
+            buffers[0] = new VertexBuffer(CubeGeometry.GetVertexCount(0b111111));
+            CubeGeometry.Build(buffers[0], ref vertOffsetCube, float3.zero, ResourcePackManager.BLANK_TEXTURE, 0b111111, new float3(1F));
 
             var modelTable = ResourcePackManager.Instance.StateModelTable;
             
             foreach (var pair in stateId2Mesh) // StateId => Mesh index
             {
                 var stateId = pair.Key;
+                uint vertOffset = 0;
 
                 if (modelTable.ContainsKey(stateId))
                 {
                     var blockGeometry = modelTable[stateId].Geometries[0];
                     var blockTint = statePalette.GetBlockColor(stateId, DummyWorld, BlockLoc.Zero, statePalette.FromId(stateId));
 
-                    blockGeometry.Build(ref buffers[pair.Value], float3.zero, 0b111111, BlockStatePreview.DUMMY_AMBIENT_OCCLUSSION,
+                    buffers[pair.Value] = new VertexBuffer(blockGeometry.GetVertexCount(0b111111));
+
+                    blockGeometry.Build(buffers[pair.Value], ref vertOffset, float3.zero, 0b111111, BlockStatePreview.DUMMY_AMBIENT_OCCLUSSION,
                             BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
                     
                     blockGeometries[pair.Value] = blockGeometry;
@@ -135,8 +137,10 @@ namespace MarkovCraft
                 }
                 else
                 {
+                    buffers[pair.Value] = new VertexBuffer(CubeGeometry.GetVertexCount(0b111111));
+
                     Debug.LogWarning($"Model for block state #{stateId} ({statePalette.FromId(stateId)}) is not available. Using cube model instead.");
-                    CubeGeometry.Build(ref buffers[pair.Value], float3.zero, ResourcePackManager.BLANK_TEXTURE, 0b111111, new float3(1F));
+                    CubeGeometry.Build(buffers[pair.Value], ref vertOffset, float3.zero, ResourcePackManager.BLANK_TEXTURE, 0b111111, new float3(1F));
                 }
             }
 

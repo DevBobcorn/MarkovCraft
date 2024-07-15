@@ -27,14 +27,17 @@ namespace MarkovCraft
             if (blockId != ResourceLocation.INVALID && previewObject != null)
             {
                 localizedNameLower = GameScene.GetL10nBlockName(blockId).ToLower();
-
                 var defaultState = BlockStatePalette.INSTANCE.StatesTable[defaultStateId];
-                var visualBuffer = new VertexBuffer();
+
+                var geometry = ResourcePackManager.Instance.StateModelTable[defaultStateId].Geometries[0];
+                var visualBuffer = new VertexBuffer(geometry.GetVertexCount(BlockStatePreview.PREVIEW_CULLFLAG));
+                uint vertOffset = 0;
 
                 var material = GameScene.Instance.MaterialManager!.GetAtlasMaterial(BlockStatePalette.INSTANCE.RenderTypeTable[blockId]);
                 var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(defaultStateId, GameScene.DummyWorld, BlockLoc.Zero, defaultState);
-                ResourcePackManager.Instance.StateModelTable[defaultStateId].Geometries[0].Build(ref visualBuffer, BlockStatePreview.ITEM_CENTER,
-                        BlockStatePreview.PREVIEW_CULLFLAG, BlockStatePreview.DUMMY_AMBIENT_OCCLUSSION, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
+
+                geometry.Build(visualBuffer, ref vertOffset, BlockStatePreview.ITEM_CENTER, BlockStatePreview.PREVIEW_CULLFLAG,
+                        BlockStatePreview.DUMMY_AMBIENT_OCCLUSSION, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
 
                 previewObject.GetComponent<MeshFilter>().sharedMesh = BlockStatePreview.BuildMesh(visualBuffer);
                 previewObject.GetComponent<MeshRenderer>().sharedMaterial = material;

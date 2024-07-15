@@ -170,10 +170,14 @@ namespace MarkovCraft
             // Update block mesh
             if (previewObject != null)
             {
-                var visualBuffer = new VertexBuffer();
+                var geometry = ResourcePackManager.Instance.StateModelTable[stateId].Geometries[0];
+                var visualBuffer = new VertexBuffer(geometry.GetVertexCount(PREVIEW_CULLFLAG));
+                uint vertOffset = 0;
+
                 var material = GameScene.Instance.MaterialManager!.GetAtlasMaterial(BlockStatePalette.INSTANCE.RenderTypeTable[newState.BlockId]);
                 var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero, newState);
-                ResourcePackManager.Instance.StateModelTable[stateId].Geometries[0].Build(ref visualBuffer, ITEM_CENTER,
+
+                geometry.Build(visualBuffer, ref vertOffset, ITEM_CENTER,
                         PREVIEW_CULLFLAG, DUMMY_AMBIENT_OCCLUSSION, DUMMY_BLOCK_VERT_LIGHT, blockTint);
 
                 previewObject.GetComponent<MeshFilter>().sharedMesh = BuildMesh(visualBuffer);

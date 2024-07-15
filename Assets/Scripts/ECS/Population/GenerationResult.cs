@@ -263,13 +263,74 @@ namespace MarkovCraft
 
                 int count = GameScene.BLOCK_RENDER_TYPES.Length, renderTypeMask = 0;
                 var visualBuffer = new VertexBuffer[count];
-                for (int i = 0;i < count;i++)
-                    visualBuffer[i] = new();
                 var nonAirIndicesInChunk = new HashSet<int>();
 
                 int blockMeshLayer = LayerMask.NameToLayer(blockMeshLayerName);
 
                 var buildTask = Task.Run(() => {
+                    var vertexCount = new int[count];
+                    for (int i = 0;i < count;i++)
+                        vertexCount[i] = 0;
+
+                    for (int ix = 0;ix < 16;ix++) for (int iy = 0;iy < 16;iy++) for (int iz = 0;iz < 16;iz++)
+                    {
+                        int x = ix + cox;
+                        int y = iy + coy;
+                        int z = iz + coz;
+
+                        if (x >= SizeX || y >= SizeY || z >= SizeZ) continue;
+                        int pos = x + y * SizeX + z * SizeX * SizeY;
+
+                        int value = BlockData[pos];
+                        if (AirIndices.Contains(value)) continue;
+
+                        nonAirIndicesInChunk.Add(value);
+
+                        int cullFlags = 0b000000;
+
+                        if (z == SizeZ - 1 || nonOpaquePalette[BlockData[x + y * SizeX + (z + 1) * SizeX * SizeY]]) // Unity +Y (Up)    | Markov +Z
+                            cullFlags |= 0b000001;
+                        if (z ==         0 || nonOpaquePalette[BlockData[x + y * SizeX + (z - 1) * SizeX * SizeY]]) // Unity -Y (Down)  | Markov -Z
+                            cullFlags |= 0b000010;
+                        if (x == SizeX - 1 || nonOpaquePalette[BlockData[(x + 1) + y * SizeX + z * SizeX * SizeY]]) // Unity +X (South) | Markov +X
+                            cullFlags |= 0b000100;
+                        if (x ==         0 || nonOpaquePalette[BlockData[(x - 1) + y * SizeX + z * SizeX * SizeY]]) // Unity -X (North) | Markov -X
+                            cullFlags |= 0b001000;
+                        if (y == SizeY - 1 || nonOpaquePalette[BlockData[x + (y + 1) * SizeX + z * SizeX * SizeY]]) // Unity +Z (East)  | Markov +Y
+                            cullFlags |= 0b010000;
+                        if (y ==         0 || nonOpaquePalette[BlockData[x + (y - 1) * SizeX + z * SizeX * SizeY]]) // Unity -Z (East)  | Markov +Y
+                            cullFlags |= 0b100000;
+
+                        int stateId = stateIdPalette[value];
+                        int renderTypeIndex = renderTypePalette[value];
+
+                        if (stateId == invalidBlockStateIndex)
+                        {
+                            if (cullFlags != 0b000000)// If at least one face is visible
+                            {
+                                vertexCount[renderTypeIndex] += CubeGeometry.GetVertexCount(cullFlags);
+                                
+                                renderTypeMask |= (1 << renderTypeIndex);
+                            }
+                        }
+                        else
+                        {
+                            if (cullFlags != 0b000000)// If at least one face is visible
+                            {
+                                vertexCount[renderTypeIndex] += stateModelTable[stateId].Geometries[0].GetVertexCount(cullFlags);
+
+                                renderTypeMask |= (1 << renderTypeIndex);
+                            }
+                        }
+                    }
+
+                    for (int i = 0;i < count;i++)
+                        visualBuffer[i] = new(vertexCount[i]);
+                    
+                    var vertexOffset = new uint[count];
+                    for (int i = 0;i < count;i++)
+                        vertexOffset[i] = 0;
+
                     for (int ix = 0;ix < 16;ix++) for (int iy = 0;iy < 16;iy++) for (int iz = 0;iz < 16;iz++)
                     {
                         int x = ix + cox;
@@ -307,10 +368,8 @@ namespace MarkovCraft
                             if (cullFlags != 0b000000)// If at least one face is visible
                             {
                                 var cubeTint = ResultPalette[value].Color;
-                                CubeGeometry.Build(ref visualBuffer[renderTypeIndex], new(ix, iz, iy), ResourcePackManager.BLANK_TEXTURE, cullFlags,
+                                CubeGeometry.Build(visualBuffer[renderTypeIndex], ref vertexOffset[renderTypeIndex], new(ix, iz, iy), ResourcePackManager.BLANK_TEXTURE, cullFlags,
                                         new(cubeTint.r / 255F, cubeTint.g / 255F, cubeTint.b / 255F));
-                                
-                                renderTypeMask |= (1 << renderTypeIndex);
                             }
                         }
                         else
@@ -318,10 +377,8 @@ namespace MarkovCraft
                             if (cullFlags != 0b000000)// If at least one face is visible
                             {
                                 var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero, statesTable[stateId]);
-                                stateModelTable[stateId].Geometries[0].Build(ref visualBuffer[renderTypeIndex], new(ix, iz, iy), cullFlags,
+                                stateModelTable[stateId].Geometries[0].Build(visualBuffer[renderTypeIndex], ref vertexOffset[renderTypeIndex], new(ix, iz, iy), cullFlags,
                                         BlockStatePreview.DUMMY_AMBIENT_OCCLUSSION, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
-
-                                renderTypeMask |= (1 << renderTypeIndex);
                             }
                         }
                     }
