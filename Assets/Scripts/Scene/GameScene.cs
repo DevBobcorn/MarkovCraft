@@ -177,6 +177,12 @@ namespace MarkovCraft
                     MarkovGlobal.MARKOV_CRAFT_BUILTIN_FILE_NAME, MarkovGlobal.MARKOV_CRAFT_BUILTIN_VERSION, extraDataDir,
                     (status) => Loom.QueueOnMainThread(() => update?.Invoke(status)),
                     () => { }, (succeed) => { }));
+            
+            // Generate vanilla_fix or check update
+            var vanillaFixDir = PathHelper.GetPackDirectoryNamed("vanilla_fix");
+            StartCoroutine(BuiltinResourceHelper.ReadyBuiltinResource(
+                    MarkovGlobal.VANILLAFIX_FILE_NAME, MarkovGlobal.VANILLAFIX_VERSION, vanillaFixDir,
+                    (status) => { }, () => { }, (succeed) => { }));
 
             // First load all possible Block States...
             var loadFlag = new DataLoadFlag();
