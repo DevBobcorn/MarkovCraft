@@ -377,8 +377,8 @@ namespace MarkovCraft
                             if (cullFlags != 0b000000)// If at least one face is visible
                             {
                                 var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero, statesTable[stateId]);
-                                stateModelTable[stateId].Geometries[0].Build(visualBuffer[renderTypeIndex], ref vertexOffset[renderTypeIndex], new(ix, iz, iy), cullFlags,
-                                        BlockStatePreview.DUMMY_AMBIENT_OCCLUSSION, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
+                                stateModelTable[stateId].Geometries[0].Build(visualBuffer[renderTypeIndex], ref vertexOffset[renderTypeIndex],
+                                        new(ix, iz, iy), cullFlags, 0, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
                             }
                         }
                     }

@@ -14,7 +14,6 @@ namespace MarkovCraft
     [RequireComponent(typeof (CanvasGroup))]
     public class BlockStatePreview : MonoBehaviour
     {
-        public static readonly bool[] DUMMY_AMBIENT_OCCLUSSION = Enumerable.Repeat(false, 27).ToArray();
         public static readonly float[] DUMMY_BLOCK_VERT_LIGHT = Enumerable.Repeat(0F, 8).ToArray();
 
         public static readonly float3 ITEM_CENTER = new(-0.5F, -0.5F, -0.5F);
@@ -178,7 +177,7 @@ namespace MarkovCraft
                 var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero, newState);
 
                 geometry.Build(visualBuffer, ref vertOffset, ITEM_CENTER,
-                        PREVIEW_CULLFLAG, DUMMY_AMBIENT_OCCLUSSION, DUMMY_BLOCK_VERT_LIGHT, blockTint);
+                        PREVIEW_CULLFLAG, 0, DUMMY_BLOCK_VERT_LIGHT, blockTint);
 
                 previewObject.GetComponent<MeshFilter>().sharedMesh = BuildMesh(visualBuffer);
                 previewObject.GetComponent<MeshRenderer>().sharedMaterial = material;
