@@ -196,7 +196,7 @@ namespace MarkovCraft
 
                 working = false;
 
-                manager?.SetActiveScreenByType<WelcomeScreen>();
+                manager!.SetActiveScreenByType<WelcomeScreen>();
             }
         }
 

@@ -117,7 +117,8 @@ namespace MarkovCraft
             canvasGroup!.alpha = 1F;
             previewObject!.SetActive(true);
 
-            var candidates = BlockStatePalette.GetBlockIdCandidates(incompleteBlockId);
+            var statePalette = BlockStatePalette.INSTANCE;
+            var candidates = statePalette.GetBlockIdCandidates(incompleteBlockId);
 
             if (candidates.Length > 0) // Display candidates
             {
@@ -126,9 +127,8 @@ namespace MarkovCraft
                 descText!.text = string.Join('\n', candidates.Select(x =>
                         $"<color=yellow>{x.ToString()[0..typedLength]}</color>{x.ToString()[typedLength..]}"));
 
-                var palette = BlockStatePalette.INSTANCE;
-                var stateId = palette.DefaultStateTable[candidates[0]];
-                UpdatePreviewObject(stateId, palette.StatesTable[stateId]);
+                var stateId = statePalette.GetDefaultNumId(candidates[0]);
+                UpdatePreviewObject(stateId, statePalette.GetByNumId(stateId));
                 
                 previewObject!.SetActive(true);
             }
@@ -151,7 +151,7 @@ namespace MarkovCraft
                 canvasGroup!.alpha = 1F;
                 previewObject!.SetActive(true);
 
-                var newState = BlockStatePalette.INSTANCE.StatesTable[stateId];
+                var newState = BlockStatePalette.INSTANCE.GetByNumId(stateId);
                 var blockName = GameScene.GetL10nBlockName(newState.BlockId);
 
                 descText!.text = $"{blockName}\n{newState}";

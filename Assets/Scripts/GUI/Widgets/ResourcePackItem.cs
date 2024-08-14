@@ -78,7 +78,7 @@ namespace MarkovCraft
             GetComponent<Image>().color = SELECTED_COLOR;
 
             selected = true;
-            packToggle?.SetSelected(true);
+            packToggle!.SetSelected(true);
 
             var parent = transform.parent;
             var curIndex = transform.GetSiblingIndex();
@@ -103,7 +103,7 @@ namespace MarkovCraft
             GetComponent<Image>().color = DESELECTED_COLOR;
 
             selected = false;
-            packToggle?.SetSelected(false);
+            packToggle!.SetSelected(false);
 
             var parent = transform.parent;
             var curIndex = transform.GetSiblingIndex();

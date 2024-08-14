@@ -143,7 +143,7 @@ namespace MarkovCraft
 
         public string? GetExportPath()
         {
-            return ExportFolderInput?.text;
+            return ExportFolderInput!.text;
         }
 
         private void UpdateExportFileName(int selectedFormatIndex)
@@ -257,7 +257,7 @@ namespace MarkovCraft
                 
                 working = false;
 
-                manager?.SetActiveScreenByType<GenerationScreen>();
+                manager!.SetActiveScreenByType<GenerationScreen>();
             }
         }
 

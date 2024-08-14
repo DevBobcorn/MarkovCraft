@@ -180,7 +180,7 @@ namespace MarkovCraft
         {
             if (working || !properlyLoaded) return;
 
-            var modelName = ModelDropdown?.options[newValue].text;
+            var modelName = ModelDropdown!.options[newValue].text;
             if (modelName == null) return;
 
             // Update which items should be displayed (included in selected model)
@@ -231,11 +231,11 @@ namespace MarkovCraft
             mappingItems.Clear();
 
             // Hide auto mapping panel
-            AutoMappingPanel?.Hide();
+            AutoMappingPanel!.Hide();
             // Hide color picker
-            ColorPicker?.CloseAndDiscard();
+            ColorPicker!.CloseAndDiscard();
             // Hide block picker
-            BlockPicker?.CloseAndDiscard();
+            BlockPicker!.CloseAndDiscard();
         }
 
         private void ShowActiveCharSet(HashSet<char> charSet)
@@ -311,7 +311,7 @@ namespace MarkovCraft
 
                 working = false;
 
-                manager?.SetActiveScreenByType<GenerationScreen>();
+                manager!.SetActiveScreenByType<GenerationScreen>();
                 game.UpdateConfiguredModel(saveFileName);
             }
         }

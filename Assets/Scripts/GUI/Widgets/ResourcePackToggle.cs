@@ -59,7 +59,7 @@ namespace MarkovCraft
 
         public void ToggleClick()
         {
-            OnToggle?.Invoke();
+            OnToggle!.Invoke();
         }
     }
 }

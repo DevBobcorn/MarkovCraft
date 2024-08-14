@@ -27,23 +27,23 @@ namespace MarkovCraft
                 if (value > MaxValue) // Input value too big
                 {
                     input!.text = MaxValue.ToString();
-                    OnValidateValue?.Invoke(MaxValue);
+                    OnValidateValue!.Invoke(MaxValue);
                 }
                 else if (value < MinValue) // Input value too small
                 {
                     input!.text = MinValue.ToString();
-                    OnValidateValue?.Invoke(MinValue);
+                    OnValidateValue!.Invoke(MinValue);
                 }
                 else
                 {
                     // Input value is valid, no need to update
-                    OnValidateValue?.Invoke(value);
+                    OnValidateValue!.Invoke(value);
                 }
             }
             else // Input is not even an integer, update to min value
             {
                 input!.text = MinValue.ToString();
-                OnValidateValue?.Invoke(MinValue);
+                OnValidateValue!.Invoke(MinValue);
             }
         }
     }

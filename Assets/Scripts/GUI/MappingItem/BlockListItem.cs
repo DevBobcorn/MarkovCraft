@@ -27,7 +27,7 @@ namespace MarkovCraft
             if (blockId != ResourceLocation.INVALID && previewObject != null)
             {
                 localizedNameLower = GameScene.GetL10nBlockName(blockId).ToLower();
-                var defaultState = BlockStatePalette.INSTANCE.StatesTable[defaultStateId];
+                var defaultState = BlockStatePalette.INSTANCE.GetByNumId(defaultStateId);
 
                 var geometry = ResourcePackManager.Instance.StateModelTable[defaultStateId].Geometries[0];
                 var visualBuffer = new VertexBuffer(geometry.GetVertexCount(BlockStatePreview.PREVIEW_CULLFLAG));

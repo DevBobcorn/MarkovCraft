@@ -17,6 +17,7 @@ using TMPro;
 
 using MarkovJunior;
 using CraftSharp;
+using Unity.Entities.UniversalDelegates;
 
 namespace MarkovCraft
 {
@@ -279,9 +280,10 @@ namespace MarkovCraft
 
                 if (!string.IsNullOrWhiteSpace(item.BlockState))
                 {
-                    if (BlockStatePalette.TryGetStateIdFromString(item.BlockState, out int stateId))
+                    if (statePalette.TryGetStateIdCandidatesFromString(item.BlockState, out int[] stateIds))
                     {
-                        var state = statePalette.StatesTable[stateId];
+                        var stateId = stateIds.First();
+                        var state = statePalette.GetByNumId(stateId);
                         //Debug.Log($"Mapped '{item.Character}' to [{stateId}] {state}");
 
                         if (stateId2Mesh.TryAdd(stateId, nextBlockMeshIndex))
@@ -356,7 +358,7 @@ namespace MarkovCraft
             int3 maxFrameSize = int3.zero;
             int stepsPerFrame = model.StepsPerRefresh;
 
-            var record = RecordToggle?.isOn ?? false;
+            var record = RecordToggle!.isOn;
 
             for (int k = 1; k <= model.Amount; k++)
             {
@@ -491,7 +493,7 @@ namespace MarkovCraft
 
                     if (record) // Save the recording file
                     {
-                        var fileName = (currentConfModel?.Model ?? "Untitled") + $"_#{k}";
+                        var fileName = (currentConfModel!.Model ?? "Untitled") + $"_#{k}";
                         StartCoroutine(RecordingExporter.SaveRecording(fullPalette, fileName,
                                 maxFrameSize.x, maxFrameSize.y, maxFrameSize.z, recordedFrames.ToArray()));
                     }
@@ -661,7 +663,7 @@ namespace MarkovCraft
             
             if (screenManager != null && !screenManager.AllowsMovementInput) return;
             
-            var cam = CamController?.ViewCamera;
+            var cam = CamController!.ViewCamera;
             
             if (cam != null && VolumeSelection != null)
             {
@@ -682,7 +684,7 @@ namespace MarkovCraft
                             // Enable block colliders
                             selectedResult.EnableBlockColliders();
                             // Show export button
-                            ResultOperationPanelAnimator?.SetBool("Hidden", false);
+                            ResultOperationPanelAnimator!.SetBool("Hidden", false);
                         }
                     }
                     else
@@ -733,8 +735,11 @@ namespace MarkovCraft
         {
             if (selectedResult == newResult) return;
 
-            // Disable block colliders
-            selectedResult?.DisableBlockColliders();
+            if (selectedResult != null)
+            {
+                // Disable block colliders
+                selectedResult.DisableBlockColliders();
+            }
 
             if (newResult != null && newResult.Valid) // Valid
             {
@@ -755,7 +760,7 @@ namespace MarkovCraft
                 UpdateBlockSelection(null);
 
                 // Hide export button
-                ResultOperationPanelAnimator?.SetBool("Hidden", true);
+                ResultOperationPanelAnimator!.SetBool("Hidden", true);
 
                 selectedResult = null;
             }
@@ -766,9 +771,9 @@ namespace MarkovCraft
             // Unlock volume selection
             VolumeSelection!.Unlock();
             // Disable block colliders
-            selectedResult?.DisableBlockColliders();
+            selectedResult!.DisableBlockColliders();
             // Hide export button
-            ResultOperationPanelAnimator?.SetBool("Hidden", true);
+            ResultOperationPanelAnimator!.SetBool("Hidden", true);
         }
 
         public GenerationResult? GetSelectedResult()
@@ -916,8 +921,8 @@ namespace MarkovCraft
             }
 
             executing = false;
-            //ModelGraphUI?.SetActiveNode(-1);
-            ModelGraphUIv2?.SetActiveNode(-1);
+            //ModelGraphUI!.SetActiveNode(-1);
+            ModelGraphUIv2!.SetActiveNode(-1);
 
             if (ExecuteButton != null)
             {

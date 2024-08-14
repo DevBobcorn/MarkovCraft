@@ -20,7 +20,7 @@ namespace MarkovCraft
             else // Show up and display specified state
             {
                 previewObject!.SetActive(true);
-                var newState = BlockStatePalette.INSTANCE.StatesTable[stateId];
+                var newState = BlockStatePalette.INSTANCE.GetByNumId(stateId);
                 UpdatePreviewObject(stateId, newState);
 
                 previewObject!.SetActive(true);
@@ -59,7 +59,7 @@ namespace MarkovCraft
             base.InitializeData(character, defoRgb, rgb, blockState, colorPicker, blockPicker, blockStatePreview);
 
             // Initialize block state preview
-            UpdatePreview(BlockStatePalette.GetStateIdFromString(blockState, 0));
+            UpdatePreview(BlockStatePalette.INSTANCE.GetStateIdFromString(blockState, 0));
         }
 
         public override void SetBlockState(string blockState)
@@ -68,7 +68,7 @@ namespace MarkovCraft
             {
                 BlockStateInput!.SetTextWithoutNotify(blockState); // Avoid updating block preview
                 // Update block state preview
-                UpdatePreview(BlockStatePalette.GetStateIdFromString(blockState, 0));
+                UpdatePreview(BlockStatePalette.INSTANCE.GetStateIdFromString(blockState, 0));
             }
         }
 
@@ -76,33 +76,33 @@ namespace MarkovCraft
         {
             base.TagAsSpecial(blockState);
             // Update block state preview
-            UpdatePreview(BlockStatePalette.GetStateIdFromString(blockState, 0));
+            UpdatePreview(BlockStatePalette.INSTANCE.GetStateIdFromString(blockState, 0));
         }
 
         protected override void OnSelectBlockStateInput(string blockState)
         {
-            if (BlockStatePalette.TryGetStateIdFromString(blockState, out int stateId)) // Update and show preview
+            if (BlockStatePalette.INSTANCE.TryGetStateIdFromString(blockState, out int stateId)) // Update and show preview
             {
-                blockStatePreview?.UpdatePreview(stateId);
+                blockStatePreview!.UpdatePreview(stateId);
                 UpdatePreview(stateId);
             }
             else // Hide preview
             {
-                blockStatePreview?.UpdatePreview(0);
+                blockStatePreview!.UpdatePreview(0);
                 UpdatePreview(0);
             }
         }
 
         protected override void OnUpdateBlockStateInput(string blockState)
         {
-            if (BlockStatePalette.TryGetStateIdFromString(blockState, out int stateId)) // Update and show preview
+            if (BlockStatePalette.INSTANCE.TryGetStateIdFromString(blockState, out int stateId)) // Update and show preview
             {
-                blockStatePreview?.UpdatePreview(stateId);
+                blockStatePreview!.UpdatePreview(stateId);
                 UpdatePreview(stateId);
             }
             else // Hide preview
             {
-                blockStatePreview?.UpdateHint(blockState);
+                blockStatePreview!.UpdateHint(blockState);
                 UpdatePreview(0);
             }
         }

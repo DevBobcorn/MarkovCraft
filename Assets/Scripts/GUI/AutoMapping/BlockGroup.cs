@@ -34,17 +34,15 @@ namespace MarkovCraft
 
         private (ResourceLocation blockId, Color32 color, Toggle toggle)[] itemInfo = { };
 
-
-
         public void SetData(string groupName, BlockGroupItemInfo[] items, bool defaultSelected)
         {
             groupTitleText!.text = groupName;
-            var blockTable = BlockStatePalette.INSTANCE.StateListTable;
+            var blockIds = BlockStatePalette.INSTANCE.GetAllGroupIds().ToHashSet();
 
             this.defaultSelected = defaultSelected;
 
             // Select only blocks which are present in currently loaded data
-            itemSource = items.Where(x => blockTable.ContainsKey(ResourceLocation.FromString(x.BlockId))).ToArray();
+            itemSource = items.Where(x => blockIds.Contains(ResourceLocation.FromString(x.BlockId))).ToArray();
 
             if (defaultSelected)
             {

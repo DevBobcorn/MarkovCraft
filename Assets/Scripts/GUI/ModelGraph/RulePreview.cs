@@ -10,7 +10,7 @@ namespace MarkovCraft
         [SerializeField] RawImage? ruleInPreview;
         [SerializeField] RawImage? ruleOutPreview;
 
-        public void SetRuleActive(bool active) => activeHint?.SetActive(active);
+        public void SetRuleActive(bool active) => activeHint!.SetActive(active);
 
         public void SetPreviews(Texture2D inPrev, Texture2D outPrev)
         {

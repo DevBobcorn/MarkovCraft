@@ -48,7 +48,7 @@ namespace MarkovCraft
             ConfirmButton!.onClick.RemoveAllListeners();
             ConfirmButton.onClick.AddListener(ConfirmResize);
             CancelButton!.onClick.RemoveAllListeners();
-            CancelButton.onClick.AddListener(() => manager?.SetActiveScreenByType<GenerationScreen>());
+            CancelButton.onClick.AddListener(() => manager!.SetActiveScreenByType<GenerationScreen>());
 
             SizeUpperDropdown!.ClearOptions();
             SizeUpperDropdown.AddOptions(SIZE_UPPER_KEYS.Select(x =>
@@ -124,7 +124,7 @@ namespace MarkovCraft
                 }
 
                 game.UpdateSelectedResult(null);
-                manager?.SetActiveScreenByType<GenerationScreen>();
+                manager!.SetActiveScreenByType<GenerationScreen>();
             }
         }
 

@@ -201,9 +201,9 @@ namespace MarkovCraft
                 // Assign in mesh palette
                 if (!string.IsNullOrWhiteSpace(item.BlockState))
                 {
-                    if (BlockStatePalette.TryGetStateIdFromString(item.BlockState, out int stateId))
+                    if (statePalette.TryGetStateIdFromString(item.BlockState, out int stateId))
                     {
-                        var state = statePalette.StatesTable[stateId];
+                        var state = statePalette.GetByNumId(stateId);
                         //Debug.Log($"Mapped '{index}' to [{stateId}] {state}");
 
                         if (stateId2Mesh.TryAdd(stateId, nextBlockMeshIndex))
@@ -372,7 +372,7 @@ namespace MarkovCraft
 
             replaying = true;
 
-            if (OptimizedPlaybackToggle?.isOn ?? true)
+            if (OptimizedPlaybackToggle!.isOn)
                 yield return StartCoroutine(ReplayOptimized());
             else
                 yield return StartCoroutine(ReplayRegular());

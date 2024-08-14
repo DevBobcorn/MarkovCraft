@@ -89,7 +89,7 @@ namespace MarkovCraft
 
         public static string GetL10nString(string key, params object[] p)
         {
-            var str = Instance.L10nTable?.GetTable().GetEntry(key);
+            var str = Instance.L10nTable!.GetTable().GetEntry(key);
             if (str == null) return $"<{key}>";
             return string.Format(str.Value, p);
         }
@@ -125,7 +125,7 @@ namespace MarkovCraft
                 if (modelTable.ContainsKey(stateId))
                 {
                     var blockGeometry = modelTable[stateId].Geometries[0];
-                    var blockTint = statePalette.GetBlockColor(stateId, DummyWorld, BlockLoc.Zero, statePalette.FromId(stateId));
+                    var blockTint = statePalette.GetBlockColor(stateId, DummyWorld, BlockLoc.Zero, statePalette.GetByNumId(stateId));
 
                     buffers[pair.Value] = new VertexBuffer(blockGeometry.GetVertexCount(0b111111));
 
@@ -139,7 +139,7 @@ namespace MarkovCraft
                 {
                     buffers[pair.Value] = new VertexBuffer(CubeGeometry.GetVertexCount(0b111111));
 
-                    Debug.LogWarning($"Model for block state #{stateId} ({statePalette.FromId(stateId)}) is not available. Using cube model instead.");
+                    Debug.LogWarning($"Model for block state #{stateId} ({statePalette.GetByNumId(stateId)}) is not available. Using cube model instead.");
                     CubeGeometry.Build(buffers[pair.Value], ref vertOffset, float3.zero, ResourcePackManager.BLANK_TEXTURE, 0b111111, new float3(1F));
                 }
             }
@@ -158,7 +158,7 @@ namespace MarkovCraft
         {
             Loading = true;
             
-            prepare?.Invoke();
+            prepare!.Invoke();
 
             var ver = VersionHolder!.Versions[VersionHolder.SelectedVersion];
             var dataVersion = ver.DataVersion;
@@ -175,7 +175,7 @@ namespace MarkovCraft
             var extraDataDir = PathHelper.GetExtraDataDirectory();
             yield return StartCoroutine(BuiltinResourceHelper.ReadyBuiltinResource(
                     MarkovGlobal.MARKOV_CRAFT_BUILTIN_FILE_NAME, MarkovGlobal.MARKOV_CRAFT_BUILTIN_VERSION, extraDataDir,
-                    (status) => Loom.QueueOnMainThread(() => update?.Invoke(status)),
+                    (status) => Loom.QueueOnMainThread(() => update!.Invoke(status)),
                     () => { }, (succeed) => { }));
             
             // Generate vanilla_fix or check update
@@ -207,7 +207,7 @@ namespace MarkovCraft
             // Load valid packs...
             loadFlag.Finished = false;
             Task.Run(() => packManager.LoadPacks(loadFlag,
-                    (status) => Loom.QueueOnMainThread(() => update?.Invoke(status))));
+                    (status) => Loom.QueueOnMainThread(() => update!.Invoke(status))));
             while (!loadFlag.Finished) yield return null;
 
             Loading = false;
@@ -244,7 +244,7 @@ namespace MarkovCraft
             else // Not present yet, try downloading it
             {
                 yield return StartCoroutine(ResourceDownloader.DownloadLanguageJson(resVersion, mcLang,
-                    (status) => Loom.QueueOnMainThread(() => update?.Invoke(status)),
+                    (status) => Loom.QueueOnMainThread(() => update!.Invoke(status)),
                     () => { }, (succeed) => {
                         if (succeed) // Downloaded successfully, load it now
                             foreach (var entry in Json.ParseJson(File.ReadAllText(langPath)).Properties.Where(x => x.Key.StartsWith("block.")))
@@ -254,7 +254,7 @@ namespace MarkovCraft
                     }));
             }
 
-            callback?.Invoke();
+            callback!.Invoke();
         }
 
         public abstract void ReturnToMenu();

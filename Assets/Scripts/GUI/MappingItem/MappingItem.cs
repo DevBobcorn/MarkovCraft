@@ -67,19 +67,19 @@ namespace MarkovCraft
         {
             var currentColor = (Color32) ColorPreviewImage!.color;
             currentColor.a = (byte) 255; // Fully opaque
-            colorPicker?.OpenAndInitialize(this, currentColor);
+            colorPicker!.OpenAndInitialize(this, currentColor);
         }
 
         private void OnPickBlockButtonClick()
         {
-            if (BlockStatePalette.TryGetStateIdFromString(GetBlockState(), out int currentStateId)) // Initialize with current blockstate
+            if (BlockStatePalette.INSTANCE.TryGetStateIdFromString(GetBlockState(), out int currentStateId)) // Initialize with current blockstate
             {
-                var currentState = BlockStatePalette.INSTANCE.StatesTable[currentStateId];
-                blockPicker?.OpenAndInitialize(this, currentStateId, currentState);
+                var currentState = BlockStatePalette.INSTANCE.GetByNumId(currentStateId);
+                blockPicker!.OpenAndInitialize(this, currentStateId, currentState);
             }
             else
             {
-                blockPicker?.OpenAndInitialize(this, 0, BlockState.AIR_STATE);
+                blockPicker!.OpenAndInitialize(this, 0, BlockState.AIR_STATE);
             }
         }
 
@@ -117,33 +117,33 @@ namespace MarkovCraft
         protected virtual void OnSelectBlockStateInput(string blockState)
         {
             // Update and show preview
-            int stateId = BlockStatePalette.GetStateIdFromString(blockState, 0);
-            blockStatePreview?.UpdatePreview(stateId);
+            int stateId = BlockStatePalette.INSTANCE.GetStateIdFromString(blockState, 0);
+            blockStatePreview!.UpdatePreview(stateId);
         }
 
         protected virtual void OnEndEditBlockStateInput(string _)
         {
             // Hide preview
-            blockStatePreview?.UpdatePreview(0);
+            blockStatePreview!.UpdatePreview(0);
         }
 
         protected virtual void OnUpdateBlockStateInput(string blockState)
         {
-            if (BlockStatePalette.TryGetStateIdFromString(blockState, out int stateId)) // Update and show preview
+            if (BlockStatePalette.INSTANCE.TryGetStateIdFromString(blockState, out int stateId)) // Update and show preview
             {
-                blockStatePreview?.UpdatePreview(stateId);
+                blockStatePreview!.UpdatePreview(stateId);
             }
             else // Hide preview
             {
-                blockStatePreview?.UpdateHint(blockState);
+                blockStatePreview!.UpdateHint(blockState);
             }
         }
 
-        public string GetColorCode() => ColorCodeInput?.text ?? "000000";
+        public string GetColorCode() => ColorCodeInput!.text ?? "000000";
 
         public string GetBlockState()
         {
-            var blockState = BlockStateInput?.text;
+            var blockState = BlockStateInput!.text;
 
             if (string.IsNullOrWhiteSpace(blockState))
                 return string.Empty;
@@ -172,12 +172,12 @@ namespace MarkovCraft
         {
             overridesPaletteColor = o;
 
-            RevertOverrideButton?.gameObject.SetActive(o);
+            RevertOverrideButton!.gameObject.SetActive(o);
         }
 
         public bool ShouldBeSaved()
         {
-            return overridesPaletteColor || !string.IsNullOrWhiteSpace(BlockStateInput?.text);
+            return overridesPaletteColor || !string.IsNullOrWhiteSpace(BlockStateInput!.text);
         }
 
         private void OnRevertOverrideButtonClick()

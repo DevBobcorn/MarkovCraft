@@ -255,7 +255,7 @@ namespace MarkovCraft
 
                 working = false;
 
-                manager?.SetActiveScreenByType<GenerationScreen>();
+                manager!.SetActiveScreenByType<GenerationScreen>();
                 game.UpdateConfiguredModel(saveFileName);
             }
         }

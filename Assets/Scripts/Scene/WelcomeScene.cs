@@ -42,7 +42,7 @@ namespace MarkovCraft
 
         public static string GetL10nString(string key, params object[] p)
         {
-            var str = Instance.L10nTable?.GetTable().GetEntry(key);
+            var str = Instance.L10nTable!.GetTable().GetEntry(key);
             if (str == null) return $"<{key}>";
             return string.Format(str.Value, p);
         }
@@ -60,7 +60,7 @@ namespace MarkovCraft
             var newResPath = PathHelper.GetPackFile($"vanilla-{version.ResourceVersion}", "pack.mcmeta");
             var resPresent = File.Exists(newResPath);
 
-            downloadButtonAnimator?.SetBool("Hidden", resPresent);
+            downloadButtonAnimator!.SetBool("Hidden", resPresent);
 
             if (EnterButton != null)
                 EnterButton.interactable = resPresent;
@@ -108,7 +108,7 @@ namespace MarkovCraft
             
             UpdateSelectedVersion();
 
-            CubeAnimator?.SetTrigger("Left");
+            CubeAnimator!.SetTrigger("Left");
         }
 
         public void NextVersion()
@@ -122,7 +122,7 @@ namespace MarkovCraft
             
             UpdateSelectedVersion();
 
-            CubeAnimator?.SetTrigger("Right");
+            CubeAnimator!.SetTrigger("Right");
         }
 
         public void NextLanguage()
@@ -146,9 +146,9 @@ namespace MarkovCraft
             downloadingRes = true;
             StartCoroutine(ResourceDownloader.DownloadResource(version.ResourceVersion,
                     (status) => DownloadInfoText!.text = GetL10nString(status),
-                    () => downloadButtonAnimator?.SetBool("Hidden", true),
+                    () => downloadButtonAnimator!.SetBool("Hidden", true),
                     (succeeded) => {
-                        downloadButtonAnimator?.SetBool("Hidden", succeeded);
+                        downloadButtonAnimator!.SetBool("Hidden", succeeded);
                         downloadingRes = false;
 
                         DownloadInfoText!.text = succeeded ? $"v{Application.version}" :

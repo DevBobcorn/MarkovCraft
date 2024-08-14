@@ -113,7 +113,7 @@ namespace MarkovCraft
                 catch
                 {
                     ScreenHeader!.text = GameScene.GetL10nString("rcon.text.connection_error");
-                    client?.Dispose();
+                    client!.Dispose();
                     client = null;
                     return false;
                 }
@@ -321,7 +321,7 @@ namespace MarkovCraft
             // Dispose client if present
             if (client != null)
             {
-                client?.Dispose();
+                client!.Dispose();
                 client = null;
                 Debug.Log("RCON disconnected");
             }

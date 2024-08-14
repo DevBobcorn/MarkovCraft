@@ -31,8 +31,8 @@ namespace MarkovCraft
 
         private void SelectBlock(ResourceLocation blockId)
         {
-            var defaultStateId = BlockStatePalette.GetDefaultStateId(blockId);
-            SelectBlockState(defaultStateId, BlockStatePalette.INSTANCE.StatesTable[defaultStateId]);
+            var defaultStateId = BlockStatePalette.INSTANCE.GetDefaultNumId(blockId);
+            SelectBlockState(defaultStateId, BlockStatePalette.INSTANCE.GetByNumId(defaultStateId));
         }
 
         private void SelectBlockState(int blockStateId, BlockState blockState)
@@ -158,10 +158,9 @@ namespace MarkovCraft
 
             int index = 0;
 
-            foreach (var pair in BlockStatePalette.INSTANCE.DefaultStateTable)
+            foreach (var blockId in BlockStatePalette.INSTANCE.GetAllGroupIds())
             {
-                var blockId = pair.Key;
-                var defaultStateId = pair.Value;
+                var defaultStateId = BlockStatePalette.INSTANCE.GetDefaultNumId(blockId);
 
                 var blockListItemObj = Instantiate(BlockListItemPrefab)!;
                 blockListItemObj.transform.SetParent(GridTransform, false);
@@ -204,8 +203,7 @@ namespace MarkovCraft
 
         private void ApplyToItem(MappingItem item)
         {
-            var table = BlockStatePalette.INSTANCE.StatesTable;
-            item.SetBlockState(table[selectedBlockStateId].ToString());
+            item.SetBlockState(BlockStatePalette.INSTANCE.GetByNumId(selectedBlockStateId).ToString());
         }
 
         public void CloseAndApply()

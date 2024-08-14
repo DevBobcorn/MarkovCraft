@@ -76,11 +76,11 @@ namespace MarkovCraft
             result = null;
 
             // Hide auto mapping panel
-            AutoMappingPanel?.Hide();
+            AutoMappingPanel!.Hide();
             // Hide color picker
-            ColorPicker?.CloseAndDiscard();
+            ColorPicker!.CloseAndDiscard();
             // Hide block picker
-            BlockPicker?.CloseAndDiscard();
+            BlockPicker!.CloseAndDiscard();
         }
 
         public void AutoMap()
@@ -125,7 +125,7 @@ namespace MarkovCraft
 
                 working = false;
 
-                manager?.SetActiveScreenByType<GenerationScreen>();
+                manager!.SetActiveScreenByType<GenerationScreen>();
             }
         }
 

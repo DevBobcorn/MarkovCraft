@@ -24,7 +24,10 @@ namespace MarkovCraft
 
         public void SetActiveScreen(BaseScreen newScreen)
         {
-            activeScreen?.Hide(this);
+            if (activeScreen != null)
+            {
+                activeScreen.Hide(this);
+            }
             
             activeScreen = newScreen;
             IsPaused = newScreen.ShouldPause();
@@ -50,8 +53,10 @@ namespace MarkovCraft
 
         void Update()
         {
-            activeScreen?.ScreenUpdate(this);
-            
+            if (activeScreen != null)
+            {
+                activeScreen.ScreenUpdate(this);
+            }
         }
     }
 }
