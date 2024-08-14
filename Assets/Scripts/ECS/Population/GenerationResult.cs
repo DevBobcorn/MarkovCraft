@@ -207,7 +207,7 @@ namespace MarkovCraft
             int chunkZ = Mathf.CeilToInt(SizeZ / 16F);
 
             var materialManager = GameScene.Instance.GetMaterialManager();
-            var palette = BlockStatePalette.INSTANCE;
+            var statePalette = BlockStatePalette.INSTANCE;
             var packManager = ResourcePackManager.Instance;
             var stateModelTable = packManager.StateModelTable;
 
@@ -215,16 +215,16 @@ namespace MarkovCraft
 
             // Cache mapped data
             var stateIdPalette = ResultPalette.Select(x =>
-                    BlockStatePalette.INSTANCE.GetStateIdCandidatesFromString(x.BlockState).
+                    statePalette.GetStateIdCandidatesFromString(x.BlockState).
                             DefaultIfEmpty(invalidBlockStateIndex).First()).ToArray();
             
-            var renderTypeTable = BlockStatePalette.INSTANCE.RenderTypeTable;
+            var renderTypeTable = statePalette.RenderTypeTable;
 
             var renderTypePalette = stateIdPalette.Select(stateId => {
                         if (stateId == invalidBlockStateIndex)
                             return GameScene.DEFAULT_MATERIAL_INDEX;
                         
-                        var stateBlockId = palette.GetGroupIdByNumId(stateId);
+                        var stateBlockId = statePalette.GetGroupIdByNumId(stateId);
                         if (renderTypeTable.ContainsKey(stateBlockId))
                             return GameScene.GetMaterialIndex( renderTypeTable[stateBlockId] );
 
@@ -237,7 +237,7 @@ namespace MarkovCraft
                         if (stateId == invalidBlockStateIndex)
                             return false; // Default pure color cubes, consider them as full opaque blocks
                         
-                        return !palette.GetByNumId(stateId).FaceOcclusionSolid;
+                        return !statePalette.GetByNumId(stateId).FaceOcclusionSolid;
                     }).ToArray();
             
             bool updateFromExistingMesh = updatedEntries is not null;
@@ -377,7 +377,7 @@ namespace MarkovCraft
                         {
                             if (cullFlags != 0b000000)// If at least one face is visible
                             {
-                                var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero, palette.GetByNumId(stateId));
+                                var blockTint = statePalette.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero, statePalette.GetByNumId(stateId));
                                 stateModelTable[stateId].Geometries[0].Build(visualBuffer[renderTypeIndex], ref vertexOffset[renderTypeIndex],
                                         new(ix, iz, iy), cullFlags, 0, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
                             }
