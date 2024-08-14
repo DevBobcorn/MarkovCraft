@@ -15,9 +15,9 @@
       "source": "git",
       "dependencies": {
         "com.unity.mathematics": "1.2.6",
-        "com.devbobcorn.craftsharp": "3.0.0"
+        "com.devbobcorn.craftsharp": "3.1.0"
       },
-      "hash": "442948bbcbedff7227452e96f4f6806a194fce4b"
+      "hash": "3306878f4f1daf63410d9ec5d18474a062c85f77"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
