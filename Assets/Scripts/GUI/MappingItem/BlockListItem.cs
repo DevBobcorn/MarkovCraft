@@ -37,7 +37,7 @@ namespace MarkovCraft
                 var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(defaultStateId, GameScene.DummyWorld, BlockLoc.Zero, defaultState);
 
                 geometry.Build(visualBuffer, ref vertOffset, BlockStatePreview.ITEM_CENTER, BlockStatePreview.PREVIEW_CULLFLAG,
-                        0, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
+                        0, 0F, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
 
                 previewObject.GetComponent<MeshFilter>().sharedMesh = BlockStatePreview.BuildMesh(visualBuffer);
                 previewObject.GetComponent<MeshRenderer>().sharedMaterial = material;

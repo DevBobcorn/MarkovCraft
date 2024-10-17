@@ -379,7 +379,7 @@ namespace MarkovCraft
                             {
                                 var blockTint = statePalette.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero, statePalette.GetByNumId(stateId));
                                 stateModelTable[stateId].Geometries[0].Build(visualBuffer[renderTypeIndex], ref vertexOffset[renderTypeIndex],
-                                        new(ix, iz, iy), cullFlags, 0, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
+                                        new(ix, iz, iy), cullFlags, 0, 0F, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
                             }
                         }
                     }

@@ -14,7 +14,7 @@ The program is made and tested with Unity 2022.3.26f1, so it is recommended to u
 
 This repository is open source under the [CDDL-1.0 license](http://opensource.org/licenses/CDDL-1.0), and this applies to all source code except those mentioning their author and license or with specific license attached. Below is a list of open source projects used in *MarkovCraft*:
 * [MarkovJunior](https://github.com/mxgmn/MarkovJunior)
-* [CornModel](https://github.com/DevBobcorn/CornModel)
+* [CraftSharp-Resource](https://github.com/DevBobcorn/CraftSharp-Resource)
 * [Minecraft-Console-Client](https://github.com/MCCTeam/Minecraft-Console-Client) (Json Parser code)
 
 Font projects used in the app:

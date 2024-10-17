@@ -129,8 +129,8 @@ namespace MarkovCraft
 
                     buffers[pair.Value] = new VertexBuffer(blockGeometry.GetVertexCount(0b111111));
 
-                    blockGeometry.Build(buffers[pair.Value], ref vertOffset, float3.zero, 0b111111, 0,
-                            BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
+                    blockGeometry.Build(buffers[pair.Value], ref vertOffset, float3.zero, 0b111111,
+                            0, 0F, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
                     
                     blockGeometries[pair.Value] = blockGeometry;
                     blockTints[pair.Value] = blockTint;

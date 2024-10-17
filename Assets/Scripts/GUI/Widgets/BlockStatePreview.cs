@@ -176,8 +176,8 @@ namespace MarkovCraft
                 var material = GameScene.Instance.MaterialManager!.GetAtlasMaterial(BlockStatePalette.INSTANCE.RenderTypeTable[newState.BlockId]);
                 var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero, newState);
 
-                geometry.Build(visualBuffer, ref vertOffset, ITEM_CENTER,
-                        PREVIEW_CULLFLAG, 0, DUMMY_BLOCK_VERT_LIGHT, blockTint);
+                geometry.Build(visualBuffer, ref vertOffset, ITEM_CENTER, PREVIEW_CULLFLAG,
+                        0, 0F, DUMMY_BLOCK_VERT_LIGHT, blockTint);
 
                 previewObject.GetComponent<MeshFilter>().sharedMesh = BuildMesh(visualBuffer);
                 previewObject.GetComponent<MeshRenderer>().sharedMaterial = material;
