@@ -1,0 +1,44 @@
+<tileset>
+  <tiles checksum="13">
+    <tile name="Empty"/>
+    <tile name="Line"/>
+    <tile name="Turn"/>
+    <tile name="Cross" weight="2.5"/>
+    <tile name="End" weight="0.01"/>
+  </tiles>
+  <neighbors>
+    <neighbor left="Empty" right="Empty"/>
+    <neighbor left="Empty" right="z Line"/>
+    <neighbor left="Empty" right="Turn"/>
+    <neighbor left="z Line" right="z Line"/>
+    <neighbor left="Line" right="Line"/>
+    <neighbor left="z Line" right="Turn"/>
+    <neighbor left="Turn" right="Line"/>
+    <neighbor left="z Turn" right="Turn"/>
+    <neighbor left="zz Turn" right="Turn"/>
+    <neighbor left="Turn" right="z Turn"/>
+    <neighbor left="Turn" right="zz Turn"/>
+    <neighbor left="Cross" right="Line"/>
+    <neighbor left="z Cross" right="Line"/>
+    <neighbor left="Turn" right="Cross"/>
+    <neighbor left="Turn" right="z Cross"/>
+    <neighbor left="Cross" right="Cross"/>
+    <neighbor left="Cross" right="z Cross"/>
+    <neighbor left="z Cross" right="z Cross"/>
+
+    <neighbor left="End" right="Empty"/>
+    <neighbor left="z End" right="Empty"/>
+    <neighbor left="Line" right="End"/>
+    <neighbor left="End" right="z Line"/>
+    <neighbor left="z End" right="z Line"/>
+    <neighbor left="Turn" right="End"/>
+    <neighbor left="End" right="Turn"/>
+    <neighbor left="z End" right="Turn"/>
+    <neighbor left="zzz End" right="Turn"/>
+    <neighbor left="Cross" right="End"/>
+    <neighbor left="zz End" right="End"/>
+    <neighbor left="End" right="zz End"/>
+    <neighbor left="z End" right="z End"/>
+    <neighbor left="z End" right="zzz End"/>
+  </neighbors>
+</tileset>

@@ -237,7 +237,7 @@ namespace MarkovCraft
                         if (stateId == invalidBlockStateIndex)
                             return false; // Default pure color cubes, consider them as full opaque blocks
                         
-                        return !statePalette.GetByNumId(stateId).FaceOcclusionSolid;
+                        return !statePalette.GetByNumId(stateId).MeshFaceOcclusionSolid;
                     }).ToArray();
             
             bool updateFromExistingMesh = updatedEntries is not null;

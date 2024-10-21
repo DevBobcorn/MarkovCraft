@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ConfiguredModel Model="Apartemazements" SizeX="8" SizeY="8" SizeZ="8" Amount="4" Steps="1000" Animated="false" StepsPerRefresh="1">
+  <Seeds>
+    <Seed Value="111" />
+    <Seed Value="222" />
+    <Seed Value="333" />
+  </Seeds>
+  <CustomMapping>
+    <Item Character="B" Color="000000" BlockState="minecraft:black_concrete" />
+    <Item Character="P" Color="7E2553" BlockState="minecraft:purple_terracotta" />
+    <Item Character="E" Color="008751" BlockState="minecraft:grass_block" />
+    <Item Character="N" Color="AB5236" BlockState="minecraft:dirt" />
+    <Item Character="D" Color="5F574F" BlockState="minecraft:cyan_terracotta" />
+    <Item Character="A" Color="FFFFFF" BlockState="minecraft:white_concrete" />
+    <Item Character="W" Color="FFC1C1" BlockState="minecraft:quartz_block" />
+    <Item Character="R" Color="FF0000" BlockState="minecraft:red_concrete" />
+    <Item Character="Y" Color="FFEC27" BlockState="minecraft:yellow_shulker_box" />
+    <Item Character="U" Color="29ADFF" BlockState="minecraft:light_blue_shulker_box" />
+    <Item Character="F" Color="FFCCAA" BlockState="minecraft:white_terracotta" />
+    <Item Character="C" Color="00FFFF" BlockState="minecraft:sea_lantern" />
+  </CustomMapping>
+</ConfiguredModel>

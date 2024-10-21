@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ConfiguredModel Model="CityRoad" SizeX="17" SizeY="17" SizeZ="1" Amount="1" Steps="10000000" Animated="true" StepsPerRefresh="1">
+  <CustomMapping>
+    <Item Character="B" Color="000000" BlockState="minecraft:black_concrete" />
+    <Item Character="W" Color="FFF1E8" BlockState="minecraft:white_concrete" />
+    <Item Character="R" Color="FF004D" BlockState="minecraft:pink_terracotta" />
+    <Item Character="Y" Color="FFEC27" BlockState="minecraft:yellow_concrete" />
+    <Item Character="G" Color="00E436" BlockState="minecraft:lime_concrete" />
+    <Item Character="b" Color="291814" BlockState="minecraft:gray_concrete" />
+    <Item Character="w" Color="F3EF7D" BlockState="minecraft:ochre_froglight" />
+    <Item Character="C" Color="00FFFF" BlockState="minecraft:light_blue_concrete" />
+    <Item Character="H" Color="E4BB40" BlockState="minecraft:air" />
+    <Item Character="h" Color="8A6F30" BlockState="minecraft:smooth_stone" />
+    <Item Character="v" Color="524B24" BlockState="minecraft:verdant_froglight" />
+  </CustomMapping>
+</ConfiguredModel>

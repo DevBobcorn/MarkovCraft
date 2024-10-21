@@ -1,0 +1,27 @@
+<sequence values="BW">
+  <all in="***/*B*/***" out="***/*W*/***"/>
+  <markov>
+    <one in="WWW/WBW" out="WBW/WBW"/>
+    <one in="WWWWWWW/BBBBBBB" out="WWWBWWW/BBBBBBB"/>
+  </markov>
+  <map scale="7 7 1" values="wbvhGBWCRYH">
+    <rule in="B" out="wwwwwww/wbbbbbw/wbRRRbw/wbRRRbw/wbRRRbw/wbbbbbw/wwwwwww" comment="Mark road cells"/>
+    <rule in="W" out="hhhhhhh/hhhhhhh/hhhhhhh/hhhhhhh/hhhhhhh/hhhhhhh/hhhhhhh" comment="Mark building cells"/>
+    <!-- Road processing -->
+    <all in="bbbbb/wwwww/wwwww/bbbbb" out="bbbbb/bbbbb/bbbbb/bbbbb" comment="Connect roads"/>
+    <all in="wbbbbbw/bbbbbbb/bbRRRbb/bbRRRbb/bbRRRbb/bbbbbbb/wbbbbbw" out="vbbbbbv/bbbbbbb/bbRRRbb/bbRbRbb/bbRRRbb/bbbbbbb/vbbbbbv" comment="Mark X-Crossroads"/>
+    <all in="wbbbbbw/bbbbbbb/bbRRRbb/bbRRRbb/bbRRRbb/bbbbbbb/wwwwwww" out="vbbbbbv/bbbbbbb/bbCCCbb/bbCbCbb/bbCbCbb/bbbbbbb/wwwwwww" comment="Mark T-Crossroads"/>
+    <all in="wbbbbbw/bbbbbbw/bbRRRbw/bbRRRbw/bbRRRbw/bbbbbbw/wwwwwww" out="vbbbbbw/bbbbbbw/bbbbRbw/bbbbRbw/bbRRRbw/bbbbbbw/wwwwwww" comment="Mark 90-Turns"/>
+    <all in="wwwwwww/bbbbbbb/bbRRRbb/bbRRRbb/bbRRRbb/bbbbbbb/wwwwwww" out="wwwwwww/bbbbbbb/bbbbbbb/bYYYYYb/bbbbbbb/bbbbbbb/wwwwwww" comment="Mark staight sections"/>
+    <!-- Crosswalks -->
+    <all in="bYb/bYb/bYb/bYb/bbb/bbb/bbb/RRR" out="bbb/WbW/WbW/WbW/bbb/bbb/bbb/RRR"/>
+    <all in="bYb/bYb/bYb/bYb/bbb/bbb/bbb/CCC" out="bbb/WbW/WbW/WbW/bbb/bbb/bbb/CCC"/>
+    <!-- Remove remaining marks on roads -->
+    <!--
+    <all in="C" out="b"/>
+    <all in="R" out="b"/>
+    -->
+    <!-- Building processing -->
+    <prl in="hhhhh/hhhhh/hhhhh/hhhhh/hhhhh" out="*****/*****/**H**/*****/*****"/>
+  </map>
+</sequence>

@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ConfiguredModel Model="Flowers" SizeX="60" SizeY="60" SizeZ="1" Amount="1" Steps="1000" Animated="true" StepsPerRefresh="1">
+  <Seeds>
+    <Seed Value="22" />
+  </Seeds>
+</ConfiguredModel>

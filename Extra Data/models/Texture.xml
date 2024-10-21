@@ -1,0 +1,15 @@
+<sequence values="BIURW">
+  <one in="BB*/BBB/*B*" out="***/*I*/***"/>
+  <all in="*I*/IBI" out="***/*I*"/>
+  <all in="*B*/BIB/*B*" out="***/*W*/***"/>
+  <markov>
+    <all>
+      <rule in="UI" out="*U"/>
+      <rule in="RI" out="*R"/>
+    </all>
+    <one>
+      <rule in="I" out="U"/>
+      <rule in="I" out="R"/>
+    </one>
+  </markov>
+</sequence>
