@@ -14,7 +14,7 @@ namespace MarkovCraft
         private static readonly char SP = Path.DirectorySeparatorChar;
 
         public const string MARKOV_CRAFT_BUILTIN_FILE_NAME = "MarkovCraftBuiltin";
-        public const int    MARKOV_CRAFT_BUILTIN_VERSION = 2;
+        public const int    MARKOV_CRAFT_BUILTIN_VERSION = 3;
         public const string VANILLAFIX_FILE_NAME = "VanillaFix";
         public const int    VANILLAFIX_VERSION = 1;
 

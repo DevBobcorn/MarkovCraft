@@ -10,6 +10,7 @@
     "grass": [
       "minecraft:grass_block",
       "minecraft:grass",
+      "minecraft:short_grass",
       "minecraft:tall_grass",
       "minecraft:fern",
       "minecraft:large_fern",
@@ -21,8 +22,20 @@
     ]
   },
   "fixed": {
-    "minecraft:birch_leaves": [128, 167, 55],
-    "minecraft:spruce_leaves": [97, 153, 97],
-    "minecraft:lily_pad": [32, 128, 48]
+    "minecraft:birch_leaves": [
+      128,
+      167,
+      55
+    ],
+    "minecraft:spruce_leaves": [
+      97,
+      153,
+      97
+    ],
+    "minecraft:lily_pad": [
+      32,
+      128,
+      48
+    ]
   }
 }
