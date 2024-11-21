@@ -59,10 +59,13 @@ namespace CraftSharp
             var cutout = new Material(AtlasCutout!);
             cutout.SetTexture("_BaseMap", packManager.GetAtlasArray(false));
             atlasMaterials.Add(RenderType.CUTOUT, cutout);
+            atlasMaterials.Add(RenderType.PLANTS, cutout);
+            atlasMaterials.Add(RenderType.TALL_PLANTS, cutout);
 
             var cutoutMipped = new Material(AtlasCutoutMipped!);
             cutoutMipped.SetTexture("_BaseMap", packManager.GetAtlasArray(true));
             atlasMaterials.Add(RenderType.CUTOUT_MIPPED, cutoutMipped);
+            atlasMaterials.Add(RenderType.FOLIAGE, cutoutMipped);
 
             // Translucent
             var translucent = new Material(AtlasTranslucent!);
