@@ -10,6 +10,7 @@ using Unity.Mathematics;
 
 using CraftSharp;
 using CraftSharp.Resource;
+using Unity.Entities;
 
 
 
@@ -200,6 +201,13 @@ namespace MarkovCraft
             }
         }
 
+        private static long GetSeedForCoords(int i, int j, int k)
+        {
+            long l = (long)(i * 3129871) ^ (long)k * 116129781L ^ (long)j;
+            l = l * l * 42317861L + l * 11L;
+            return l >> 16;
+        }
+
         private IEnumerator RebuildResultMesh(HashSet<int>? updatedEntries)
         {
             int chunkX = Mathf.CeilToInt(SizeX / 16F);
@@ -377,9 +385,34 @@ namespace MarkovCraft
                         {
                             if (cullFlags != 0b000000)// If at least one face is visible
                             {
+                                var offsetType = stateModelTable[stateId].OffsetType;
+                                float3 posOffset;
+                                if (offsetType == OffsetType.XZ) // Apply random offset on horizontal directions
+                                {
+                                    var oSeed = GetSeedForCoords(x, 0, y); // Markov (x, y) => MC (x, z)
+                                    var ox = (((oSeed & 15L) / 15.0F) - 0.5F) * 0.5F;      // -0.25F to 0.25F
+                                    var oz = (((oSeed >> 8 & 15L) / 15.0F) - 0.5F) * 0.5F; // -0.25F to 0.25F
+
+                                    posOffset = new float3(ix + oz, iz, iy + ox);
+
+                                }
+                                else if (offsetType == OffsetType.XYZ) // Apply random offset on all directions
+                                {
+                                    var oSeed = GetSeedForCoords(x, 0, y); // Markov (x, y) => MC (x, z)
+                                    var ox = (((oSeed & 15L) / 15.0F) - 0.5F) * 0.5F;      // -0.25F to 0.25F
+                                    var oz = (((oSeed >> 8 & 15L) / 15.0F) - 0.5F) * 0.5F; // -0.25F to 0.25F
+                                    var oy = (((oSeed >> 4 & 15L) / 15.0F) - 1.0F) * 0.2F; //  -0.2F to    0F
+
+                                    posOffset = new float3(ix + oz, iz + oy, iy + ox);
+                                }
+                                else
+                                {
+                                    posOffset = new(ix, iz, iy);
+                                }
+
                                 var blockTint = statePalette.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero, statePalette.GetByNumId(stateId));
                                 stateModelTable[stateId].Geometries[0].Build(visualBuffer[renderTypeIndex], ref vertexOffset[renderTypeIndex],
-                                        new(ix, iz, iy), cullFlags, 0, 0F, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
+                                        posOffset, cullFlags, 0, 0F, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
                             }
                         }
                     }

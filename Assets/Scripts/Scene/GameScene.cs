@@ -25,7 +25,10 @@ namespace MarkovCraft
             RenderType.SOLID,
             RenderType.CUTOUT,
             RenderType.CUTOUT_MIPPED,
-            RenderType.TRANSLUCENT
+            RenderType.TRANSLUCENT,
+            RenderType.FOLIAGE,
+            RenderType.PLANTS,
+            RenderType.TALL_PLANTS,
         };
 
         public static int GetMaterialIndex(RenderType renderType)
@@ -36,6 +39,9 @@ namespace MarkovCraft
                 RenderType.CUTOUT        => 1,
                 RenderType.CUTOUT_MIPPED => 2,
                 RenderType.TRANSLUCENT   => 3,
+                RenderType.FOLIAGE       => 4,
+                RenderType.PLANTS        => 5,
+                RenderType.TALL_PLANTS   => 6,
                 _   => DEFAULT_MATERIAL_INDEX
             };
         }
