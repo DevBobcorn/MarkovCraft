@@ -10,9 +10,6 @@ using Unity.Mathematics;
 
 using CraftSharp;
 using CraftSharp.Resource;
-using Unity.Entities;
-
-
 
 namespace MarkovCraft
 {
