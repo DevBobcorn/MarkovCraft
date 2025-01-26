@@ -50,7 +50,7 @@ namespace CraftSharp
 
             // Solid
             var solid = new Material(AtlasSolid!);
-            solid.SetTexture("_BaseMap", packManager.GetAtlasArray(false));
+            solid.SetTexture("_BaseMap", packManager.GetAtlasArray(true));
             atlasMaterials.Add(RenderType.SOLID, solid);
 
             defaultAtlasMaterial = solid;
@@ -69,7 +69,7 @@ namespace CraftSharp
 
             // Translucent
             var translucent = new Material(AtlasTranslucent!);
-            translucent.SetTexture("_BaseMap", packManager.GetAtlasArray(false));
+            translucent.SetTexture("_BaseMap", packManager.GetAtlasArray(true));
             atlasMaterials.Add(RenderType.TRANSLUCENT, translucent);
 
             // Water
