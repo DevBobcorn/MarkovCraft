@@ -5,7 +5,7 @@
 *MarkovCraft* is a Unity port of [MarkovJunior](https://github.com/mxgmn/MarkovJunior). Unity's new ECS system enables *MarkovCraft* to render model generation process in realtime, with considerable performance. This app provides a more user-friendly graphical interface, making it easier to create, view, run and export MarkovJunior models.
 
 ## > Building & Running
-The program is made and tested with Unity 2022.3.50f1, so it is recommended to use this version of Unity(or a newer version) to build this app.
+The program is made and tested with Unity 6000.0.38f1, so it is recommended to use this version of Unity(or a newer version) to build this app.
 
 ## > Localization
 *English (en)* and *Simplified Chinese (zh-Hans)* locales are currently available. Support for other languages might be added later.
