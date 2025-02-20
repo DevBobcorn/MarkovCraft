@@ -61,7 +61,7 @@ namespace MarkovCraft
         protected string loadedDataVersionName = "MC 0.0";
         protected int loadedDataVersionInt = 0;
 
-        [SerializeField] public MaterialManager? MaterialManager;
+        public MaterialManager? MaterialManager;
         [HideInInspector] public bool Loading = false;
 
         private static GameScene? instance;
@@ -69,7 +69,7 @@ namespace MarkovCraft
         {
             get {
                 if (instance == null)
-                    instance = Component.FindObjectOfType<GameScene>();
+                    instance = Component.FindFirstObjectByType<GameScene>();
 
                 return instance!;
             }

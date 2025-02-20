@@ -805,7 +805,7 @@ namespace MarkovCraft
             // Update result selection
             UpdateSelectedResult(null);
             // Clear up generation results
-            var results = Component.FindObjectsOfType<GenerationResult>().ToArray();
+            var results = Component.FindObjectsByType<GenerationResult>(FindObjectsSortMode.None).ToArray();
             for (int i = 0;i < results.Length;i++)
             {
                 results[i].Valid = false;

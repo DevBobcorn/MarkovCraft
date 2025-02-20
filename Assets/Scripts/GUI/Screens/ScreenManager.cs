@@ -38,7 +38,7 @@ namespace MarkovCraft
 
         public void SetActiveScreenByType<T>() where T : BaseScreen
         {
-            var screen = Component.FindObjectOfType<T>();
+            var screen = Component.FindFirstObjectByType<T>();
 
             SetActiveScreen(screen);
         }

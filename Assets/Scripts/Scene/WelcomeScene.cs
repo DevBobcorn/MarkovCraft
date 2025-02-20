@@ -31,7 +31,7 @@ namespace MarkovCraft
         {
             get {
                 if (instance == null)
-                    instance = Component.FindObjectOfType<WelcomeScene>();
+                    instance = Component.FindFirstObjectByType<WelcomeScene>();
 
                 return instance!;
             }
