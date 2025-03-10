@@ -7,7 +7,7 @@
       "dependencies": {
         "com.unity.mathematics": "1.2.6"
       },
-      "hash": "5466aca09d385406eeb65dfe7a2c6e00af23277e"
+      "hash": "db9d35024111243b945829402e172ea992f56324"
     },
     "com.devbobcorn.craftsharp-resource": {
       "version": "https://github.com/DevBobcorn/CraftSharp-Resource.git",
@@ -17,7 +17,7 @@
         "com.unity.mathematics": "1.2.6",
         "com.devbobcorn.craftsharp": "4.7.0"
       },
-      "hash": "019089283182e118b5644a26291dbd4365a2e901"
+      "hash": "2de16820a6ef20f1541499d4cfb3af0fe9590a5f"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
@@ -58,7 +58,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.collections": {
-      "version": "2.5.2",
+      "version": "2.5.3",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -78,23 +78,23 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.entities": {
-      "version": "1.3.9",
+      "version": "1.3.10",
       "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.burst": "1.8.18",
-        "com.unity.collections": "2.5.2",
+        "com.unity.collections": "2.5.3",
         "com.unity.mathematics": "1.3.2",
         "com.unity.modules.audio": "1.0.0",
-        "com.unity.serialization": "3.1.1",
+        "com.unity.serialization": "3.1.2",
         "com.unity.profiling.core": "1.0.2",
         "com.unity.modules.physics": "1.0.0",
-        "com.unity.nuget.mono-cecil": "1.11.4",
+        "com.unity.nuget.mono-cecil": "1.11.5",
         "com.unity.modules.uielements": "1.0.0",
         "com.unity.modules.assetbundle": "1.0.0",
         "com.unity.modules.unityanalytics": "1.0.0",
         "com.unity.modules.unitywebrequest": "1.0.0",
-        "com.unity.scriptablebuildpipeline": "1.21.21",
+        "com.unity.scriptablebuildpipeline": "1.21.25",
         "com.unity.test-framework.performance": "3.0.3"
       },
       "url": "https://packages.unity.com"
@@ -174,7 +174,7 @@
       }
     },
     "com.unity.nuget.mono-cecil": {
-      "version": "1.11.4",
+      "version": "1.11.5",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
