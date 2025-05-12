@@ -407,7 +407,7 @@ namespace MarkovCraft
                                     posOffset = new(ix, iz, iy);
                                 }
 
-                                var blockTint = statePalette.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero, statePalette.GetByNumId(stateId));
+                                var blockTint = statePalette.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero);
                                 stateModelTable[stateId].Geometries[0].Build(visualBuffer[renderTypeIndex], ref vertexOffset[renderTypeIndex],
                                         posOffset, cullFlags, 0, 0F, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
                             }

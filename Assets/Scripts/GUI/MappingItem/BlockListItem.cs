@@ -27,14 +27,13 @@ namespace MarkovCraft
             if (blockId != ResourceLocation.INVALID && previewObject != null)
             {
                 localizedNameLower = GameScene.GetL10nBlockName(blockId).ToLower();
-                var defaultState = BlockStatePalette.INSTANCE.GetByNumId(defaultStateId);
 
                 var geometry = ResourcePackManager.Instance.StateModelTable[defaultStateId].Geometries[0];
                 var visualBuffer = new VertexBuffer(geometry.GetVertexCount(BlockStatePreview.PREVIEW_CULLFLAG));
                 uint vertOffset = 0;
 
                 var material = GameScene.Instance.MaterialManager!.GetAtlasMaterial(BlockStatePalette.INSTANCE.RenderTypeTable[blockId]);
-                var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(defaultStateId, GameScene.DummyWorld, BlockLoc.Zero, defaultState);
+                var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(defaultStateId, GameScene.DummyWorld, BlockLoc.Zero);
 
                 geometry.Build(visualBuffer, ref vertOffset, BlockStatePreview.ITEM_CENTER, BlockStatePreview.PREVIEW_CULLFLAG,
                         0, 0F, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);

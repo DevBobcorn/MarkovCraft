@@ -128,7 +128,7 @@ namespace MarkovCraft
                         $"<color=yellow>{x.ToString()[0..typedLength]}</color>{x.ToString()[typedLength..]}"));
 
                 var stateId = statePalette.GetDefaultNumId(candidates[0]);
-                UpdatePreviewObject(stateId, statePalette.GetByNumId(stateId));
+                UpdatePreviewObject(stateId, statePalette.GetGroupIdByNumId(stateId));
                 
                 previewObject!.SetActive(true);
             }
@@ -152,16 +152,17 @@ namespace MarkovCraft
                 previewObject!.SetActive(true);
 
                 var newState = BlockStatePalette.INSTANCE.GetByNumId(stateId);
-                var blockName = GameScene.GetL10nBlockName(newState.BlockId);
+                var blockId = newState.BlockId;
+                var blockName = GameScene.GetL10nBlockName(blockId);
 
                 descText!.text = $"{blockName}\n{newState}";
-                UpdatePreviewObject(stateId, newState);
+                UpdatePreviewObject(stateId, blockId);
 
                 previewObject!.SetActive(true);
             }
         }
 
-        private void UpdatePreviewObject(int stateId, BlockState newState)
+        private void UpdatePreviewObject(int stateId, ResourceLocation blockId)
         {
             if (stateId == currentStateId)
                 return; // No need to update
@@ -173,8 +174,8 @@ namespace MarkovCraft
                 var visualBuffer = new VertexBuffer(geometry.GetVertexCount(PREVIEW_CULLFLAG));
                 uint vertOffset = 0;
 
-                var material = GameScene.Instance.MaterialManager!.GetAtlasMaterial(BlockStatePalette.INSTANCE.RenderTypeTable[newState.BlockId]);
-                var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero, newState);
+                var material = GameScene.Instance.MaterialManager!.GetAtlasMaterial(BlockStatePalette.INSTANCE.RenderTypeTable[blockId]);
+                var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero);
 
                 geometry.Build(visualBuffer, ref vertOffset, ITEM_CENTER, PREVIEW_CULLFLAG,
                         0, 0F, DUMMY_BLOCK_VERT_LIGHT, blockTint);

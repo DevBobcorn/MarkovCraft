@@ -7,7 +7,7 @@
       "dependencies": {
         "com.unity.mathematics": "1.2.6"
       },
-      "hash": "d9809f1c941c0c628dc1e04d196cdba9ac3418be"
+      "hash": "79c83d3dd64c6322d8eadccdf32c5a4ea6f23443"
     },
     "com.devbobcorn.craftsharp-resource": {
       "version": "https://github.com/DevBobcorn/CraftSharp-Resource.git",
@@ -15,9 +15,9 @@
       "source": "git",
       "dependencies": {
         "com.unity.mathematics": "1.2.6",
-        "com.devbobcorn.craftsharp": "4.7.0"
+        "com.devbobcorn.craftsharp": "4.16.0"
       },
-      "hash": "165389af1d2a6914d91679f8646b34f696570ec9"
+      "hash": "fc26e69f553141d6a400f1d1193be98d72ea8797"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
