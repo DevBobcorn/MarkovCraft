@@ -7,6 +7,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+using CraftSharp;
+
 namespace MarkovCraft
 {
     public class ResultExporterScreen : ResultManipulatorWithItemRemapScreen

@@ -6,6 +6,8 @@ using System.Linq;
 using UnityEngine;
 using Newtonsoft.Json;
 
+using CraftSharp;
+
 namespace MarkovCraft
 {
     public static class RecordingExporter

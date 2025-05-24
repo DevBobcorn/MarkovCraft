@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+using CraftSharp;
+
 namespace MarkovCraft
 {
     public class ResultManipulatorWithItemRemapScreen : ResultManipulatorScreen

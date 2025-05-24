@@ -2,6 +2,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+using CraftSharp;
+
 namespace MarkovCraft
 {
     [RequireComponent(typeof (CanvasGroup))]
