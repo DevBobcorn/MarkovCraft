@@ -36,6 +36,9 @@
 # Visual Studio Code settings
 .vscode/
 
+# Jetbrains cache directory
+.idea/
+
 # Gradle cache directory
 .gradle/
 
