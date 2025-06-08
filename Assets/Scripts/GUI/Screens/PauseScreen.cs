@@ -26,7 +26,7 @@ namespace MarkovCraft
 
         public void BackToGame()
         {
-            if (normalScreen != null)
+            if (normalScreen)
             {
                 manager!.SetActiveScreen(normalScreen);
             }

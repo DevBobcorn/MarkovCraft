@@ -26,13 +26,12 @@ namespace MarkovCraft
         // RGB color of this item in the base palette
         private int defaultRgb = 0;
 
-        private char character;
-        public char Character => character;
+        public char Character { get; private set; }
 
         public virtual void InitializeData(char character, int defoRgb, int rgb, string blockState, 
                 MappingItemColorPicker colorPicker, MappingItemBlockPicker blockPicker, BlockStatePreview blockStatePreview)
         {
-            this.character = character;
+            Character = character;
             defaultRgb = defoRgb & 0xFFFFFF; // Remove alpha channel if presents
 
             // BlockState Preview
@@ -85,7 +84,7 @@ namespace MarkovCraft
 
         public void SetCharacter(char character)
         {
-            this.character = character;
+            Character = character;
             // Character display
             CharacterText!.text = character.ToString();
         }
@@ -145,10 +144,7 @@ namespace MarkovCraft
         {
             var blockState = BlockStateInput!.text;
 
-            if (string.IsNullOrWhiteSpace(blockState))
-                return string.Empty;
-            
-            return blockState;
+            return string.IsNullOrWhiteSpace(blockState) ? string.Empty : blockState;
         }
 
         public virtual void SetBlockState(string blockState)
@@ -182,7 +178,7 @@ namespace MarkovCraft
 
         private void OnRevertOverrideButtonClick()
         {
-            if (ColorPreviewImage == null || CharacterText == null || ColorCodeInput == null || BlockStateInput == null)
+            if (!ColorPreviewImage || !CharacterText || !ColorCodeInput || !BlockStateInput)
             {
                 Debug.LogError("Mapping Item missing components!");
                 return;

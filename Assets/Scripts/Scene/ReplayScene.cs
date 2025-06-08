@@ -31,8 +31,8 @@ namespace MarkovCraft
         [SerializeField] public Toggle? OptimizedPlaybackToggle;
         [SerializeField] public Button? ReplayButton; // , ExportButton;
 
-        private string recordingFile = string.Empty;
-        public string RecordingFile => recordingFile;
+        public string RecordingFile { get; private set; } = string.Empty;
+
         private readonly Dictionary<int, string> loadedRecordings = new();
         private ColoredBlockStateInfo[] recordingPalette = { }; // Palette of active recording
         private int sizeX, sizeY, sizeZ; // Size of active recording
@@ -66,7 +66,7 @@ namespace MarkovCraft
             }
         }
 
-        void Start()
+        private void Start()
         {
             // First load Minecraft data & resources
             StartCoroutine(LoadMCBlockData(
@@ -74,13 +74,13 @@ namespace MarkovCraft
                     ReplayButton!.interactable = false;
                     ReplayButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.load_resource");
                 },
-                (status) => ReplayText!.text = GetL10nString(status),
+                (status, progress) => ReplayText!.text = GetL10nString(status) + progress,
                 () => {
                     PlaybackSpeedSlider!.onValueChanged.AddListener(UpdatePlaybackSpeed);
                     UpdatePlaybackSpeed(PlaybackSpeedSlider.value);
 
                     var dir = MarkovGlobal.GetRecordingFile(string.Empty);
-                    if (Directory.Exists(dir) && RecordingDropdown != null)
+                    if (Directory.Exists(dir) && RecordingDropdown)
                     {
                         var options = new List<TMP_Dropdown.OptionData>();
                         loadedRecordings.Clear();
@@ -131,7 +131,7 @@ namespace MarkovCraft
 
         private const int FRAME_LIMIT = int.MaxValue; // 5;
 
-        public IEnumerator UpdateRecording(string recordingFile)
+        private IEnumerator UpdateRecording(string recordingFile)
         {
             Loading = true;
             ReplayText!.text = GetL10nString("status.info.load_recording", recordingFile);
@@ -188,10 +188,6 @@ namespace MarkovCraft
             nextBlockMeshIndex = 1; // #0 is preserved for default cube mesh
 
             var renderTypeTable = BlockStatePalette.INSTANCE.RenderTypeTable;
-            int getStateMaterial(BlockState blockState)
-            {
-                return GetMaterialIndex(renderTypeTable.GetValueOrDefault(blockState.BlockId, RenderType.SOLID));
-            };
 
             // Fill mesh palette
             for (int index = 0;index < recData.Palette.Count;index++) // Read and assign palette
@@ -261,7 +257,7 @@ namespace MarkovCraft
             // and as for 2d, it's 3 numbers with z values omitted
             int itemLength = is2d ? 3 : 4;
             
-            for (int f = 0;f < recData.FrameData.Count && f < FRAME_LIMIT;f++) // For each frame i the recording
+            for (int f = 0; f < recData.FrameData.Count; f++) // For each frame i the recording
             {
                 var nums = recData.FrameData[f].Split(' ');
 
@@ -321,43 +317,50 @@ namespace MarkovCraft
             ReplayButton.onClick.AddListener(StartReplay);
 
             ReplayText!.text = GetL10nString("status.info.loaded_recording", loadedDataVersionName, loadedDataVersionInt, recordingFile);
+            yield break;
+
+            int getStateMaterial(BlockState blockState)
+            {
+                return GetMaterialIndex(renderTypeTable.GetValueOrDefault(blockState.BlockId, RenderType.SOLID));
+            }
         }
 
-        void Update()
+        private void Update()
         {
-            if (FPSText != null)
+            if (FPSText)
                 FPSText.text = $"FPS:{(int)(1 / Time.unscaledDeltaTime), 4}";
             
         }
 
-        public void UpdatePlaybackSpeed(float newValue)
+        private void UpdatePlaybackSpeed(float newValue)
         {
             playbackSpeed = newValue;
 
-            if (PlaybackSpeedText != null)
+            if (PlaybackSpeedText)
                 PlaybackSpeedText.text = $"{newValue:0.0}";
             
         }
-        public void UpdateDropdownOption(int newValue)
+
+        private void UpdateDropdownOption(int newValue)
         {
-            if (loadedRecordings.ContainsKey(newValue))
-                SetRecording(loadedRecordings[newValue]);
+            if (loadedRecordings.TryGetValue(newValue, out var recording))
+                SetRecording(recording);
         }
 
-        public void SetRecording(string newRecordingFile)
+        private void SetRecording(string newRecordingFile)
         {
             if (replaying)
                 StopReplay();
             
-            recordingFile = newRecordingFile;
+            RecordingFile = newRecordingFile;
 
             if (!Loading)
                 StartCoroutine(UpdateRecording(newRecordingFile));
         }
 
-        public IEnumerator ReplayRecording()
+        private IEnumerator ReplayRecording()
         {
-            if (replaying || recordingPalette.Length == 0 || frameData.Count == 0 || ReplayText == null)
+            if (replaying || recordingPalette.Length == 0 || frameData.Count == 0 || !ReplayText)
             {
                 Debug.LogWarning("Replay cannot be initiated");
                 StopReplay();
@@ -419,7 +422,7 @@ namespace MarkovCraft
             // For optimized playback, playback speed cannot be hot-updated when playing
             float constTick = 1F / playbackSpeed;
             // Lock playback speed slider
-            if (PlaybackSpeedSlider != null)
+            if (PlaybackSpeedSlider)
                 PlaybackSpeedSlider.interactable = false;
 
             var materials = MaterialManager!.GetMaterialArray(BLOCK_RENDER_TYPES);
@@ -430,17 +433,10 @@ namespace MarkovCraft
                 {
                     break;
                 }
-                
-                BlockChangeInfo[] changes;
 
-                if (is2d) // 2d mode, nothing special needed
-                {
-                    changes = frameData[f];
-                }
-                else // 3d mode, filter out air block placement
-                {
-                    changes = frameData[f].Where(x => x.newBlock != 0).ToArray();
-                }
+                var changes = is2d ? frameData[f] : // 2d mode, nothing special needed
+                    // 3d mode, filter out air block placement
+                    frameData[f].Where(x => x.newBlock != 0).ToArray();
 
                 var instanceData = (
                         changes.Select(x => new int3(x.x, x.z, x.y)).ToArray(),
@@ -454,7 +450,7 @@ namespace MarkovCraft
             }
 
             // Unlock playback speed slider
-            if (PlaybackSpeedSlider != null)
+            if (PlaybackSpeedSlider)
                 PlaybackSpeedSlider.interactable = true;
         }
 
@@ -468,7 +464,7 @@ namespace MarkovCraft
 
             StartCoroutine(ReplayRecording());
 
-            if (ReplayButton != null)
+            if (ReplayButton)
             {
                 ReplayButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.stop_replay");
                 ReplayButton.onClick.RemoveAllListeners();
@@ -486,7 +482,7 @@ namespace MarkovCraft
 
             replaying = false;
 
-            if (ReplayButton != null)
+            if (ReplayButton)
             {
                 ReplayButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.start_replay");
                 ReplayButton.onClick.RemoveAllListeners();
@@ -494,7 +490,7 @@ namespace MarkovCraft
             }
         }
 
-        private void ClearUpScene()
+        private static void ClearUpScene()
         {
             // Clear up persistent entities
             BlockInstanceSpawner.ClearUpPersistentState();
@@ -507,7 +503,7 @@ namespace MarkovCraft
             
             ClearUpScene();
 
-            // Unpause game to restore time scale
+            // Unpause game to restore timescale
             screenManager!.IsPaused = false;
 
             SceneManager.LoadScene("Scenes/Welcome", LoadSceneMode.Single);

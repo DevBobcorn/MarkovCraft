@@ -6,9 +6,8 @@ namespace MarkovCraft
     public class ScreenManager : MonoBehaviour
     {
         [SerializeField] private BaseScreen? initialScreen;
-        private BaseScreen? activeScreen;
-        public BaseScreen? ActiveScreen => activeScreen;
-        
+        private BaseScreen? ActiveScreen { get; set; }
+
         private bool isPaused = true;
         public bool IsPaused
         {
@@ -24,12 +23,12 @@ namespace MarkovCraft
 
         public void SetActiveScreen(BaseScreen newScreen)
         {
-            if (activeScreen != null)
+            if (ActiveScreen)
             {
-                activeScreen.Hide(this);
+                ActiveScreen.Hide(this);
             }
             
-            activeScreen = newScreen;
+            ActiveScreen = newScreen;
             IsPaused = newScreen.ShouldPause();
             AllowsMovementInput = newScreen.AllowsMovementInput();
 
@@ -43,19 +42,19 @@ namespace MarkovCraft
             SetActiveScreen(screen);
         }
 
-        void Start()
+        private void Start()
         {
-            if (initialScreen != null) // Initialize screen
+            if (initialScreen) // Initialize screen
             {
                 SetActiveScreen(initialScreen);
             }
         }
 
-        void Update()
+        private void Update()
         {
-            if (activeScreen != null)
+            if (ActiveScreen)
             {
-                activeScreen.ScreenUpdate(this);
+                ActiveScreen.ScreenUpdate(this);
             }
         }
     }

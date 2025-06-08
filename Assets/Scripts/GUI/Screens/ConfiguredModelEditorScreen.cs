@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Xml.Linq;
 
 using UnityEngine;
@@ -44,7 +45,7 @@ namespace MarkovCraft
         [SerializeField] public AutoMappingPanel? AutoMappingPanel;
 
         private readonly List<MappingItem> mappingItems = new();
-        // Items in this dictionary share refereces with generation scene's fullPaletteAsLoaded
+        // Items in this dictionary share references with generation scene's fullPaletteAsLoaded
         // Its CustomMappingItem objects SHOULD NOT be edited
         private Dictionary<char, CustomMappingItem> fullPaletteAsLoaded = new();
         // Base color palette, loaded in and taken from generation scene
@@ -57,7 +58,7 @@ namespace MarkovCraft
         // Disable pause for animated inventory
         public override bool ShouldPause() => false;
 
-        private IEnumerator InitializeScreen(string confModelFile)
+        private IEnumerator InitializeScreen(string initConfModelFile)
         {
             // Initialize settings panel
             var dir = MarkovGlobal.GetDataFile("models");
@@ -91,15 +92,12 @@ namespace MarkovCraft
             AmountInput!.text = confModel.Amount.ToString();
             StepsInput!.text = confModel.Steps.ToString();
 
-            if (confModel.Seeds.Length > 0)
-                SeedsInput!.text = string.Join(' ', confModel.Seeds);
-            else
-                SeedsInput!.text = string.Empty;
+            SeedsInput!.text = confModel.Seeds.Length > 0 ? string.Join(' ', confModel.Seeds) : string.Empty;
             
             AnimatedToggle!.isOn = confModel.Animated;
             StepsPerRefreshInput!.text = confModel.StepsPerRefresh.ToString();
 
-            SaveNameInput!.text = confModelFile;
+            SaveNameInput!.text = initConfModelFile;
             SaveButton!.onClick.RemoveAllListeners();
             SaveButton.onClick.AddListener(SaveConfiguredModel);
 
@@ -133,7 +131,7 @@ namespace MarkovCraft
             working = false;
             properlyLoaded = true;
 
-            ScreenHeader!.text = GameScene.GetL10nString("editor.text.loaded", confModelFile);
+            ScreenHeader!.text = GameScene.GetL10nString("editor.text.loaded", initConfModelFile);
         }
 
         private IEnumerator UpdateActiveCharSetFromModel(string modelName)
@@ -146,7 +144,7 @@ namespace MarkovCraft
             if (File.Exists(modelFileName))
             {
                 var fs2 = new FileStream(modelFileName, FileMode.Open);
-                var task2 = XDocument.LoadAsync(fs2, LoadOptions.SetLineInfo, new());
+                var task2 = XDocument.LoadAsync(fs2, LoadOptions.SetLineInfo, CancellationToken.None);
 
                 while (!task2.IsCompleted)
                     yield return null;
@@ -208,7 +206,7 @@ namespace MarkovCraft
             baseColorPalette = game.GetBaseColorPalette();
             fullPaletteAsLoaded = game.GetFullPaletteAsLoaded();
             
-            if (confModel == null)
+            if (!confModel)
             {
                 Debug.LogWarning("Editor is not properly loaded!");
 
@@ -242,10 +240,8 @@ namespace MarkovCraft
         {
             foreach (var mappingItem in mappingItems)
             {
-                if (charSet.Contains(mappingItem.Character)) // This item is used in the current model. Show it
-                    mappingItem.gameObject.SetActive(true);
-                else // Hide it
-                    mappingItem.gameObject.SetActive(false);
+                // Show item if it is used in the current model
+                mappingItem.gameObject.SetActive(charSet.Contains(mappingItem.Character));
             }
         }
 
@@ -270,8 +266,7 @@ namespace MarkovCraft
             {
                 working = true;
 
-                var model = ScriptableObject.CreateInstance(typeof (ConfiguredModel)) as ConfiguredModel;
-                if (model is not null)
+                if (ScriptableObject.CreateInstance(typeof (ConfiguredModel)) is ConfiguredModel model)
                 {
                     model.Model = ModelDropdown!.options[ModelDropdown.value].text;
 
@@ -282,7 +277,7 @@ namespace MarkovCraft
                     int.TryParse(StepsInput!.text, out model.Steps);
                     model.Animated = AnimatedToggle!.isOn;
                     int.TryParse(StepsPerRefreshInput!.text, out model.StepsPerRefresh);
-                    model.Seeds = SeedsInput!.text.Split(' ').Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => int.Parse(x)).ToArray();
+                    model.Seeds = SeedsInput!.text.Split(' ').Where(x => !string.IsNullOrWhiteSpace(x)).Select(int.Parse).ToArray();
                     
                     model.CustomMapping = mappingItems.Where(x => x.ShouldBeSaved()).Select(x => new CustomMappingItem()
                     {

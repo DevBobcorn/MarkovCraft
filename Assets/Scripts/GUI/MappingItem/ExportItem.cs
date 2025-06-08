@@ -34,7 +34,7 @@ namespace MarkovCraft
                 return; // No need to update
             
             // Update block mesh
-            if (previewObject != null)
+            if (previewObject)
             {
                 var geometry = ResourcePackManager.Instance.StateModelTable[stateId].Geometries[0];
                 var visualBuffer = new VertexBuffer(geometry.GetVertexCount(BlockStatePreview.PREVIEW_CULLFLAG));

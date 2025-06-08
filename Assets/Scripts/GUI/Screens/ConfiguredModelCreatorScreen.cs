@@ -51,12 +51,12 @@ namespace MarkovCraft
                 return;
             }
 
-            if (modelItems.ContainsKey(modelName))
+            if (modelItems.TryGetValue(modelName, out var modelItem))
             {
                 // Select our target
                 selectedModel = modelName;
                 // Assign preset values
-                (int px, int py, int pz, int ps, bool anim) = modelItems[modelName].PresetData;
+                (int px, int py, int pz, int ps, bool anim) = modelItem.PresetData;
 
                 if (px > 0)
                     SizeXInput!.text = px.ToString();
@@ -101,8 +101,7 @@ namespace MarkovCraft
                 if (modelName == null)
                     continue;
 
-                var modelItemObj = Instantiate(ModelItemPrefab)!;
-                modelItemObj.transform.SetParent(GridTransform, false);
+                var modelItemObj = Instantiate(ModelItemPrefab, GridTransform, false)!;
 
                 var modelItem = modelItemObj.GetComponent<ModelItem>();
                 int x = melem.Get<int>("SizeX");
@@ -156,9 +155,9 @@ namespace MarkovCraft
                 var modelName = pair.Key;
 
                 // See if preview is cached
-                if (cachedModelPreviews.ContainsKey(modelName))
+                if (cachedModelPreviews.TryGetValue(modelName, out var preview))
                 {
-                    (var sprite, var is3d) = cachedModelPreviews[modelName];
+                    (var sprite, var is3d) = preview;
                     pair.Value.SetPreviewSprite(sprite, is3d);
                     continue;
                 }
@@ -184,9 +183,9 @@ namespace MarkovCraft
                     var bytes = File.ReadAllBytes(prevPath);
                     tex.LoadImage(bytes);
                     // Update sprite
-                    var sprite = UnityEngine.Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2, tex.height / 2));
+                    var sprite = UnityEngine.Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2F, tex.height / 2F));
 
-                    if (pair.Value == null) // Item got destroyed, screen might be closed already
+                    if (!pair.Value) // Item got destroyed, screen might be closed already
                     {
                         yield break;
                     }

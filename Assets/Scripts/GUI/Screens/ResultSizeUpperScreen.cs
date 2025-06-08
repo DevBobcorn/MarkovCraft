@@ -36,9 +36,9 @@ namespace MarkovCraft
 
         private IEnumerator InitializeScreen()
         {
-            if (result == null)
+            if (!result)
             {
-                Debug.LogWarning($"ERROR: Size upper screen not correctly initialized!");
+                Debug.LogWarning("ERROR: Size upper screen not correctly initialized!");
                 working = false;
                 properlyLoaded = false;
                 yield break;
@@ -54,7 +54,7 @@ namespace MarkovCraft
             SizeUpperDropdown.AddOptions(SIZE_UPPER_KEYS.Select(x =>
                     new TMP_Dropdown.OptionData(GameScene.GetL10nString(x))).ToList());
             SizeUpperDropdown!.onValueChanged.RemoveAllListeners();
-            SizeUpperDropdown!.onValueChanged.AddListener((_) => UpdateResizeData());
+            SizeUpperDropdown!.onValueChanged.AddListener(_ => UpdateResizeData());
 
             // Reset scale size
             scaleX = scaleY = scaleZ = 1;
@@ -102,7 +102,7 @@ namespace MarkovCraft
             var tex = MarkovJunior.Graphics.CreateTexture2D(pixels, sizeX, sizeY);
             //tex.filterMode = FilterMode.Point;
             // Update sprite
-            var sprite = Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2, tex.height / 2));
+            var sprite = Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2F, tex.height / 2F));
             ResultPreviewImage!.sprite = sprite;
             ResultPreviewImage!.SetNativeSize();
 
@@ -128,9 +128,9 @@ namespace MarkovCraft
             }
         }
 
-        public void UpdateResizeData()
+        private void UpdateResizeData()
         {
-            if (result == null) return;
+            if (!result) return;
             //Debug.Log($"Updating resize preview: {scaleX}x{scaleY}x{scaleZ}");
 
             int sizeX = result.SizeX;
@@ -192,7 +192,7 @@ namespace MarkovCraft
             
             // Get selected result data
             result = game.GetSelectedResult();
-            if (result == null)
+            if (!result)
             {
                 Debug.LogWarning("Size upper is not properly loaded!");
 

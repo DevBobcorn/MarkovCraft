@@ -17,21 +17,27 @@ namespace MarkovCraft
     [RequireComponent(typeof (Animator))]
     public class WelcomeScene : MonoBehaviour
     {
-        [SerializeField] TMP_Text? VersionText, DownloadInfoText;
+        private static readonly int LEFT = Animator.StringToHash("Left");
+        private static readonly int RIGHT = Animator.StringToHash("Right");
+        private static readonly int HIDDEN = Animator.StringToHash("Hidden");
+        private static readonly int ENTER = Animator.StringToHash("Enter");
+        
+        [SerializeField] private TMP_Text? VersionText, DownloadInfoText;
         [SerializeField] private VersionHolder? VersionHolder;
         [SerializeField] private LocalizedStringTable? L10nTable;
-        [SerializeField] Animator? CubeAnimator;
-        [SerializeField] Button? EnterButton, DownloadButton, ReplayButton;
-        [SerializeField] Button? ResourcePacksButton;
+        [SerializeField] private Animator? CubeAnimator;
+        [SerializeField] private Button? EnterButton, DownloadButton, ReplayButton;
+        [SerializeField] private Button? ResourcePacksButton;
 
-        [SerializeField] WelcomeScreen? WelcomeScreen;
+        [SerializeField] private WelcomeScreen? WelcomeScreen;
 
         private static WelcomeScene? instance;
+
         public static WelcomeScene Instance
         {
             get {
-                if (instance == null)
-                    instance = Component.FindFirstObjectByType<WelcomeScene>();
+                if (!instance)
+                    instance = FindFirstObjectByType<WelcomeScene>();
 
                 return instance!;
             }
@@ -43,38 +49,37 @@ namespace MarkovCraft
         public static string GetL10nString(string key, params object[] p)
         {
             var str = Instance.L10nTable!.GetTable().GetEntry(key);
-            if (str == null) return $"<{key}>";
-            return string.Format(str.Value, p);
+            return str == null ? $"<{key}>" : string.Format(str.Value, p);
         }
 
         private void UpdateSelectedVersion()
         {
-            if (VersionHolder == null) return;
+            if (!VersionHolder) return;
 
             var verIndex = VersionHolder.SelectedVersion;
             var version = VersionHolder.Versions[verIndex];
 
-            if (VersionText != null)
+            if (VersionText)
                 VersionText.text = $"< {version.Name} >";
             
             var newResPath = PathHelper.GetPackFile($"vanilla-{version.ResourceVersion}", "pack.mcmeta");
             var resPresent = File.Exists(newResPath);
 
-            downloadButtonAnimator!.SetBool("Hidden", resPresent);
+            downloadButtonAnimator!.SetBool(HIDDEN, resPresent);
 
-            if (EnterButton != null)
+            if (EnterButton)
                 EnterButton.interactable = resPresent;
             
-            if (ReplayButton != null)
+            if (ReplayButton)
                 ReplayButton.interactable = resPresent;
             
-            if (ResourcePacksButton != null)
+            if (ResourcePacksButton)
                 ResourcePacksButton.interactable = resPresent;
         }
 
-        void Start()
+        private void Start()
         {
-            if (VersionHolder == null || DownloadButton == null || DownloadInfoText == null) return;
+            if (!VersionHolder || !DownloadButton || !DownloadInfoText) return;
 
             downloadButtonAnimator = DownloadButton.GetComponent<Animator>();
             DownloadInfoText.text = $"v{Application.version}";
@@ -99,7 +104,7 @@ namespace MarkovCraft
 
         public void PrevVersion()
         {
-            if (VersionHolder == null || downloadingRes) return;
+            if (!VersionHolder || downloadingRes) return;
 
             var count = VersionHolder.Versions.Length;
 
@@ -108,12 +113,12 @@ namespace MarkovCraft
             
             UpdateSelectedVersion();
 
-            CubeAnimator!.SetTrigger("Left");
+            CubeAnimator!.SetTrigger(LEFT);
         }
 
         public void NextVersion()
         {
-            if (VersionHolder == null || downloadingRes) return;
+            if (!VersionHolder || downloadingRes) return;
 
             var count = VersionHolder.Versions.Length;
 
@@ -122,7 +127,7 @@ namespace MarkovCraft
             
             UpdateSelectedVersion();
 
-            CubeAnimator!.SetTrigger("Right");
+            CubeAnimator!.SetTrigger(RIGHT);
         }
 
         public void NextLanguage()
@@ -138,17 +143,17 @@ namespace MarkovCraft
 
         public void DownloadResource()
         {
-            if (VersionHolder == null || downloadingRes) return;
+            if (!VersionHolder || downloadingRes) return;
 
             var verIndex = VersionHolder.SelectedVersion;
             var version = VersionHolder.Versions[verIndex];
 
             downloadingRes = true;
             StartCoroutine(ResourceDownloader.DownloadResource(version.ResourceVersion,
-                    (status) => DownloadInfoText!.text = GetL10nString(status),
-                    () => downloadButtonAnimator!.SetBool("Hidden", true),
-                    (succeeded) => {
-                        downloadButtonAnimator!.SetBool("Hidden", succeeded);
+                    (status, progress) => DownloadInfoText!.text = GetL10nString(status) + progress,
+                    () => downloadButtonAnimator!.SetBool(HIDDEN, true),
+                    succeeded => {
+                        downloadButtonAnimator!.SetBool(HIDDEN, succeeded);
                         downloadingRes = false;
 
                         DownloadInfoText!.text = succeeded ? $"v{Application.version}" :
@@ -161,7 +166,7 @@ namespace MarkovCraft
 
         private IEnumerator MarkovCoroutine()
         {
-            if (WelcomeScreen != null)
+            if (WelcomeScreen)
             {
                 WelcomeScreen.SetEnterGameTrigger();
             }
@@ -170,32 +175,32 @@ namespace MarkovCraft
 
             var op = SceneManager.LoadSceneAsync("Scenes/Generation", LoadSceneMode.Single);
 
-            while (op.progress < 0.9F)
+            while (op!.progress < 0.9F)
                 yield return null;
         }
 
         public void EnterMarkov()
         {
-            if (VersionHolder == null || downloadingRes) return;
+            if (!VersionHolder || downloadingRes) return;
 
             StartCoroutine(MarkovCoroutine());
         }
 
         private IEnumerator ReplayCoroutine()
         {
-            GetComponent<Animator>().SetTrigger("Enter");
+            GetComponent<Animator>().SetTrigger(ENTER);
 
             yield return new WaitForSecondsRealtime(0.32F);
 
             var op = SceneManager.LoadSceneAsync("Scenes/Replay", LoadSceneMode.Single);
 
-            while (op.progress < 0.9F)
+            while (op!.progress < 0.9F)
                 yield return null;
         }
 
         public void EnterReplay()
         {
-            if (VersionHolder == null || downloadingRes) return;
+            if (!VersionHolder || downloadingRes) return;
 
             StartCoroutine(ReplayCoroutine());
         }

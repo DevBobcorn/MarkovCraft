@@ -6,17 +6,19 @@ namespace MarkovCraft
     [RequireComponent(typeof (CanvasGroup), typeof (Animator))]
     public abstract class BaseScreen : MonoBehaviour
     {
+        private static readonly int HIDDEN = Animator.StringToHash("Hidden");
+        
         protected ScreenManager? manager;
 
         public void Show(ScreenManager manager)
         {
-            GetComponent<Animator>().SetBool("Hidden", false);
+            GetComponent<Animator>().SetBool(HIDDEN, false);
             OnShow(this.manager = manager);
         }
 
         public void Hide(ScreenManager manager)
         {
-            GetComponent<Animator>().SetBool("Hidden", true);
+            GetComponent<Animator>().SetBool(HIDDEN, true);
             OnHide(manager);
         }
 

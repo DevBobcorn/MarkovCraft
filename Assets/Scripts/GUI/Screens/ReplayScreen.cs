@@ -7,7 +7,7 @@ namespace MarkovCraft
     {
         private GameScene? game;
 
-        void Start()
+        private void Start()
         {
             game = GameScene.Instance;
         }

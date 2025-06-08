@@ -83,7 +83,7 @@ namespace MarkovCraft
             var tex = MarkovJunior.Graphics.CreateTexture2D(pixels, sizeX, sizeY);
             //tex.filterMode = FilterMode.Point;
             // Update sprite
-            var sprite = Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2, tex.height / 2));
+            var sprite = Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2F, tex.height / 2F));
             ResultPreviewImage!.sprite = sprite;
             ResultPreviewImage!.SetNativeSize();
 
@@ -157,14 +157,8 @@ namespace MarkovCraft
                 }
             }
 
-            if (areaPreview)
-            {
-                PreviewButtonText!.text = GameScene.GetL10nString("rcon.text.preview_stop");
-            }
-            else
-            {
-                PreviewButtonText!.text = GameScene.GetL10nString("rcon.text.preview_show");
-            }
+            PreviewButtonText!.text = GameScene.GetL10nString(areaPreview ?
+                "rcon.text.preview_stop" : "rcon.text.preview_show");
         }
 
         void Update()
@@ -172,7 +166,7 @@ namespace MarkovCraft
             if (areaPreview && Time.unscaledTime - lastPreviewTime > PREVIEW_INTERVAL)
             {
                 lastPreviewTime = Time.unscaledTime;
-                if (client != null && result != null)
+                if (client != null && result)
                 {
                     int sx = result.SizeY, sy = result.SizeZ, sz = result.SizeX;
                     float xi = posX, yi = posY + 0.2F, zi = posZ;
@@ -208,14 +202,14 @@ namespace MarkovCraft
         }
 
         private string[] GetPrintCommands(int px, int py, int pz, int sx, int sy, int sz,
-                CustomMappingItem[] resultPalette, HashSet<int> airIndicies, int[] blockData)
+                CustomMappingItem[] resultPalette, HashSet<int> airIndices, int[] blockData)
         {
             string[] commands = new string[sx * sy * sz];
 
             for (int mcy = 0; mcy < sy; mcy++) for (int mcx = 0; mcx < sx; mcx++) for (int mcz = 0; mcz < sz; mcz++)
             {
                 int resultIndex = blockData[mcz + mcx * sz + mcy * sz * sx];
-                var blockState = airIndicies.Contains(resultIndex) ? "air" : resultPalette[resultIndex].BlockState;
+                var blockState = airIndices.Contains(resultIndex) ? "air" : resultPalette[resultIndex].BlockState;
                 
                 commands[mcz + mcx * sz + mcy * sz * sx] = $"setblock {px + mcx} {py + mcy} {pz + mcz} {blockState}";
             }
@@ -300,7 +294,7 @@ namespace MarkovCraft
             
             // Get selected result data
             result = game.GetSelectedResult();
-            if (result == null)
+            if (!result)
             {
                 Debug.LogWarning("RCON is not properly loaded!");
 

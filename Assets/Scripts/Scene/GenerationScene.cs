@@ -17,13 +17,13 @@ using TMPro;
 
 using MarkovJunior;
 using CraftSharp;
-using Unity.Entities.UniversalDelegates;
 
 namespace MarkovCraft
 {
     public class GenerationScene : GameScene
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
+        private static readonly int HIDDEN = Animator.StringToHash("Hidden");
         private const string CONFIGURED_MODEL_FOLDER = "configured_models";
         private static readonly Vector3 BLOCK_SELECTION_HIDDEN_POS = new(0F, -100F, 0F);
 
@@ -61,11 +61,11 @@ namespace MarkovCraft
         private readonly Dictionary<char, int> baseColorPalette = new();
         private bool baseColorPaletteLoaded = false;
 
-        private string confModelFile = string.Empty;
-        public string ConfiguredModelFile => confModelFile;
+        public string ConfiguredModelFile { get; private set; } = string.Empty;
+
         private readonly Dictionary<int, string> loadedConfModels = new();
-        private ConfiguredModel? currentConfModel = null;
-        public ConfiguredModel? ConfiguredModel => currentConfModel;
+        public ConfiguredModel? ConfiguredModel { get; private set; } = null;
+
         private GenerationResult? selectedResult = null;
         // Character => (meshIndex, matIndex, meshColor)
         private readonly Dictionary<char, int3> meshPalette = new();
@@ -77,7 +77,7 @@ namespace MarkovCraft
 
         private void GenerateProcedureGraph(string modelName)
         {
-            if (ModelGraphUIv2 != null)
+            if (ModelGraphUIv2)
             {
                 if (interpreter != null)
                 {
@@ -91,7 +91,7 @@ namespace MarkovCraft
             }
             
             /* MODEL GRAPH V1
-            if (ModelGraphUI != null)
+            if (ModelGraphUI)
             {
                 if (interpreter != null)
                 {
@@ -109,7 +109,7 @@ namespace MarkovCraft
         {
             if (!baseColorPaletteLoaded)
             {
-                XDocument.Load(MarkovGlobal.GetDataFile("palette.xml")).Root.Elements("color").ToList().ForEach(x =>
+                XDocument.Load(MarkovGlobal.GetDataFile("palette.xml")).Root!.Elements("color").ToList().ForEach(x =>
                 {
                     var character = x.Get<char>("symbol");
                     var rgb = ColorConvert.RGBFromHexString(x.Get<string>("value"));
@@ -123,7 +123,7 @@ namespace MarkovCraft
         public override void HideSpecialGUI()
         {
             // Hide UI Toolkit Model Graph (V2) which doesn't use proper rendering
-            if (ModelGraphUIv2 != null)
+            if (ModelGraphUIv2)
             {
                 ModelGraphUIv2.HidePanel();
             }
@@ -133,7 +133,7 @@ namespace MarkovCraft
         {
             UpdateBlockSelection(null);
             // Also show UI Toolkit Model Graph (V2) if it is ready
-            if (ModelGraphUIv2 != null)
+            if (ModelGraphUIv2)
             {
                 ModelGraphUIv2.ShowPanelIfNotEmpty();
             }
@@ -164,13 +164,13 @@ namespace MarkovCraft
             ClearUpScene();
 
             // Clear up current model graph
-            if (ModelGraphUIv2 != null)
+            if (ModelGraphUIv2)
             {
                 ModelGraphUIv2.ClearUp();
             }
             
             /* MODEL GRAPH V1
-            if (ModelGraphUI != null)
+            if (ModelGraphUI)
             {
                 ModelGraphUI.ClearUp();
             } */
@@ -184,7 +184,7 @@ namespace MarkovCraft
             {
                 FileStream fs = new(fileName, FileMode.Open);
 
-                var task = XDocument.LoadAsync(fs, LoadOptions.SetLineInfo, new());
+                var task = XDocument.LoadAsync(fs, LoadOptions.SetLineInfo, CancellationToken.None);
 
                 while (!task.IsCompleted)
                     yield return null;
@@ -268,10 +268,6 @@ namespace MarkovCraft
             nextBlockMeshIndex = 1; // #0 is preserved for default cube mesh
 
             var renderTypeTable = BlockStatePalette.INSTANCE.RenderTypeTable;
-            int getStateMaterial(BlockState blockState)
-            {
-                return GetMaterialIndex(renderTypeTable.GetValueOrDefault(blockState.BlockId, RenderType.SOLID));
-            };
 
             // Read and apply custom mappings
             foreach (var item in confModel.CustomMapping)
@@ -301,14 +297,7 @@ namespace MarkovCraft
                     meshPalette[item.Symbol] = new(0, DEFAULT_MATERIAL_INDEX, rgb);
                 }
                 
-                if (fullPalette.ContainsKey(item.Symbol)) // Entry defined in base palette, overwrite it
-                {
-                    fullPalette[item.Symbol] = item;
-                }
-                else // A new entry
-                {
-                    fullPalette.Add( item.Symbol, item );
-                }
+                fullPalette[item.Symbol] = item;
                 
                 yield return null;
             }
@@ -329,13 +318,19 @@ namespace MarkovCraft
             ExecuteButton.onClick.AddListener(StartExecution);
 
             GenerationText!.text = GetL10nString("status.info.loaded_conf_model", loadedDataVersionName, loadedDataVersionInt, confModelFile);
+            yield break;
+
+            int getStateMaterial(BlockState blockState)
+            {
+                return GetMaterialIndex(renderTypeTable.GetValueOrDefault(blockState.BlockId, RenderType.SOLID));
+            }
         }
 
         private static int nextResultId = 10001;
 
         private IEnumerator RunGeneration()
         {
-            if (executing || currentConfModel == null || currentConfModel.Amount == 0 || interpreter == null)
+            if (executing || !ConfiguredModel || ConfiguredModel.Amount == 0 || interpreter == null)
             {
                 Debug.LogWarning("Generation cannot be initiated");
                 StopExecution();
@@ -349,7 +344,7 @@ namespace MarkovCraft
             var materials = MaterialManager!.GetMaterialArray(BLOCK_RENDER_TYPES);
 
             executing = true;
-            var model = currentConfModel;
+            var model = ConfiguredModel;
 
             var resultPerLine = Mathf.CeilToInt(Mathf.Sqrt(model.Amount));
             System.Random rand = new();
@@ -371,7 +366,7 @@ namespace MarkovCraft
                 var resultObj = Instantiate(GenerationResultPrefab);
                 var resultId = nextResultId++;
                 resultObj!.name = $"Result #{resultId} (Seed: {seed})";
-                var result = resultObj!.GetComponent<GenerationResult>();
+                var result = resultObj.GetComponent<GenerationResult>();
                 result.GenerationSeed = seed;
                 result.ResultId = resultId;
                 
@@ -454,13 +449,13 @@ namespace MarkovCraft
 
                             // Initialize with new content
                             BlockInstanceSpawner.InitializeGrid(pos, frameSize, materials, blockMeshes, gridData);
-                            yield return null;
                         }
                         else // Size remains the same, just update content
                         {
                             BlockInstanceSpawner.UpdateGrid(gridData);
-                            yield return null;
                         }
+
+                        yield return null;
 
                         if (record) // Record the data frame
                         {
@@ -484,7 +479,7 @@ namespace MarkovCraft
                     Array.Copy(dataFrame.legend!, legendClone, legendClone.Length);
 
                     // Set result data and generate final mesh
-                    result.SetData(fullPalette, stateClone, legendClone, dataFrame.FX, dataFrame.FY, dataFrame.FZ, dataFrame.stepCount, confModelFile, seed);
+                    result.SetData(fullPalette, stateClone, legendClone, dataFrame.FX, dataFrame.FY, dataFrame.FZ, dataFrame.stepCount, ConfiguredModelFile, seed);
 
                     Debug.Log($"Iteration {k} complete. Steps: {dataFrame.stepCount} Frames: {recordedFrames.Count}");
                     // MODEL GRAPH V1 ModelGraphUI!.SetActiveNode(-1); // Deselect active node
@@ -493,7 +488,7 @@ namespace MarkovCraft
 
                     if (record) // Save the recording file
                     {
-                        var fileName = (currentConfModel!.Model ?? "Untitled") + $"_#{k}";
+                        var fileName = (ConfiguredModel!.Model ?? "Untitled") + $"_#{k}";
                         StartCoroutine(RecordingExporter.SaveRecording(fullPalette, fileName,
                                 maxFrameSize.x, maxFrameSize.y, maxFrameSize.z, recordedFrames.ToArray()));
                     }
@@ -550,7 +545,7 @@ namespace MarkovCraft
                 var resultObj = Instantiate(GenerationResultPrefab);
                 var resultId = nextResultId++;
                 resultObj!.name = $"Result #{resultId} (Imported from vox)";
-                var result = resultObj!.GetComponent<GenerationResult>();
+                var result = resultObj.GetComponent<GenerationResult>();
                 result.GenerationSeed = 0;
                 result.ResultId = resultId;
 
@@ -571,7 +566,7 @@ namespace MarkovCraft
                     VoxImportButton!.interactable = false;
                     VoxImportButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.load_resource");
                 },
-                (status) => GenerationText!.text = GetL10nString(status),
+                (status, progress) => GenerationText!.text = GetL10nString(status) + progress,
                 () => {
                     PlaybackSpeedSlider!.onValueChanged.AddListener(UpdatePlaybackSpeed);
                     UpdatePlaybackSpeed(PlaybackSpeedSlider.value);
@@ -604,10 +599,7 @@ namespace MarkovCraft
                     });
 
                     ExtrudeButton!.onClick.RemoveAllListeners();
-                    ExtrudeButton.onClick.AddListener(() => {
-                        HideSpecialGUI();
-                        //screenManager!.SetActiveScreenByType<ResultSizeUpperScreen>();
-                    });
+                    ExtrudeButton.onClick.AddListener(HideSpecialGUI);
 
                     RCONButton!.onClick.RemoveAllListeners();
                     RCONButton.onClick.AddListener(() => {
@@ -616,9 +608,7 @@ namespace MarkovCraft
                     });
 
                     UnlockButton!.onClick.RemoveAllListeners();
-                    UnlockButton.onClick.AddListener(() => {
-                        UnlockSelectedResult();
-                    });
+                    UnlockButton.onClick.AddListener(UnlockSelectedResult);
 
                     VoxImportButton!.interactable = true;
                     VoxImportButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.import_vox");
@@ -656,16 +646,16 @@ namespace MarkovCraft
             }
         }
 
-        void Update()
+        private void Update()
         {
-            if (FPSText != null)
+            if (FPSText)
                 FPSText.text = $"FPS:{(int)(1 / Time.unscaledDeltaTime), 4}";
             
-            if (screenManager != null && !screenManager.AllowsMovementInput) return;
+            if (screenManager && !screenManager.AllowsMovementInput) return;
             
             var cam = CamController!.ViewCamera;
             
-            if (cam != null && VolumeSelection != null)
+            if (cam && VolumeSelection)
             {
                 if (!VolumeSelection.Locked) // Update selected volume
                 {
@@ -684,7 +674,7 @@ namespace MarkovCraft
                             // Enable block colliders
                             selectedResult.EnableBlockColliders();
                             // Show export button
-                            ResultOperationPanelAnimator!.SetBool("Hidden", false);
+                            ResultOperationPanelAnimator!.SetBool(HIDDEN, false);
                         }
                     }
                     else
@@ -699,7 +689,7 @@ namespace MarkovCraft
                         var ray = cam.ScreenPointToRay(Input.mousePosition);
 
                         // Volume is still locked, update block selection
-                        if (selectedResult != null && Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 1000F, BlockMeshLayerMask)) // Mouse pointer is over a block
+                        if (selectedResult && Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 1000F, BlockMeshLayerMask)) // Mouse pointer is over a block
                         {
                             // Get block position in the volume (local space in volume)
                             var blockPos = hit.point - hit.normal * 0.01F;
@@ -735,13 +725,13 @@ namespace MarkovCraft
         {
             if (selectedResult == newResult) return;
 
-            if (selectedResult != null)
+            if (selectedResult)
             {
                 // Disable block colliders
                 selectedResult.DisableBlockColliders();
             }
 
-            if (newResult != null && newResult.Valid) // Valid
+            if (newResult && newResult.Valid) // Valid
             {
                 var fsc = newResult.FinalStepCount;
 
@@ -760,7 +750,7 @@ namespace MarkovCraft
                 UpdateBlockSelection(null);
 
                 // Hide export button
-                ResultOperationPanelAnimator!.SetBool("Hidden", true);
+                ResultOperationPanelAnimator!.SetBool(HIDDEN, true);
 
                 selectedResult = null;
             }
@@ -773,12 +763,12 @@ namespace MarkovCraft
             // Disable block colliders
             selectedResult!.DisableBlockColliders();
             // Hide export button
-            ResultOperationPanelAnimator!.SetBool("Hidden", true);
+            ResultOperationPanelAnimator!.SetBool(HIDDEN, true);
         }
 
         public GenerationResult? GetSelectedResult()
         {
-            if (selectedResult == null || !selectedResult.Valid || !selectedResult.Completed)
+            if (!selectedResult || !selectedResult.Valid || !selectedResult.Completed)
                 return null;
 
             // Result data should be present if the generation is completed
@@ -789,7 +779,7 @@ namespace MarkovCraft
         {
             var selected = GetSelectedResult();
 
-            if (selected != null)
+            if (selected)
             {
                 // Update result selection
                 UpdateSelectedResult(null);
@@ -817,15 +807,15 @@ namespace MarkovCraft
         {
             playbackSpeed = newValue;
 
-            if (PlaybackSpeedText != null)
+            if (PlaybackSpeedText)
                 PlaybackSpeedText.text = $"{newValue:0.0}";
             
         }
 
         private void UpdateDropdownOption(int newValue)
         {
-            if (loadedConfModels.ContainsKey(newValue))
-                SetConfiguredModel(loadedConfModels[newValue]);
+            if (loadedConfModels.TryGetValue(newValue, out var model))
+                SetConfiguredModel(model);
         }
 
         private void UpdateConfModelList()
@@ -857,12 +847,9 @@ namespace MarkovCraft
             UpdateConfModelList();
             // Find index of this item in our list
             int selectedIndex = -1;
-            foreach (var pair in loadedConfModels)
+            foreach (var pair in loadedConfModels.Where(pair => pair.Value == confModelFile))
             {
-                if (pair.Value == confModelFile)
-                {
-                    selectedIndex = pair.Key;
-                }
+                selectedIndex = pair.Key;
             }
 
             if (selectedIndex != -1)
@@ -877,13 +864,13 @@ namespace MarkovCraft
             if (executing)
                 StopExecution();
             
-            confModelFile = newConfModelFile;
+            ConfiguredModelFile = newConfModelFile;
 
-            var xdoc = XDocument.Load($"{MarkovGlobal.GetDataFile(CONFIGURED_MODEL_FOLDER)}/{confModelFile}");
+            var xdoc = XDocument.Load($"{MarkovGlobal.GetDataFile(CONFIGURED_MODEL_FOLDER)}/{ConfiguredModelFile}");
             var newConfModel = ConfiguredModel.CreateFromXMLDoc(xdoc);
 
             // Assign new configured model
-            currentConfModel = newConfModel;
+            ConfiguredModel = newConfModel;
 
             if (!Loading)
                 StartCoroutine(UpdateConfiguredModel(newConfModelFile, newConfModel));
@@ -899,14 +886,14 @@ namespace MarkovCraft
 
             StartCoroutine(RunGeneration());
 
-            if (ExecuteButton != null)
+            if (ExecuteButton)
             {
                 ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.stop_execution");
                 ExecuteButton.onClick.RemoveAllListeners();
                 ExecuteButton.onClick.AddListener(StopExecution);
             }
 
-            if (RecordToggle != null)
+            if (RecordToggle)
             {
                 RecordToggle.enabled = false;
             }
@@ -924,14 +911,14 @@ namespace MarkovCraft
             //ModelGraphUI!.SetActiveNode(-1);
             ModelGraphUIv2!.SetActiveNode(-1);
 
-            if (ExecuteButton != null)
+            if (ExecuteButton)
             {
                 ExecuteButton.GetComponentInChildren<TMP_Text>().text = GetL10nString("control.text.start_execution");
                 ExecuteButton.onClick.RemoveAllListeners();
                 ExecuteButton.onClick.AddListener(StartExecution);
             }
 
-            if (RecordToggle != null)
+            if (RecordToggle)
             {
                 RecordToggle.enabled = true;
             }
@@ -944,7 +931,7 @@ namespace MarkovCraft
             
             ClearUpScene();
 
-            // Unpause game to restore time scale
+            // Unpause game to restore timescale
             screenManager!.IsPaused = false;
 
             SceneManager.LoadScene("Scenes/Welcome", LoadSceneMode.Single);

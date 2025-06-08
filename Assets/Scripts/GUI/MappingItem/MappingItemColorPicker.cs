@@ -31,7 +31,7 @@ namespace MarkovCraft
 
         public void OpenAndInitialize(MappingItem item, Color32 initColor)
         {
-            if (activeItem != null) // Opened by an item while editing another one
+            if (activeItem) // Opened by an item while editing another one
             {
                 // Apply current color to active item
                 ApplyToItem(activeItem);
@@ -69,7 +69,7 @@ namespace MarkovCraft
 
         public void CloseAndApply()
         {
-            if (activeItem != null) // Active item is available
+            if (activeItem) // Active item is available
             {
                 // Apply current color to active item
                 ApplyToItem(activeItem);

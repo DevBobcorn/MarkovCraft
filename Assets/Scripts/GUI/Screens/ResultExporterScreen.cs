@@ -46,7 +46,7 @@ namespace MarkovCraft
 
         private IEnumerator InitializeScreen()
         {
-            if (result == null)
+            if (!result)
             {
                 Debug.LogWarning($"ERROR: Export screen not correctly initialized!");
                 working = false;
@@ -92,7 +92,7 @@ namespace MarkovCraft
             var tex = MarkovJunior.Graphics.CreateTexture2D(pixels, sizeX, sizeY);
             //tex.filterMode = FilterMode.Point;
             // Update sprite
-            var sprite = Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2, tex.height / 2));
+            var sprite = Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2F, tex.height / 2F));
             ResultPreviewImage!.sprite = sprite;
             ResultPreviewImage!.SetNativeSize();
 
@@ -163,7 +163,7 @@ namespace MarkovCraft
         {
             if (working) return;
 
-            if (properlyLoaded && result != null) // The editor is properly loaded
+            if (properlyLoaded && result) // The editor is properly loaded
             {
                 working = true;
 

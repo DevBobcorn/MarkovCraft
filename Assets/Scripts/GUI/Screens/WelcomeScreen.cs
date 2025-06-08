@@ -6,15 +6,14 @@ namespace MarkovCraft
 {
     public class WelcomeScreen : BaseScreen
     {
-        [SerializeField] Button? ResourcePacksButton;
+        [SerializeField] private Button? ResourcePacksButton;
 
         public override void OnShow(ScreenManager manager)
         {
-            if (ResourcePacksButton != null)
+            if (ResourcePacksButton)
             {
                 ResourcePacksButton.onClick.RemoveAllListeners();
-                ResourcePacksButton.onClick.AddListener(() =>
-                        manager.SetActiveScreenByType<ResourcePacksScreen>());
+                ResourcePacksButton.onClick.AddListener(manager.SetActiveScreenByType<ResourcePacksScreen>);
             }
             
         }

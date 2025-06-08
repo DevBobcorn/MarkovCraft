@@ -19,6 +19,7 @@ namespace MarkovCraft
     public abstract class GameScene : MonoBehaviour
     {
         private static readonly char SP = Path.DirectorySeparatorChar;
+        private static readonly int HIDDEN = Animator.StringToHash("Hidden");
 
         public static readonly RenderType[] BLOCK_RENDER_TYPES =
         {
@@ -57,7 +58,7 @@ namespace MarkovCraft
         // Unity config and asset files
         [SerializeField] protected VersionHolder? VersionHolder;
         [SerializeField] protected LocalizedStringTable? L10nTable;
-        protected Dictionary<string, string> L10nBlockNameTable = new();
+        private readonly Dictionary<string, string> L10nBlockNameTable = new();
         protected string loadedDataVersionName = "MC 0.0";
         protected int loadedDataVersionInt = 0;
 
@@ -68,8 +69,8 @@ namespace MarkovCraft
         public static GameScene Instance
         {
             get {
-                if (instance == null)
-                    instance = Component.FindFirstObjectByType<GameScene>();
+                if (!instance)
+                    instance = FindFirstObjectByType<GameScene>();
 
                 return instance!;
             }
@@ -113,9 +114,6 @@ namespace MarkovCraft
             var statePalette = BlockStatePalette.INSTANCE;
             var buffers = new VertexBuffer[nextBlockMeshIndex];
 
-            var blockGeometries = new BlockGeometry[nextBlockMeshIndex];
-            var blockTints = new float3[nextBlockMeshIndex];
-
             // #0 is default cube mesh
             uint vertOffsetCube = 0;
             buffers[0] = new VertexBuffer(CubeGeometry.GetVertexCount(0b111111));
@@ -123,30 +121,26 @@ namespace MarkovCraft
 
             var modelTable = ResourcePackManager.Instance.StateModelTable;
             
-            foreach (var pair in stateId2Mesh) // StateId => Mesh index
+            foreach (var (stateId, layer) in stateId2Mesh) // StateId => Mesh index
             {
-                var stateId = pair.Key;
                 uint vertOffset = 0;
 
-                if (modelTable.ContainsKey(stateId))
+                if (modelTable.TryGetValue(stateId, out var stateModel))
                 {
-                    var blockGeometry = modelTable[stateId].Geometries[0];
+                    var blockGeometry = stateModel.Geometries[0];
                     var blockTint = statePalette.GetBlockColor(stateId, DummyWorld, BlockLoc.Zero);
 
-                    buffers[pair.Value] = new VertexBuffer(blockGeometry.GetVertexCount(0b111111));
+                    buffers[layer] = new VertexBuffer(blockGeometry.GetVertexCount(0b111111));
 
-                    blockGeometry.Build(buffers[pair.Value], ref vertOffset, float3.zero, 0b111111,
+                    blockGeometry.Build(buffers[layer], ref vertOffset, float3.zero, 0b111111,
                             0, 0F, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
-                    
-                    blockGeometries[pair.Value] = blockGeometry;
-                    blockTints[pair.Value] = blockTint;
                 }
                 else
                 {
-                    buffers[pair.Value] = new VertexBuffer(CubeGeometry.GetVertexCount(0b111111));
+                    buffers[layer] = new VertexBuffer(CubeGeometry.GetVertexCount(0b111111));
 
                     Debug.LogWarning($"Model for block state #{stateId} ({statePalette.GetByNumId(stateId)}) is not available. Using cube model instead.");
-                    CubeGeometry.Build(buffers[pair.Value], ref vertOffset, float3.zero, ResourcePackManager.BLANK_TEXTURE, 0b111111, new float3(1F));
+                    CubeGeometry.Build(buffers[layer], ref vertOffset, float3.zero, ResourcePackManager.BLANK_TEXTURE, 0b111111, new float3(1F));
                 }
             }
 
@@ -160,7 +154,7 @@ namespace MarkovCraft
             }
         }
 
-        protected IEnumerator LoadMCBlockData(Action? prepare = null, Action<string>? update = null, Action? callback = null)
+        protected IEnumerator LoadMCBlockData(Action? prepare = null, Action<string, string>? update = null, Action? callback = null)
         {
             Loading = true;
             
@@ -181,14 +175,14 @@ namespace MarkovCraft
             var extraDataDir = PathHelper.GetExtraDataDirectory();
             yield return StartCoroutine(BuiltinResourceHelper.ReadyBuiltinResource(
                     MarkovGlobal.MARKOV_CRAFT_BUILTIN_FILE_NAME, MarkovGlobal.MARKOV_CRAFT_BUILTIN_VERSION, extraDataDir,
-                    (status) => Loom.QueueOnMainThread(() => update!.Invoke(status)),
-                    () => { }, (succeed) => { }));
+                    (status) => Loom.QueueOnMainThread(() => update!.Invoke(status, string.Empty)),
+                    () => { }, _ => { }));
             
             // Generate vanilla_fix or check update
             var vanillaFixDir = PathHelper.GetPackDirectoryNamed("vanilla_fix");
             yield return StartCoroutine(BuiltinResourceHelper.ReadyBuiltinResource(
                     MarkovGlobal.VANILLAFIX_FILE_NAME, MarkovGlobal.VANILLAFIX_VERSION, vanillaFixDir,
-                    (status) => { }, () => { }, (succeed) => { }));
+                    (status) => { }, () => { }, _ => { }));
 
             // First load all possible Block States...
             var loadFlag = new DataLoadFlag();
@@ -213,7 +207,7 @@ namespace MarkovCraft
             // Load valid packs...
             loadFlag.Finished = false;
             Task.Run(() => packManager.LoadPacks(loadFlag,
-                    (status) => Loom.QueueOnMainThread(() => update!.Invoke(status))));
+                    (status, progress) => Loom.QueueOnMainThread(() => update!.Invoke(status, progress))));
             while (!loadFlag.Finished) yield return null;
 
             Loading = false;
@@ -250,8 +244,8 @@ namespace MarkovCraft
             else // Not present yet, try downloading it
             {
                 yield return StartCoroutine(ResourceDownloader.DownloadLanguageJson(resVersion, mcLang,
-                    (status) => Loom.QueueOnMainThread(() => update!.Invoke(status)),
-                    () => { }, (succeed) => {
+                    (status, progress) => Loom.QueueOnMainThread(() => update!.Invoke(status, progress)),
+                    () => { }, succeed => {
                         if (succeed) // Downloaded successfully, load it now
                             foreach (var entry in Json.ParseJson(File.ReadAllText(langPath)).Properties.Where(x => x.Key.StartsWith("block.")))
                                 L10nBlockNameTable.Add(entry.Key, entry.Value.StringValue);

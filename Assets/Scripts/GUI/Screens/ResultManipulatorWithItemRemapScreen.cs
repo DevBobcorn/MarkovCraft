@@ -97,7 +97,7 @@ namespace MarkovCraft
         {
             if (working) return;
 
-            if (properlyLoaded && result != null) // The editor is properly loaded
+            if (properlyLoaded && result) // The editor is properly loaded
             {
                 working = true;
 

@@ -32,7 +32,7 @@ namespace MarkovCraft
             transforming = false;
             Locked = true;
 
-            if (MatLocked != null)
+            if (MatLocked)
                 GetComponent<MeshRenderer>().sharedMaterial = MatLocked;
         }
 
@@ -40,7 +40,7 @@ namespace MarkovCraft
         {
             Locked = false;
 
-            if (MatLocked != null)
+            if (MatLocked)
                 GetComponent<MeshRenderer>().sharedMaterial = MatB;
         }
 
@@ -71,7 +71,7 @@ namespace MarkovCraft
         {
             transforming = true;
 
-            if (MatA != null)
+            if (MatA)
                 GetComponent<MeshRenderer>().sharedMaterial = MatA;
         }
 
@@ -79,11 +79,11 @@ namespace MarkovCraft
         {
             transforming = false;
 
-            if (MatB != null)
+            if (MatB)
                 GetComponent<MeshRenderer>().sharedMaterial = MatB;
         }
 
-        void Update()
+        private void Update()
         {
             if (!transforming) return;
 

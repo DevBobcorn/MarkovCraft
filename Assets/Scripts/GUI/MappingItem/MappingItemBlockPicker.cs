@@ -60,7 +60,7 @@ namespace MarkovCraft
 
                 foreach (var pair in selectedBlockState.Properties)
                 {
-                    var propObj = GameObject.Instantiate(propertyPrefab);
+                    var propObj = GameObject.Instantiate(propertyPrefab, propertyListTransform, false);
                     var prop = propObj!.GetComponent<BlockStateProperty>();
                     
                     prop.SetData(pair.Key, allProps[pair.Key].ToArray());
@@ -73,8 +73,6 @@ namespace MarkovCraft
                         
                         SelectBlockState(newStateId, newState);
                     });
-
-                    propObj.transform.SetParent(propertyListTransform, false);
                 }
             }
         }
@@ -140,7 +138,7 @@ namespace MarkovCraft
 
         public void OpenAndInitialize(MappingItem item, int initialBlockStateId, BlockState initialBlockState)
         {
-            if (activeItem != null) // Opened by an item while editing another one
+            if (activeItem) // Opened by an item while editing another one
             {
                 // Apply current blockstate to active item
                 ApplyToItem(activeItem);
@@ -156,14 +154,11 @@ namespace MarkovCraft
                 Destroy(block.gameObject);
             }
 
-            int index = 0;
-
             foreach (var blockId in BlockStatePalette.INSTANCE.GetAllGroupIds())
             {
                 var defaultStateId = BlockStatePalette.INSTANCE.GetDefaultNumId(blockId);
 
-                var blockListItemObj = Instantiate(BlockListItemPrefab)!;
-                blockListItemObj.transform.SetParent(GridTransform, false);
+                var blockListItemObj = Instantiate(BlockListItemPrefab, GridTransform, false)!;
 
                 var blockListItem = blockListItemObj.GetComponent<BlockListItem>();
 
@@ -171,14 +166,11 @@ namespace MarkovCraft
                 blockListItem.SetClickEvent(() => SelectBlock(blockId));
                 
                 blockListItems.Add(blockId, blockListItem);
-
-                index++;
             }
 
             // Update selected blockstate
-            if (blockListItems.ContainsKey(initialBlockState.BlockId))
+            if (blockListItems.TryGetValue(initialBlockState.BlockId, out var target))
             {
-                var target = blockListItems[initialBlockState.BlockId]!;
                 var pos = blockListItems.Keys.ToList().IndexOf(initialBlockState.BlockId);
                 var posInList = pos / (float) blockListItems.Count;
 
@@ -191,7 +183,7 @@ namespace MarkovCraft
             // Clear search box
             BlockSearchInput!.onValueChanged.RemoveAllListeners();
             BlockSearchInput!.text = string.Empty;
-            BlockSearchInput.onValueChanged.AddListener((text) => UpdateBlockList(text));
+            BlockSearchInput.onValueChanged.AddListener(UpdateBlockList);
 
             Open();
         }
@@ -208,7 +200,7 @@ namespace MarkovCraft
 
         public void CloseAndApply()
         {
-            if (activeItem != null) // Active item is available
+            if (activeItem) // Active item is available
             {
                 // Apply current color to active item
                 ApplyToItem(activeItem);

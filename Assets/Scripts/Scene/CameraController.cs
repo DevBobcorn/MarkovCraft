@@ -7,8 +7,8 @@ namespace MarkovCraft
     [RequireComponent(typeof (Camera))]
     public class CameraController : MonoBehaviour
     {
-        private static readonly Plane REFERENCE_PLANE = new Plane(Vector3.up, Vector3.zero);
-        private static readonly Vector2 VIEWPORT_ROTATE_CENTER = new Vector2(0.5F, 0.3F);
+        private static readonly Plane REFERENCE_PLANE = new(Vector3.up, Vector3.zero);
+        private static readonly Vector2 VIEWPORT_ROTATE_CENTER = new(0.5F, 0.3F);
         [SerializeField] private ScreenManager? screenManager;
         [SerializeField] [Range( 1F, 1000F)] private float moveSpeed   =  10F;
         [SerializeField] [Range( 1F, 1000F)] private float turnSpeed   =  10F;
@@ -17,8 +17,7 @@ namespace MarkovCraft
         [SerializeField] [Range(10F, 1000F)] private float yPosMax   = 325F;
         private float yPosition = 0F;
 
-        private Camera? viewCamera;
-        public Camera? ViewCamera => viewCamera;
+        public Camera? ViewCamera { get; private set; }
 
         private bool dragging = false, dragRotating = false;
         private Vector3 lastDragPos = Vector2.zero;
@@ -26,9 +25,9 @@ namespace MarkovCraft
 
         public void SetCenterPosition(Vector3 newCenter)
         {
-            var ray = viewCamera == null ?
+            var ray = !ViewCamera ?
                     new Ray(transform.position, transform.forward) :
-                    viewCamera.ViewportPointToRay(VIEWPORT_ROTATE_CENTER);
+                    ViewCamera.ViewportPointToRay(VIEWPORT_ROTATE_CENTER);
             REFERENCE_PLANE.Raycast(ray, out float dist);
 
             newCenter.y = 0F;
@@ -36,15 +35,15 @@ namespace MarkovCraft
             targetPos = newCenter - ray.direction * dist;
         }
 
-        void Start()
+        private void Start()
         {
             // Get camera component
-            viewCamera = GetComponent<Camera>();
+            ViewCamera = GetComponent<Camera>();
             // Update initial y position
             yPosition = transform.position.y;
         }
 
-        void Update()
+        private void Update()
         {
             if (targetPos != null)
             {
@@ -58,7 +57,7 @@ namespace MarkovCraft
                 }
             }
 
-            if (screenManager != null && !screenManager.AllowsMovementInput)
+            if (screenManager && !screenManager.AllowsMovementInput)
             {
                 dragging = false;
                 return;
@@ -73,7 +72,7 @@ namespace MarkovCraft
                     var curDragPos = Input.mousePosition;
                     var dragOffset = curDragPos - lastDragPos;
 
-                    var dragMultiplier = (yPosition / yPosMax) * 0.3F;
+                    var dragMultiplier = yPosition / yPosMax * 0.3F;
                     var newPos = transform.position - dragMultiplier * (transform.right * dragOffset.x + transform.up * dragOffset.y);
 
                     newPos.y = Mathf.Clamp(newPos.y, yPosMin, yPosMax);
@@ -152,9 +151,9 @@ namespace MarkovCraft
 
             if (rot != 0F) // Turn camera
             {
-                var ray = viewCamera == null ?
+                var ray = !ViewCamera ?
                         new Ray(transform.position, transform.forward) :
-                        viewCamera.ViewportPointToRay(VIEWPORT_ROTATE_CENTER);
+                        ViewCamera.ViewportPointToRay(VIEWPORT_ROTATE_CENTER);
                 REFERENCE_PLANE.Raycast(ray, out float dist);
 
                 var hitPoint = transform.position + ray.direction * dist;
@@ -164,8 +163,8 @@ namespace MarkovCraft
                 transform.localEulerAngles = new Vector3(eulers.x, eulers.y + rot * turnSpeed * Time.deltaTime, eulers.z);
 
                 // Get ray direction after the rotation
-                var newRayDirection = viewCamera == null ? transform.forward:
-                        viewCamera.ViewportPointToRay(VIEWPORT_ROTATE_CENTER).direction;
+                var newRayDirection = !ViewCamera ? transform.forward:
+                        ViewCamera.ViewportPointToRay(VIEWPORT_ROTATE_CENTER).direction;
 
                 // Update current position
                 transform.position = hitPoint - newRayDirection * dist;
@@ -173,7 +172,7 @@ namespace MarkovCraft
 
             if (hor != 0F) // Movement in horizontal direction - Left / Right
             {
-                transform.position += transform.right * hor * Time.deltaTime * moveSpeed;
+                transform.position += transform.right * (hor * Time.deltaTime * moveSpeed);
             }
 
             if (ver != 0F) // Movement in horizontal direction - Forward / Back
@@ -182,12 +181,12 @@ namespace MarkovCraft
                 horizontalForward.y = 0;
                 horizontalForward = horizontalForward.normalized;
 
-                transform.position += horizontalForward * ver * Time.deltaTime * moveSpeed;
+                transform.position += horizontalForward * (ver * Time.deltaTime * moveSpeed);
             }
 
             if (fly != 0F) // Movement in vertical direction - Up / Down
             {
-                var newPos = transform.position + Vector3.up * fly * Time.deltaTime * moveSpeed;
+                var newPos = transform.position + Vector3.up * (fly * Time.deltaTime * moveSpeed);
                 newPos.y = Mathf.Clamp(newPos.y, yPosMin, yPosMax);
 
                 transform.position = newPos;

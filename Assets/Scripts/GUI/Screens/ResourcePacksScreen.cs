@@ -87,22 +87,21 @@ namespace MarkovCraft
                 var packFormat = "0";
                 var description = "<No description>";
 
-                if (metaData.Properties.ContainsKey("pack"))
+                if (metaData.Properties.TryGetValue("pack", out var packData))
                 {
-                    Json.JSONData packData = metaData.Properties["pack"];
-                    if (packData.Properties.ContainsKey("pack_format"))
+                    if (packData.Properties.TryGetValue("pack_format", out var packFormatData))
                     {
-                        packFormat = packData.Properties["pack_format"].StringValue;
+                        packFormat = packFormatData.StringValue;
                         description = string.Empty;
 
-                        if (packData.Properties.ContainsKey("description"))
+                        if (packData.Properties.TryGetValue("description", out var descriptionData))
                         {
-                            description = packData.Properties["description"].StringValue;
+                            description = descriptionData.StringValue;
                         }
                     }
                     else
                     {
-                        continue; // No a valid resource pack
+                        continue; // Not a valid resource pack
                     }
                 }
 
@@ -115,7 +114,7 @@ namespace MarkovCraft
                     var bytes = File.ReadAllBytes(packPngPath);
                     tex.LoadImage(bytes);
 
-                    sprite = Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2, tex.height / 2));
+                    sprite = Sprite.Create(tex, new(0, 0, tex.width, tex.height), new(tex.width / 2F, tex.height / 2F));
                 }
 
                 // Initialize item data
