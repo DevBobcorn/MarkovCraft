@@ -202,7 +202,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 501063469670400
-    m_Localized: Editing [{0}]
+    m_Localized: 'Editing [{0}]'
     m_Metadata:
       m_Items: []
   - m_Id: 503485516652544
@@ -594,7 +594,16 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 138431833176973312
-    m_Localized: "Minecraft\u7248\u672C\uFF1A\n<u>{0}</u>\n\n\u8D44\u6E90\u5305\u683C\u5F0F\uFF1A\n<u>{1}</u>"
+    m_Localized: 'Minecraft Version:
+
+      <u>{0}</u>
+
+      
+
+      Resource
+      Pack Format:
+
+      <u>{1}</u>'
     m_Metadata:
       m_Items: []
   - m_Id: 138434806934315008
