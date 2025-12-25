@@ -67,51 +67,58 @@ namespace MarkovCraft
             var mouse = Mouse.current;
             var keyboard = Keyboard.current;
 
-            if (mouse == null || keyboard == null)
-            {
-                dragging = false;
-                return;
-            }
+            // If no mouse is available, always consider pointer is over UI
+            var pointerOverUI = true;
 
-            var pointerOverUI = EventSystem.current.IsPointerOverGameObject();
-
-            if (dragging) // Perform dragging
+            if (mouse != null)
             {
-                if (mouse.rightButton.isPressed)
+                pointerOverUI = EventSystem.current.IsPointerOverGameObject();
+                
+                if (dragging) // Perform dragging
                 {
-                    var curDragPos = mouse.position.ReadValue();
-                    var dragOffset = curDragPos - lastDragPos;
+                    if (mouse.rightButton.isPressed)
+                    {
+                        var curDragPos = mouse.position.ReadValue();
+                        var dragOffset = curDragPos - lastDragPos;
 
-                    var dragMultiplier = yPosition / yPosMax * 0.3F;
-                    var newPos = transform.position - dragMultiplier * (transform.right * dragOffset.x + transform.up * dragOffset.y);
+                        var dragMultiplier = yPosition / yPosMax * 0.3F;
+                        var newPos = transform.position - dragMultiplier * (transform.right * dragOffset.x + transform.up * dragOffset.y);
 
-                    newPos.y = Mathf.Clamp(newPos.y, yPosMin, yPosMax);
+                        newPos.y = Mathf.Clamp(newPos.y, yPosMin, yPosMax);
 
-                    transform.position = newPos;
+                        transform.position = newPos;
 
-                    lastDragPos = curDragPos;
+                        lastDragPos = curDragPos;
+                    }
+                    else
+                    {
+                        dragging = false;
+                    }
                 }
-                else
+                else // Check start dragging
                 {
-                    dragging = false;
-                }
-            }
-            else // Check start dragging
-            {
-                if (!dragRotating && mouse.rightButton.isPressed && !pointerOverUI)
-                {
-                    dragging = true;
-                    lastDragPos = mouse.position.ReadValue();
+                    if (!dragRotating && mouse.rightButton.isPressed && !pointerOverUI)
+                    {
+                        dragging = true;
+                        lastDragPos = mouse.position.ReadValue();
+                    }
                 }
             }
 
             float hor = 0F;
-            if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed) hor -= 1F;
-            if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed) hor += 1F;
+            if (keyboard != null)
+            {
+                if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed) hor -= 1F;
+                if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed) hor += 1F;
+            }
 
             float ver = 0F;
-            if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed) ver -= 1F;
-            if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed) ver += 1F;
+            if (keyboard != null)
+            {
+                if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed) ver -= 1F;
+                if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed) ver += 1F;
+            }
+            
             float fly = 0F;
             float rot = 0F;
 
@@ -121,51 +128,57 @@ namespace MarkovCraft
                 ver += joystickPanel.Value.y * 0.01F;
             }
 
-            if (dragRotating) // Perform dragging
+            if (mouse != null)
             {
-                if (mouse.middleButton.isPressed)
+                if (dragRotating) // Perform dragging
                 {
-                    var curDragPos = mouse.position.ReadValue();
-                    var dragOffset = curDragPos - lastDragPos;
-
-                    rot = dragOffset.x * Time.deltaTime * 30F;
-
-                    lastDragPos = curDragPos;
-                }
-                else
-                {
-                    dragRotating = false;
-                }
-            }
-            else // Check start dragging
-            {
-                if (!dragging && mouse.middleButton.isPressed && !pointerOverUI)
-                {
-                    dragRotating = true;
-                    lastDragPos = mouse.position.ReadValue();
-                }
-                else
-                {
-                    if (keyboard.qKey.isPressed) // Turn camera counter-clockwise
+                    if (mouse.middleButton.isPressed)
                     {
-                        rot += 1F;
+                        var curDragPos = mouse.position.ReadValue();
+                        var dragOffset = curDragPos - lastDragPos;
+
+                        rot = dragOffset.x * Time.deltaTime * 30F;
+
+                        lastDragPos = curDragPos;
                     }
+                    else
+                    {
+                        dragRotating = false;
+                    }
+                }
+                else // Check start dragging
+                {
+                    if (!dragging && mouse.middleButton.isPressed && !pointerOverUI)
+                    {
+                        dragRotating = true;
+                        lastDragPos = mouse.position.ReadValue();
+                    }
+                    else if (keyboard != null)
+                    {
+                        if (keyboard.qKey.isPressed) // Turn camera counter-clockwise
+                        {
+                            rot += 1F;
+                        }
                     
-                    if (keyboard.eKey.isPressed) // Turn camera clockwise
-                    {
-                        rot -= 1F;
+                        if (keyboard.eKey.isPressed) // Turn camera clockwise
+                        {
+                            rot -= 1F;
+                        }
                     }
                 }
             }
 
-            if (keyboard.spaceKey.isPressed) // Fly up
+            if (keyboard != null)
             {
-                fly += 1F;
-            }
+                if (keyboard.spaceKey.isPressed) // Fly up
+                {
+                    fly += 1F;
+                }
 
-            if (keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed) // Fly down
-            {
-                fly -= 1F;
+                if (keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed) // Fly down
+                {
+                    fly -= 1F;
+                }
             }
 
             float scroll = pointerOverUI ? 0F : mouse.scroll.ReadValue().y / 120F;

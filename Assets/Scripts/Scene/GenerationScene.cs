@@ -656,21 +656,24 @@ namespace MarkovCraft
             
             var cam = CamController!.ViewCamera;
             var mouse = Mouse.current;
+            var pointer = Pointer.current;
             
-            if (mouse == null) return;
+            if (mouse == null && pointer == null) return;
             
             if (cam && VolumeSelection)
             {
                 if (!VolumeSelection.Locked) // Update selected volume
                 {
-                    var mousePos = mouse.position.ReadValue();
+                    var mousePos = mouse != null ? mouse.position.ReadValue() : pointer.position.ReadValue();
                     var ray = cam.ScreenPointToRay(mousePos);
 
                     if (!EventSystem.current.IsPointerOverGameObject() && Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 1000F, VolumeLayerMask))
                     {
                         UpdateSelectedResult(hit.collider.gameObject.GetComponentInParent<GenerationResult>());
 
-                        if (mouse.leftButton.wasPressedThisFrame && selectedResult!.Completed) // Lock can only be applied to completed results
+                        var clicked = mouse != null ? mouse.leftButton.wasPressedThisFrame : pointer.wasUpdatedThisFrame;
+
+                        if (clicked && selectedResult!.Completed) // Lock can only be applied to completed results
                         {
                             // Lock volume selection
                             VolumeSelection!.Lock();
@@ -691,7 +694,7 @@ namespace MarkovCraft
                 {
                     if (!EventSystem.current.IsPointerOverGameObject())
                     {
-                        var mousePos = mouse.position.ReadValue();
+                        var mousePos = mouse != null ? mouse.position.ReadValue() : pointer.position.ReadValue();
                         var ray = cam.ScreenPointToRay(mousePos);
 
                         // Volume is still locked, update block selection
