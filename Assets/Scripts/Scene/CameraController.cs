@@ -1,4 +1,3 @@
-#nullable enable
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -10,15 +9,16 @@ namespace MarkovCraft
     {
         private static readonly Plane REFERENCE_PLANE = new(Vector3.up, Vector3.zero);
         private static readonly Vector2 VIEWPORT_ROTATE_CENTER = new(0.5F, 0.3F);
-        [SerializeField] private ScreenManager? screenManager;
+        [SerializeField] private ScreenManager screenManager;
         [SerializeField] [Range( 1F, 1000F)] private float moveSpeed   =  10F;
         [SerializeField] [Range( 1F, 1000F)] private float turnSpeed   =  10F;
         [SerializeField] [Range( 1F, 1000F)] private float scrollSpeed = 500F;
         [SerializeField] [Range(10F, 1000F)] private float yPosMin   =  15F;
         [SerializeField] [Range(10F, 1000F)] private float yPosMax   = 325F;
+        [SerializeField] private JoystickPanel joystickPanel;
         private float yPosition = 0F;
 
-        public Camera? ViewCamera { get; private set; }
+        public Camera ViewCamera { get; private set; }
 
         private bool dragging = false, dragRotating = false;
         private Vector2 lastDragPos = Vector2.zero;
@@ -115,6 +115,12 @@ namespace MarkovCraft
             float fly = 0F;
             float rot = 0F;
 
+            if (joystickPanel && joystickPanel.Magnitude > 0F)
+            {
+                hor += joystickPanel.Value.x * 0.01F;
+                ver += joystickPanel.Value.y * 0.01F;
+            }
+
             if (dragRotating) // Perform dragging
             {
                 if (mouse.middleButton.isPressed)
@@ -140,12 +146,12 @@ namespace MarkovCraft
                 }
                 else
                 {
-                    if (keyboard.eKey.isPressed) // Turn camera counter-clockwise
+                    if (keyboard.qKey.isPressed) // Turn camera counter-clockwise
                     {
                         rot += 1F;
                     }
-
-                    if (keyboard.qKey.isPressed) // Turn camera clockwise
+                    
+                    if (keyboard.eKey.isPressed) // Turn camera clockwise
                     {
                         rot -= 1F;
                     }
@@ -164,6 +170,29 @@ namespace MarkovCraft
 
             float scroll = pointerOverUI ? 0F : mouse.scroll.ReadValue().y / 120F;
 
+            if (joystickPanel)
+            {
+                if (joystickPanel.ZoomInButtonIsHeld)
+                {
+                    scroll += Time.deltaTime;
+                }
+
+                if (joystickPanel.ZoomOutButtonIsHeld)
+                {
+                    scroll -= Time.deltaTime;
+                }
+
+                if (joystickPanel.RotateLeftButtonIsHeld)
+                {
+                    rot += 1F;
+                }
+
+                if (joystickPanel.RotateRightButtonIsHeld)
+                {
+                    rot -= 1F;
+                }
+            }
+
             if (rot != 0F) // Turn camera
             {
                 var ray = !ViewCamera ?
@@ -174,8 +203,8 @@ namespace MarkovCraft
                 var hitPoint = transform.position + ray.direction * dist;
                 Debug.DrawLine(hitPoint, hitPoint + Vector3.up * 50F);
 
-                var eulers = transform.eulerAngles;
-                transform.localEulerAngles = new Vector3(eulers.x, eulers.y + rot * turnSpeed * Time.deltaTime, eulers.z);
+                var eulerAngles = transform.eulerAngles;
+                transform.localEulerAngles = new Vector3(eulerAngles.x, eulerAngles.y + rot * turnSpeed * Time.deltaTime, eulerAngles.z);
 
                 // Get ray direction after the rotation
                 var newRayDirection = !ViewCamera ? transform.forward:
