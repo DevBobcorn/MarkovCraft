@@ -1,5 +1,6 @@
 #nullable enable
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace MarkovCraft
 {
@@ -24,7 +25,10 @@ namespace MarkovCraft
 
         public override void ScreenUpdate(ScreenManager manager)
         {
-            if (Input.GetKeyDown(KeyCode.C))
+            var keyboard = Keyboard.current;
+            if (keyboard == null) return;
+
+            if (keyboard.cKey.wasPressedThisFrame)
             {
                 if (!game!.Loading)
                 {
@@ -32,7 +36,7 @@ namespace MarkovCraft
                     manager.SetActiveScreenByType<ConfiguredModelEditorScreen>();
                 }
             }
-            else if (Input.GetKeyDown(KeyCode.Escape))
+            else if (keyboard.escapeKey.wasPressedThisFrame)
             {
                 if (!game!.Loading)
                 {

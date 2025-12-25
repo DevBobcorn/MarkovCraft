@@ -1,5 +1,6 @@
 #nullable enable
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace MarkovCraft
 {
@@ -12,7 +13,7 @@ namespace MarkovCraft
 
         public override void ScreenUpdate(ScreenManager manager)
         {
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Keyboard.current?.escapeKey.wasPressedThisFrame == true)
             {
                 BackToGame();
             }

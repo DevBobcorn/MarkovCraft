@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using TMPro;
 using CraftSharp;
@@ -203,7 +204,7 @@ namespace MarkovCraft
         {
             if (working) return;
             
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Keyboard.current?.escapeKey.wasPressedThisFrame == true)
             {
                 manager.SetActiveScreenByType<WelcomeScreen>();
             }

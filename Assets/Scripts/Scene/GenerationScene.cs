@@ -12,6 +12,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 using Unity.Mathematics;
 using TMPro;
 
@@ -654,18 +655,22 @@ namespace MarkovCraft
             if (screenManager && !screenManager.AllowsMovementInput) return;
             
             var cam = CamController!.ViewCamera;
+            var mouse = Mouse.current;
+            
+            if (mouse == null) return;
             
             if (cam && VolumeSelection)
             {
                 if (!VolumeSelection.Locked) // Update selected volume
                 {
-                    var ray = cam.ScreenPointToRay(Input.mousePosition);
+                    var mousePos = mouse.position.ReadValue();
+                    var ray = cam.ScreenPointToRay(mousePos);
 
                     if (!EventSystem.current.IsPointerOverGameObject() && Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 1000F, VolumeLayerMask))
                     {
                         UpdateSelectedResult(hit.collider.gameObject.GetComponentInParent<GenerationResult>());
 
-                        if (Input.GetKeyDown(KeyCode.Mouse0) && selectedResult!.Completed) // Lock can only be applied to completed results
+                        if (mouse.leftButton.wasPressedThisFrame && selectedResult!.Completed) // Lock can only be applied to completed results
                         {
                             // Lock volume selection
                             VolumeSelection!.Lock();
@@ -686,7 +691,8 @@ namespace MarkovCraft
                 {
                     if (!EventSystem.current.IsPointerOverGameObject())
                     {
-                        var ray = cam.ScreenPointToRay(Input.mousePosition);
+                        var mousePos = mouse.position.ReadValue();
+                        var ray = cam.ScreenPointToRay(mousePos);
 
                         // Volume is still locked, update block selection
                         if (selectedResult && Physics.Raycast(ray.origin, ray.direction, out RaycastHit hit, 1000F, BlockMeshLayerMask)) // Mouse pointer is over a block
@@ -697,7 +703,7 @@ namespace MarkovCraft
                             var (x, y, z, unityPos, item) = selectedResult.GetBlockPosInVolume(blockPos);
                             UpdateBlockSelection(item, $"({x}, {y}, {z})");
 
-                            /* if (item == null && Input.GetKeyDown(KeyCode.Mouse0)) // Unlock volume
+                            /* if (item == null && Mouse.current?.leftButton.wasPressedThisFrame == true) // Unlock volume
                             {
                                 UnlockSelectedResult();
                             } */
@@ -707,7 +713,7 @@ namespace MarkovCraft
                         }
                         else // Mouse pointer is over no block
                         {
-                            /* if (Input.GetKeyDown(KeyCode.Mouse0)) // Unlock volume
+                            /* if (Mouse.current?.leftButton.wasPressedThisFrame == true) // Unlock volume
                             {
                                 UnlockSelectedResult();
                             } */

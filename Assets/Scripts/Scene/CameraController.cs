@@ -1,6 +1,7 @@
 #nullable enable
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 namespace MarkovCraft
 {
@@ -20,7 +21,7 @@ namespace MarkovCraft
         public Camera? ViewCamera { get; private set; }
 
         private bool dragging = false, dragRotating = false;
-        private Vector3 lastDragPos = Vector2.zero;
+        private Vector2 lastDragPos = Vector2.zero;
         private Vector3? targetPos = null;
 
         public void SetCenterPosition(Vector3 newCenter)
@@ -63,13 +64,22 @@ namespace MarkovCraft
                 return;
             }
 
+            var mouse = Mouse.current;
+            var keyboard = Keyboard.current;
+
+            if (mouse == null || keyboard == null)
+            {
+                dragging = false;
+                return;
+            }
+
             var pointerOverUI = EventSystem.current.IsPointerOverGameObject();
 
             if (dragging) // Perform dragging
             {
-                if (Input.GetMouseButton(1))
+                if (mouse.rightButton.isPressed)
                 {
-                    var curDragPos = Input.mousePosition;
+                    var curDragPos = mouse.position.ReadValue();
                     var dragOffset = curDragPos - lastDragPos;
 
                     var dragMultiplier = yPosition / yPosMax * 0.3F;
@@ -88,23 +98,28 @@ namespace MarkovCraft
             }
             else // Check start dragging
             {
-                if (!dragRotating && Input.GetMouseButton(1) && !pointerOverUI)
+                if (!dragRotating && mouse.rightButton.isPressed && !pointerOverUI)
                 {
                     dragging = true;
-                    lastDragPos = Input.mousePosition;
+                    lastDragPos = mouse.position.ReadValue();
                 }
             }
 
-            float hor = Input.GetAxis("Horizontal");
-            float ver = Input.GetAxis("Vertical");
+            float hor = 0F;
+            if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed) hor -= 1F;
+            if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed) hor += 1F;
+
+            float ver = 0F;
+            if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed) ver -= 1F;
+            if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed) ver += 1F;
             float fly = 0F;
             float rot = 0F;
 
             if (dragRotating) // Perform dragging
             {
-                if (Input.GetMouseButton(2))
+                if (mouse.middleButton.isPressed)
                 {
-                    var curDragPos = Input.mousePosition;
+                    var curDragPos = mouse.position.ReadValue();
                     var dragOffset = curDragPos - lastDragPos;
 
                     rot = dragOffset.x * Time.deltaTime * 30F;
@@ -118,36 +133,36 @@ namespace MarkovCraft
             }
             else // Check start dragging
             {
-                if (!dragging && Input.GetMouseButton(2) && !pointerOverUI)
+                if (!dragging && mouse.middleButton.isPressed && !pointerOverUI)
                 {
                     dragRotating = true;
-                    lastDragPos = Input.mousePosition;
+                    lastDragPos = mouse.position.ReadValue();
                 }
                 else
                 {
-                    if (Input.GetKey(KeyCode.E)) // Turn camera counter-clockwise
+                    if (keyboard.eKey.isPressed) // Turn camera counter-clockwise
                     {
                         rot += 1F;
                     }
 
-                    if (Input.GetKey(KeyCode.Q)) // Turn camera clockwise
+                    if (keyboard.qKey.isPressed) // Turn camera clockwise
                     {
                         rot -= 1F;
                     }
                 }
             }
 
-            if (Input.GetKey(KeyCode.Space)) // Fly up
+            if (keyboard.spaceKey.isPressed) // Fly up
             {
                 fly += 1F;
             }
 
-            if (Input.GetKey(KeyCode.LeftShift)) // Fly down
+            if (keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed) // Fly down
             {
                 fly -= 1F;
             }
 
-            float scroll = pointerOverUI ? 0F : Input.GetAxis("Mouse ScrollWheel");
+            float scroll = pointerOverUI ? 0F : mouse.scroll.ReadValue().y / 120F;
 
             if (rot != 0F) // Turn camera
             {

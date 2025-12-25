@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 using CraftSharp;
 using System.Linq;
@@ -61,7 +62,7 @@ namespace MarkovCraft
 
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.F11)) // Toggle full screen
+            if (Keyboard.current?.f11Key.wasPressedThisFrame == true) // Toggle full screen
             {
                 if (Screen.fullScreen)
                 {
