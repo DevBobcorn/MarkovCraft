@@ -128,7 +128,7 @@ namespace MarkovCraft
                 if (modelTable.TryGetValue(stateId, out var stateModel))
                 {
                     var blockGeometry = stateModel.Geometries[0];
-                    var blockTint = statePalette.GetBlockColor(stateId, DummyWorld, BlockLoc.Zero);
+                    var blockTint = ColorConvert.GetFloat3(statePalette.GetBlockColor(stateId, DummyWorld, BlockLoc.Zero));
 
                     buffers[layer] = new VertexBuffer(blockGeometry.GetVertexCount(0b111111));
 
