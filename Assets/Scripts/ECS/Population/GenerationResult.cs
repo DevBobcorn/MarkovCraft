@@ -374,8 +374,8 @@ namespace MarkovCraft
                             if (cullFlags != 0b000000)// If at least one face is visible
                             {
                                 var cubeTint = ResultPalette[value].Color;
-                                CubeGeometry.Build(visualBuffer[renderTypeIndex], ref vertexOffset[renderTypeIndex], new(ix, iz, iy), ResourcePackManager.BLANK_TEXTURE, cullFlags,
-                                        new(cubeTint.r / 255F, cubeTint.g / 255F, cubeTint.b / 255F));
+                                CubeGeometry.Build(visualBuffer[renderTypeIndex], ref vertexOffset[renderTypeIndex], new(ix, iz, iy),
+                                        ResourcePackManager.BLANK_TEXTURE, cullFlags, (cubeTint.r << 16) | (cubeTint.g << 8) | cubeTint.b);
                             }
                         }
                         else
@@ -407,7 +407,7 @@ namespace MarkovCraft
                                     posOffset = new(ix, iz, iy);
                                 }
 
-                                var blockTint = ColorConvert.GetFloat3(statePalette.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero));
+                                var blockTint = statePalette.GetBlockColor(stateId, GameScene.DummyWorld, BlockLoc.Zero);
                                 stateModelTable[stateId].Geometries[0].Build(visualBuffer[renderTypeIndex], ref vertexOffset[renderTypeIndex],
                                         posOffset, cullFlags, 0, 0F, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
                             }

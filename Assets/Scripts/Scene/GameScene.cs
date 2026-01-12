@@ -117,7 +117,7 @@ namespace MarkovCraft
             // #0 is default cube mesh
             uint vertOffsetCube = 0;
             buffers[0] = new VertexBuffer(CubeGeometry.GetVertexCount(0b111111));
-            CubeGeometry.Build(buffers[0], ref vertOffsetCube, float3.zero, ResourcePackManager.BLANK_TEXTURE, 0b111111, new float3(1F));
+            CubeGeometry.Build(buffers[0], ref vertOffsetCube, float3.zero, ResourcePackManager.BLANK_TEXTURE, 0b111111, 0xFFFFFF);
 
             var modelTable = ResourcePackManager.Instance.StateModelTable;
             
@@ -128,7 +128,7 @@ namespace MarkovCraft
                 if (modelTable.TryGetValue(stateId, out var stateModel))
                 {
                     var blockGeometry = stateModel.Geometries[0];
-                    var blockTint = ColorConvert.GetFloat3(statePalette.GetBlockColor(stateId, DummyWorld, BlockLoc.Zero));
+                    var blockTint = statePalette.GetBlockColor(stateId, DummyWorld, BlockLoc.Zero);
 
                     buffers[layer] = new VertexBuffer(blockGeometry.GetVertexCount(0b111111));
 
@@ -140,7 +140,7 @@ namespace MarkovCraft
                     buffers[layer] = new VertexBuffer(CubeGeometry.GetVertexCount(0b111111));
 
                     Debug.LogWarning($"Model for block state #{stateId} ({statePalette.GetByNumId(stateId)}) is not available. Using cube model instead.");
-                    CubeGeometry.Build(buffers[layer], ref vertOffset, float3.zero, ResourcePackManager.BLANK_TEXTURE, 0b111111, new float3(1F));
+                    CubeGeometry.Build(buffers[layer], ref vertOffset, float3.zero, ResourcePackManager.BLANK_TEXTURE, 0b111111, 0xFFFFFF);
                 }
             }
 

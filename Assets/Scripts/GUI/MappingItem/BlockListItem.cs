@@ -33,7 +33,7 @@ namespace MarkovCraft
                 uint vertOffset = 0;
 
                 var material = GameScene.Instance.MaterialManager!.GetAtlasMaterial(BlockStatePalette.INSTANCE.RenderTypeTable[blockId]);
-                var blockTint = ColorConvert.GetFloat3(BlockStatePalette.INSTANCE.GetBlockColor(defaultStateId, GameScene.DummyWorld, BlockLoc.Zero));
+                var blockTint = BlockStatePalette.INSTANCE.GetBlockColor(defaultStateId, GameScene.DummyWorld, BlockLoc.Zero);
 
                 geometry.Build(visualBuffer, ref vertOffset, BlockStatePreview.ITEM_CENTER, BlockStatePreview.PREVIEW_CULLFLAG,
                         0, 0F, BlockStatePreview.DUMMY_BLOCK_VERT_LIGHT, blockTint);
