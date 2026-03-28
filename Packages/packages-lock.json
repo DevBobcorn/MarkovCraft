@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "com.boxqkrtm.ide.cursor": {
+      "version": "https://github.com/boxqkrtm/com.unity.ide.cursor.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.test-framework": "1.1.9"
+      },
+      "hash": "fd8ff1fb700caf062eb5cce364c1d0a85f99ebe6"
+    },
     "com.devbobcorn.craftsharp": {
       "version": "https://github.com/DevBobcorn/CraftSharp.git",
       "depth": 0,
@@ -10,14 +19,13 @@
       "hash": "a2330b4edd379912fd465045dbac0bac280560b0"
     },
     "com.devbobcorn.craftsharp-resource": {
-      "version": "https://github.com/DevBobcorn/CraftSharp-Resource.git",
+      "version": "file:com.devbobcorn.craftsharp-resource",
       "depth": 0,
-      "source": "git",
+      "source": "embedded",
       "dependencies": {
         "com.unity.mathematics": "1.2.6",
-        "com.devbobcorn.craftsharp": "4.22.0"
-      },
-      "hash": "8e211c295002e448f6953ae4317d64d4b8407729"
+        "com.devbobcorn.craftsharp": "4.29.0"
+      }
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",

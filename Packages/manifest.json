@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.boxqkrtm.ide.cursor": "https://github.com/boxqkrtm/com.unity.ide.cursor.git",
     "com.devbobcorn.craftsharp": "https://github.com/DevBobcorn/CraftSharp.git",
     "com.devbobcorn.craftsharp-resource": "https://github.com/DevBobcorn/CraftSharp-Resource.git",
     "com.unity.2d.sprite": "1.0.0",
