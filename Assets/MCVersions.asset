@@ -33,4 +33,9 @@ MonoBehaviour:
     ResPackFormatInt: 32
     DataVersion: 1.20.6
     ResourceVersion: 1.20.6
+  - Name: MC 1.21.11
+    DataVersionInt: 4671
+    ResPackFormatInt: 75
+    DataVersion: 1.20.6
+    ResourceVersion: 1.21.11
   SelectedVersion: 0
